@@ -1,0 +1,17 @@
+runtime: python
+entrypoint: gunicorn -b :$PORT main:app
+instance_class: F1
+default_expiration: "1m"
+
+runtime_config:
+    python_version: 3
+
+handlers:
+-   url: /static
+    static_dir: static/
+    secure: always
+    expiration: '5m'
+
+automatic_scaling:
+    min_instances: 0
+    max_instances: 1
