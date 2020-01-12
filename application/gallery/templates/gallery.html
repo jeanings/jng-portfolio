@@ -1,0 +1,96 @@
+{% extends "layout.html" %}
+{% block title %}
+    {{ title }}
+{% endblock %}
+{% block content %}
+<section class="pages-section">
+    <script type="text/javascript">
+        var captions = {{ captions|tojson }}
+    </script>
+    <div class="gallery-container">
+        <div class="gallery-grid">
+            <div class="showcase-container">
+                <h2>
+                    <i class="fas fa-angle-up" id="minimize-gallery-description"></i>
+                </h2>
+                <p class="gallery-description" id="gallery-text-open">
+                    This page needs a bit of an explanation; short summary is the images are sorted by their 
+                    main colour.  If you just want to click through the gallery, close this section with the arrow above.  
+                    Except for a few shots, all the photos are taken with my trusty 
+                    <a href="https://en.wikipedia.org/wiki/Panasonic_Lumix_DMC-LX7">Lumix LX7</a>.
+                    <br></br>
+                    Since building this website, I knew I wanted to implement some sort of gallery, 
+                    but not just any kind.  I wanted something that would enable me to learn about a 
+                    new-to-me tool, and thinking back to the first online introductory CS course I took,   
+                    <a href="https://www.edx.org/course/cs50s-introduction-to-computer-science">CS50</a>, 
+                    a large portion of the course was about sorting.
+                    <br></br>
+                    With so many colours in an image, 2<sup>24</sup> in 24bit images, the lines between colours
+                    are a blur, as the colours we see are gradients and not solids.  Because I just want a rough 
+                    approximation of the main dominant colour of an image, I needed a tool that can help with 
+                    grouping similar colours together.  Sticking with Python, I came across the 
+                    <a href="https://scikit-image.org/">scikit-image</a> image processing module with clustering 
+                    methods that can help with what I'm visualizing.
+                    <br></br>
+                    As I've learned, this clustering of similar colours is called quantization, and the steps I took 
+                    to sort this gallery is as follows:
+                    <br></br>
+                    <ol class="gallery-description">
+                        <li>Shrink images by 70% (it takes forever on full-sized images)</li>
+                        <li>Set amount of clusters to 8, meaning I only want 8 colours (I did say rough approximation)</li>
+                        <li>Save each quantized image, which is the reduced image you see pulsing below</li>
+                        <li>Take the HSL colour value with the most pixel count</li>
+                        <li>In a list containing all the images' data, sort according to hue</li>
+                        <li>Tie it all up and display on this page</li>
+                    </ol>
+                </p>
+                <div class="poster-caption-container">
+                    <figure>
+                        <div class="poster-container">
+                            <div class="poster-container poster">
+                                <!-- <img id="poster" src="/static/images/gallery/2017-04-27%20066.jpg">    LOCAL DEV -->
+                                <img id="poster" src="https://storage.googleapis.com/jn-portfolio/gallery/2017-04-27%20066.jpg">
+                            </div>
+                            <div class="poster-container quantized">
+                                <!-- <img id="quantized" src="/static/images/gallery/quantized/2017-04-27%20066.jpg">   LOCAL DEV -->
+                                <img id="quantized" src="https://storage.googleapis.com/jn-portfolio/gallery/quantized/2017-04-27%20066.jpg">
+                            </div>
+                        </div>
+                        <figcaption id="caption">
+                            Seaside Diner
+                            <!-- <h2 id="offset"></h2> -->
+                        </figcaption>
+                    </figure>
+                </div>
+            </div>
+            <div class="swatch-container">
+            {%- for swatch in swatches -%}
+                {% set sat, lum = 0, 0 %}
+                {%- if swatch[1][1] <= 15 -%}
+                    {% set sat = 10 %}
+                {%- elif swatch[1][1] >= 70 -%}
+                    {% set sat = -10 %}
+                {%- endif -%}
+                {%- if swatch[1][2] >= 70 -%}
+                    {% set lum = -25 %}
+                {%- elif swatch[1][2] <= 15 -%}
+                    {% set lum = 10 %}
+                {%- endif -%}
+                <style>
+                    #swatch-{{ loop.index }} {
+                        background: hsl({{ swatch[1][0] }}, {{ swatch[1][1] + sat }}%, {{ swatch[1][2] + lum }}%);
+                    }
+                    #swatch-{{ loop.index }}:hover {
+                        background: none;
+                    }
+                </style>
+                <div class="swatch-tiles" id="swatch-{{ loop.index }}">
+                    <img class="swatch-images" src="{{ 'https://storage.googleapis.com/jn-portfolio/gallery/thumbs/' + swatch[0] }}" 
+                        data-hi-res-src="{{ 'https://storage.googleapis.com/jn-portfolio/gallery/hi_res/' + swatch[0] }}">
+                </div>
+            {%- endfor -%}
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

@@ -1,0 +1,192 @@
+/* ----------------------------------------------------------------- */
+/*                              Landing                              */
+/* ----------------------------------------------------------------- */
+.cityscape {
+    display: grid;
+    position: relative;
+    /* align-items: center; blanks*/
+    width: 100vw;
+    height: 130vh;
+    grid-template-columns: 1fr;
+    grid-template-rows: 1fr;
+}
+    .cityscape .layers {
+        position: relative;
+        height: 100%;
+        grid-column-start: 1;
+        grid-row-start: 1;
+        object-fit: cover;
+        transition: opacity 1000ms ease-in-out;
+    }
+        .deep-dof {
+            pointer-events: none;
+            opacity: 1;
+        }
+
+        .shallow-dof {
+            pointer-events: none;
+            opacity: 0;
+        }
+
+    #layer1 {
+        background: url("https://storage.googleapis.com/jn-portfolio/index/images/city01.png") center no-repeat;
+        z-index: 1;
+    }
+        #layer1b {
+            background: url("https://storage.googleapis.com/jn-portfolio/index/images/city01b.png") center no-repeat;
+            transition: opacity 2000ms ease-in-out;
+            z-index: 1;
+        }
+
+    #layer2 {
+        background: url("https://storage.googleapis.com/jn-portfolio/index/images/city02.png") center no-repeat;
+        transition: opacity 2000ms ease-in-out;
+        z-index: -1;
+    }
+        #layer2b {
+            background: url("https://storage.googleapis.com/jn-portfolio/index/images/city02b.png") center no-repeat;
+            transition: opacity 2000ms ease-in-out;
+            z-index: 0;
+        }
+        #layer2c {
+            background: url("https://storage.googleapis.com/jn-portfolio/index/images/city02c.png") center no-repeat;
+            transition: opacity 2000ms ease-in-out;
+            z-index: 1;
+        }
+
+    #layer3 {
+        background: url("https://storage.googleapis.com/jn-portfolio/index/images/city03.png") center no-repeat;
+        z-index: -2;
+    }
+        #layer3b {
+            background: url("https://storage.googleapis.com/jn-portfolio/index/images/city03b.png") center no-repeat;
+            z-index: -2;
+        }
+
+    #layer4 {
+        background: url("https://storage.googleapis.com/jn-portfolio/index/images/city04.png") center no-repeat;
+        z-index: -3;
+    }
+        #layer4b {
+            background: url("https://storage.googleapis.com/jn-portfolio/index/images/city04b.png") center no-repeat;
+            z-index: -3;
+        }
+
+    #layer5 {
+        background: url("https://storage.googleapis.com/jn-portfolio/index/images/city05.png") center no-repeat;
+        z-index: -4;
+    }
+        #layer5b {
+            background: url("https://storage.googleapis.com/jn-portfolio/index/images/city05b.png") center no-repeat;
+            z-index: -4;
+        }
+
+    #layer6 {
+        background: url("https://storage.googleapis.com/jn-portfolio/index/images/city06.png") center no-repeat;
+        z-index: -5;
+    }
+        #layer6b {
+            background: url("https://storage.googleapis.com/jn-portfolio/index/images/city06b.png") center no-repeat;
+            z-index: -5;
+        }
+
+    #layer7 {
+        background: url("https://storage.googleapis.com/jn-portfolio/index/images/city07.png") center no-repeat;
+        z-index: -6;
+    }
+        #layer7b {
+            background: url("https://storage.googleapis.com/jn-portfolio/index/images/city07b.png") center no-repeat;
+            z-index: -6;
+        }
+
+    #layer8 {
+        background: url("https://storage.googleapis.com/jn-portfolio/index/images/city08.png") center no-repeat;
+        z-index: -7;
+    }
+        #layer8b {
+            background: url("https://storage.googleapis.com/jn-portfolio/index/images/city08b.png") center no-repeat;
+            z-index: -7;
+        }
+
+    #layer9 {
+        background: url("https://storage.googleapis.com/jn-portfolio/index/images/city09.png") center no-repeat;
+        z-index: -8;
+    }
+        #layer9b {
+            background: url("https://storage.googleapis.com/jn-portfolio/index/images/city09b.png") center no-repeat;
+            z-index: -8;
+        }
+
+    #layer10 {
+        background: url("https://storage.googleapis.com/jn-portfolio/index/images/city10.png") center no-repeat;
+        z-index: -9;
+    }
+        #layer10b {
+            background: url("https://storage.googleapis.com/jn-portfolio/index/images/city10b.png") center no-repeat;
+            z-index: -9;
+        }
+
+    #layer11 {
+        background: url("https://storage.googleapis.com/jn-portfolio/index/images/city11.png") center no-repeat;
+        z-index: -10;
+    }
+        #layer11b {
+            background: url("https://storage.googleapis.com/jn-portfolio/index/images/city11b.png") center no-repeat;
+            z-index: -10;
+        }
+
+    #layer12 {
+        background: url("https://storage.googleapis.com/jn-portfolio/index/images/city12.png") center no-repeat;
+        z-index: -11;
+    }
+        #layer12b {
+            background: url("https://storage.googleapis.com/jn-portfolio/index/images/city12b.png") center no-repeat;
+            z-index: -11;
+        }
+
+    #layer13 {
+        background: url("https://storage.googleapis.com/jn-portfolio/index/images/city13b.png") center no-repeat;
+        z-index: -12;
+    }
+
+
+
+    
+/* ------------------------------------------------------------------ */
+/*                            About page                              */
+/* ------------------------------------------------------------------ */
+.about-container {
+    display: grid;
+    position: relative;
+    background-color: #5f5c5b;
+    max-width: 100%;
+    height: auto;
+    grid-template-columns: 1fr;
+    grid-template-rows: 1fr 7fr;
+    /* align-items: center; */
+    /* justify-content: center; */
+    padding: 9rem !important;
+    /* padding: 7rem 7rem 7rem 7rem; */
+    color: #cdcdcd;
+}
+    .about-container h1 {
+        position: relative;
+        text-shadow: 5px 5px #000000;
+    }
+    .about-container p {
+        position: relative;
+        margin-top: 2rem !important;
+    }
+    .about-container a {
+        color: rgb(122, 199, 21);
+        text-decoration: none;
+        transition: all 500ms;
+    }
+        .about-container a:visited {
+            color: rgb(122, 199, 21);
+        }
+        .about-container a:hover {
+            background: #d4d4d4;
+            color: #5f5c5b;
+            transition: all 500ms;
+        }
