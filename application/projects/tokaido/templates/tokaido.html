@@ -1,0 +1,14 @@
+{% extends "tokaido/layout.html" %}
+{% block title %}
+    {{ title }}
+{% endblock %}
+{% block content %}     
+<section>
+    <div class="map-container">
+        <div id="map">
+        </div>
+    </div>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB2yha2ZLvYxA5ItwIm-Miul9bMFz4r3N4&callback=initMap">
+    </script>
+</section>
+{% endblock %}

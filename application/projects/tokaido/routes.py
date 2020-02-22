@@ -1,5 +1,5 @@
 #------------------------------------------
-# Route for projects page.
+# Route for tokaido page.
 #------------------------------------------
 
 from flask import Blueprint, render_template
@@ -8,13 +8,12 @@ from .assets import build_assets
 
 
 # Blueprint config.
-projects_bp = Blueprint('projects_bp', __name__, 
+tokaido_bp = Blueprint('tokaido_bp', __name__, 
                         static_folder='static', 
                         template_folder='templates')
 build_assets(app)
 
-
-# Projects route.
-@projects_bp.route("/projects", methods=['GET'])
+# Tokaido route.
+@tokaido_bp.route('/tokaido_urban_hike', methods=['GET'])
 def projects():
-    return render_template("projects.html", title="Projects")
+    return render_template('tokaido.html', title="Urban hiking the Tokaido")

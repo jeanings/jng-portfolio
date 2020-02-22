@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta http-equiv="X-UA-Compatible" content="ie=edge">
+        {% include 'projects/script1.html' %}
+        <link href="https://fonts.googleapis.com/css?family=Abel|Antic+Slab|VT323&display=swap" rel="stylesheet">
+        <script src="https://kit.fontawesome.com/6bf4161487.js"></script>
+        <title>
+            {% block title %}{% endblock %}
+        </title>
+    </head>
+    
+    <body class="pages-body"></body>
+        <div class="pages-body" id="pages-loader">
+            <header class="top">
+                <div class="top-greet-pages">
+                    <h1 id="greeting">Welcome.</h1>
+                </div>
+                {% include 'nav.html' %}
+            </header>
+        
+{% block content %}        
+{% endblock %}
+
+        </div>
+        {% include 'projects/script2.html' %}
+    </body>
+</html>
