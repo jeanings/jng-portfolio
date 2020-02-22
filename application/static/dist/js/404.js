@@ -45,6 +45,8 @@ document.querySelectorAll("a[href^='#']").forEach(anchor => {
   } else if (currentPath == "/projects") {
     document.getElementById("greeting").textContent = "Projects";
     menuItems.childNodes[7].style.display = "none";
+  } else if (currentPath == "/projects/tokaido_urban_hike") {
+    document.getElementById("greeting").textContent = "Urban Hiking: Tokaido";
   } else {
     document.getElementById("greeting").textContent = "Page not found!";
   }

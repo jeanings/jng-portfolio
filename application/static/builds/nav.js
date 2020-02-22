@@ -11,6 +11,8 @@
     } else if (currentPath == "/projects") {
       document.getElementById("greeting").textContent = "Projects";
       menuItems.childNodes[7].style.display = "none";
+    } else if (currentPath == "/projects/tokaido_urban_hike") {
+      document.getElementById("greeting").textContent = "Urban Hiking the 東海道";
     } else {
       document.getElementById("greeting").textContent = "Page not found!";
     }
@@ -25,8 +27,6 @@
     const menuSlider = document.getElementById("menu");
     const menuBtnOpen = document.getElementById("menu-open");
     const menuBtnClose = document.getElementById("menu-close");
-    const galleryBtn = document.getElementById("minimize-gallery-description");
-    const galleryText = document.getElementsByClassName("gallery-description");
     var isMouseDown = false;
     
     // Pulls out menu list on click, closes on click
@@ -54,16 +54,6 @@
       if (!isMouseDown) {
         menuSlider.classList.remove("slide-left-toggle");
       }
-    }, true);
-  
-    if (galleryBtn) {
-      galleryBtn.addEventListener("click", function() {
-        for (var i = 0; i < galleryText.length; i++) {
-          galleryText[i].classList.toggle("gallery-text-toggle");
-        }
-        galleryBtn.classList.toggle("toggle");
-      });
-    }
-    
+    }, true);    
   })();
   

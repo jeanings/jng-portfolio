@@ -1,3 +1,19 @@
+// Button toggles
+(function galleryToggle() {
+  const galleryBtn = document.getElementById("minimize-gallery-description");
+  const galleryText = document.getElementsByClassName("gallery-description");
+  
+  if (galleryBtn) {
+    galleryBtn.addEventListener("click", function() {
+      for (var i = 0; i < galleryText.length; i++) {
+        galleryText[i].classList.toggle("gallery-text-toggle");
+      }
+      galleryBtn.classList.toggle("toggle");
+    });
+  }
+})();
+
+
 // Gallery: changing mainspread picture (event delegation)
 document.addEventListener("DOMContentLoaded", function() {
   const poster = document.getElementById("poster");
@@ -26,7 +42,7 @@ document.addEventListener("DOMContentLoaded", function() {
         event.path[1].style.background = "none";
 
         // Match poster image with its caption from Python dict.
-        fileName = imgPath[6].split("%20");
+        fileName = imgPath[5].split("%20");
         fileName = fileName[0] + " " + fileName[1];
         caption = captions[fileName];
         captionText.textContent = caption;
@@ -38,7 +54,7 @@ document.addEventListener("DOMContentLoaded", function() {
             poster.classList.remove("fade"), 500);
           imgPath = poster.src.split("/");
           quantized.src = imgPath[0] + "//" + imgPath[1] + "/" + imgPath[2] + "/" + 
-              imgPath[3] + "/" + imgPath[4] + "/quantized/" + imgPath[5];
+              imgPath[3] + "/" + imgPath[4] + "/quantized/" + imgPath[6];
 
           // Keeps viewed swatches popped out.
           event.target.style.opacity = "1";
@@ -46,7 +62,7 @@ document.addEventListener("DOMContentLoaded", function() {
           event.path[1].style.background = "none";
 
           // Match poster image with its caption from Python dict.
-          fileName = imgPath[7].split("%20");
+          fileName = imgPath[6].split("%20");
           fileName = fileName[0] + " " + fileName[1];
           caption = captions[fileName];
           captionText.textContent = caption;
