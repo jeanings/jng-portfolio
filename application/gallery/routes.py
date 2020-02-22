@@ -10,7 +10,6 @@ import numpy as np
 import csv
 
 
-
 # Blueprint config.
 gallery_bp = Blueprint('gallery_bp', __name__, 
                         static_folder='static', 

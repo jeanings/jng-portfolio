@@ -14,14 +14,15 @@ def build_assets(app):
     css_bundle = Bundle(
                     'builds/style.css',
                     'builds/gallery/gallery.css',
-                    filters='cssmin',
+                    'builds/media_res.css',
+                    # filters='cssmin',
                     output='dist/css/gallery.css')
 
     js_bundle = Bundle(
                     'builds/main.js',
                     'builds/nav.js',
                     'builds/gallery/gallery.js',
-                    filters='jsmin',
+                    # filters='jsmin',
                     output='dist/js/gallery.js')
 
 

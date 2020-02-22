@@ -17,10 +17,12 @@ def create_app():
         from .index import routes as index
         from .gallery import routes as gallery
         from .projects import routes as projects
+        from .projects.tokaido import routes as tokaido
 
         app.register_blueprint(index.index_bp)
         app.register_blueprint(gallery.gallery_bp)
         app.register_blueprint(projects.projects_bp)
+        app.register_blueprint(tokaido.tokaido_bp, url_prefix="/projects")
         app.register_error_handler(404, page_not_found)
 
         return app
