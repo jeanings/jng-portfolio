@@ -10,8 +10,8 @@ from pathlib import Path
 import numpy as np
 import matplotlib, pprint
 
-IMG_FOLDER = Path('images/')
-STATIC = Path('static/')
+IMG_FOLDER = Path.cwd() / "application" / "static" / "images"
+PROJ_FOLDER = Path.cwd() / "application" / "gallery" / "tools"
 OUTPUT = IMG_FOLDER / 'quantized'
 
 
@@ -87,7 +87,7 @@ def find_color(filename):
 def main():
     """ Crawl through images directory and quantize images to get dominant color value. """
     hsv = []
-    quantized_file = STATIC / 'hsv_list.npy'
+    quantized_file = PROJ_FOLDER / 'hsv_list.npy'
 
     # Crawls through directory, calls find_color for each image found.
     if not quantized_file.is_file():
@@ -113,7 +113,7 @@ def main():
     # Sort by hue, luminance, saturation.
     hsl_sorted = sorted(hsl_list, key=lambda x: (x[1][0], x[1][2], x[1][1]))
 
-    hsl_file = STATIC / 'hsl_list.npy'
+    hsl_file = PROJ_FOLDER / 'hsl_list.npy'
     if not hsl_file.is_file():
         np.save(hsl_file, hsl_sorted)
     

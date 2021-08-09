@@ -5,7 +5,8 @@
   
   if (galleryBtn) {
     galleryBtn.addEventListener("click", function() {
-      for (var i = 0; i < galleryText.length; i++) {
+    //for (var i = 0; i < galleryText.length; i++) {
+      for (var i = 0, n = galleryText.length; i < n; i++) {
         galleryText[i].classList.toggle("gallery-text-toggle");
       }
       galleryBtn.classList.toggle("toggle");
