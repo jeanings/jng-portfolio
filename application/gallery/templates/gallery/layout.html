@@ -12,7 +12,7 @@
         </title>
     </head>
     
-    <body class="pages-body"></body>
+    <body class="pages-body">
         <div class="pages-body" id="pages-loader">
             <header class="top">
                 <div class="top-greet-pages">
@@ -21,8 +21,8 @@
                 {% include 'nav.html' %}
             </header>
         
-{% block content %}        
-{% endblock %}
+            {% block content %}        
+            {% endblock %}
 
         </div>
         {% include 'gallery/script2.html' %}
