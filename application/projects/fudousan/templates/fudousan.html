@@ -1,0 +1,305 @@
+{% extends "fudousan/layout.html" %}
+{% block title %}
+    {{ title }}
+{% endblock %}
+{% block content %}
+
+<!-- <div class="tokaido-portrait-overlay">
+    <i class="fas fa-mobile-alt" id="tokaido-rotate"></i>
+</div> -->
+
+<section id="ui-overlay">
+    <section class="map-container">
+        <div id="map">
+            <script>
+                mapboxgl.accessToken = "{{MAPBOX_ACCESS_KEY}}";
+            </script>
+        </div>
+    </section>
+
+    <form id="filter-form">
+        <div class="filter-menu" id="filter-menu">
+            <div class="filter-home-type" id="home-types">
+                <label class="radio-home-type">
+                    <input type="radio" name="type" id="detached">
+                    <svg xmlns="http://www.w3.org/2000/svg" class='ionicon' width="100%" id="detached-icon" viewBox='0 0 512 512'>
+                        <path d='M261.56 101.28a8 8 0 00-11.06 0L66.4 277.15a8 8 0 00-2.47 5.79L63.9 448a32 32 0 0032 32H192a16 16 0 0016-16V328a8 8 0 018-8h80a8 8 0 018 8v136a16 16 0 0016 16h96.06a32 32 0 0032-32V282.94a8 8 0 00-2.47-5.79z'/><path d='M490.91 244.15l-74.8-71.56V64a16 16 0 00-16-16h-48a16 16 0 00-16 16v32l-57.92-55.38C272.77 35.14 264.71 32 256 32c-8.68 0-16.72 3.14-22.14 8.63l-212.7 203.5c-6.22 6-7 15.87-1.34 22.37A16 16 0 0043 267.56L250.5 69.28a8 8 0 0111.06 0l207.52 198.28a16 16 0 0022.59-.44c6.14-6.36 5.63-16.86-.76-22.97z'/>
+                    </svg>
+                    <!-- <i class="fas fa-home filter-home-type"></i> -->
+                </label>
+                <label class="radio-home-type">
+                    <input type="radio" name="type" id="condo">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="ionicon" width="100%" id="condo-icon" viewBox="0 0 512 512">
+                        <path d='M432 176H320V64a48 48 0 00-48-48H80a48 48 0 00-48 48v416a16 16 0 0016 16h104a8 8 0 008-8v-71.55c0-8.61 6.62-16 15.23-16.43A16 16 0 01192 416v72a8 8 0 008 8h264a16 16 0 0016-16V224a48 48 0 00-48-48zM98.08 431.87a16 16 0 1113.79-13.79 16 16 0 01-13.79 13.79zm0-80a16 16 0 1113.79-13.79 16 16 0 01-13.79 13.79zm0-80a16 16 0 1113.79-13.79 16 16 0 01-13.79 13.79zm0-80a16 16 0 1113.79-13.79 16 16 0 01-13.79 13.79zm0-80a16 16 0 1113.79-13.79 16 16 0 01-13.79 13.79zm80 240a16 16 0 1113.79-13.79 16 16 0 01-13.79 13.79zm0-80a16 16 0 1113.79-13.79 16 16 0 01-13.79 13.79zm0-80a16 16 0 1113.79-13.79 16 16 0 01-13.79 13.79zm0-80a16 16 0 1113.79-13.79 16 16 0 01-13.79 13.79zm80 320a16 16 0 1113.79-13.79 16 16 0 01-13.79 13.79zm0-80a16 16 0 1113.79-13.79 16 16 0 01-13.79 13.79zm0-80a16 16 0 1113.79-13.79 16 16 0 01-13.79 13.79zm0-80a16 16 0 1113.79-13.79 16 16 0 01-13.79 13.79zm0-80a16 16 0 1113.79-13.79 16 16 0 01-13.79 13.79zM444 464H320V208h112a16 16 0 0116 16v236a4 4 0 01-4 4z'/><path d='M400 400a16 16 0 1016 16 16 16 0 00-16-16zM400 320a16 16 0 1016 16 16 16 0 00-16-16zM400 240a16 16 0 1016 16 16 16 0 00-16-16zM336 400a16 16 0 1016 16 16 16 0 00-16-16zM336 320a16 16 0 1016 16 16 16 0 00-16-16zM336 240a16 16 0 1016 16 16 16 0 00-16-16z'/>
+                    </svg>
+                    <!-- <i class="fas fa-building filter-home-type"></i> -->
+                </label>
+            </div>
+            <div class="filter-options-container">
+                <div class="filter-options box-footage">
+                    <div class="category-title">
+                        面積 <span id="sqm">m<sup>2</sup></span>
+                    </div>
+                    <div class="radio-list">
+                        <label class="radio-item">
+                            <input type="radio" name="footage" id="10_50">
+                            <span class="radio-text">～50</span>
+                        </label>
+                        <label class="radio-item">
+                            <input type="radio" name="footage" id="50_75">
+                            <span class="radio-text">50～75</span>
+                        </label>
+                        <label class="radio-item">
+                            <input type="radio" name="footage" id="75_100">
+                            <span class="radio-text">75～100</span>
+                        </label>
+                        <label class="radio-item">
+                            <input type="radio" name="footage" id="100_150">
+                            <span class="radio-text">100～150</span>
+                        </label>
+                        <label class="radio-item">
+                            <input type="radio" name="footage" id="150_200">
+                            <span class="radio-text">150～200</span>
+                        </label>
+                        <label class="radio-item">
+                            <input type="radio" name="footage" id="200_250">
+                            <span class="radio-text">200～250</span>
+                        </label>
+                        <label class="radio-item">
+                            <input type="radio" name="footage" id="250_300">
+                            <span class="radio-text">250～300</span>
+                        </label>
+                        <label class="radio-item">
+                            <input type="radio" name="footage" id="300_350">
+                            <span class="radio-text">300～350</span>
+                        </label>
+                        <label class="radio-item">
+                            <input type="radio" name="footage" id="350_400">
+                            <span class="radio-text">350～400</span>
+                        </label>
+                        <label class="radio-item">
+                            <input type="radio" name="footage" id="400_500">
+                            <span class="radio-text">400～500</span>
+                        </label>
+                        <label class="radio-item">
+                            <input type="radio" name="footage" id="500_600">
+                            <span class="radio-text">500～600</span>
+                        </label>
+                        <label class="radio-item">
+                            <input type="radio" name="footage" id="600_">
+                            <span class="radio-text">600～</span>
+                        </label>
+                    </div>
+                </div>
+                <div class="filter-options box-age">
+                    <div class="category-title">
+                        建築年
+                    </div>
+                    <div class="radio-list">
+                        <label class="radio-item">
+                            <input type="radio" name="age" id="20_60">
+                            <span class="radio-text">～1960</span>
+                        </label>
+                        <label class="radio-item">
+                            <input type="radio" name="age" id="60_80">
+                            <span class="radio-text">1960～1980</span>
+                        </label>
+                        <label class="radio-item">
+                            <input type="radio" name="age" id="80_90">
+                            <span class="radio-text">1980～1990</span>
+                        </label>
+                        <label class="radio-item">
+                            <input type="radio" name="age" id="90_00">
+                            <span class="radio-text">1990～2000</span>
+                        </label>
+                        <label class="radio-item">
+                            <input type="radio" name="age" id="00_10">
+                            <span class="radio-text">2000～2010</span>
+                        </label>
+                        <label class="radio-item">
+                            <input type="radio" name="age" id="10_20">
+                            <span class="radio-text">2010～2020</span>
+                        </label>
+                        <label class="radio-item">
+                            <input type="radio" name="age" id="20_">
+                            <span class="radio-text">2020～</span>
+                        </label>
+                    </div>
+                </div>
+                <div class="filter-options box-station">
+                    <div class="category-title">
+                        駅徒歩分
+                    </div>
+                    <div class="radio-list">
+                        <label class="radio-item">
+                            <input type="radio" name="station" id="0_15">
+                            <span class="radio-text">～15</span>
+                        </label>
+                        <label class="radio-item">
+                            <input type="radio" name="station" id="15_30">
+                            <span class="radio-text">15～30</span>
+                        </label>
+                        <label class="radio-item">
+                            <input type="radio" name="station" id="30_45">
+                            <span class="radio-text">30～45</span>
+                        </label>
+                        <label class="radio-item">
+                            <input type="radio" name="station" id="45_">
+                            <span class="radio-text">45～</span>
+                        </label>
+                    </div>
+                </div>
+                <div class="filter-options box-mtrl">
+                    <div class="category-title">
+                        建物構造
+                    </div>
+                    <div class="radio-list">
+                        <label class="radio-item">
+                            <input type="radio" name="mtrl" id="wood">
+                            <span class="radio-text">木造</span>
+                        </label>
+                        <label class="radio-item">
+                            <input type="radio" name="mtrl" id="con">
+                            <span class="radio-text">コンクリートブロック造</span>
+                        </label>
+                        <label class="radio-item">
+                            <input type="radio" name="mtrl" id="stFrame">
+                            <span class="radio-text">鉄骨造</span>
+                        </label>
+                        <label class="radio-item">
+                            <input type="radio" name="mtrl" id="reCon">
+                            <span class="radio-text">鉄筋コンクリート造</span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+            <div class="filter-submit">
+                <div class="submit-parameters-check">
+                    <span id="check-message">ステータスOK
+                        <!-- <svg width="15%" height="0.2rem" class="check-message-cursor">
+                            <rect id="message-cursor" fill="#703cff" width="0.75rem" height="100%"></rect>
+                        </svg> -->
+                        <span class="check-message-cursor"></span>
+                    </span>
+                </div>
+                <button type="submit" value="Submit">
+                    <i class="fas fa-search"></i>
+                </button>
+                <div class="submit-tooltip" id="speech-box">
+                    <span id="submit-tooltip-text"></span>
+                </div>
+                <div class="side-buttons">
+                    <div id="citation">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="ionicon" id="citation-icon" width="100%" viewBox="0 0 512 512">
+                            <rect class="svg-catch" x="0" y="0" width="100%" height="100%" fill="transparent"/>
+                            <path d='M256 56C145.72 56 56 145.72 56 256s89.72 200 200 200 200-89.72 200-200S366.28 56 256 56zm0 82a26 26 0 11-26 26 26 26 0 0126-26zm48 226h-88a16 16 0 010-32h28v-88h-16a16 16 0 010-32h32a16 16 0 0116 16v104h28a16 16 0 010 32z'/>
+                        </svg>
+                        <div class="citation-info" id="citation-box">
+                            <span id="citation-info-text">
+                                アプリは<a href="https://www.land.mlit.go.jp/webland/servlet/MainServlet">国土交通省</a>のデータから作成。
+                                <br>
+                                2010～2020年の編集に基づいて
+                                <br>
+                                操作を実行しました。
+                            </span>
+                        </div>
+                    </div>
+                    <div id="mail">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="ionicon" id="mail-icon" width="100%" viewBox="0 0 512 512">
+                            <rect class="svg-catch" x="0" y="0" width="100%" height="100%" fill="transparent"/>
+                            <path d='M424 80H88a56.06 56.06 0 00-56 56v240a56.06 56.06 0 0056 56h336a56.06 56.06 0 0056-56V136a56.06 56.06 0 00-56-56zm-14.18 92.63l-144 112a16 16 0 01-19.64 0l-144-112a16 16 0 1119.64-25.26L256 251.73l134.18-104.36a16 16 0 0119.64 25.26z'/>
+                        </svg>
+                        <div class="mail-info" id="mail-box">
+                            <span id="mail-info-text">
+                                もしコメントや提案があったら、メールしてください！<br>
+                                ✉️<a href="#" class="say-hi"
+                                    data-name="jeanings.ng"
+                                    data-domain="gmail"
+                                    data-tld="com"
+                                    onclick="window.location.href = 'mailto:' + this.dataset.name + '@' + this.dataset.domain + '.' + this.dataset.tld; return false;">
+                                </a>
+                            </span>
+                        </div>
+                    </div>
+                    <div id="collapse">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="ionicon" id="collapse-icon" width="100%" viewBox="0 0 512 512">
+                            <rect class="svg-catch" x="0" y="0" width="100%" height="100%" fill="transparent"/>
+                            <path d='M160 136v104h153.37l-52.68-52.69a16 16 0 0122.62-22.62l80 80a16 16 0 010 22.62l-80 80a16 16 0 01-22.62-22.62L313.37 272H160v104a56.06 56.06 0 0056 56h208a56.06 56.06 0 0056-56V136a56.06 56.06 0 00-56-56H216a56.06 56.06 0 00-56 56zM48 240a16 16 0 000 32h112v-32z'/>
+                        </svg>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+    
+    <section id="price-gauge">
+        <div class="colour-bar-cell" id="c80000"></div>
+        <div class="colour-bar-numeral">8.0億</div>
+        <div class="colour-bar-cell" id="c40000"></div>
+        <div class="colour-bar-numeral">4.0億</div>
+        <div class="colour-bar-cell" id="c20000"></div>
+        <div class="colour-bar-numeral">2.0億</div>
+        <div class="colour-bar-cell" id="c15000"></div>
+        <div class="colour-bar-numeral">1.5億</div>
+        <div class="colour-bar-cell" id="c10000"></div>
+        <div class="colour-bar-numeral">1.0億</div>
+        <div class="colour-bar-cell" id="c9000"></div>
+        <div class="colour-bar-numeral">9000万</div>
+        <div class="colour-bar-cell" id="c8000"></div>
+        <div class="colour-bar-numeral">8000万</div>
+        <div class="colour-bar-cell" id="c7000"></div>
+        <div class="colour-bar-numeral">7000万</div>
+        <div class="colour-bar-cell" id="c6000"></div>
+        <div class="colour-bar-numeral">6000万</div>
+        <div class="colour-bar-cell" id="c5000"></div>
+        <div class="colour-bar-numeral">5000万</div>
+        <div class="colour-bar-cell" id="c4000"></div>
+        <div class="colour-bar-numeral">4000万</div>
+        <div class="colour-bar-cell" id="c3500"></div>
+        <div class="colour-bar-numeral">3500万</div>
+        <div class="colour-bar-cell" id="c3000"></div>
+        <div class="colour-bar-numeral">3000万</div>
+        <div class="colour-bar-cell" id="c2500"></div>
+        <div class="colour-bar-numeral">2500万</div>
+        <div class="colour-bar-cell" id="c2000"></div>
+        <div class="colour-bar-numeral">2000万</div>
+        <div class="colour-bar-cell" id="c1500"></div>
+        <div class="colour-bar-numeral">1500万</div>
+        <div class="colour-bar-cell" id="c1250"></div>
+        <div class="colour-bar-numeral">1250万</div>
+        <div class="colour-bar-cell" id="c1000"></div>
+        <div class="colour-bar-numeral">1000万</div>
+        <div class="colour-bar-cell" id="c750"></div>
+        <div class="colour-bar-numeral">750万</div>
+        <div class="colour-bar-cell" id="c500"></div>
+        <div class="colour-bar-numeral">500万</div>
+    </section>
+
+    <section id="search-stats">
+        <div class="stats-box">
+            <span class="stats-icon" id="stats-home"></span>
+            <span class="stats-icon" id="stats-puffer">🐡</span>
+            <span class="stats-param" id="param-footage"></span>
+            <span class="stats-icon" id="stats-turtle">🐢</span>
+            <span class="stats-param" id="param-age"></span>
+            <span class="stats-icon" id="stats-dog">🐕‍</span>
+            <span class="stats-param" id="param-station"></span>
+            <span class="stats-icon" id="stats-bee">🐝</span>
+            <span class="stats-param" id="param-mtrl"></span>
+        </div>
+    </section>
+    
+    <section id="dashboard">
+        <div class="info-box">
+            <span class="info-text" id="dash-title-region">地域</span>
+            <span class="info-text info-data" id="dash-data-region"></span>
+            <span class="info-text" id="dash-title-prefecture">都道府県</span>
+            <span class="info-text info-data" id="dash-data-prefecture"></span>
+            <span class="info-text" id="dash-title-city">市町村</span>
+            <span class="info-text info-data" id="dash-data-city"></span>
+            <span class="info-text" id="dash-title-price">平均価格</span>
+            <span class="info-text info-data" id="dash-data-price"></span>
+        </div>
+    </section>
+</section>
+{% endblock %}
