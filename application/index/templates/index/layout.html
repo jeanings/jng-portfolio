@@ -24,13 +24,10 @@
                 </div>
             </header>
 
-{% block content %}        
-{% endblock %}
+        {% block content %}        
+        {% endblock %}
 
         </div>
-        <!-- {% assets "index_js" %}
-            <script src="{{ ASSET_URL }}"></script>
-        {% endassets %} -->
         <script src="{{ url_for('static', filename='dist/js/index.js') }}"></script>
     </body>
 </html>

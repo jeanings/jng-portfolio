@@ -4,14 +4,14 @@
 
 from flask import Blueprint, render_template, url_for
 from flask import current_app as app
-from . import assets
+from . import assets      # COMMENT OUT FOR GAE DEPLOYMENT
 
 
 # Blueprint config.
 index_bp = Blueprint('index_bp', __name__, 
                     static_folder='static',
                     template_folder='templates')
-assets.build_assets(app)
+assets.build_assets(app)      # COMMENT OUT FOR GAE DEPLOYMENT
 
 
 # Index route.
