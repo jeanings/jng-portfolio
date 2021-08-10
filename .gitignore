@@ -5,10 +5,30 @@ __pycache__/
 
 # VSCode
 .vscode/
+portfolio.code-workspace
+
+# Configs
+.env
+Pipfile
+Pipfile.lock
 
 # Portfolio project related
 .webassets-cache/
 Takeout/
 unused/
-images/
-data/
+application/static/images/
+application/projects/tokaido/tools/data/
+application/projects/tokaido/tools/journal/
+application/projects/fudousan/tools/binned5yr/
+application/projects/fudousan/tools/binned10yr/
+application/projects/fudousan/tools/cleaned5yr/
+application/projects/fudousan/tools/cleaned10yr/
+application/projects/fudousan/tools/geo_related/
+application/projects/fudousan/tools/*.ods
+application/projects/fudousan_stats/tools/binned_data/
+application/projects/fudousan_stats/tools/japan_mlit_data/
+application/projects/fudousan_stats/tools/mongodb/
+application/projects/fudousan_stats/tools/unpacked_json/
+application/projects/fudousan_stats/tools/*.txt
+application/projects/fudousan_stats/tools/*.ods
+application/static/builds/projects/tokaido/addmarker.js
