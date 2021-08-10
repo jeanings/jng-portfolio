@@ -12,7 +12,7 @@ def build_assets(app):
     Environment.debug = False
 
     css_bundle = Bundle(
-                    'builds/style.css',
+                    'builds/projects/tokaido/style.css',
                     'builds/projects/tokaido/tokaido.css',
                     'builds/media_res.css',
                     # filters='cssmin',

@@ -4,16 +4,33 @@
 
 from flask import Blueprint, render_template
 from flask import current_app as app
-from .assets import build_assets
+from flask_sqlalchemy import SQLAlchemy
+from .assets import build_assets      # COMMENT OUT FOR GAE DEPLOYMENT
+from application.models import db, Journal
 
 
 # Blueprint config.
 tokaido_bp = Blueprint('tokaido_bp', __name__, 
                         static_folder='static', 
                         template_folder='templates')
-build_assets(app)
+build_assets(app)      # COMMENT OUT FOR GAE DEPLOYMENT
+
 
 # Tokaido route.
-@tokaido_bp.route('/tokaido_urban_hike', methods=['GET'])
-def projects():
-    return render_template('tokaido.html', title="Urban hiking the Tokaido")
+@tokaido_bp.route('/tokaido-urban-hike', methods=['GET'])
+@tokaido_bp.route('/tokaido-urban-hike/', methods=['GET'])  
+def tokaido_urban_hike():
+    """ Dynamically generate each journal entry, pulling info from database. """
+    
+    day_entries = []
+    cumulative_dist = []
+    total_dist = 545.68
+
+    for i in range(0, 27):
+        day_entry = Journal.query.filter_by(day=i).first()
+        day_entries.append(day_entry)
+        dist = float(day_entry.distance_percent_cum)
+        cumulative = total_dist - (total_dist * 0.01 * dist)
+        cumulative_dist.append("{:.2f}".format(cumulative))
+
+    return render_template('tokaido.html', title="Urban hiking the Tokaido", MAPBOX_ACCESS_KEY=app.config["MAPBOX_ACCESS_KEY"], day_entries=day_entries, totals=cumulative_dist, total=total_dist)
