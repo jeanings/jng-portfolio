@@ -12,19 +12,39 @@
         </title>
     </head>
     
-    <body class="pages-body"></body>
+    <body class="pages-body tokaido light-mode">
         <div class="pages-body" id="pages-loader">
             <header class="top">
                 <div class="top-greet-pages">
-                    <h1 id="greeting">Welcome.</h1>
+                    <h1 class="map-title" id="map-title-eng">urban<br>hiking<br>the</h1>
+                    <h1 class="map-title" id="map-title-jpn">東海道</h1>
+                    <div class="map-intro">
+                        <p>
+                            {{ day_entries[0].entry|safe }}
+                        </p>
+                    </div>
+                    <h2 class="map-instructions" id="instruct-left">
+                        <i class="fas fa-arrow-circle-up up"></i>
+                        <br>scroll<br>
+                        <i class="fas fa-arrow-circle-down down"></i>
+                    </h2>
+                    <h2 class="map-instructions" id="instruct-right">
+                        <i class="fas fa-arrow-circle-up up"></i>
+                        <br>
+                        <i class="fas fa-arrow-circle-left left"></i>
+                        move map
+                        <i class="fas fa-arrow-circle-right right"></i>
+                        <br>
+                        <i class="fas fa-arrow-circle-down down"></i>
+                    </h2>
                 </div>
-                {% include 'nav.html' %}
+                {% include 'tokaido/nav.html' %}
             </header>
-        
-{% block content %}        
-{% endblock %}
-
         </div>
+        
+        {% block content %}        
+        {% endblock %}
+
         {% include 'tokaido/script2.html' %}
     </body>
 </html>

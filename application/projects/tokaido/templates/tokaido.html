@@ -2,13 +2,105 @@
 {% block title %}
     {{ title }}
 {% endblock %}
-{% block content %}     
-<section>
+{% block content %}
+
+<div class="tokaido-portrait-overlay">
+    <i class="fas fa-mobile-alt" id="tokaido-rotate"></i>
+</div>
+
+<div class="tokaido-overlay">
+    <div class="tokaido-overlay-img">
+        <img>
+    </div>
+    <div class="tokaido-overlay-bg">
+    </div>
+</div>
+
+<section id="map-spread">
     <div class="map-container">
         <div id="map">
+        <script>
+            mapboxgl.accessToken = "{{MAPBOX_ACCESS_KEY}}";
+        </script>
         </div>
     </div>
-    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB2yha2ZLvYxA5ItwIm-Miul9bMFz4r3N4&callback=initMap">
-    </script>
+</section>
+
+<section class="journal">
+    <section class="day-tracker">
+        <a href="#day1" class="day-marker" data-tracker="day1">01</a>
+        <a href="#day2" class="day-marker" data-tracker="day2">02</a>
+        <a href="#day3" class="day-marker" data-tracker="day3">03</a>
+        <a href="#day4" class="day-marker" data-tracker="day4">04</a>
+        <a href="#day5" class="day-marker" data-tracker="day5">05</a>
+        <a href="#day6" class="day-marker" data-tracker="day6">06</a>
+        <a href="#day7" class="day-marker" data-tracker="day7">07</a>
+        <a href="#day8" class="day-marker" data-tracker="day8">08</a>
+        <a href="#day9" class="day-marker" data-tracker="day9">09</a>
+        <a href="#day10" class="day-marker" data-tracker="day10">10</a>
+        <a href="#day11" class="day-marker" data-tracker="day11">11</a>
+        <a href="#day12" class="day-marker" data-tracker="day12">12</a>
+        <a href="#day13" class="day-marker" data-tracker="day13">13</a>
+        <a href="#day14" class="day-marker" data-tracker="day14">14</a>
+        <a href="#day15" class="day-marker" data-tracker="day15">15</a>
+        <a href="#day16" class="day-marker" data-tracker="day16">16</a>
+        <a href="#day17" class="day-marker" data-tracker="day17">17</a>
+        <a href="#day18" class="day-marker" data-tracker="day18">18</a>
+        <a href="#day19" class="day-marker" data-tracker="day19">19</a>
+        <a href="#day20" class="day-marker" data-tracker="day20">20</a>
+        <a href="#day21" class="day-marker" data-tracker="day21">21</a>
+        <a href="#day22" class="day-marker" data-tracker="day22">22</a>
+        <a href="#day23" class="day-marker" data-tracker="day23">23</a>
+        <a href="#day24" class="day-marker" data-tracker="day24">24</a>
+        <a href="#day25" class="day-marker" data-tracker="day25">25</a>
+        <a href="#day26" class="day-marker" data-tracker="day26">26</a>
+    </section>
+
+    <section class="journal-entries-container">
+    {%- for day in day_entries -%}
+        {% if loop.index >= 2 %}
+            <div class="journal-entries" id="day{{ loop.index - 1 }}">
+                <h4 class="entry-row1">
+                    <div class="date">{{ day.date }}</div>
+                    <div class="moving tooltip">
+                        <i class="fas fa-stopwatch"></i> {{ day.moving }}
+                        <span class="tooltiptext">Active walking time</span>
+                    </div>
+                    <div class="distance tooltip">
+                        <i class="fas fa-drafting-compass"></i> {{ day.distance }}km
+                        <span class="tooltiptext">Today's distance walked</span>
+                    </div>
+                </h4>
+                <h4 class="entry-row2">
+                    <div class="route">{{ day.route|safe }}</div>
+                    <div class="food tooltip">
+                        <i class="fas fa-utensils"></i> ￥{{ day.food }}
+                        <span class="tooltiptext">Food cost</span>
+                    </div>
+                    <div class="distance-percent tooltip">
+                        <i class="fas fa-calendar-day"></i> {{ day.distance_percent }}% of {{ total }}km
+                        <span class="tooltiptext">Today's distance as % of total</span>
+                        <!-- &nbsp&nbsp&nbsp -->
+                    </div>
+                </h4>
+                <h4 class="entry-row3">
+                    <div class="weather">{{ day.weather|safe }} {{ day.temp }}&deg;C</div>
+                    <div class="lodging tooltip">
+                        <i class="fas fa-bed"></i> ￥{{ day.lodging }}
+                        <span class="tooltiptext">Accomodation cost</span>
+                    </div>
+                    <div class="distance-cumulative tooltip">
+                        <i class="fas fa-flag-checkered"></i> {{ day.distance_percent_cum }}% walked<!-- {{ totals[loop.index - 1] }}km remain -->
+                        <span class="tooltiptext">Walking progress</span>
+                    </div>
+                </h4>
+                <p class="entry-row4">
+                    {{ day.entry|safe }}
+                </p>
+            </div>
+        {% endif %}
+    {%- endfor -%}
+    </section>
+
 </section>
 {% endblock %}
