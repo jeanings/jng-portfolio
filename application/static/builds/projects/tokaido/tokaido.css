@@ -1,32 +1,460 @@
 /* ---------------------------------------------------------------------- */
 /*                               Tokaido page                             */
 /* ---------------------------------------------------------------------- */
+
+/* 
+.light-mode ::selection {
+    background: #4a5543;
+    color: cornsilk;
+    --boxShadow: orangered;
+}
+
+
+.dark-mode ::selection {
+    background: darkslategrey;
+    color: gold;
+    --boxShadow: goldenrod;
+}
+
+.day-tracker.dark-mode a {
+    color: gold;
+}
+
+.day-tracker.dark-mode a:hover {
+    background: dimgrey;
+}
+
+.map-intro.dark-mode,
+.journal.dark-mode {
+    background-color: dimgrey;
+    color: lightgrey;
+}
+
+.pages-body.dark-mode p:first-letter {
+    color: gold;
+}
+
+.top-greet-pages .map-title.dark-mode {
+    color: #050217;
+}
+*/
+
+/* Dark mode styling end */
+
+h3 {
+    font-size: 2rem;
+}
+
+h4 {
+    font-size: 1.5rem;
+}
+
+.tokaido-portrait-overlay {
+    display: none;
+}
+
+.nav #menu.slide-toggle {
+    height: 100%;
+}
+
+.tokaido-overlay {
+    display: grid;
+    position: fixed;
+    top: 0;
+    right: -100%;
+    opacity: 0;
+    transition: all 500ms ease-out;
+    z-index: 15;
+}
+.tokaido-overlay.open {
+    /* display: grid; */
+    width: 100vw;
+    height: 100vh;
+    top: 0;
+    right: 0;
+    opacity: 1;
+}
+.tokaido-overlay .tokaido-overlay-bg {
+    position: absolute;
+    width: 100vw;
+    height: 100vh;
+    top: 0;
+    right: 0;
+    cursor: pointer;
+    background-image: linear-gradient(to right, #ffffff, #000000 60%);
+    opacity: 0.90;
+    z-index: 15;
+}
+    .tokaido-overlay .tokaido-overlay-img {
+        max-width: 85vw;
+        max-height: 85vh;
+        margin: auto;
+        z-index: 20;
+    }
+        .tokaido-overlay-img img {
+            max-width: 85vw;
+            max-height: 85vh;
+            border: solid white 0.5rem;
+        }
+
+.map-intro {
+    grid-area: intro;
+    background-color: var(--para-bg-colour);
+    color: var(--para-font-colour);
+    opacity: 0.875;
+    line-height: 1.35;
+    padding: 5rem 3rem;
+    box-shadow: 0px 30px 55px rgba(0, 0, 0, 0.60), 
+        0 20px 20px rgba(0, 0, 0, 0.30), 
+        0 0 0 1px rgba(0, 0, 0, 0);
+    z-index: 15;
+    transition: all 500ms;
+}
+.map-intro a:hover {
+    background: var(--link-hover-bg-colour);
+    color: var(--link-font-colour);
+}
+.map-instructions {
+    margin: auto;
+    text-align: center;
+    font-size: 3.5rem;
+    color: var(--para-font-colour);
+    user-select: none;
+}
+#instruct-left {
+    grid-area: instructions-L;
+}
+#instruct-left .up {
+    margin: 1rem;
+    animation-name: instructScrollUp;
+    animation-delay: 0ms;
+    animation-duration: 2000ms;
+    animation-iteration-count: 30;
+    animation-timing-function: ease-out;
+}
+#instruct-left .down {
+    margin: 1rem;
+    animation-name: instructScrollDown;
+    animation-delay: 0ms;
+    animation-duration: 2000ms;
+    animation-iteration-count: 30;
+    animation-timing-function: ease-out;
+} 
+@keyframes instructScrollUp {
+    0% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(1rem);
+    }
+}
+@keyframes instructScrollDown {
+    0% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(-1rem);
+    }
+}
+#instruct-right {
+    grid-area: instructions-R;
+}
+#instruct-right .up {
+    margin: 1rem;
+    animation-name: instructScrollUp2;
+    animation-delay: 0ms;
+    animation-duration: 2000ms;
+    animation-iteration-count: 30;
+    animation-timing-function: ease-out;
+} 
+#instruct-right .down {
+    margin: 1rem;
+    animation-name: instructScrollDown2;
+    animation-delay: 0ms;
+    animation-duration: 2000ms;
+    animation-iteration-count: 30;
+    animation-timing-function: ease-out;
+} 
+#instruct-right .left {
+    margin: 1rem;
+    animation-name: instructScrollLeft;
+    animation-delay: 0ms;
+    animation-duration: 2000ms;
+    animation-iteration-count: 30;
+    animation-timing-function: ease-out;
+} 
+#instruct-right .right {
+    margin: 1rem;
+    animation-name: instructScrollRight;
+    animation-delay: 0ms;
+    animation-duration: 2000ms;
+    animation-iteration-count: 30;
+    animation-timing-function: ease-out;
+}
+@keyframes instructScrollUp2 {
+    0% {
+        transform: translateY(0);
+    }
+    /* 25% {
+        transform: translateY(-2rem);
+    } */
+    50% {
+        transform: translateY(-1rem);
+    }
+}
+@keyframes instructScrollDown2 {
+    0% {
+        transform: translateY(0);
+    }
+    /* 25% {
+        transform: translateY(2rem);
+    } */
+    50% {
+        transform: translateY(1rem);
+    }
+} 
+@keyframes instructScrollLeft {
+    0% {
+        transform: translateX(0);
+    }
+    /* 25% {
+        transform: translateX(-1rem);
+    } */
+    50% {
+        transform: translateX(-1rem);
+    }
+}
+@keyframes instructScrollRight {
+    0% {
+        transform: translateX(0);
+    }
+    /* 25% {
+        transform: translateX(1rem);
+    } */
+    50% {
+        transform: translateX(1rem);
+    }
+}
+.journal {
+    display: grid;
+    grid-template-rows: auto;   /* auto*/
+    grid-template-columns: repeat(10, 1fr); /* 1fr */
+    grid-template-areas: 
+        "journal    tracker";
+    position: absolute;
+    width: 51vw;
+    min-height: 80vh;
+    top: 0;
+    left: 0;
+    padding: 230rem 3rem 5rem 3rem;
+    z-index: 10;
+}
+    .journal .day-tracker {
+        display: grid;
+        grid-template-rows: auto;
+        grid-template-columns: 1fr;
+        grid-area: tracker;
+        row-gap: 0.10rem;
+        position: sticky;
+        width: 3vw;
+        max-height: 1%;
+        top: 0;
+        padding: 3rem 0rem 0rem 0rem;
+        justify-items: flex-end;
+        z-index: 15;
+    }
+        .day-tracker a {
+            font-family: 'Abel', sans-serif;
+            font-size: 1.5rem;
+            color: var(--tracker-font-colour);
+        }
+        .day-tracker .toggle {
+            color: var(--tracker-toggle-colour);
+            background-color: var(--tracker-bg-colour);
+            opacity: 0.875;
+            border-radius: 50%;
+            transform: scale(2.5, 2.5);
+            /* transition: all 500ms; */
+        }
+        .day-tracker a:hover {
+            color: var(--tracker-toggle-colour);
+            background: var(--tracker-bg-colour);
+            border-radius: 50%;
+        }
+    .journal .journal-entries-container {
+        display: grid;
+        width: 45vw;
+        grid-template-columns: 1fr;
+        grid-template-rows: auto;
+        grid-area: journal;
+        row-gap: 25rem;
+    }
+        .journal-entries-container .journal-entries{
+            display: grid;
+            grid-template-rows: 1fr 1fr auto; 
+            grid-template-columns: 1fr;
+            row-gap: 1rem;
+            grid-template-areas: 
+                "top"
+                "middle"
+                "bottom"
+                "text";
+            background-color: var(--para-bg-colour);
+            color: var(--para-font-colour);
+            opacity: 0.875;
+            padding: 2.5rem;
+            text-align: start;
+            transition: all 500ms;
+            box-shadow: 0px 30px 55px rgba(0, 0, 0, 0.60), 
+                0 20px 20px rgba(0, 0, 0, 0.30), 
+                0 0 0 1px rgba(0, 0, 0, 0);
+        }
+            .journal-entries .tooltip {
+                display: inline-block;
+                position: relative;
+            }
+            .journal-entries:hover .tooltip {
+                cursor: help;
+            }
+                .tooltip .tooltiptext {
+                    visibility: hidden;
+                    position: absolute;
+                    top: -0.5rem;
+                    right: 105%;
+                    width: fit-content;
+                    background-color: var(--tooltip-bg-colour);
+                    color: var(--tooltip-font-colour);
+                    text-align: center;
+                    padding: 8px 10px 8px 10px;
+                    border-radius: 5px;
+                    z-index: 5;
+                }
+                .tooltip:hover .tooltiptext {
+                    visibility: visible;
+                }
+            .journal-entries .entry-row1 {
+                display: grid;
+                grid-area: top;
+                grid-template-columns: 1fr 1fr 1fr;
+                grid-template-areas: "topL  topC   topR";
+                font-family: 'Antic Slab', serif;
+                font-size: 1.15rem;
+                align-items: end;
+            }
+                .journal-entries .entry-row1 .date {
+                    grid-area: topL;
+                    font-size: 1.5rem;
+                }
+                .journal-entries .entry-row1 .moving {
+                    grid-area: topC;
+                }
+                .journal-entries .entry-row1 .distance {
+                    grid-area: topR;
+                }
+            .journal-entries .entry-row2 {
+                display: grid;
+                grid-area: middle;
+                grid-template-columns: 1fr 1fr 1fr;
+                grid-template-areas: "middleL   middleC   middleR";
+                font-family: 'Antic Slab', serif;
+                font-size: 1.15rem;
+                align-items: center;
+            }
+                .journal-entries .entry-row2 .route {
+                    grid-area: middleL;
+                }
+                .journal-entries .entry-row2 .food {
+                    grid-area: middleC;
+                }
+                .journal-entries .entry-row2 .distance-percent {
+                    grid-area: middleR;
+                }
+            
+            .journal-entries .entry-row3 {
+                display: grid;
+                grid-area: bottom;
+                grid-template-columns: 1fr 1fr 1fr;
+                grid-template-areas: "bottomL   bottomC   bottomR";
+                font-family: 'Antic Slab', serif;
+                font-size: 1.15rem;
+                align-items: end;
+            }
+                .journal-entries .entry-row3 .weather {
+                    grid-area: bottomL;
+                }
+                .journal-entries .entry-row3 .lodging {
+                    grid-area: bottomC;
+                }
+                .journal-entries .entry-row3 .distance-cumulative {
+                    grid-area: bottomR;
+                }
+            .journal-entries .entry-row4 {
+                grid-area: text;
+                padding: 1.75rem 0 0 0;
+                line-height: 1.35;
+            }
+                .journal-entries .entry-row4 a:hover {
+                    background: var(--link-hover-bg-colour);
+                    color: var(--link-font-colour);
+                }
+/* .mapboxgl-canvas {
+    width: fit-content !important;      OFF FOR MOBILE, forgot what it was added in for
+    height: fit-content !important;
+} */
+.mapboxgl-popup {
+    max-width: 800px !important;
+    max-height: 800px !important;
+    font-family: 'Antic Slab', serif;
+    font-size: 1.35rem;
+    box-shadow: 0px 30px 55px rgba(0, 0, 0, 0.60), 
+                0 20px 20px rgba(0, 0, 0, 0.30), 
+                0 0 0 1px rgba(0, 0, 0, 0);
+}
+.mapboxgl-popup-tip {
+    border: 0px !important;
+}
+.mapbox-gl-popup-extra {
+    opacity: 1;
+}
+.mapboxgl-popup-close-button {
+    display: none !important;
+}
+.mapboxgl-popup-content {
+    border-radius: 1px !important;
+}
+.mapboxgl-popup-content img {
+    transition: all 300ms ease-out;
+}
+.mapboxgl-popup-content img:hover {
+    cursor: zoom-in;
+    /* transform: scale(1.2, 1.2); */
+    box-shadow: 0px 30px 55px rgba(0, 0, 0, 0.60), 
+                0 20px 20px rgba(0, 0, 0, 0.30), 
+                0 0 0 1px rgba(0, 0, 0, 0);
+    transition: all 400ms ease-out;
+}
+
 .map-container {
-    position: relative;
-    width: 100%;
-    height: 80vh;
+    /* position: relative; */
+    width: 100vw;
+    height: 100vh;
     justify-content: center;
 }
     .map-container #map {
         width: 100%;
-        height: 80vh;
+        height: 100%;
+        position: fixed;
+        top: 0;
+        bottom: 0;
     }
 
+.spider-leg-container .spider-leg-line {
+    width: 4px !important;
+    background-color: var(--spider-leg-colour) !important;
+    opacity: 0.45 !important;
+}
 
-
-    .projects-container .projects-grid {
-        display: grid;
-        height: 100vh;
-        grid-template-columns: repeat(3, 1fr);
-        grid-template-rows: 1fr;
-        column-gap: 2rem;
-        /* grid-template-areas: 
-            "project"; */
-        padding: 4rem 4rem 4rem 4rem;
-        border: dashed 1px #cdcdcd;
-    }
-        .projects-grid .showcase-container {
-            width: 100%;
-            height: 25rem;
-            border: dashed 1px #cdcdcd;
-        }
+.spider-leg-container .spider-leg-pin {
+    font-size: 1.5rem;
+    color: var(--spider-pin-colour);
+}
