@@ -1,0 +1,9 @@
+.Dashboard {
+    grid-column: 2 / -1;
+    grid-row: 2 / -1;
+    display: grid;
+    grid-template-columns: 50% 50%;
+    grid-template-rows: 50% 50%;
+    padding: 1vw;
+    justify-items: center;
+}

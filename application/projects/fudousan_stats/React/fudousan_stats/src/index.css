@@ -1,0 +1,34 @@
+:root {
+  --background: #00001e;
+  --transparent: #00001e00;
+  --titles-font-colour: #703cff;
+  --titles-font-colour-fade: #703cff85;
+  --options-font-inactive: darkslateblue;
+  --options-font-active: chocolate;
+  --options-font-highlight: gold;
+  overflow: hidden;
+  /* user-select: none; */
+  font-size: 16px;
+}
+
+* {
+  box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  -webkit-box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+#root {
+  height: 100vh;
+}
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+    monospace;
+}
