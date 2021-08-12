@@ -17,6 +17,7 @@ Pipfile.lock
 Takeout/
 unused/
 application/static/images/
+application/static/dist/
 application/projects/tokaido/tools/data/
 application/projects/tokaido/tools/journal/
 application/projects/fudousan/tools/binned5yr/
