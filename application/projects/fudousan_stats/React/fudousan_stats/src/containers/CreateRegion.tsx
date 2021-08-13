@@ -17,31 +17,25 @@ const CreateRegion: React.FC<CreateRegionProps> = (props: CreateRegionProps) => 
 
     // Handle clicks on menu items.
     const onLevelChange = (event: any) => {
-        const name: string = event.target.name;
-        const category: string = event.target.getAttribute("data-category");
-        const level: string = event.target.getAttribute("data-level");
-        const levelNum:number = parseInt(level.replace(/\D/g, ''))
-        const nextLevel: string = 'level' + ' ' + (levelNum + 1);
-
         if (availability === 'available') {
             // Create activeLevel state.
             const nextRender = {
-                [nextLevel]: {
-                    name: name,
+                [props.nextLevel]: {
+                    name: props.name,
                     category: props.category,
                 }
             }
             
             // Only dispatch if not the final level.
-            if (category != 'districts') {
+            if (props.category != 'districts') {
                 // Send to menu level slice for use as marker.
                 dispatch(handleMenuLevel(nextRender));
                 // Switch render direction.
                 dispatch(handleRenderDirection('zoom in'));
 
                 // Send to MongoDB thunk to get menu data (if first time retrieving).
-                if (!menuApiState[props.nextCategory][name]) {
-                    const param: object = {[category]: name};
+                if (!menuApiState[props.nextCategory][props.name]) {
+                    const param: object = {[props.category]: props.name};
                     dispatch(mongoDbFetchRegions(param));
                 } else {
                     // console.log("Reusing menu data: ", category, name);
@@ -53,17 +47,11 @@ const CreateRegion: React.FC<CreateRegionProps> = (props: CreateRegionProps) => 
 
     // Handle clicks on selection checkboxes.
     const onSelectionChange = (event: any) => {
-        const name: string = event.target.name;
-        const category: string = event.target.getAttribute("data-category");
-        const level: string = event.target.getAttribute("data-level");
-        const levelNum:number = parseInt(level.replace(/\D/g, ''))
-        const nextLevel: string = 'level' + ' ' + (levelNum + 1);
-
         // Create payload for selection state.
         const selected = {
-            [nextLevel]: {
-                name: name,
-                category: category,
+            [props.nextLevel]: {
+                name: props.name,
+                category: props.category,
                 selected: event.target.checked,
                 partOf: menuLevelState.active
             }
@@ -161,6 +149,7 @@ interface CreateRegionProps {
     name: string,
     category: string,
     level: string,
+    nextLevel: string,
     nextCategory: string,
 }
 

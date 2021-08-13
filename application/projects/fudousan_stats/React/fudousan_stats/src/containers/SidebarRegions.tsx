@@ -25,19 +25,10 @@ const SidebarRegions: React.FC = () => {
     let nextLength = Object.keys(menuLevelState.active).length;
     let nextLevel: string = 'level' + ' ' + nextLength;
     let nextCategory: string = categories[nextLevel];
-    // let renderLevel: string = renderedLength === 0 ? 'level 0' : 'level' + ' ' + (renderedLength);
-    // let renderCategory:string = categories[renderLevel];
     let menu: Array<JSX.Element> = [];
-    // let prevMenu: Array<JSX.Element> = []
     let prevElementKey: string;
     let activeMenuElementsProps: Array<MenuElementProps> = [];
     let menuApiDataList = menuApiState[nextCategory];
-
-    
-    // let prevLevel: string = 
-    //         'level' + ' ' + (renderedLength - 1) === 'level -1' 
-    //             ? 'level 0'
-    //             : 'level' + ' ' + (renderedLength - 1);
 
     let prevElemPropsList: Array<MenuElementProps> | null = null;
     if (renderedLength !== 0) {
@@ -140,6 +131,7 @@ function createMenuItem(item: any, categories: { [key: string]: string}, level: 
             name={item.name} 
             category={category}
             level={level}
+            nextLevel={nextLevel}
             nextCategory={nextCategory}
         />
     )
