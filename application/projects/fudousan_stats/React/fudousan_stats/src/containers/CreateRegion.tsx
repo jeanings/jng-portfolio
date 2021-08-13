@@ -12,8 +12,21 @@ const CreateRegion: React.FC<CreateRegionProps> = (props: CreateRegionProps) => 
     const dataState = useAppSelector(state => state.data);
     const menuApiState = useAppSelector(state => state.menuApi);
     const menuLevelState = useAppSelector(state => state.menuLevel);
+    const selectionState = useAppSelector(state => state.selection.selected);
     const availability: string = checkAvailability();
     
+    
+    // Check for and assign checkbox value based on current selection state.
+    function getChecked(): boolean {
+        let selectorCheck = selectionState?.[props.nextLevel]?.[props.name];
+        let boxChecked: boolean = false;
+
+        if (typeof(selectorCheck) !== 'undefined') {
+            boxChecked = selectorCheck.selected;
+        } 
+        return boxChecked;
+    }
+
 
     // Handle clicks on menu items.
     const onLevelChange = (event: any) => {
@@ -135,7 +148,7 @@ const CreateRegion: React.FC<CreateRegionProps> = (props: CreateRegionProps) => 
                     name={props.name}
                     data-category={props.category}
                     data-level={props.level}
-                    // checked={checkStatus()}
+                    checked={getChecked()}
                     onChange={onSelectionChange} />
                 <span className="Sidebar_regions_item_checkbox_overlay"></span>
             </label>
