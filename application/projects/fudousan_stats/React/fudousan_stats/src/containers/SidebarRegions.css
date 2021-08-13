@@ -5,6 +5,7 @@
 .Sidebar_regions.show {
     display: inline-block;
     border: dashed 1px #cdcdcd;
+    border-top: none;
     padding-top: 2vw;
     padding-bottom: 2vw;
     justify-items: center;

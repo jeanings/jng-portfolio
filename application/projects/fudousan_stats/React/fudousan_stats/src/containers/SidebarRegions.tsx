@@ -92,7 +92,7 @@ const SidebarRegions: React.FC = () => {
 
 
     return (
-        <form className="Sidebar_regions show">
+        <form className="Sidebar_regions">
             <div className="Sidebar_regions_back">
                 <button className={renderedLength <= 1 
                             ? "Sidebar_regions_back_button"
