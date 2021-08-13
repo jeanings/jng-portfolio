@@ -1,11 +1,21 @@
 import { configureStore, Action, ThunkAction } from '@reduxjs/toolkit';
+import selectionReducer from './slices/selectionSlice';
+import menuLevelReducer from './slices/menuLevelSlice';
+import menuStoreReducer from './slices/menuStoreSlice';
+import menuApiReducer from './slices/menuApiSlice';
 import slidersReducer from './slices/slidersSlice';
+import dataReducer from './slices/dataSlice';
 
 
 
 export const store = configureStore({
   reducer: {
+    selection: selectionReducer,
+    menuLevel: menuLevelReducer,
+    menuStore: menuStoreReducer,
+    menuApi: menuApiReducer,
     sliders: slidersReducer,
+    data: dataReducer
   }
 });
 
