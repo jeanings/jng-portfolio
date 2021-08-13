@@ -1,0 +1,54 @@
+.Sidebar_regions {
+    display: none; /* inline-block when active */    
+}
+
+.Sidebar_regions.show {
+    display: inline-block;
+    border: dashed 1px #cdcdcd;
+    border-top: none;
+    padding-top: 2vw;
+    padding-bottom: 2vw;
+    justify-items: center;
+}
+
+/* Back button */
+.Sidebar_regions_back {
+    margin-left: 2vw;
+    margin-bottom: 1vw;
+    justify-self: start;
+}
+/* .Sidebar_regions_back button {
+    cursor: zoom-out;
+} */
+
+.Sidebar_regions_back_button {
+    border: none;
+    border-radius: 3px;
+    background: var(--titles-font-colour-fade);
+    padding: 0.25rem 0.4rem 0.25rem 0.4rem;
+    font-size: 0.9rem;
+    color: #ffffff;
+    opacity: 0.15;
+    cursor: not-allowed;
+    transition: 200ms all ease-in-out;
+
+}
+.Sidebar_regions_back_button.show {
+    opacity: 1;
+    cursor: zoom-out;
+}
+.Sidebar_regions_back_button.show:hover {
+    font-size: 0.92rem;
+    box-shadow: 5px 5px 4px rgb(178, 188, 197), 2px 4px 5px rgb(169, 176, 180);
+    transition: 200ms all ease-in-out;
+}
+.Sidebar_regions_back_button.show:active {
+    font-size: 0.9rem;
+    box-shadow: none;
+    transition: 100ms all ease-in-out;
+}
+
+.Sidebar_regions_back_button_arrow {
+    padding: 0.25rem;
+    /* font-size: 1rem; */
+}

@@ -1,0 +1,95 @@
+.Sidebar_regions_item {
+    display: grid;
+    width: 85%;
+    grid-template-columns: auto 2rem;
+    margin-bottom: 0.25rem;
+    padding-left: 2vw;
+    animation-name: slide-down;
+    animation-fill-mode: forwards;
+    animation-duration: 500ms;
+    animation-timing-function: ease-in;
+}
+@keyframes slide-down {
+    0% {
+        height: 0rem;
+        opacity: 0;
+    }
+    50% {
+        opacity: 0.2;
+    }
+    100% {
+        height: 1.25rem;
+        opacity: 1;
+    }
+}
+
+.Sidebar_regions_item_name {
+    border: none;
+    background: none;
+    color: var(--options-font-inactive);
+    font-size: 0.9rem;
+    text-align: end;
+    cursor: zoom-in;
+}
+
+.Sidebar_regions_item_name.unavailable {
+    opacity: 0.15;
+    cursor: not-allowed;
+    user-select: none
+}
+.Sidebar_regions_item_name.unavailable:hover {
+    opacity: 0.25;
+    background-color: dimgrey;
+    transition: background-color 300ms;
+}
+
+
+.Sidebar_regions_item_name:hover,
+.Sidebar_regions_item_name.toggle {
+    color: #ffffff;
+    border-radius: 0.15rem;
+    background-color: var(--titles-font-colour-fade);
+    transition: background-color 300ms;
+}
+
+.Sidebar_regions_item_checkbox {
+    display: grid;
+    width: 1rem;
+    margin: 0.15rem -0.15rem 0.15rem 0.15rem;
+    justify-self: end;
+    transition: background-color 300ms;
+}
+.Sidebar_regions_item_checkbox.unavailable {
+    display: none;
+}
+.Sidebar_regions_item_checkbox:hover {
+    color: #ffffff;
+    border-radius: 0.15rem;
+    background-color: var(--titles-font-colour-fade);
+}
+
+.Sidebar_regions_item_checkbox input {
+    display: none;
+    grid-column: 1;
+    /* justify-self: right;
+    align-self: center; */
+}
+
+.Sidebar_regions_item_checkbox_overlay {
+    /* position: relative; */
+    height: 1rem;
+    width: 1rem;
+    grid-column: 2;
+    grid-row: 1;
+    opacity: 0.5;
+    justify-self: right;
+    align-self: center;
+    border: dashed 2px #000000;
+    transition: background-color 300ms;
+    cursor: pointer;
+}
+
+.Sidebar_regions_item_checkbox input:checked ~ .Sidebar_regions_item_checkbox_overlay {
+    background-color: var(--options-font-inactive);
+    opacity: 0.75;
+}

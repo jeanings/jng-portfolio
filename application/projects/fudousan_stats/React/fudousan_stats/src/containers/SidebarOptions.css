@@ -2,6 +2,7 @@
     display: grid;
     max-height: 600px;
     border: dashed 1px #cdcdcd;
+    border-top: none;
     padding-top: 2vw;
     padding-bottom: 2vw;
     transition: all 300ms ease-out;

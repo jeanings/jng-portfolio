@@ -3,3 +3,79 @@
     grid-template-columns: 50% 50%;
     height: 100%;
 }
+
+.Sidebar_tab button {
+    background-color: #ffffff;
+    cursor: pointer;
+}
+
+/* SVG icon styling */
+.ionicon {
+    width: 1.25rem;
+    height: 1.25rem;
+    cursor: pointer;
+    fill: var(--options-font-inactive);
+    color: var(--options-font-inactive);
+    transition: all 200ms ease-in-out;
+    -moz-transition: all 200ms ease-in-out;
+    -webkit-transition: all 200ms ease-in-out;
+}
+.ionicon path {
+    pointer-events: none;
+}
+
+#Sidebar_tab_options {
+    border-top-left-radius: 5px;
+    border-top-right-radius: 25px;
+    border-top: dashed 1px #cdcdcd;
+    border-left: dashed 1px #cdcdcd;
+    border-right: dashed 1px #cdcdcd;
+    border-bottom: none;    
+}
+#Sidebar_tab_options.hide {
+    border-top-left-radius: 5px;
+    border-top-right-radius: 25px;
+    border-top: none;
+    border-left: none;
+    border-right: none;
+    border-bottom: dashed 1px #cdcdcd;
+}
+#Sidebar_tab_options_icon {
+    opacity: 0.85;
+    transition: all 200ms ease-in-out;
+}
+#Sidebar_tab_options_icon.hide {
+    opacity: 0.25;
+}
+
+#Sidebar_tab_regions {
+    border-top-right-radius: 5px;
+    border-top-left-radius: 25px;
+    border-top: none;
+    border-left: none;
+    border-right: none;
+    border-bottom: dashed 1px #cdcdcd;
+    
+}
+#Sidebar_tab_regions.show {
+    border-top-right-radius: 5px;
+    border-top-left-radius: 25px;
+    border-top: dashed 1px #cdcdcd;
+    border-left: dashed 1px #cdcdcd;
+    border-right: dashed 1px #cdcdcd;
+    border-bottom: none;
+}
+#Sidebar_tab_regions_icon {
+    opacity: 0.25;
+    transition: all 200ms ease-in-out;
+}
+#Sidebar_tab_regions_icon.show {
+    opacity: 0.85;
+}
+
+#Sidebar_tab_options:hover > .ionicon,
+#Sidebar_tab_regions:hover > .ionicon {
+    fill: var(--titles-font-colour-fade);
+    color: var(--titles-font-colour-fade);
+    opacity: 1;
+}

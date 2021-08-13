@@ -1,6 +1,7 @@
 import React from "react";
 import { useAppDispatch, useAppSelector } from '../hooks';
 import { handleSliders } from '../slices/slidersSlice';
+import { handleRawInput, mongoDbFetchData } from '../slices/dataSlice';
 import "./SidebarOptions.css";
 
 
@@ -8,8 +9,16 @@ import "./SidebarOptions.css";
 const SidebarOptions: React.FC = () => {
     const dispatch = useAppDispatch();
     const slidersState = useAppSelector(state => state.sliders);
+    const dataState = useAppSelector(state => state.data);
 
-   
+    // Helper: for onSaving readability.
+    function keyExists(inputKey: string, inputObj: object) {
+        if (inputKey in inputObj) {
+            return true;
+        } else
+            return false;
+    }
+
     // Helper: translate (replace) backend-use English to user-facing Japanese.
     function translateReplace(inputString: string, patternDict: SliderProps) {
         if (inputString in patternDict) {
@@ -85,6 +94,27 @@ const SidebarOptions: React.FC = () => {
     const onSaving = (event: any) => {
         event.preventDefault();
 
+        // Save raw input.
+        dispatch(handleRawInput(slidersState.options));
+
+        // Create MongoDB API payload.
+        const collection: string = slidersState.options.age;
+        const options: string = slidersState.options.material.concat(
+            '-', slidersState.options.floorArea, '.',
+            'stationDistanceMin', '.', slidersState.options.stationDist, '.',
+            'type', '.', slidersState.options.buildingType
+        );
+
+        // Send to MongoDB thunk to get housing data, if not already retrieved.
+        if (keyExists(collection, dataState.collections) == true) {
+            if (keyExists(options, dataState.collections[collection]) == false) {
+                dispatch(mongoDbFetchData({"collection": collection, "options": options}));
+            } else {
+                console.log("Reusing existing data -->", collection, options);
+            }
+        } else {
+            dispatch(mongoDbFetchData({"collection": collection, "options": options}));
+        }
     }
 
 

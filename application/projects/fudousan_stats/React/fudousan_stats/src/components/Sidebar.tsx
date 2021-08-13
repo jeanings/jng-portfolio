@@ -1,6 +1,7 @@
 import React from 'react';
 import SidebarTabs from '../containers/SidebarTabs';
 import SidebarOptions from '../containers/SidebarOptions';
+import SidebarRegions from '../containers/SidebarRegions';
 import './Sidebar.css';
 
 
@@ -11,6 +12,7 @@ const Sidebar: React.FC = () => {
             <>
                 <SidebarTabs />
                 <SidebarOptions />
+                <SidebarRegions />
             </>        
         </aside>
     );
