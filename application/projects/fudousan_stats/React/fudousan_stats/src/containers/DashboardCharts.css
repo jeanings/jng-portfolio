@@ -1,0 +1,13 @@
+.Dashboard_chart_line-price {
+    grid-column: 2 / -1;
+    grid-row: 1 / 2;
+    padding: 1vw;
+    width: 90%;
+}
+
+.Dashboard_chart_bar-count {
+    grid-column: 2 / -1;
+    grid-row: 2 / -1;
+    padding: 1vw;
+    width: 90%;
+}
