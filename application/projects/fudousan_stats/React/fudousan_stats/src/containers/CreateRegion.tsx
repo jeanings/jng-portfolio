@@ -29,7 +29,7 @@ const CreateRegion: React.FC<CreateRegionProps> = (props: CreateRegionProps) => 
 
 
     // Handle clicks on menu items.
-    const onLevelChange = (event: any) => {
+    const onLevelChange = () => {
         if (availability === 'available') {
             // Create activeLevel state.
             const nextRender = {
@@ -45,11 +45,11 @@ const CreateRegion: React.FC<CreateRegionProps> = (props: CreateRegionProps) => 
                 dispatch(handleMenuLevel(nextRender));
                 // Switch render direction.
                 dispatch(handleRenderDirection('zoom in'));
-
+                
                 // Send to MongoDB thunk to get menu data (if first time retrieving).
                 if (!menuApiState[props.nextCategory][props.name]) {
-                    const param: object = {[props.category]: props.name};
-                    dispatch(mongoDbFetchRegions(param));
+                    let mongoDbRequest: object = {[props.category]: props.name};
+                    dispatch(mongoDbFetchRegions(mongoDbRequest));
                 } else {
                     // console.log("Reusing menu data: ", category, name);
                 }

@@ -129,7 +129,7 @@ const menuApiSlice = createSlice({
 
 // Types setting.
 export interface MenuApiProps {
-    [index: string]: string | any, // fix?
+    [index: string]: string | any,
     status: 'awaiting' | 'pending' | 'successful' | 'unsuccessful',
     regions: any,
     prefectures: any,
