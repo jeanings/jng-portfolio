@@ -1,5 +1,33 @@
 .Sidebar_regions {
-    display: none; /* inline-block when active */    
+    display: none; /* inline-block when active */
+    /* Max height minus other elements */
+    /*                     header   tabs   back button*/
+    max-height: calc(100vh - 6rem - 2rem - 2vw );
+    overflow-y: scroll;
+}
+/* Menu scrollbar */
+.Sidebar_regions::-webkit-scrollbar {
+    width: 0.5rem;
+}
+/* Scroll track above thumb */
+.Sidebar_regions::-webkit-scrollbar-track-piece {
+    background-color: #ffffff;
+}
+/* Scroll track below thumb */
+.Sidebar_regions::-webkit-scrollbar-track {
+    background-color: #ffffff;
+}
+/* Scroll direction buttons */
+.Sidebar_regions::-webkit-scrollbar-button {
+    display: none;
+}
+/* Scroll "pong" bar */
+.Sidebar_regions::-webkit-scrollbar-thumb {
+    background-color: rgb(182, 182, 182);
+    border-radius: 0.20rem;
+}
+.Sidebar_regions::-webkit-scrollbar-thumb:hover {
+    background-color: var(--titles-font-colour-fade);
 }
 
 .Sidebar_regions.show {
@@ -17,9 +45,6 @@
     margin-bottom: 1vw;
     justify-self: start;
 }
-/* .Sidebar_regions_back button {
-    cursor: zoom-out;
-} */
 
 .Sidebar_regions_back_button {
     border: none;
@@ -31,7 +56,6 @@
     opacity: 0.15;
     cursor: not-allowed;
     transition: 200ms all ease-in-out;
-
 }
 .Sidebar_regions_back_button.show {
     opacity: 1;
