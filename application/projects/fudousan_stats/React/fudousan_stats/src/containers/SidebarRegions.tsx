@@ -22,6 +22,7 @@ const SidebarRegions: React.FC = () => {
 
     let renderDirection: string = menuLevelState.direction;
     let renderedLength: number = Object.keys(menuStoreState.rendered).length;
+    let currentLevel: string = 'level' + ' ' + (Object.keys(menuLevelState.active).length - 1);
     let nextLength = Object.keys(menuLevelState.active).length;
     let nextLevel: string = 'level' + ' ' + nextLength;
     let nextCategory: string = categories[nextLevel];
@@ -35,7 +36,6 @@ const SidebarRegions: React.FC = () => {
         prevElementKey = 'level' + ' ' + (renderedLength - 1);
         prevElemPropsList = menuStoreState.rendered[prevElementKey];
     }
-
 
     // Create list of JSX elements to be rendered.
     if (menuApiState.status === 'successful' 
@@ -106,7 +106,7 @@ const SidebarRegions: React.FC = () => {
                         ? ''
                         : nextLength === 1
                             ? '地域全体に'
-                            : menuLevelState.active[nextLevel].name + 'に'}
+                            : menuLevelState.active[currentLevel].name + 'に'}
                     戻る
                 </button>
             </div>
@@ -147,6 +147,5 @@ type MenuElementProps = {
     level: string,
     nextCategory: string
 }
-
 
 export default SidebarRegions;
