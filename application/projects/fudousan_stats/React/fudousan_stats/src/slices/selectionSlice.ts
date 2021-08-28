@@ -37,6 +37,11 @@ const selectionSlice = createSlice({
             } else if (selected === false) {
                 delete state.selected[level][name];
             }
+        },
+        clearSelection: (state, action) => {
+            const level: string = action.payload.level;
+            const name: string = action.payload.name;
+            delete state.selected[level][name];
         }
     }
 });
@@ -71,5 +76,5 @@ export const selectSelection = (state: RootState) => state.selection;
 
 // Export actions, reducers.
 const { actions, reducer } = selectionSlice;
-export const { handleSelection } = actions;
+export const { handleSelection, clearSelection } = actions;
 export default reducer;

@@ -5,6 +5,17 @@
     max-height: calc(100vh - 6rem - 2rem - 2vw );
     overflow-y: scroll;
 }
+
+.Sidebar_regions.show {
+    display: grid;
+    grid-template-rows: 5% auto;
+    border: dashed 1px #cdcdcd;
+    border-top: none;
+    padding-top: 1.5vw;
+    padding-bottom: 2vw;
+    /* justify-items: center; */
+}
+
 /* Menu scrollbar */
 .Sidebar_regions::-webkit-scrollbar {
     width: 0.5rem;
@@ -30,23 +41,23 @@
     background-color: var(--titles-font-colour-fade);
 }
 
-.Sidebar_regions.show {
-    display: inline-block;
-    border: dashed 1px #cdcdcd;
-    border-top: none;
-    padding-top: 2vw;
-    padding-bottom: 2vw;
-    justify-items: center;
+/* Regions header area */
+.Sidebar_regions_header {
+    grid-row: 1 / 2;
+    display: grid;
+    grid-template-columns: auto 2rem;
+    margin-left: 1.5vw;
+    margin-right: 1.5vw;
 }
 
 /* Back button */
-.Sidebar_regions_back {
-    margin-left: 2vw;
-    margin-bottom: 1vw;
+.Sidebar_regions_header_back {
+    grid-column: 1 / 2;
+    /* margin-left: 1.5vw; */
     justify-self: start;
 }
 
-.Sidebar_regions_back_button {
+.Sidebar_regions_header_back_button {
     border: none;
     border-radius: 3px;
     background: var(--titles-font-colour-fade);
@@ -57,22 +68,73 @@
     cursor: not-allowed;
     transition: 200ms all ease-in-out;
 }
-.Sidebar_regions_back_button.show {
+.Sidebar_regions_header_back_button.show {
     opacity: 1;
     cursor: zoom-out;
 }
-.Sidebar_regions_back_button.show:hover {
+.Sidebar_regions_header_back_button.show:hover {
     font-size: 0.92rem;
     box-shadow: 5px 5px 4px rgb(178, 188, 197), 2px 4px 5px rgb(169, 176, 180);
     transition: 200ms all ease-in-out;
 }
-.Sidebar_regions_back_button.show:active {
+.Sidebar_regions_header_back_button.show:active {
     font-size: 0.9rem;
     box-shadow: none;
     transition: 100ms all ease-in-out;
 }
 
-.Sidebar_regions_back_button_arrow {
+#Sidebar_regions_header_back_button_arrow {
     padding: 0.25rem;
-    /* font-size: 1rem; */
+    font-size: 1rem;
+}
+
+/* Sidebar header selected list toggle */
+.Sidebar_regions_header_selected {
+    grid-column: 2 / -1 ;
+    justify-self: end;
+    align-self: center;
+}
+
+.Sidebar_regions_header_selected_button {
+    height: 1.2rem;
+    width: 1.2rem;
+    opacity: 0.5;
+    border: dashed 2px #000000;
+    cursor: pointer;
+}
+#Sidebar_regions_header_selected_button_arrow {
+    display: inline-block;
+    color: #000000;
+    opacity: 1;
+    transition: all 300ms ease-out;
+}
+#Sidebar_regions_header_selected_button_arrow:hover {
+    color: var(--titles-font-colour);
+}
+#Sidebar_regions_header_selected_button_arrow.open {
+    transform: rotate(180deg);
+    text-align: center;
+    color: var(--titles-font-colour);
+    transition: all 300ms ease-in;
+}
+
+/* Menu list area */
+.Sidebar_regions_list {
+    grid-row: 2 / -1;
+    /* display: grid; */
+    margin-top: 1vw;
+    margin-left: 1.5vw;
+    margin-right: 1.5vw;
+}
+
+.Sidebar_regions_list_selected {
+    /* height: 0; */
+}
+
+/* Region items list */
+.Sidebar_regions_list_menu {
+    /* grid-row: 2 / -1;
+    margin-top: 1vw;
+    margin-left: 1.5vw;
+    margin-right: 1.5vw; */
 }
