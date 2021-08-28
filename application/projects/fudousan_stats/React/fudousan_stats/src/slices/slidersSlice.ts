@@ -10,7 +10,7 @@ const initialState: SlidersProps = {
        stationDist: '0_15',
        material: 'wood',
        age: '1920_1960',
-       floorArea: '10_50'
+       floorArea: '10_20'
    }
 }
 
