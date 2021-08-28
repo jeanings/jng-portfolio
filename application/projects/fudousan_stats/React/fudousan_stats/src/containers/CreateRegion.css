@@ -1,9 +1,7 @@
 .Sidebar_regions_item {
     display: grid;
-    width: 85%;
     grid-template-columns: auto 2rem;
     margin-bottom: 0.25rem;
-    padding-left: 2vw;
     animation-name: slide-down;
     animation-fill-mode: forwards;
     animation-duration: 500ms;
@@ -55,7 +53,7 @@
 .Sidebar_regions_item_checkbox {
     display: grid;
     width: 1rem;
-    margin: 0.15rem -0.15rem 0.15rem 0.15rem;
+    /* margin: 0.15rem -0.15rem 0.15rem 0.15rem; */
     justify-self: end;
     transition: background-color 300ms;
 }

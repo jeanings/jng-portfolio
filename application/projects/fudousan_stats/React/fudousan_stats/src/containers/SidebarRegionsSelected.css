@@ -1,0 +1,27 @@
+.Sidebar_regions_selected {
+    display: none;
+}
+
+.Sidebar_regions_selected.open {
+    display: grid;
+    border-bottom: dashed 1px #cdcdcd;
+    padding-bottom: 0.5vw;
+    margin-bottom: 1.5vw;
+}
+
+.Sidebar_regions_selected_header {
+    color: #000000;
+}
+
+.Sidebar_regions_selected_category {
+    justify-self: right;
+    padding-bottom: 0.75vw;
+}
+
+.Sidebar_regions_selected_category_name {
+    display: flex;
+    flex-direction: row-reverse;
+    font-size: 1.15rem;
+    color: var(--titles-font-colour);
+    user-select: none;
+}
