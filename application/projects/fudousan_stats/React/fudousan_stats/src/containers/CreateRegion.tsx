@@ -135,14 +135,6 @@ const CreateRegion: React.FC<CreateRegionProps> = (props: CreateRegionProps) => 
 
     return (
         <div className={"Sidebar_regions_item" + " " + props.name}>
-            <button className={"Sidebar_regions_item_name" + " " + availability} 
-                    type="button" 
-                    name={props.name}
-                    data-category={props.category}
-                    data-level={props.level}
-                    onClick={onLevelChange}>
-                {props.name}
-            </button>
             <label className={"Sidebar_regions_item_checkbox" + " " + availability}>
                 <input type="checkbox" 
                     name={props.name}
@@ -152,6 +144,14 @@ const CreateRegion: React.FC<CreateRegionProps> = (props: CreateRegionProps) => 
                     onChange={onSelectionChange} />
                 <span className="Sidebar_regions_item_checkbox_overlay"></span>
             </label>
+            <button className={"Sidebar_regions_item_name" + " " + availability} 
+                    type="button" 
+                    name={props.name}
+                    data-category={props.category}
+                    data-level={props.level}
+                    onClick={onLevelChange}>
+                {props.name}
+            </button>
         </div>
     );
 }
