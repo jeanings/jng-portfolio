@@ -1,8 +1,9 @@
-import React from 'react';
+import React, { useRef } from 'react';
 import { useAppSelector } from '../hooks';
 import { Line, Bar } from 'react-chartjs-2';
+import { ChartEvent, ChartType, LegendItem, TooltipItem } from 'chart.js';
+import { fadedColours, solidColours } from '../imports/chartColourSets';
 import './DashboardCharts.css';
-import { ChartType, TooltipItem } from 'chart.js';
 
 
 
@@ -10,6 +11,8 @@ const DashboardCharts: React.FC = () => {
     const selectState = useAppSelector(state => state.selection.selected);
     const dataState = useAppSelector(state => state.data);
     const dataOptions = dataState.currentOptions;
+    const refLine = useRef<any | null>(null);
+    const refBar = useRef<any | null>(null);
     let dataSet: any;
     let chartData: Array<any> = [];
 
@@ -154,47 +157,6 @@ const DashboardCharts: React.FC = () => {
     }
 
 
-    // Colour set for chart items.
-    const solidAlpha: string = '0.95' + ')';
-    const solidColours: Array<string> = [
-        'rgba(18,17,18,' + solidAlpha,     // black
-        'rgba(119,45,134,' + solidAlpha,   // purple, wine
-        'rgba(93,31,227,' + solidAlpha,    // purple
-        'rgba(85,126,244,' + solidAlpha,   // blue-sky
-        'rgba(85,198,244,' + solidAlpha,   // blue, robin egg
-        'rgba(154,187,187,' + solidAlpha,  // blue-green, sea foam
-        'rgba(213,210,137,' + solidAlpha,  // yellow-green, dry grass
-        'rgba(226,166,62,' + solidAlpha,   // orange-yellow, egg yolk
-        'rgba(246,109,55,' + solidAlpha,   // orange, candied orange 
-        'rgba(255,8,0,' + solidAlpha,      // red
-        'rgba(251,47,226,' + solidAlpha,   // pink, hot
-        'rgba(253,144,125,' + solidAlpha,  // pink, lemonade
-        'rgba(255,241,23,' + solidAlpha,   // yellow, lemon
-        'rgba(168,186,24,' + solidAlpha,   // green, bright moss
-        'rgba(46,110,26,' + solidAlpha,    // green, British racing
-        'rgba(12,62,107,' + solidAlpha     // blue, navy
-    ];
-    const fadedAlpha: string = '0.70' + ')';
-    const fadedColours: Array<string> = [
-        'rgba(18,17,18,' + fadedAlpha,     // black
-        'rgba(119,45,134,' + fadedAlpha,   // purple, wine
-        'rgba(93,31,227,' + fadedAlpha,    // purple
-        'rgba(85,126,244,' + fadedAlpha,   // blue-sky
-        'rgba(85,198,244,' + fadedAlpha,   // blue, robin egg
-        'rgba(154,187,187,' + fadedAlpha,  // blue-green, sea foam
-        'rgba(213,210,137,' + fadedAlpha,  // yellow-green, dry grass
-        'rgba(226,166,62,' + fadedAlpha,   // orange-yellow, egg yolk
-        'rgba(246,109,55,' + fadedAlpha,   // orange, candied orange 
-        'rgba(255,8,0,' + fadedAlpha,      // red
-        'rgba(251,47,226,' + fadedAlpha,   // pink, hot
-        'rgba(253,144,125,' + fadedAlpha,  // pink, lemonade
-        'rgba(255,241,23,' + fadedAlpha,   // yellow, lemon
-        'rgba(168,186,24,' + fadedAlpha,   // green, bright moss
-        'rgba(46,110,26,' + fadedAlpha,    // green, British racing
-        'rgba(12,62,107,' + fadedAlpha     // blue, navy
-    ];
-
-
     // Transform chart data into suitable data structure for chartjs.
     let priceDataSet: Array<any> = [];
     let countDataSet: Array<any> = [];
@@ -226,6 +188,39 @@ const DashboardCharts: React.FC = () => {
     const linePriceData = {
         labels: xAxisYears,
         datasets: priceDataSet
+    }
+
+
+    function handleLegendClick(event: ChartEvent, legendItem: LegendItem) {
+        // Reference: https://stackoverflow.com/a/45343334/14181584
+        let itemIndex: number = legendItem.datasetIndex;
+        
+        
+        if (refLine.current !== null && refBar.current !== null) {
+            let lineMeta = refLine.current.getDatasetMeta(itemIndex);   // Same data set --> index,
+            let barMeta = refBar.current.getDatasetMeta(itemIndex);     // otherwise don't do this.
+            
+            // Toggle un/hide on click.
+            if (lineMeta.hidden === null) {
+                lineMeta.hidden = !lineMeta.hidden;
+                barMeta.hidden = !barMeta.hidden;
+            } else {
+                lineMeta.hidden = null;
+                barMeta.hidden = null;
+            }
+            // Update the charts.
+            refLine.current.update();
+            refBar.current.update();
+        }
+        
+    }
+
+    function handleLegendHover(event: any) {
+        event.native.target.style.cursor = 'pointer';
+    }
+
+    function handleLegendLeave(event: any) {
+        event.native.target.style.cursor = 'default';
     }
 
     const linePriceOptions = {
@@ -267,7 +262,10 @@ const DashboardCharts: React.FC = () => {
                         // size: 13
                     },
                     padding: 15             // Adds vertical space between legend items
-                }
+                },
+                onClick: handleLegendClick, // Syncs both charts' clicks under Line's
+                onHover: handleLegendHover, // Changes cursor into pointer
+                onLeave: handleLegendLeave  // Undo above
             },
             tooltip: {
                 backgroundColor: '#311d6990',
@@ -275,7 +273,7 @@ const DashboardCharts: React.FC = () => {
                 caretPadding: 10,
                 cornerRadius: 3,
                 displayColors: true,
-                intersect: false,
+                intersect: false,           // Tooltip shows when in proximity of point
                 padding: 10,
                 position: 'average'
             }
@@ -317,12 +315,12 @@ const DashboardCharts: React.FC = () => {
                 color: '#483d8b'
             },
             legend: {
-                display: false              // Using the same one from line chart
+                display: false              // Sync'ed from Line's clicks
             },
             tooltip: {
                 backgroundColor: '#311d6990',
                 callbacks: {
-                    footer: barCountSum     // Adds a total amount on each bar
+                    footer: barCountSum     // Adds a total count on each bar
                 },
                 caretSize: 8,
                 cornerRadius: 3,
@@ -349,12 +347,14 @@ const DashboardCharts: React.FC = () => {
             <div className="Dashboard_charts_line-price">
                 <Line
                     data={linePriceData}
-                    options={linePriceOptions} />
+                    options={linePriceOptions}
+                    ref={refLine} />
             </div>
             <div className="Dashboard_charts_bar-count">
                 <Bar
                     data={barCountData}
-                    options={barCountOptions} />
+                    options={barCountOptions}
+                    ref={refBar} />
             </div>
         </div>    
     );
@@ -383,12 +383,6 @@ type DataSetArrayProps = {
     'id': string, 
     'price': Array<number | null>,
     'count': Array<number | null>
-}
-
-type PartOfObj = {
-    [index: string] : string | any
-    category: string,
-    name: string
 }
 
 type DataTypeProp = {
