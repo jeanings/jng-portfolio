@@ -2,6 +2,7 @@ import React from 'react';
 import { useAppSelector } from '../hooks';
 import { Line, Bar } from 'react-chartjs-2';
 import './DashboardCharts.css';
+import { ChartType, TooltipItem } from 'chart.js';
 
 
 
@@ -47,7 +48,7 @@ const DashboardCharts: React.FC = () => {
                 data = dataSet[props.partOf['level 1'].category][props.partOf['level 1'].name];
             }
 
-            const categoryMap: { [key: string]: string} = {
+            const categoryMap: {[key: string]: string} = {
                 'level 1': 'prefectures',
                 'level 2': 'cities',
                 'level 3': 'districts',
@@ -134,7 +135,7 @@ const DashboardCharts: React.FC = () => {
         }
 
 
-        // Helper: dives deeper in to dataSet object.
+        // Helper: dives deeper into dataSet object.
         function getLevelData(selfCategory: string, selfName: string, 
             targetCategory: string, targetName: string, data: any) {
             let category: string = '';
@@ -153,36 +154,63 @@ const DashboardCharts: React.FC = () => {
     }
 
 
-    const colours = [
-        'rgba(119,45,134,1)', 'rgba(93,31,227,1))', 'rgba(85,126,244,1)', 'rgba(85,126,244,1)', 'rgba(85,198,244,1)', 'rgba(154,187,187,1)',
-        'rgba(213,210,137,1)', 'rgba(226,166,62,1)', 'rgba(246,109,55,1)', 'rgba(255,8,0,1)', 'rgba(251,47,226,1)'
-    ]
-    const bgColours = [
-        'rgba(119,45,134,0.5)', 'rgba(93,31,227,0.5)', 'rgba(85,126,244,0.5)', 'rgba(85,126,244,0.5)', 'rgba(85,198,244,0.5)', 'rgba(154,187,187,0.5)',
-        'rgba(213,210,137,0.5)', 'rgba(226,166,62,0.5)', 'rgba(246,109,55,0.5)', 'rgba(255,8,0,0.5)', 'rgba(251,47,226,0.5)'
-    ]
+    // Colour set for chart items.
+    const solidAlpha: string = '0.95' + ')';
+    const solidColours: Array<string> = [
+        'rgba(18,17,18,' + solidAlpha,     // black
+        'rgba(119,45,134,' + solidAlpha,   // purple, wine
+        'rgba(93,31,227,' + solidAlpha,    // purple
+        'rgba(85,126,244,' + solidAlpha,   // blue-sky
+        'rgba(85,198,244,' + solidAlpha,   // blue, robin egg
+        'rgba(154,187,187,' + solidAlpha,  // blue-green, sea foam
+        'rgba(213,210,137,' + solidAlpha,  // yellow-green, dry grass
+        'rgba(226,166,62,' + solidAlpha,   // orange-yellow, egg yolk
+        'rgba(246,109,55,' + solidAlpha,   // orange, candied orange 
+        'rgba(255,8,0,' + solidAlpha,      // red
+        'rgba(251,47,226,' + solidAlpha,   // pink, hot
+        'rgba(253,144,125,' + solidAlpha,  // pink, lemonade
+        'rgba(255,241,23,' + solidAlpha,   // yellow, lemon
+        'rgba(168,186,24,' + solidAlpha,   // green, bright moss
+        'rgba(46,110,26,' + solidAlpha,    // green, British racing
+        'rgba(12,62,107,' + solidAlpha     // blue, navy
+    ];
+    const fadedAlpha: string = '0.70' + ')';
+    const fadedColours: Array<string> = [
+        'rgba(18,17,18,' + fadedAlpha,     // black
+        'rgba(119,45,134,' + fadedAlpha,   // purple, wine
+        'rgba(93,31,227,' + fadedAlpha,    // purple
+        'rgba(85,126,244,' + fadedAlpha,   // blue-sky
+        'rgba(85,198,244,' + fadedAlpha,   // blue, robin egg
+        'rgba(154,187,187,' + fadedAlpha,  // blue-green, sea foam
+        'rgba(213,210,137,' + fadedAlpha,  // yellow-green, dry grass
+        'rgba(226,166,62,' + fadedAlpha,   // orange-yellow, egg yolk
+        'rgba(246,109,55,' + fadedAlpha,   // orange, candied orange 
+        'rgba(255,8,0,' + fadedAlpha,      // red
+        'rgba(251,47,226,' + fadedAlpha,   // pink, hot
+        'rgba(253,144,125,' + fadedAlpha,  // pink, lemonade
+        'rgba(255,241,23,' + fadedAlpha,   // yellow, lemon
+        'rgba(168,186,24,' + fadedAlpha,   // green, bright moss
+        'rgba(46,110,26,' + fadedAlpha,    // green, British racing
+        'rgba(12,62,107,' + fadedAlpha     // blue, navy
+    ];
+
 
     // Transform chart data into suitable data structure for chartjs.
-    const xAxisYears: Array<string>= [
-        '2010年', '2011年', '2012年', '2013年', '2014年', '2015年',
-        '2016年', '2017年', '2018年', '2019年', '2020年'
-    ];
-    
     let priceDataSet: Array<any> = [];
     let countDataSet: Array<any> = [];
+
     chartData.forEach((item, index) => {
         let priceDataPoint = {
             'label': item.id,
             'data': item.price,
-            'borderColor': colours[index],
-            'backgroundColor': bgColours[index]
+            'borderColor': solidColours[index],
+            'backgroundColor': fadedColours[index]
         };
 
         let countDataPoint = {
             'label': item.id,
             'data': item.count,
-            'borderColor': colours[index],
-            'backgroundColor': bgColours[index]
+            'backgroundColor': fadedColours[index]
         };
 
         priceDataSet.push(priceDataPoint);
@@ -191,6 +219,10 @@ const DashboardCharts: React.FC = () => {
    
 
     // Chart configs.
+    const xAxisYears: Array<string>= [
+        '2010年', '2011年', '2012年', '2013年', '2014年', '2015年',
+        '2016年', '2017年', '2018年', '2019年', '2020年'
+    ];
     const linePriceData = {
         labels: xAxisYears,
         datasets: priceDataSet
@@ -199,95 +231,132 @@ const DashboardCharts: React.FC = () => {
     const linePriceOptions = {
         elements: {
             line: {
-                cubicInterpolationMode: 'monotone',
+                borderWidth: 3,
                 fill: false,
-                // spanGaps: true,
-                tension: 0.3
+                // spanGaps: true           // Misrepresents data
             },
             point: {
-                borderWidth: 0,
-                pointStyle: 'circle',
-                radius: 4,
+                pointStyle: 'crossRot',
+                radius: 7,
+                hoverRadius: 12, 
+                borderWidth: 1,
+                hoverBorderWidth: 3,
+                hitRadius: 8
             }
         },
-        maintainAspectRatio: true,
+        maintainAspectRatio: false,         // Important for responsiveness
         plugins: {
             title: {
                 display: true,
-                text: '取引平均価格（万円）'
+                text: '取引平均価格（万円）',
+                padding: {
+                    bottom: 20
+                },
+                font: {
+                    family: 'Kaisei Opti',
+                    size: 18,
+                    weight: 'normal'
+                },
+                color: '#483d8b'
+            },
+            legend: {
+                position: 'bottom',
+                labels: {
+                    font: {
+                        // family: 'Kaisei Opti',
+                        // size: 13
+                    },
+                    padding: 15             // Adds vertical space between legend items
+                }
             },
             tooltip: {
+                backgroundColor: '#311d6990',
                 caretSize: 8,
+                caretPadding: 10,
                 cornerRadius: 3,
                 displayColors: true,
                 intersect: false,
-                position: 'nearest'
+                padding: 10,
+                position: 'average'
             }
         },
         responsive: true,
-        scales: {
-            yAxes: [
-                {
-                    ticks: {
-                        beginAtZero: true,
-                    },
-                },
-            ],
-        }
+        titleFontSize: 20
     }
     
+
     const barCountData = {
         labels: xAxisYears,
         datasets: countDataSet
     }
-    
+
+    const barCountSum = (tooltipItems: Array<TooltipItem<ChartType>>) => {
+        let sum = 0;
+
+        tooltipItems.forEach(function(tooltipItem) {
+            sum += tooltipItem.parsed.y;
+        });
+        return '総計: ' + sum;
+    }
+
     const barCountOptions = {
-        maintainAspectRatio: true,
+        maintainAspectRatio: false,         // Important for responsiveness
         plugins: {
             title: {
                 display: true,
-                text: '取引件数'
+                text: '取引件数',
+                padding: {
+                    top: 20,
+                    bottom: 20
+                },
+                font: {
+                    family: 'Kaisei Opti',
+                    size: 18,
+                    weight: 'normal'
+                },
+                color: '#483d8b'
+            },
+            legend: {
+                display: false              // Using the same one from line chart
             },
             tooltip: {
+                backgroundColor: '#311d6990',
+                callbacks: {
+                    footer: barCountSum     // Adds a total amount on each bar
+                },
                 caretSize: 8,
                 cornerRadius: 3,
                 displayColors: true,
-                // intersect: false,
-                position: 'nearest'
+                intersect: true,
+                padding: 10,
+                position: 'average'
             }
         },
         responsive: true,
         scales: {
             x: {
                 stacked: true,
-                // ticks: {
-                //     beginAtZero: true
-                // }
             },
             y: {
                 stacked: true,
-                // ticks: {
-                //     beginAtZero: true,
-                // },
             },
-        
         }
     }
 
 
     return (
-        <>
-            <div className="Dashboard_chart_line-price">
+        <div className="Dashboard_charts">
+            <div className="Dashboard_charts_line-price">
                 <Line
                     data={linePriceData}
                     options={linePriceOptions} />
             </div>
-            <div className="Dashboard_chart_bar-count">
+            <div className="Dashboard_charts_bar-count">
                 <Bar
                     data={barCountData}
                     options={barCountOptions} />
             </div>
-        </>    
+        </div>    
     );
 }
 

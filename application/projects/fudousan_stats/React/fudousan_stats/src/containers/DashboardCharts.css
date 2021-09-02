@@ -1,13 +1,20 @@
-.Dashboard_chart_line-price {
+.Dashboard_charts {
     grid-column: 2 / -1;
-    grid-row: 1 / 2;
-    padding: 1vw;
-    width: 90%;
+    grid-row: 1 / -1;
+    display: grid;
+    height: 100%;
+    width: 100%;
+    padding: 0 1vw 1vw 1vw;
+    grid-template-columns: 100%;
+    grid-template-rows: 55% 45%;
 }
 
-.Dashboard_chart_bar-count {
-    grid-column: 2 / -1;
+.Dashboard_charts_line-price {
+    grid-row: 1 / 2;
+    width: 100%;
+}
+
+.Dashboard_charts_bar-count {
     grid-row: 2 / -1;
-    padding: 1vw;
-    width: 90%;
+    width: 100%;
 }

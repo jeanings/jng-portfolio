@@ -2,8 +2,9 @@
     grid-column: 2 / -1;
     grid-row: 2 / -1;
     display: grid;
+    height: 100%;
     grid-template-columns: 50% 50%;
     grid-template-rows: 50% 50%;
-    padding: 1vw;
+    padding: 0 1vw 1vw 1vw;
     justify-items: center;
 }
