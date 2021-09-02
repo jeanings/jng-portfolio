@@ -1,6 +1,6 @@
 import React, { useRef } from 'react';
 import { useAppSelector } from '../hooks';
-import { Line, Bar } from 'react-chartjs-2';
+import { Bar, Line } from 'react-chartjs-2';
 import { ChartEvent, ChartType, LegendItem, TooltipItem } from 'chart.js';
 import { fadedColours, solidColours } from '../imports/chartColourSets';
 import './DashboardCharts.css';
@@ -8,6 +8,9 @@ import './DashboardCharts.css';
 
 
 const DashboardCharts: React.FC = () => {
+    /* ------------------------------------------------------------------------------
+        Chart.js component that listens to state changes to data and select states.
+    ------------------------------------------------------------------------------- */
     const selectState = useAppSelector(state => state.selection.selected);
     const dataState = useAppSelector(state => state.data);
     const dataOptions = dataState.currentOptions;
@@ -16,14 +19,14 @@ const DashboardCharts: React.FC = () => {
     let dataSet: any;
     let chartData: Array<any> = [];
 
-
+    // Check for data in state.
     let dataExists = dataState.collections?.[dataOptions.collection]?.[dataOptions.options];
     if (typeof(dataExists) !== 'undefined') {
         dataSet = dataExists;
     } 
 
+    // Build selected data set for charts.
     if (dataSet !== undefined) {
-        // Build selected data set for charts.
         for (const [level, itemsObj] of Object.entries(selectState)) {
             const selectedDataSet = getSelectedDataSet(itemsObj as ChartDataSetProps);
             selectedDataSet.forEach(item => {
@@ -31,17 +34,26 @@ const DashboardCharts: React.FC = () => {
             });
         }   
     }
+
     
 
-    // Helper: builds array of sales data for rendering in charts.
+
     function getSelectedDataSet(items: ChartDataSetProps) {
+        /* ---------------------------------------------------------------
+            Helper: builds array of sales data for rendering in charts.
+        --------------------------------------------------------------- */
         let dataSetArray: Array<DataSetArrayProps> = [];
 
         for (const [item, props] of Object.entries(items)) {
             const yearRange: Array<string> = [
                 '2010', '2011', '2012', '2013', '2014', '2015', '2016', '2017', '2018', '2019', '2020'
             ];
-            let data;
+            const categoryMap: {[key: string]: string} = {
+                'level 1': 'prefectures',
+                'level 2': 'cities',
+                'level 3': 'districts',
+            }
+            let data = null;
             
             // Initial point of chaining to retrieve correct level of data.
             // Retrieves 'regions' data.
@@ -49,12 +61,6 @@ const DashboardCharts: React.FC = () => {
                 data = dataSet[props.category][item];
             } else {
                 data = dataSet[props.partOf['level 1'].category][props.partOf['level 1'].name];
-            }
-
-            const categoryMap: {[key: string]: string} = {
-                'level 1': 'prefectures',
-                'level 2': 'cities',
-                'level 3': 'districts',
             }
 
             // Retrieves 'prefectures' data.
@@ -87,8 +93,7 @@ const DashboardCharts: React.FC = () => {
                 data = getLevelData(props.category, item, targetCategory, targetName, data);
             }
 
-
-            // Build separate arrays for year and actual data.
+            // Build separate arrays for x-axis (year) and y-axis (data points).
             let dataArray: Array<any> = [];
             let dataYears: Array<string> = [];
             for (const [year, dataObj] of Object.entries(data.transactYear)) {
@@ -97,12 +102,12 @@ const DashboardCharts: React.FC = () => {
                 dataYears.push(year);
             }
 
-            // Check for any missing years.
+            // Check for any year(s) with no data.
             let missingYears = yearRange.filter(function(year: any) {
                 return dataYears.indexOf(year) === -1;
             });
 
-            // Fill in all missing years.
+            // Fill in all empty years for chart to (not) render.
             missingYears.forEach(year => {
                 const yearObj = {
                     [year]: {
@@ -113,8 +118,7 @@ const DashboardCharts: React.FC = () => {
                 dataArray.push(yearObj);
             });
 
-
-            // Prepare array: sort by year in ascending order.
+            // Prepare array by sorting year in ascending order.
             dataArray.sort((a, b) => (
                 Object.keys(a) > Object.keys(b) ? 1 : -1
             ));
@@ -138,9 +142,11 @@ const DashboardCharts: React.FC = () => {
         }
 
 
-        // Helper: dives deeper into dataSet object.
         function getLevelData(selfCategory: string, selfName: string, 
             targetCategory: string, targetName: string, data: any) {
+            /* --------------------------------------------
+                Helper: dives deeper into dataSet object.
+            --------------------------------------------- */
             let category: string = '';
             let name: string = '';
 
@@ -157,7 +163,7 @@ const DashboardCharts: React.FC = () => {
     }
 
 
-    // Transform chart data into suitable data structure for chartjs.
+    // Transform data structure for chartjs.
     let priceDataSet: Array<any> = [];
     let countDataSet: Array<any> = [];
 
@@ -185,49 +191,26 @@ const DashboardCharts: React.FC = () => {
         '2010年', '2011年', '2012年', '2013年', '2014年', '2015年',
         '2016年', '2017年', '2018年', '2019年', '2020年'
     ];
+
+
+
+    function handleAfterDraw(chart: any, options: any) {
+        console.log(refLine.current);
+    }
+
+    /* -----------------------------------------
+                Line chart configs.
+    ----------------------------------------- */
     const linePriceData = {
         labels: xAxisYears,
         datasets: priceDataSet
-    }
-
-
-    function handleLegendClick(event: ChartEvent, legendItem: LegendItem) {
-        // Reference: https://stackoverflow.com/a/45343334/14181584
-        let itemIndex: number = legendItem.datasetIndex;
-        
-        
-        if (refLine.current !== null && refBar.current !== null) {
-            let lineMeta = refLine.current.getDatasetMeta(itemIndex);   // Same data set --> index,
-            let barMeta = refBar.current.getDatasetMeta(itemIndex);     // otherwise don't do this.
-            
-            // Toggle un/hide on click.
-            if (lineMeta.hidden === null) {
-                lineMeta.hidden = !lineMeta.hidden;
-                barMeta.hidden = !barMeta.hidden;
-            } else {
-                lineMeta.hidden = null;
-                barMeta.hidden = null;
-            }
-            // Update the charts.
-            refLine.current.update();
-            refBar.current.update();
-        }
-        
-    }
-
-    function handleLegendHover(event: any) {
-        event.native.target.style.cursor = 'pointer';
-    }
-
-    function handleLegendLeave(event: any) {
-        event.native.target.style.cursor = 'default';
     }
 
     const linePriceOptions = {
         elements: {
             line: {
                 borderWidth: 3,
-                fill: false,
+                fill: false
                 // spanGaps: true           // Misrepresents data
             },
             point: {
@@ -257,10 +240,6 @@ const DashboardCharts: React.FC = () => {
             legend: {
                 position: 'bottom',
                 labels: {
-                    font: {
-                        // family: 'Kaisei Opti',
-                        // size: 13
-                    },
                     padding: 15             // Adds vertical space between legend items
                 },
                 onClick: handleLegendClick, // Syncs both charts' clicks under Line's
@@ -279,16 +258,22 @@ const DashboardCharts: React.FC = () => {
             }
         },
         responsive: true,
-        titleFontSize: 20
+        titleFontSize: 20,
     }
     
 
+    /* ---------------------------------------------
+                    Bar chart configs.
+    --------------------------------------------- */
     const barCountData = {
         labels: xAxisYears,
         datasets: countDataSet
     }
 
     const barCountSum = (tooltipItems: Array<TooltipItem<ChartType>>) => {
+        /* -----------------------------------------
+            Adds a simple total count on each bar.
+        ----------------------------------------- */
         let sum = 0;
 
         tooltipItems.forEach(function(tooltipItem) {
@@ -315,7 +300,7 @@ const DashboardCharts: React.FC = () => {
                 color: '#483d8b'
             },
             legend: {
-                display: false              // Sync'ed from Line's clicks
+                display: false              // Taken over by and synced with Line's clicks
             },
             tooltip: {
                 backgroundColor: '#311d6990',
@@ -328,17 +313,56 @@ const DashboardCharts: React.FC = () => {
                 intersect: true,
                 padding: 10,
                 position: 'average'
-            }
+            },
+            // afterInit: handleAfterDraw
         },
         responsive: true,
         scales: {
-            x: {
-                stacked: true,
-            },
-            y: {
-                stacked: true,
-            },
+            x: {stacked: true},
+            y: {stacked: true}
         }
+    }
+
+
+    function handleLegendClick(event: ChartEvent, legendItem: LegendItem) {
+        /* -----------------------------------------------------------
+            Change mouse cursor into pointer on hover.
+            Reference: https://stackoverflow.com/a/45343334/14181584
+        ----------------------------------------------------------- */
+        let itemIndex: number = legendItem.datasetIndex;
+        console.log(refLine.current);
+        
+        if (refLine.current !== null && refBar.current !== null) {
+            let lineMeta = refLine.current.getDatasetMeta(itemIndex);   // Same data set --> index,
+            let barMeta = refBar.current.getDatasetMeta(itemIndex);     // otherwise don't do this.
+            
+            // Toggle un/hide on click.
+            if (lineMeta.hidden === null) {
+                lineMeta.hidden = !lineMeta.hidden;
+                barMeta.hidden = !barMeta.hidden;
+            } else {
+                lineMeta.hidden = null;
+                barMeta.hidden = null;
+            }
+            // Update the charts.
+            refLine.current.update();
+            refBar.current.update();
+        }
+        
+    }
+
+    function handleLegendHover(event: any) {
+        /* ---------------------------------------------
+            Change mouse cursor into pointer on hover.
+        --------------------------------------------- */
+        event.native.target.style.cursor = 'pointer';
+    }
+
+    function handleLegendLeave(event: any) {
+        /* ------------------------------------------
+            Change mouse cursor into pointer on hover.
+        -------------------------------------------- */
+        event.native.target.style.cursor = 'default';
     }
 
 
