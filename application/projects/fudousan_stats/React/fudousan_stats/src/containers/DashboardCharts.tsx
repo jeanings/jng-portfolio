@@ -368,12 +368,76 @@ const DashboardCharts: React.FC = () => {
     }
 
 
+
+    /* ===========================================
+                Custom Chartjs plugins
+    =========================================== */
+
+    const noDataNotify = {
+        /* ------------------------------------------------------------------------
+            Chartjs custom plugin to display "no data" text when none is loaded.
+            Reference: https://stackoverflow.com/questions/60183607/
+            API: https://www.chartjs.org/docs/next/developers/plugins.html
+                 https://www.chartjs.org/docs/latest/api/interfaces/Plugin.html
+        ------------------------------------------------------------------------ */
+        id: 'noDataNotify',
+        afterDraw: (chart: Chart) => {
+            let dataSet: number = chart.data.datasets.length;
+            if (dataSet === 0) {
+                let ctx = chart.ctx;
+                ctx.save();
+
+                // Canvas drawing styling.
+                ctx.textAlign = 'start';
+                ctx.textBaseline = 'middle';
+                ctx.font = "24px DotGothic16";
+                ctx.fillStyle = "gray";
+
+                // Text drawn when no data is selected.
+                // Using it as a readme on how to use app.
+                ctx.fillText(
+                    "Sorry! データが指定されていません",
+                    chart.width / 4.2,
+                    chart.height / 3.8,
+                    chart.width / 1.2
+                );
+                ctx.fillText(
+                    "検索条件を確認してください😔",
+                    chart.width / 4.2,
+                    chart.height / 3.0,
+                    chart.width / 1.2
+                );
+                ctx.fillText(
+                    "１）検索条件を選んでセーブして💾",
+                    chart.width / 3.9,
+                    chart.height / 2.2,
+                    chart.width / 1.2
+                );
+                ctx.fillText(
+                    "２）🌏のタブを押して興味ある地域を選定、",
+                    chart.width / 3.9,
+                    chart.height / 1.875,
+                    chart.width / 1.2
+                );
+                ctx.fillText(
+                    "３）そのデータはここに表示します😎",
+                    chart.width / 3.9,
+                    chart.height / 1.63,
+                    chart.width / 1.2
+                );
+                ctx.restore();
+            }
+        }
+    }
+
+
     return (
         <div className="Dashboard_charts">
             <div className="Dashboard_charts_line-price">
                 <Line
                     data={linePriceData}
                     options={linePriceOptions}
+                    plugins={[noDataNotify]}
                     ref={refLine} />
             </div>
             <div className="Dashboard_charts_bar-count">
