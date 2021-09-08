@@ -2,7 +2,7 @@ import React, { useEffect, useRef } from 'react';
 import { useAppSelector } from '../hooks';
 import { Chart, LineElement, BarElement, ChartType, 
             Title, Legend, LegendItem, Tooltip ,TooltipItem, CategoryScale, LinearScale,
-            PointElement, ChartEvent, LineController, BarController } from 'chart.js';
+            PointElement, ChartEvent, LineController, BarController, ChartDataset } from 'chart.js';
 import { fadedColours, solidColours } from '../imports/chartColourSets';
 import './DashboardCharts.css';
 
@@ -94,9 +94,14 @@ const DashboardCharts: React.FC = () => {
                 // Remove unselected region element from charts.
                 const removalTarget: string = selectState.prevRemoved !== null
                     ? selectState.prevRemoved : '';
+                // console.log('--removing: ', removalTarget, refLineChart.current);
 
-                refLineChart.current.data.datasets.splice(removalTarget, 1);
-                refBarChart.current.data.datasets.splice(removalTarget, 1)
+                refLineChart.current.data.datasets.forEach((dataSet: ChartDataset, index: number) => {
+                    if (dataSet.label === removalTarget) {
+                        refLineChart.current.data.datasets.splice(index, 1);
+                        refBarChart.current.data.datasets.splice(index, 1)
+                    }
+                });                
             }
             
             // Redraw charts.
