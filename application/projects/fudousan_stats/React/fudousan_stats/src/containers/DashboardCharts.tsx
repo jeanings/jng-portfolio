@@ -1,9 +1,14 @@
-import React, { useRef } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { useAppSelector } from '../hooks';
-import { Bar, Line } from 'react-chartjs-2';
-import { Chart, ChartEvent, ChartType, LegendItem, TooltipItem } from 'chart.js';
+import { Chart, LineElement, BarElement, ChartType, 
+            Title, Legend, LegendItem, Tooltip ,TooltipItem, CategoryScale, LinearScale,
+            PointElement, ChartEvent, LineController, BarController, ChartDataset } from 'chart.js';
 import { fadedColours, solidColours } from '../imports/chartColourSets';
 import './DashboardCharts.css';
+
+Chart.register(LineElement, BarElement, PointElement, 
+    LineController, BarController, CategoryScale, LinearScale, 
+    Title, Legend, Tooltip);
 
 
 
@@ -11,50 +16,98 @@ const DashboardCharts: React.FC = () => {
     /* -------------------------------------------------------------------------------
         Chart.js component that subscribes to {data} and {selection} states.
     ------------------------------------------------------------------------------- */
-    const selectState = useAppSelector(state => state.selection.selected);
+    // Dispatch, selector hooks.
+    const selectState = useAppSelector(state => state.selection);
     const dataState = useAppSelector(state => state.data);
-    const dataOptions = dataState.currentOptions;
-    const refLine = useRef<any | null>(null);
-    const refBar = useRef<any | null>(null);
-    let dataSetRaw: any;
-    let combinedChartData: Array<any> = [];
+    // Chart refs.
+    const refLineChartContainer = useRef<any>(null);
+    const refLineChart = useRef<any>(null);
+    const refBarChartContainer = useRef<any>(null);
+    const refBarChart = useRef<any>(null);
 
-    // Check for data in state.
-    let dataExists = dataState.collections?.[dataOptions.collection]?.[dataOptions.options];
-    if (typeof(dataExists) !== 'undefined') {
-        dataSetRaw = dataExists;
-    } 
 
-    // Build each {data} data set(s) of {selection} for charts.
-    if (dataSetRaw !== undefined) {
-        for (const [level, regionObj] of Object.entries(selectState)) {
-            const selectedDataSet = getSelectedDataSet(regionObj as ChartDataSetProps);
-            selectedDataSet.forEach(regionDataSet => {
-                combinedChartData.push(regionDataSet);
+    useEffect(() => {
+        /* -------------------------------------------------
+            Instantiate chartjs canvas on initial render.
+        ------------------------------------------------- */
+        if (refLineChart.current === null) {
+            refLineChart.current = new Chart(refLineChartContainer.current, {
+                type: 'line',
+                data: linePriceData,
+                options: linePriceOptions,
+                plugins: [noDataNotify]
             });
-        }   
-    }
 
-    // Transform data structure for chartjs.
-    let priceChartDataSet: Array<any> = [];
-    let countChartDataSet: Array<any> = [];
+            refBarChart.current = new Chart(refBarChartContainer.current, {
+                type: 'bar',
+                data: barCountData,
+                options: barCountOptions
+            });
+        }
+    }, []);
 
-    combinedChartData.forEach((regionItem, index) => {
-        let priceRegionalData = {
-            'label': regionItem.id,
-            'data': regionItem.price,
-            'borderColor': solidColours[index],
-            'backgroundColor': fadedColours[index]
-        };
 
-        let countRegionalData = {
-            'label': regionItem.id,
-            'data': regionItem.count,
-            'backgroundColor': fadedColours[index]
-        };
+    useEffect(() => {
+        /* -----------------------------------
+            Update charts' data sets.
+            Build when selection increases.
+        ----------------------------------- */
+        if (refLineChart.current) {
+            // Array lengths for state-selected and chart-drawn elements.
+            let chartDataSets: Array<ChartDataSetProps | null> = refLineChart.current.data.datasets;
+            let toBeDrawnDataLength: number = selectState.count;
+            let drawnDataLength: number = refLineChart.current.data.datasets.length !== undefined
+                ? refLineChart.current.data.datasets.length : 0;
+            // Arrays for drawn elements.
+            let drawnElementsNames: Array<string> = [];
+            let drawnFadedColours: Array<string> = [];
+            let drawnSolidColours: Array<string> = [];
+        
+            
+            // Get names and colours of drawn elements.
+            chartDataSets.forEach(dataSet => {
+                if (dataSet) {
+                    drawnElementsNames.push(dataSet.label);
+                    
+                    if (dataSet.borderColor) {
+                        drawnSolidColours.push(dataSet.borderColor);
+                    }
 
-        priceChartDataSet.push(priceRegionalData);
-        countChartDataSet.push(countRegionalData);
+                    if (dataSet.backgroundColor) {
+                        drawnFadedColours.push(dataSet.backgroundColor);
+                    }
+                }
+            });
+
+            if (toBeDrawnDataLength !== 0 && toBeDrawnDataLength >= drawnDataLength) {
+                // Build chart data on selection increment.
+                let regionDataSet = buildChartDataSet(drawnElementsNames)!;
+
+                // Add colour options to make data set ready for Chartjs.
+                let chartDataSet = transformDataSet(regionDataSet, drawnFadedColours)!;
+
+                // Push to chart data.
+                refLineChart.current.data.datasets.push(chartDataSet.price);
+                refBarChart.current.data.datasets.push(chartDataSet.count);
+
+            } else if (toBeDrawnDataLength < drawnDataLength) {
+                // Remove unselected region element from charts.
+                const removalTarget: string = selectState.prevRemoved !== null
+                    ? selectState.prevRemoved : '';
+                // console.log('--removing: ', removalTarget, refLineChart.current);
+
+                refLineChart.current.data.datasets.forEach((dataSet: ChartDataset, index: number) => {
+                    if (dataSet.label === removalTarget) {
+                        refLineChart.current.data.datasets.splice(index, 1);
+                        refBarChart.current.data.datasets.splice(index, 1)
+                    }
+                });                
+            }
+            
+            // Redraw charts.
+            refLineChart.current.update();
+            refBarChart.current.update();
+        }
     });
 
 
@@ -62,8 +115,8 @@ const DashboardCharts: React.FC = () => {
                 Line chart configs.
     ========================================= */
 
-    // Chart configs.
-    const xAxisYears: Array<string>= [
+    // X axis labels shared with bar chart.
+    const xAxisYears: Array<string> = [
         '2010年', '2011年', '2012年', '2013年', '2014年', 
         '2015年', '2016年', '2017年', '2018年', '2019年', 
         '2020年'
@@ -71,8 +124,8 @@ const DashboardCharts: React.FC = () => {
     
     const linePriceData = {
         labels: xAxisYears,
-        datasets: priceChartDataSet
-    }
+        datasets: []
+    };
 
     const linePriceOptions = {
         elements: {
@@ -106,7 +159,7 @@ const DashboardCharts: React.FC = () => {
                 color: '#483d8b'
             },
             legend: {
-                position: 'bottom',
+                position: 'bottom' as 'bottom',
                 labels: {
                     padding: 15             // Adds vertical space between legend items
                 },
@@ -122,7 +175,7 @@ const DashboardCharts: React.FC = () => {
                 displayColors: true,
                 intersect: false,           // Tooltip shows when in proximity of point
                 padding: 10,
-                position: 'average'
+                position: 'average' as 'average'
             }
         },
         responsive: true,
@@ -133,10 +186,11 @@ const DashboardCharts: React.FC = () => {
     /* =============================================
                     Bar chart configs.
     ============================================= */
+
     const barCountData = {
         labels: xAxisYears,
-        datasets: countChartDataSet
-    }
+        datasets: []
+    };
 
     const barCountOptions = {
         maintainAspectRatio: false,         // Important for responsiveness
@@ -168,7 +222,7 @@ const DashboardCharts: React.FC = () => {
                 displayColors: true,
                 intersect: true,
                 padding: 10,
-                position: 'average'
+                position: 'average' as 'average'
             },
         },
         responsive: true,
@@ -176,116 +230,119 @@ const DashboardCharts: React.FC = () => {
             x: {stacked: true},
             y: {stacked: true}
         }
-    }
+    };
 
 
     /* ===========================================
                     Helper functions
     =========================================== */
 
-    function getSelectedDataSet(regionObj: ChartDataSetProps) {
+    function getSelectedDataSet(regionName: string, props: StateDataSetProps, dataSetRaw: any) {
         /* -------------------------------------------------------------------------
             Builds array of data points of a region item for rendering in charts.
         ------------------------------------------------------------------------- */
-        let dataSetArray: Array<DataSetArrayProps> = [];
+        let dataSetArray: DataSetArrayProps;
+        let data;
 
-        for (const [regionName, props] of Object.entries(regionObj)) {
-            const yearRange: Array<string> = [
-                '2010', '2011', '2012', '2013', '2014', '2015', '2016', '2017', '2018', '2019', '2020'
-            ];
-            const categoryMap: {[key: string]: string} = {
-                'level 1': 'prefectures',
-                'level 2': 'cities',
-                'level 3': 'districts',
-            }
-            let data = null;
-            
-            // Initial point of chaining to retrieve correct level of data.
-            // Retrieves 'regions' data.
-            if (Object.keys(props.partOf).length === 0) {
-                data = dataSetRaw[props.category][regionName];
-            } else {
-                data = dataSetRaw[props.partOf['level 1'].category][props.partOf['level 1'].name];
-            }
-
-            // Retrieves 'prefectures' data.
-            if (props.partOf['level 1']) {
-                let targetCategory = categoryMap['level 1'];
-                let targetName = props.partOf['level 2'] !== undefined
-                    ? props.partOf['level 2'].name
-                    : regionName;
-
-                data = getLevelData(props.category, regionName, targetCategory, targetName, data);
-            }
-
-            // Retrieves 'cities' data.
-            if (props.partOf['level 2']) {
-                let targetCategory = categoryMap['level 2'];
-                let targetName = props.partOf['level 3'] !== undefined
-                    ? props.partOf['level 3'].name
-                    : regionName;
-
-                data = getLevelData(props.category, regionName, targetCategory, targetName, data);
-            }
-
-            // Retrieves 'districts' data.
-            if (props.partOf['level 3']) {
-                let targetCategory = categoryMap['level 3'];
-                let targetName = props.partOf['level 4'] !== undefined
-                    ? props.partOf['level 4'].name
-                    : regionName;
-
-                data = getLevelData(props.category, regionName, targetCategory, targetName, data);
-            }
-
-            // Build separate arrays for x-axis (year) and y-axis (data points).
-            let dataArray: Array<any> = [];
-            let dataYears: Array<string> = [];
-            for (const [year, dataObj] of Object.entries(data.transactYear)) {
-                const yearObj = {[year]: dataObj};
-                dataArray.push(yearObj);
-                dataYears.push(year);
-            }
-
-            // Check for any year(s) with no data.
-            let missingYears = yearRange.filter(function(year: any) {
-                return dataYears.indexOf(year) === -1;
-            });
-
-            // Fill in all empty years for chart to (not) render.
-            missingYears.forEach(year => {
-                const yearObj = {
-                    [year]: {
-                        'count': null,
-                        'priceMean': null
-                    }
-                }
-                dataArray.push(yearObj);
-            });
-
-            // Prepare array by sorting year in ascending order.
-            dataArray.sort((a, b) => (
-                Object.keys(a) > Object.keys(b) ? 1 : -1
-            ));
-
-            // Convert data structure to one that's readable by chartjs.
-            let priceMeanData: Array<number | null> = [];
-            let countData: Array<number | null> = [];
-            dataArray.forEach(item => {
-                for (const value of Object.values(item)) {
-                    let tempDataSet = value as DataSetProps;
-                    countData.push(tempDataSet.count);
-                    priceMeanData.push(tempDataSet.priceMean);
-                }
-            });
-
-            dataSetArray.push({
-                'id': regionName, 
-                'price': priceMeanData, 
-                'count': countData
-            });
+        const yearRange: Array<string> = [
+            '2010', '2011', '2012', '2013', '2014', '2015', '2016', '2017', '2018', '2019', '2020'
+        ];
+        const categoryMap: {[key: string]: string} = {
+            'level 1': 'prefectures',
+            'level 2': 'cities',
+            'level 3': 'districts',
+        };
+        
+        
+        // Initial point of chaining to retrieve correct level of data.
+        // Retrieves 'regions' data.
+        if (Object.keys(props.partOf).length === 0) {
+            data = dataSetRaw[props.category][regionName];
+        } else {
+            data = dataSetRaw[props.partOf['level 1']!.category][props.partOf['level 1']!.name];
         }
 
+        // Retrieves 'prefectures' data.
+        if (props.partOf['level 1']) {
+            let targetCategory = categoryMap['level 1'];
+            let targetName = props.partOf['level 2'] !== undefined
+                ? props.partOf['level 2']!.name
+                : regionName;
+
+            data = getLevelData(props.category, regionName, targetCategory, targetName, data);
+        }
+
+        // Retrieves 'cities' data.
+        if (props.partOf['level 2']) {
+            let targetCategory = categoryMap['level 2'];
+            let targetName = props.partOf['level 3'] !== undefined
+                ? props.partOf['level 3']!.name
+                : regionName;
+
+            data = getLevelData(props.category, regionName, targetCategory, targetName, data);
+        }
+
+        // Retrieves 'districts' data.
+        if (props.partOf['level 3']) {
+            let targetCategory = categoryMap['level 3'];
+            let targetName = props.partOf['level 4'] !== undefined
+                ? props.partOf['level 4']!.name
+                : regionName;
+
+            data = getLevelData(props.category, regionName, targetCategory, targetName, data);
+        }
+
+        let yAxisCombinedData: Array<any> = [];
+        let xAxisYears: Array<string> = [];
+        // Build separate arrays for x-axis (year) and y-axis (data points).
+        for (const [year, dataObj] of Object.entries(data.transactYear)) {
+            const yearObj = {[year]: dataObj};
+
+            yAxisCombinedData.push(yearObj);
+            xAxisYears.push(year);
+        }
+
+        // Build array of missing years (if any).
+        let missingYears: Array<string> = yearRange.filter(function(year: any) {
+            return xAxisYears.indexOf(year) === -1;
+        });
+
+        // Fill in all empty years for chart to (not) render.
+        missingYears.forEach((year: string) => {
+            const missingYearObj = {
+                [year]: {
+                    'count': null,
+                    'priceMean': null
+                }
+            };
+
+            yAxisCombinedData.push(missingYearObj);
+        });
+
+        // Prepare array by sorting year in ascending order.
+        yAxisCombinedData.sort((a, b) => (
+            Object.keys(a) > Object.keys(b) ? 1 : -1
+        ));
+
+        let priceMeanData: Array<number | null> = [];
+        let countData: Array<number | null> = [];
+        // Separate into 'count' and 'price' data sets. 
+        yAxisCombinedData.forEach(dataSet => {
+            for (const value of Object.values(dataSet)) {
+                let dataPoint = value as DataSetProps;
+
+                countData.push(dataPoint.count);
+                priceMeanData.push(dataPoint.priceMean);
+            }
+        });
+
+        // Bundle combined sets of cleaned data for the region. 
+        dataSetArray = {
+            'id': regionName, 
+            'price': priceMeanData, 
+            'count': countData
+        };
+        
 
         function getLevelData(selfCategory: string, selfName: string, 
             targetCategory: string, targetName: string, data: any) {
@@ -302,10 +359,75 @@ const DashboardCharts: React.FC = () => {
                 category = targetCategory;
                 name = targetName;
             }
+
             return data[category][name];
         }
 
         return dataSetArray;
+    }
+
+
+    function buildChartDataSet(names: Array<string>) {
+        /* ---------------------------------------------
+            Build base data set for requested region.
+        --------------------------------------------- */
+        let request = dataState.currentOptions;
+        let dataExists = dataState.collections?.[request.collection]?.[request.options];
+        let dataSetRaw: any = typeof(dataExists) !== 'undefined' ? dataExists : null;
+        let selectedDataSet: DataSetArrayProps;
+        
+        // Build each {data} set(s) of {selection} for charts.
+        if (dataSetRaw) {
+            for (const [dummyLevel, regionObjs] of Object.entries(selectState.selected)) {
+                for (const [regionName, props] of Object.entries(regionObjs as StateDataSetProps)) {
+                    if (names.length === 0 || names.includes(regionName) === false) {
+                        // Build for region that isn't currently drawn in charts.
+                        selectedDataSet = getSelectedDataSet(regionName, props, dataSetRaw) as DataSetArrayProps;
+                        
+                        return selectedDataSet;
+                    }
+                }
+            }
+        }
+    }
+
+
+    function transformDataSet(regionItem: DataSetArrayProps, drawnFadedColours: Array<string>) {
+        /* ---------------------------------------------------
+            Transform data sets to Chartjs' requirements.
+            Adds colour options to line and point elements.
+        --------------------------------------------------- */
+        for (let i = 0; i < fadedColours.length; i++) {
+            const useFaded: string = fadedColours[i];
+            const useSolid: string = solidColours[i];
+
+            if (drawnFadedColours.includes(useFaded) === true) {
+                continue;
+            } else if (drawnFadedColours.includes(useFaded) === false) {
+                // For line chart.
+                let priceRegionalData: ChartDataSetProps = {
+                    'label': regionItem.id,
+                    'data': regionItem.price,
+                    'borderColor': useSolid,
+                    'backgroundColor': useFaded
+                };
+        
+                // For bar chart.
+                let countRegionalData: ChartDataSetProps = {
+                    'label': regionItem.id,
+                    'data': regionItem.count,
+                    'backgroundColor': useFaded
+                };
+                
+                // Return as combined object.
+                let chartDataSet: RegionSetProps = {
+                    'price': priceRegionalData,
+                    'count': countRegionalData
+                };
+
+                return chartDataSet;
+            }
+        }
     }
 
 
@@ -322,6 +444,7 @@ const DashboardCharts: React.FC = () => {
         tooltipItems.forEach(function(tooltipItem) {
             sum += tooltipItem.parsed.y;
         });
+
         return '総計: ' + sum;
     }
 
@@ -333,9 +456,9 @@ const DashboardCharts: React.FC = () => {
         ----------------------------------------------------------- */
         let itemIndex: number = legendItem.datasetIndex;
         
-        if (refLine.current !== null && refBar.current !== null) {
-            let lineMeta = refLine.current.getDatasetMeta(itemIndex);   // Same data set --> index,
-            let barMeta = refBar.current.getDatasetMeta(itemIndex);     // otherwise don't do this.
+        if (refLineChart.current !== null && refBarChart.current !== null) {
+            let lineMeta = refLineChart.current.getDatasetMeta(itemIndex);   // Same data set --> index,
+            let barMeta = refBarChart.current.getDatasetMeta(itemIndex);     // otherwise don't do this.
             
             // Toggle un/hide on click.
             if (lineMeta.hidden === null) {
@@ -345,9 +468,10 @@ const DashboardCharts: React.FC = () => {
                 lineMeta.hidden = null;
                 barMeta.hidden = null;
             }
-            // Update the charts.
-            refLine.current.update();
-            refBar.current.update();
+
+            // Redraw charts.
+            refLineChart.current.update();
+            refBarChart.current.update();
         }
     }
 
@@ -361,26 +485,84 @@ const DashboardCharts: React.FC = () => {
 
 
     function handleLegendLeave(event: any) {
-        /* ----------------------------------------------
-            Change mouse cursor into pointer on hover.
-        ---------------------------------------------- */
+        /* -------------------------------------------------
+            Change mouse cursor back to default on leave.
+        ------------------------------------------------- */
         event.native.target.style.cursor = 'default';
+    }
+
+
+    /* ===========================================
+                Custom Chartjs plugins
+    =========================================== */
+
+    const noDataNotify = {
+        /* ------------------------------------------------------------------------
+            Chartjs custom plugin to display "no data" text when none is loaded.
+            Reference: https://stackoverflow.com/questions/60183607/
+            API: https://www.chartjs.org/docs/next/developers/plugins.html
+                 https://www.chartjs.org/docs/latest/api/interfaces/Plugin.html
+        ------------------------------------------------------------------------ */
+        id: 'noDataNotify',
+        afterDraw: (chart: Chart) => {
+            let dataSet: number = chart.data.datasets.length;
+            if (dataSet === 0) {
+                let ctx = chart.ctx;
+                ctx.save();
+
+                // Canvas drawing styling.
+                ctx.textAlign = 'start';
+                ctx.textBaseline = 'middle';
+                ctx.font = "24px DotGothic16";
+                ctx.fillStyle = "gray";
+
+                // Text drawn when no data is selected.
+                // Using it as a readme on how to use app.
+                ctx.fillText(
+                    "Sorry! データが指定されていません",
+                    chart.width / 4.2,
+                    chart.height / 3.8,
+                    chart.width / 1.2
+                );
+                ctx.fillText(
+                    "検索条件を確認してください😔",
+                    chart.width / 4.2,
+                    chart.height / 3.0,
+                    chart.width / 1.2
+                );
+                ctx.fillText(
+                    "１）検索条件を選んでセーブして💾",
+                    chart.width / 3.9,
+                    chart.height / 2.2,
+                    chart.width / 1.2
+                );
+                ctx.fillText(
+                    "２）🌏のタブを押して興味ある地域を選定、",
+                    chart.width / 3.9,
+                    chart.height / 1.875,
+                    chart.width / 1.2
+                );
+                ctx.fillText(
+                    "３）そのデータはここに表示します😎",
+                    chart.width / 3.9,
+                    chart.height / 1.63,
+                    chart.width / 1.2
+                );
+                ctx.restore();
+            }
+        }
     }
 
 
     return (
         <div className="Dashboard_charts">
             <div className="Dashboard_charts_line-price">
-                <Line
-                    data={linePriceData}
-                    options={linePriceOptions}
-                    ref={refLine} />
+                <canvas id="Dashboard_charts_line-price_chart" 
+                        ref={refLineChartContainer} />
             </div>
             <div className="Dashboard_charts_bar-count">
-                <Bar
-                    data={barCountData}
-                    options={barCountOptions}
-                    ref={refBar} />
+                <canvas id="Dashboard_charts_bar-count_chart"
+                        ref={refBarChartContainer} />
             </div>
         </div>    
     );
@@ -391,8 +573,8 @@ const DashboardCharts: React.FC = () => {
                 Types setting
 ========================================== */
 
-interface ChartDataSetProps {
-    [index: string] : string | any
+interface StateDataSetProps {
+    [index: string]: string | any
     category: string,
     partOf: {
         'level 1': PartOfProps | null,
@@ -403,7 +585,7 @@ interface ChartDataSetProps {
 }
 
 type PartOfProps = {
-    [index: string] : string | any,
+    [index: string]: string | any,
     category: string,
     name: string
 }
@@ -415,9 +597,23 @@ type DataSetArrayProps = {
 }
 
 type DataSetProps = {
-    [index: string] : string | any,
+    [index: string]: string | any,
     count: number | null,
     priceMean: number | null
+}
+
+type RegionSetProps = {
+    [index: string]: string | any,
+    price: ChartDataSetProps,
+    count: ChartDataSetProps
+}
+
+type ChartDataSetProps = {
+    [index: string]: string | any,
+    label: string,
+    data: Array<number | null>,
+    backgroundColor?: string,
+    borderColor?: string
 }
 
 
