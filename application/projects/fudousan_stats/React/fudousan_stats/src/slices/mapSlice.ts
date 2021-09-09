@@ -39,26 +39,35 @@ export const fetchGeo = (apiUrl: string, requestGeo: MapboxGeocoderProps) => {
     const language: string = '&language=ja';
     const worldview: string = '&worldview=jp';
     const resultsLimit: string = '&limit=' + '1';
+
     const settings: string = '.json?access_token='.concat(
-        accessToken, country, language, worldview, resultsLimit
+        accessToken, 
+        country, 
+        language, 
+        worldview, 
+        resultsLimit
     );
+
     const requestUrl: string = apiUrl.concat(
-        requestGeo.partOf, requestGeo.name, settings    // No type, bad results due to complicated regional typing.
+        requestGeo.partOf,
+        requestGeo.name,
+        settings
     );
         
     let geocoderPromise = Promise.resolve(axios.get(requestUrl));
+
     return geocoderPromise;
 }
 
 
 // State for initial render.
 const initialState: MapProps = {
-    lng: 137.89,
-    lat: 38.43,
-    zoom: 4.75,
+    lng: 137.57,
+    lat: 35.91,
+    zoom: 4.35,
     bounds: {
-        ne: {lng: null, lat: null},
-        sw: {lng: null, lat: null}
+        ne: {lng: 151.1719, lat: 46.3044},
+        sw: {lng: 123.9681, lat: 23.9492}
     }
 }
 
