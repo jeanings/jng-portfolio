@@ -10,6 +10,9 @@ import './DashboardMap.css';
 
 
 const DashboardMap: React.FC = () => {
+    /* ----------------------------------------------------------------------------
+        Mapbox GL JS component that subscribes to {menuLevel} and {map} states.
+    ---------------------------------------------------------------------------- */
     const dispatch = useAppDispatch();
     const menuLevelState = useAppSelector(state => state.menuLevel);
     const mapState = useAppSelector(state => state.map);
@@ -18,8 +21,10 @@ const DashboardMap: React.FC = () => {
     mapboxgl.accessToken = process.env.REACT_APP_DEV_MAPBOX;
 
 
-    // Initialize map (first render only).
     useEffect(() => {
+        /* -------------------------------------
+            Initialize map on initial render.
+        ------------------------------------- */
         if (map.current === null) {
             map.current = new mapboxgl.Map({
                 container: mapContainer.current,
@@ -40,8 +45,10 @@ const DashboardMap: React.FC = () => {
     });
 
 
-    // Send region props to Mapbox Geocoder API.
     useEffect(() => {
+        /* ----------------------------------------------
+            Send region props to Mapbox Geocoder API.
+        ---------------------------------------------- */
         const menuLevels = Object.entries(menuLevelState.active);
         let name: string = '';
         let type: string = '';
@@ -51,27 +58,31 @@ const DashboardMap: React.FC = () => {
         if (menuLevels.length > 1) {
             if (menuLevels.length === 4) {
                 // Current view: district type.
-                name = menuLevelState.active['level 4'].name,
-                type = 'locality',
-                partOf = menuLevelState.active['level 2'].name + ' ' + menuLevelState.active['level 3'].name;
+                type = 'locality';
+                name = menuLevelState.active['level 4'].name;
+                partOf = menuLevelState.active['level 2'].name.concat(
+                    ' ', menuLevelState.active['level 3'].name
+                );
             } else if (menuLevels.length === 3) {
                 // Current view: city type.
-                name = menuLevelState.active['level 3'].name;
                 type = 'place';
+                name = menuLevelState.active['level 3'].name;
                 partOf = menuLevelState.active['level 2'].name;
             } else if (menuLevels.length === 2) {
                 // Current view: prefecture type.
-                name = menuLevelState.active['level 2'].name;
                 type = 'region';
+                name = menuLevelState.active['level 2'].name;
                 partOf = '';
 
-                // Tokyo prefecture exception (bounding box from Mapbox way too big).
+                // Exception: Tokyo prefecture (bounding box from Mapbox way too big).
                 if (name === '東京都') {
                     updateBounds = {
                         sw: {lng: 138.9396, lat: 35.4955},
                         ne: {lng: 139.9244, lat: 35.8984}
-                    }
+                    };
+
                     dispatch(handleBoundsUpdate(updateBounds));
+                    
                     return;
                 }
             }
@@ -80,45 +91,38 @@ const DashboardMap: React.FC = () => {
                 name: name,
                 types: type,
                 partOf: partOf
-            }
-            dispatch(mapboxFetchGeo(mapboxRequest));
+            };
 
+            dispatch(mapboxFetchGeo(mapboxRequest));
         } else if (menuLevels.length === 1) {
             // Current view: region type.
             name = menuLevelState.active['level 1'].name;
             updateBounds = {
-                sw: {
-                    lng: regionCoords[name].sw.lng,
-                    lat: regionCoords[name].sw.lat
-                },
-                ne: {
-                    lng: regionCoords[name].ne.lng,
-                    lat: regionCoords[name].ne.lat
-                }
-            }
+                sw: {lng: regionCoords[name].sw.lng, lat: regionCoords[name].sw.lat},
+                ne: {lng: regionCoords[name].ne.lng, lat: regionCoords[name].ne.lat}
+            };
+
             dispatch(handleBoundsUpdate(updateBounds));
         } else {
-            // Current view: initial Japan view.
+            // Current view: initial Japan bounds.
             updateBounds = {
-                sw: {
-                    lng: 123.9681, 
-                    lat: 23.9492
-                },
-                ne: {
-                    lng: 151.1719, 
-                    lat: 46.3044
-                }
-            }
+                sw: {lng: 123.9681, lat: 23.9492},
+                ne: {lng: 151.1719, lat: 46.3044}
+            };
+
             dispatch(handleBoundsUpdate(updateBounds));
         }
-
     }, [menuLevelState.active]);
 
 
-    // Fit map to bounding or central coordinates on region change.
     useEffect(() => {
+        /* ----------------------------------------------------------------
+            Fit map to bounds or centre to coordinates on region change.
+        ---------------------------------------------------------------- */
         if (map.current) {
             if (mapState.bounds.sw.lng !== null) {
+                // Fit to bounds if API returns them.
+                // Most likely any region other than district types.
                 const bbox: Array<number> = [
                     mapState.bounds.sw.lng!, mapState.bounds.sw.lat!,
                     mapState.bounds.ne.lng!, mapState.bounds.ne.lat!
@@ -133,6 +137,8 @@ const DashboardMap: React.FC = () => {
                     }
                 );
             } else if (mapState.zoom !== null) {
+                // Centre to coordinates.
+                // Most likely district types only.
                 const center: Array<number> = [
                     mapState.lng, mapState.lat
                 ];
@@ -149,24 +155,13 @@ const DashboardMap: React.FC = () => {
             }
         }
     }, [mapState.bounds, mapState.lng]);
-
-
-    // *** For development *** 
-    // Get centre coordinates and bounding box
-    useEffect(() => {
-        if (map.current) {
-
-           
-            map.current.on('move', () => {
-                
-                console.log(map.current.getBounds())
-            });
-        }
-    })
         
     
     return (
-        <div id="map" ref={mapContainer} className="Dashboard_map_container">
+        <div 
+            id="map" 
+            ref={mapContainer} 
+            className="Dashboard_map_container">
         </div>
     );
 }
