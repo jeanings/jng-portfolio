@@ -4,9 +4,9 @@
     display: grid;
     height: 100%;
     width: 100%;
-    padding: 0 1vw 1vw 1vw;
+    padding: 0 1vw 0 1vw;
     grid-template-columns: 100%;
-    grid-template-rows: 55% 45%;
+    grid-template-rows: 52% 43% 5%;
 }
 
 .Dashboard_charts_line-price {
@@ -15,6 +15,31 @@
 }
 
 .Dashboard_charts_bar-count {
-    grid-row: 2 / -1;
+    grid-row: 2 / 3;
     width: 100%;
+}
+
+.Dashboard_charts_citation {
+    grid-row: 3 / -1;
+    align-self: flex-end;
+    justify-self: flex-end;
+    user-select: none;
+    -webkit-user-select: none;
+    color: var(--titles-font-colour-fade);
+    opacity: 0.85;
+}
+
+.Dashboard_charts_citation a {
+    opacity: 1;
+    padding: 0.2rem;
+    text-decoration: none;
+    color: var(--options-font-inactive);
+    transition: all 200ms ease-in;
+}
+
+.Dashboard_charts_citation a:hover {
+    background-color: var(--titles-font-colour);
+    color: #ffffff;
+    border-radius: 2px;
+    transition: all 200ms ease-out;
 }
