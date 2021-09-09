@@ -564,6 +564,9 @@ const DashboardCharts: React.FC = () => {
                 <canvas id="Dashboard_charts_bar-count_chart"
                         ref={refBarChartContainer} />
             </div>
+            <div className="Dashboard_charts_citation">
+                ※資料： <a href="https://www.land.mlit.go.jp/webland/servlet/MainServlet" target="_blank">国土交通省</a>から作成。
+            </div>
         </div>    
     );
 }
