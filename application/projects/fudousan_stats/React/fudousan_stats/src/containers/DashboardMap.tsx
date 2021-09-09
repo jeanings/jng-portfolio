@@ -26,10 +26,14 @@ const DashboardMap: React.FC = () => {
                 style: 'mapbox://styles/jeanings/cks7i4p090r9s18s3srb7d57l',
                 center: [mapState.lng, mapState.lat],
                 zoom: mapState.zoom,
+                bounds: [
+                    [mapState.bounds.sw.lng, mapState.bounds.sw.lat],
+                    [mapState.bounds.ne.lng, mapState.bounds.ne.lat]
+                ],
                 // interactive: false
                 boxZoom: false,
                 doubleClickZoom: false,
-                dragPan: false,
+                dragPan: true,
                 dragRotate: false
             });
         }
@@ -42,6 +46,7 @@ const DashboardMap: React.FC = () => {
         let name: string = '';
         let type: string = '';
         let partOf: string = '';
+        let updateBounds;
 
         if (menuLevels.length > 1) {
             if (menuLevels.length === 4) {
@@ -62,7 +67,7 @@ const DashboardMap: React.FC = () => {
 
                 // Tokyo prefecture exception (bounding box from Mapbox way too big).
                 if (name === '東京都') {
-                    const updateBounds = {
+                    updateBounds = {
                         sw: {lng: 138.9396, lat: 35.4955},
                         ne: {lng: 139.9244, lat: 35.8984}
                     }
@@ -79,8 +84,9 @@ const DashboardMap: React.FC = () => {
             dispatch(mapboxFetchGeo(mapboxRequest));
 
         } else if (menuLevels.length === 1) {
+            // Current view: region type.
             name = menuLevelState.active['level 1'].name;
-            const updateBounds = {
+            updateBounds = {
                 sw: {
                     lng: regionCoords[name].sw.lng,
                     lat: regionCoords[name].sw.lat
@@ -91,7 +97,21 @@ const DashboardMap: React.FC = () => {
                 }
             }
             dispatch(handleBoundsUpdate(updateBounds));
+        } else {
+            // Current view: initial Japan view.
+            updateBounds = {
+                sw: {
+                    lng: 123.9681, 
+                    lat: 23.9492
+                },
+                ne: {
+                    lng: 151.1719, 
+                    lat: 46.3044
+                }
+            }
+            dispatch(handleBoundsUpdate(updateBounds));
         }
+
     }, [menuLevelState.active]);
 
 
@@ -129,6 +149,20 @@ const DashboardMap: React.FC = () => {
             }
         }
     }, [mapState.bounds, mapState.lng]);
+
+
+    // *** For development *** 
+    // Get centre coordinates and bounding box
+    useEffect(() => {
+        if (map.current) {
+
+           
+            map.current.on('move', () => {
+                
+                console.log(map.current.getBounds())
+            });
+        }
+    })
         
     
     return (
