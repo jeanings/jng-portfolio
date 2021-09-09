@@ -17,6 +17,8 @@ export const mapboxFetchGeo = createAsyncThunk(
                 // Returns promise status, caught and handled by extra reducers in mapSlice. 
                 // console.log("SUCCESS: mapboxFetchGeo called.", response);
                 return (await response.data);
+            } else {
+                console.log("ERROR: mapboxFetchGeo response failed.", response);
             }
         } catch (error) {
             if (axios.isAxiosError(error.response)) {
@@ -32,8 +34,14 @@ export const mapboxFetchGeo = createAsyncThunk(
 // Fetch helper function.
 export const fetchGeo = (apiUrl: string, requestGeo: MapboxGeocoderProps) => {
     const accessToken = process.env.REACT_APP_DEV_MAPBOX as string;
-    const type: string = '&types=' + requestGeo.types;
-    const settings: string = '.json?access_token=' + accessToken + '&country=jp&worldview=jp&language=ja&limit=1';
+    // const type: string = '&types=' + requestGeo.types;
+    const country: string = '&country=jp';
+    const language: string = '&language=ja';
+    const worldview: string = '&worldview=jp';
+    const resultsLimit: string = '&limit=' + '1';
+    const settings: string = '.json?access_token='.concat(
+        accessToken, country, language, worldview, resultsLimit
+    );
     const requestUrl: string = apiUrl.concat(
         requestGeo.partOf, requestGeo.name, settings    // No type, bad results due to complicated regional typing.
     );
@@ -66,7 +74,8 @@ const mapSlice = createSlice({
         },
         // Update bounding coords for region change.
         handleBoundsUpdate: (state, action) => {
-            state.bounds = action.payload;
+            const newBounds: BoundsProps = action.payload;
+            state.bounds = newBounds;
         }
     },
     extraReducers: (builder) => {
@@ -74,10 +83,38 @@ const mapSlice = createSlice({
         // Reducers for async thunk Mapbox Geocoder API call.
             .addCase(mapboxFetchGeo.fulfilled, (state, action) => {
                 const geoData = action.payload.features[0];
+                let sameSwLng: boolean;
+                let sameNeLat: boolean;
+                let unchanged: boolean;
 
-                // Update bounding box coords.
-                [state.bounds.sw.lng, state.bounds.sw.lat,
-                    state.bounds.ne.lng, state.bounds.ne.lat] = geoData.bbox;
+                // Check if bounding box is the same as previous.
+                if (geoData.bbox !== undefined) {
+                    sameSwLng = state.bounds.sw.lng === geoData.bbox[0] ? true : false;
+                    sameNeLat = state.bounds.ne.lng === geoData.bbox[3] ? true : false;
+                } else {
+                    [sameSwLng, sameNeLat] = [false, false];
+                }
+
+                unchanged = sameSwLng === true || sameNeLat === true ? true : false;
+
+                if (geoData.bbox !== undefined && unchanged === false) {
+                    // Not used; update just for debugging
+                    [state.lng, state.lat] = geoData.center;
+                    state.zoom = null;
+
+                    // Update bounding box coords (exception: districts).
+                    [state.bounds.sw.lng, state.bounds.sw.lat,
+                        state.bounds.ne.lng, state.bounds.ne.lat] = geoData.bbox;
+                } else {
+                    // Update lng lat centres as exception.
+                    // (Mapbox free tier doesn't provide such tight local boundaries)
+                    [state.lng, state.lat] = geoData.center;
+                    state.zoom = 15;     // Arbitrary zoom level
+                    
+                    // Remove bounding box since it's not provided. 
+                    [state.bounds.sw.lng, state.bounds.sw.lat,
+                        state.bounds.ne.lng, state.bounds.ne.lat] = [null, null, null, null];
+                }
             })
 
             .addCase(mapboxFetchGeo.pending, (state, action) => {
@@ -97,7 +134,7 @@ export interface MapProps {
     [index: string]: string | any,
     lng: number,
     lat: number,
-    zoom: number,
+    zoom: number | null,
     bounds: BoundsProps
 }
 
