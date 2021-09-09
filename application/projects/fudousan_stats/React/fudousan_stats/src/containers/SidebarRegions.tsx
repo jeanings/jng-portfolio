@@ -31,12 +31,15 @@ const SidebarRegions: React.FC = () => {
     let menuApiDataList = menuApiState[nextCategory];
     let prevElemPropsList: Array<MenuElementProps> | null = null;
     if (renderedLength !== 0) {
-        prevElementKey = 'level' + ' ' + (renderedLength - 1);
+        prevElementKey = nextLength < 4 
+            ? 'level' + ' ' + (renderedLength - 1) 
+            : 'level' + ' ' + (renderedLength);
         prevElemPropsList = menuStoreState.rendered[prevElementKey];
     }
 
     // Create list of JSX elements for region items.
-    if (menuApiState.status === 'successful' 
+    if (menuApiState.status === 'successful'
+        && nextLength !== 4
         && Object.keys(menuApiDataList).length !== 0) {
         
         if (renderDirection === 'zoom in') {

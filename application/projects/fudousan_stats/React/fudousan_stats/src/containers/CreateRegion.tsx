@@ -39,13 +39,13 @@ const CreateRegion: React.FC<CreateRegionProps> = (props: CreateRegionProps) => 
                 }
             }
             
-            // Only dispatch if not the final level.
+            // Send to menu level slice for use as marker.
+            dispatch(handleMenuLevel(nextRender));
+            // Switch render direction.
+            dispatch(handleRenderDirection('zoom in'));
+            
+            // Dispatch to MongoDB thunk for requests above 'districts'.
             if (props.category != 'districts') {
-                // Send to menu level slice for use as marker.
-                dispatch(handleMenuLevel(nextRender));
-                // Switch render direction.
-                dispatch(handleRenderDirection('zoom in'));
-                
                 // Send to MongoDB thunk to get menu data (if first time retrieving).
                 if (!menuApiState[props.nextCategory][props.name]) {
                     let mongoDbRequest: object = {[props.category]: props.name};
