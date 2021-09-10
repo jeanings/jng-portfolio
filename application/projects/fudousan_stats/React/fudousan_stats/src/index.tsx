@@ -8,6 +8,18 @@ import * as serviceWorker from './serviceWorker';
 
 
 
+var WebFont = require('webfontloader');
+WebFont.load({
+  google: {
+    families: [
+      'DotGothic16:400',
+      'Kaisei Opti:400',
+      'M PLUS 1p:100,300'
+    ]
+  }
+});
+
+
 ReactDOM.render(
   <React.StrictMode>
     <Provider store={store}>
