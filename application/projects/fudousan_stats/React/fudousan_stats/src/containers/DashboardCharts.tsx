@@ -1,7 +1,7 @@
 import React, { useEffect, useRef } from 'react';
 import { useAppSelector } from '../hooks';
 import { Chart, LineElement, BarElement, ChartType, 
-            Title, Legend, LegendItem, Tooltip ,TooltipItem, CategoryScale, LinearScale,
+            Title, Legend, LegendItem, Tooltip, TooltipItem, CategoryScale, LinearScale,
             PointElement, ChartEvent, LineController, BarController, ChartDataset } from 'chart.js';
 import { fadedColours, solidColours } from '../imports/chartColourSets';
 import './DashboardCharts.css';
@@ -122,64 +122,115 @@ const DashboardCharts: React.FC = () => {
         '2020年'
     ];
     
+
     const linePriceData = {
         labels: xAxisYears,
         datasets: []
     };
 
-    const linePriceOptions = {
-        elements: {
-            line: {
-                borderWidth: 3,
-                fill: false,
-                spanGaps: false             // Misrepresents data, so keep at 'false'
-            },
-            point: {
-                pointStyle: 'crossRot',
-                radius: 7,
-                hoverRadius: 12, 
-                borderWidth: 1,
-                hoverBorderWidth: 3,
-                hitRadius: 8
-            }
+
+    // Chart grid elements options.
+    const linePriceOptionElements = {
+        line: {
+            borderWidth: 3,
+            fill: false,
+            spanGaps: false             // Misrepresents data, so keep at 'false'
         },
-        maintainAspectRatio: false,         // Important for responsiveness
-        plugins: {
-            title: {
-                display: true,
-                text: '取引平均価格（万円）',
-                padding: {
-                    bottom: 20
-                },
+        point: {
+            pointStyle: 'crossRot',
+            radius: 7,
+            borderWidth: 1,
+            hoverBorderWidth: 3,
+            hoverRadius: 12,
+            hitRadius: 8                // Increases proximity range of hover.
+        }
+    };
+
+
+    // Axes elements options.
+    const linePriceOptionScales = {
+        x: {
+            display: true,
+            ticks: {
                 font: {
-                    family: 'Kaisei Opti',
-                    size: 18,
-                    weight: 'normal'
-                },
-                color: '#483d8b'
-            },
-            legend: {
-                position: 'bottom' as 'bottom',
-                labels: {
-                    padding: 15             // Adds vertical space between legend items
-                },
-                onClick: handleLegendClick, // Syncs both charts' clicks under Line's
-                onHover: handleLegendHover, // Changes cursor into pointer
-                onLeave: handleLegendLeave  // Undo above
-            },
-            tooltip: {
-                backgroundColor: '#311d6990',
-                caretSize: 8,
-                caretPadding: 10,
-                cornerRadius: 3,
-                displayColors: true,
-                intersect: false,           // Tooltip shows when in proximity of point
-                padding: 10,
-                position: 'average' as 'average'
+                    family: "'M PLUS 1p', sans-serif",
+                    size: 12            // Font size in px.
+                }
             }
         },
+        y: {
+            display: true,
+            ticks: {
+                font: {
+                    family: "'M PLUS 1p', sans-serif",
+                    size: 12
+                }
+            }
+        }
+    };
+    
+    
+    // Chart UI elements options.
+    const linePriceOptionPlugins = {
+        title: {
+            display: true,
+            text: '取引平均価格（万円）',
+            padding: {
+                bottom: 20
+            },
+            font: {
+                family: "'M PLUS 1p', sans-serif",
+                size: 24,               // Font size in px.
+                weight: 'normal'
+            },
+            color: '#483d8b'
+        },
+        legend: {
+            display: true,
+            position: 'bottom' as 'bottom',
+            labels: {
+                padding: 15,            // Adds vertical space between legend items
+                boxHeight: 13,          // Height of coloured box in px.
+                boxWidth: 30,
+                font: {
+                    family: "'M PLUS 1p', sans-serif",
+                    size: 15
+                }
+            },
+            onClick: handleLegendClick, // Syncs both charts' clicks under Line's
+            onHover: handleLegendHover, // Changes cursor into pointer
+            onLeave: handleLegendLeave  // Undo above
+        },
+        tooltip: {
+            backgroundColor: '#311d6990',
+            caretSize: 8,
+            caretPadding: 10,
+            cornerRadius: 3,
+            displayColors: true,
+            intersect: false,           // Tooltip shows when in proximity of point
+            multiKeyBackground: '#00000000',
+            padding: 10,
+            position: 'average' as 'average',
+            titleFont: {
+                family: "'M PLUS 1p', sans-serif",
+                size: 15
+            },
+            bodyFont: {
+                family: "'M PLUS 1p', sans-serif",
+                size: 13
+            },
+            yAlign: 'bottom' as 'bottom'
+        }
+    };
+
+
+    // Main options object.
+    const linePriceOptions = {
+        elements: linePriceOptionElements,
+        maintainAspectRatio: false,         // Important for responsiveness
+        plugins: linePriceOptionPlugins,
         responsive: true,
-        titleFontSize: 20,
+        scales: linePriceOptionScales
     }
     
 
@@ -192,44 +243,88 @@ const DashboardCharts: React.FC = () => {
         datasets: []
     };
 
+
+    // Axes elements options.
+    const barCountOptionScales = {
+        x: {
+            display: true,
+            stacked: true,
+            ticks: {
+                font: {
+                    family: "'M PLUS 1p', sans-serif",
+                    size: 12        // Font size in px.
+                }
+            }
+        },
+        y: {
+            display: true,
+            stacked: true,
+            ticks: {
+                font: {
+                    family: "'M PLUS 1p', sans-serif",
+                    size: 12
+                }
+            }
+        }
+    };
+
+
+    // Chart UI elements options.
+    const barCountOptionPlugins = {
+        title: {
+            display: true,
+            text: '取引件数',
+            padding: {
+                top: 20,
+                bottom: 20
+            },
+            font: {
+                family: "'M PLUS 1p', sans-serif",
+                size: 24,               // Font size in px.
+                weight: 'normal'
+            },
+            color: '#483d8b'
+        },
+        legend: {
+            display: false
+        },
+        tooltip: {
+            backgroundColor: '#311d6990',
+            caretSize: 8,
+            cornerRadius: 3,
+            displayColors: true,
+            intersect: true,
+            multiKeyBackground: '#00000000',
+            padding: 10,
+            position: 'average' as 'average',
+            titleFont: {
+                family: "'M PLUS 1p', sans-serif",
+                size: 15
+            },
+            bodyFont: {
+                family: "'M PLUS 1p', sans-serif",
+                size: 13
+            },
+            footerFont: {
+                family: "'M PLUS 1p', sans-serif",
+                weight: 'normal',
+                size: 14
+            },
+            yAlign: 'bottom' as 'bottom',
+            callbacks: {
+                footer: barCountSum     // Adds a total count on each bar
+            },
+            
+        }
+    };
+
+
+    // Main options object.
     const barCountOptions = {
         maintainAspectRatio: false,         // Important for responsiveness
-        plugins: {
-            title: {
-                display: true,
-                text: '取引件数',
-                padding: {
-                    top: 20,
-                    bottom: 20
-                },
-                font: {
-                    family: 'Kaisei Opti',
-                    size: 18,
-                    weight: 'normal'
-                },
-                color: '#483d8b'
-            },
-            legend: {
-                display: false              // Taken over by and synced with Line's clicks
-            },
-            tooltip: {
-                backgroundColor: '#311d6990',
-                callbacks: {
-                    footer: barCountSum     // Adds a total count on each bar
-                },
-                caretSize: 8,
-                cornerRadius: 3,
-                displayColors: true,
-                intersect: true,
-                padding: 10,
-                position: 'average' as 'average'
-            },
-        },
+        plugins: barCountOptionPlugins,
         responsive: true,
-        scales: {
-            x: {stacked: true},
-            y: {stacked: true}
-        }
+        scales: barCountOptionScales
     };
 
 
@@ -409,7 +504,7 @@ const DashboardCharts: React.FC = () => {
                     'label': regionItem.id,
                     'data': regionItem.price,
                     'borderColor': useSolid,
-                    'backgroundColor': useFaded
+                    'backgroundColor': useFaded,
                 };
         
                 // For bar chart.
@@ -521,31 +616,31 @@ const DashboardCharts: React.FC = () => {
                 ctx.fillText(
                     "Sorry! データが指定されていません",
                     chart.width / 4.2,
-                    chart.height / 3.8,
+                    chart.height / 4.1,
                     chart.width / 1.2
                 );
                 ctx.fillText(
                     "検索条件を確認してください😔",
                     chart.width / 4.2,
-                    chart.height / 3.0,
+                    chart.height / 3.1,
                     chart.width / 1.2
                 );
                 ctx.fillText(
                     "１）検索条件を選んでセーブして💾",
-                    chart.width / 3.9,
-                    chart.height / 2.2,
+                    chart.width / 3.7,
+                    chart.height / 2.08,
                     chart.width / 1.2
                 );
                 ctx.fillText(
                     "２）🌏のタブを押して興味ある地域を選定、",
-                    chart.width / 3.9,
-                    chart.height / 1.875,
+                    chart.width / 3.7,
+                    chart.height / 1.79,
                     chart.width / 1.2
                 );
                 ctx.fillText(
-                    "３）そのデータはここに表示します😎",
-                    chart.width / 3.9,
-                    chart.height / 1.63,
+                    "３）データはここに表示します😎",
+                    chart.width / 3.7,
+                    chart.height / 1.565,
                     chart.width / 1.2
                 );
                 ctx.restore();
