@@ -2,6 +2,7 @@ import React from "react";
 import { useAppDispatch, useAppSelector } from '../hooks';
 import { handleSliders } from '../slices/slidersSlice';
 import { handleRawInput, mongoDbFetchData } from '../slices/dataSlice';
+import { clearAllSelections } from '../slices/selectionSlice';
 import "./SidebarOptions.css";
 
 
@@ -102,6 +103,9 @@ const SidebarOptions: React.FC = () => {
 
         // Save raw input.
         dispatch(handleRawInput(slidersState.options));
+
+        // Clear selections state.
+        dispatch(clearAllSelections(true));
 
         // Create MongoDB API payload.
         const collection: string = slidersState.options.age;
