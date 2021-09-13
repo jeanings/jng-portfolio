@@ -1,5 +1,6 @@
 import React, { useEffect, useRef } from 'react';
 import { useAppSelector } from '../hooks';
+import { fontDotGothic, fontMPlus } from '../index';
 import { Chart, LineElement, BarElement, ChartType, 
             Title, Legend, LegendItem, Tooltip, TooltipItem, CategoryScale, LinearScale,
             PointElement, ChartEvent, LineController, BarController, ChartDataset } from 'chart.js';
@@ -31,18 +32,25 @@ const DashboardCharts: React.FC = () => {
             Instantiate chartjs canvas on initial render.
         ------------------------------------------------- */
         if (refLineChart.current === null) {
-            refLineChart.current = new Chart(refLineChartContainer.current, {
-                type: 'line',
-                data: linePriceData,
-                options: linePriceOptions,
-                plugins: [noDataNotify]
-            });
 
-            refBarChart.current = new Chart(refBarChartContainer.current, {
-                type: 'bar',
-                data: barCountData,
-                options: barCountOptions
-            });
+            // Require title, axes font to load first.
+            fontMPlus.load(null, 4000)
+                .then(function() {
+                    refLineChart.current = new Chart(refLineChartContainer.current, {
+                        type: 'line',
+                        data: linePriceData,
+                        options: linePriceOptions,
+                        plugins: [noDataNotify]
+                    });
+
+                    refBarChart.current = new Chart(refBarChartContainer.current, {
+                        type: 'bar',
+                        data: barCountData,
+                        options: barCountOptions
+                    });
+                }, function() {
+                    console.error("Charts font 'M Plus' timed out.");
+                });
         }
     }, []);
 
@@ -601,50 +609,48 @@ const DashboardCharts: React.FC = () => {
         id: 'noDataNotify',
         afterDraw: (chart: Chart) => {
             let dataSet: number = chart.data.datasets.length;
-            if (dataSet === 0) {
-                let ctx = chart.ctx;
-                ctx.save();
+            
+            // Require notification text to load first.
+            fontDotGothic.load(null, 4000)
+                .then(function() {
+                    if (dataSet === 0) {
+                        let ctx = chart.ctx;
+                        ctx.save();
 
-                // Canvas drawing styling.
-                ctx.textAlign = 'start';
-                ctx.textBaseline = 'middle';
-                ctx.font = "24px DotGothic16";
-                ctx.fillStyle = "gray";
+                        // Canvas drawing styling.
+                        const xInitial: number = chart.width / 4.25;
+                        const xMax: number = chart.width / 1.2;
+                        const yInitial: number = chart.height / 4.20;
+                        ctx.textAlign = 'start';
+                        ctx.textBaseline = 'middle';
+                        ctx.font = "24px DotGothic16";
+                        ctx.fillStyle = "#9d99a8";      // lightly lavender-tinted grey
 
-                // Text drawn when no data is selected.
-                // Using it as a readme on how to use app.
-                ctx.fillText(
-                    "Sorry! データが指定されていません",
-                    chart.width / 4.2,
-                    chart.height / 4.1,
-                    chart.width / 1.2
-                );
-                ctx.fillText(
-                    "検索条件を確認してください😔",
-                    chart.width / 4.2,
-                    chart.height / 3.1,
-                    chart.width / 1.2
-                );
-                ctx.fillText(
-                    "１）検索条件を選んでセーブして💾",
-                    chart.width / 3.7,
-                    chart.height / 2.08,
-                    chart.width / 1.2
-                );
-                ctx.fillText(
-                    "２）🌏のタブを押して興味ある地域を選定、",
-                    chart.width / 3.7,
-                    chart.height / 1.79,
-                    chart.width / 1.2
-                );
-                ctx.fillText(
-                    "３）データはここに表示します😎",
-                    chart.width / 3.7,
-                    chart.height / 1.565,
-                    chart.width / 1.2
-                );
-                ctx.restore();
-            }
+                        const lines: Array<string> = [
+                            "Sorry! データが指定されていません",
+                            "検索条件を確認してください😔",
+                            "１）検索条件を選んでセーブして💾",
+                            "２）🌏のタブを押して興味ある地域を選定、",
+                            "３）データはここに表示します😎"
+                        ];
+
+                        // Draw text lines.
+                        lines.forEach((line: string, index:number) => {
+                            const ySpacing: number = yInitial + index * 35;
+
+                            ctx.fillText(
+                                line,                                   // text
+                                xInitial,                               // x position
+                                index === 0 ? yInitial : ySpacing,      // y position
+                                xMax                                    // x constraint
+                            );
+                        });
+
+                        ctx.restore();
+                    }
+                }, function() {
+                    console.error("Charts no-data fill text font 'DotGothic' timed out.");
+                });
         }
     }
 
