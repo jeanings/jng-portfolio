@@ -6,18 +6,10 @@ import App from './App';
 import { store } from './store';
 import * as serviceWorker from './serviceWorker';
 
-
-
-var WebFont = require('webfontloader');
-WebFont.load({
-  google: {
-    families: [
-      'DotGothic16:400',
-      'Kaisei Opti:400',
-      'M PLUS 1p:100,300'
-    ]
-  }
-});
+var FontFaceObserver = require('fontfaceobserver');
+export const fontDotGothic = new FontFaceObserver('DotGothic16');
+export const fontKaiseiOpti = new FontFaceObserver('Kaisei Opti');
+export const fontMPlus = new FontFaceObserver('M PLUS 1p');
 
 
 ReactDOM.render(
@@ -29,6 +21,11 @@ ReactDOM.render(
   document.getElementById('root')
 );
 
+
+// Types setting
+type FontsProps = {
+  [index: string] : string | any
+}
 
 // const render: React.FC = () => {
 //   ReactDOM.render(
