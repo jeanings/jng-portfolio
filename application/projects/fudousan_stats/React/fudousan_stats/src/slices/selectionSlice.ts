@@ -47,9 +47,17 @@ const selectionSlice = createSlice({
         clearSelection: (state, action) => {
             const level: string = action.payload.level;
             const name: string = action.payload.name;
-            delete state.selected[level][name];
+
             state.count = state.count - 1;
-            state.prevRemoved = name;
+            delete state.selected[level][name];
+        },
+        clearAllSelections: (state, action) => {
+            const clearAll: boolean = action.payload;
+
+            if (clearAll === true) {
+                state.count = 0;
+                state.selected = {};
+            }
         }
     }
 });
@@ -86,5 +94,5 @@ export const selectSelection = (state: RootState) => state.selection;
 
 // Export actions, reducers.
 const { actions, reducer } = selectionSlice;
-export const { handleSelection, clearSelection } = actions;
+export const { handleSelection, clearSelection, clearAllSelections } = actions;
 export default reducer;

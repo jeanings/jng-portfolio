@@ -98,11 +98,10 @@ const DashboardCharts: React.FC = () => {
                 refLineChart.current.data.datasets.push(chartDataSet.price);
                 refBarChart.current.data.datasets.push(chartDataSet.count);
 
-            } else if (toBeDrawnDataLength < drawnDataLength) {
+            } else if (toBeDrawnDataLength !==0 && toBeDrawnDataLength < drawnDataLength) {
                 // Remove unselected region element from charts.
                 const removalTarget: string = selectState.prevRemoved !== null
                     ? selectState.prevRemoved : '';
-                // console.log('--removing: ', removalTarget, refLineChart.current);
 
                 refLineChart.current.data.datasets.forEach((dataSet: ChartDataset, index: number) => {
                     if (dataSet.label === removalTarget) {
@@ -110,6 +109,9 @@ const DashboardCharts: React.FC = () => {
                         refBarChart.current.data.datasets.splice(index, 1)
                     }
                 });                
+            } else if (toBeDrawnDataLength === 0) {
+                refLineChart.current.data.datasets = [];
+                refBarChart.current.data.datasets = [];
             }
             
             // Redraw charts.
@@ -475,10 +477,10 @@ const DashboardCharts: React.FC = () => {
             Build base data set for requested region.
         --------------------------------------------- */
         let request = dataState.currentOptions;
-        let dataExists = dataState.collections?.[request.collection]?.[request.options];
+        let dataExists = dataState.collections[request.collection][request.options];
         let dataSetRaw: any = typeof(dataExists) !== 'undefined' ? dataExists : null;
         let selectedDataSet: DataSetArrayProps;
-        
+
         // Build each {data} set(s) of {selection} for charts.
         if (dataSetRaw) {
             for (const [dummyLevel, regionObjs] of Object.entries(selectState.selected)) {

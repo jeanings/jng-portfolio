@@ -63,7 +63,14 @@ const dataSlice = createSlice({
     initialState,
     reducers: {
         handleRawInput: (state, action) => {
-            state.currentOptions.rawInput = action.payload;
+            const collection = action.payload.collection;
+            const options = action.payload.options;
+            const rawInput = action.payload.rawInput;
+            console.log('handleRawInput', action.payload);
+            // Update state.
+            state.currentOptions.collection = collection;
+            state.currentOptions.options = options;
+            state.currentOptions.rawInput = rawInput;
         }
     },
     extraReducers: (builder) => {
