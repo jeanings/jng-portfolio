@@ -5,5 +5,5 @@
     grid-template-columns: 100%;
     grid-template-rows: 2rem auto;
     /* border: dashed 1px #cdcdcd; */
-    margin: 0.5vw;
+    padding: 0.5vw;
 }

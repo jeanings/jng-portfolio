@@ -1,10 +1,12 @@
 .Sidebar_options {
     display: grid;
-    max-height: 600px;
+    grid-template-columns: 100%;
+    grid-template-rows: repeat(5, 6rem) auto;
     border: dashed 1px #cdcdcd;
     border-top: none;
     padding-top: 1.5vw;
     padding-bottom: 2vw;
+    user-select: none;
     transition: all 300ms ease-out;
 }
 
@@ -16,8 +18,8 @@
     position: relative;
     width: 100%;
     margin-bottom: 1vw;
-    padding-left: 1.5vw;
-    padding-right: 1.5vw;
+    padding-left: 1vw;
+    padding-right: 1vw;
     justify-self: center;
 }
 
@@ -30,17 +32,18 @@
     opacity: 0;
 }
 .Sidebar_options_slider_text_label {
-    font-size: 0.9rem;
+    font-family: "Kaisei Opti", serif;
+    font-size: 1.15rem;
     text-align: start;
-    user-select: none;
     transition: all 500ms ease-out;
 }
 .Sidebar_options_slider_text_selected {
     color: var(--titles-font-colour);
-    font-size: 0.8rem;
+    font-family: "M PLUS 1p", san-serif;
+    font-weight: 300;
+    font-size: 0.85rem;
     text-align: end;
     align-self: end;
-    user-select: none;
 }
 
 
@@ -149,7 +152,7 @@
 /* Submission button */
 .Sidebar_options_save {
     margin-top: 1vw;
-    margin-right: 2vw;
+    padding-right: 1vw;
     justify-self: end;
 }
 .Sidebar_options_save button {
@@ -161,17 +164,19 @@
     border-radius: 3px;
     background: var(--titles-font-colour-fade);
     padding: 0.25rem 0.4rem 0.25rem 0.4rem;
-    font-size: 0.9rem;
+    font-family: "M PLUS 1p", san-serif;
+    font-weight: 300;
+    font-size: 1rem;
     color: #ffffff;
     transition: 200ms all ease-in-out;
 }
 #Sidebar_options_save_button:hover {
-    font-size: 0.92rem;
+    font-size: 1.02rem;
     box-shadow: 5px 5px 4px rgb(178, 188, 197), 2px 4px 5px rgb(169, 176, 180);
     transition: 200ms all ease-in-out;
 }
 #Sidebar_options_save_button:active {
-    font-size: 0.9rem;
+    font-size: 1rem;
     box-shadow: none;
     transition: 100ms all ease-in-out;
 }

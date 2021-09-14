@@ -12,8 +12,7 @@
     border: dashed 1px #cdcdcd;
     border-top: none;
     padding-top: 1.5vw;
-    padding-bottom: 2vw;
-    /* justify-items: center; */
+    padding-bottom: 1.5vw;
 }
 
 /* Menu scrollbar */
@@ -46,14 +45,13 @@
     grid-row: 1 / 2;
     display: grid;
     grid-template-columns: auto 2rem;
-    margin-left: 1.5vw;
-    margin-right: 1.5vw;
+    padding-left: 1vw;
+    padding-right: 1.5vw;
 }
 
 /* Back button */
 .Sidebar_regions_header_back {
     grid-column: 1 / 2;
-    /* margin-left: 1.5vw; */
     justify-self: start;
 }
 
@@ -62,7 +60,9 @@
     border-radius: 3px;
     background: var(--titles-font-colour-fade);
     padding: 0.25rem 0.4rem 0.25rem 0.4rem;
-    font-size: 0.9rem;
+    font-family: "M PLUS 1p", san-serif;
+    font-weight: 300;
+    font-size: 1rem;
     color: #ffffff;
     opacity: 0.15;
     cursor: not-allowed;
@@ -73,12 +73,12 @@
     cursor: zoom-out;
 }
 .Sidebar_regions_header_back_button.show:hover {
-    font-size: 0.92rem;
+    font-size: 1.02rem;
     box-shadow: 5px 5px 4px rgb(178, 188, 197), 2px 4px 5px rgb(169, 176, 180);
     transition: 200ms all ease-in-out;
 }
 .Sidebar_regions_header_back_button.show:active {
-    font-size: 0.9rem;
+    font-size: 1rem;
     box-shadow: none;
     transition: 100ms all ease-in-out;
 }
@@ -121,20 +121,7 @@
 /* Menu list area */
 .Sidebar_regions_list {
     grid-row: 2 / -1;
-    /* display: grid; */
     margin-top: 1vw;
-    margin-left: 1.5vw;
-    margin-right: 1.5vw;
-}
-
-.Sidebar_regions_list_selected {
-    /* height: 0; */
-}
-
-/* Region items list */
-.Sidebar_regions_list_menu {
-    /* grid-row: 2 / -1;
-    margin-top: 1vw;
-    margin-left: 1.5vw;
-    margin-right: 1.5vw; */
+    padding-left: 1vw;
+    padding-right: 1.5vw;
 }

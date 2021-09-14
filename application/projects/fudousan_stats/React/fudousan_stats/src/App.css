@@ -1,9 +1,9 @@
 .App {
   min-height: 100%;
   display: grid;
-  grid-template-columns: 15% 85%;
+  grid-template-columns: 16% 84%;
   grid-template-rows: 6rem auto;
-  margin: 1vh;
+  padding: 0.5vw;
   background-color: #ffffff;
   color: var(--options-font-inactive);
 }

@@ -1,30 +1,125 @@
 .Header {
     grid-column: 1 / -1;
     grid-row: 1;
+    display: grid;
+    grid-template-columns: 17% 83%;
+    grid-template-rows: 70% 30%;
     padding: 0.5rem;
     user-select: none;
 }
 
-.Header h1,
-.Header h2 {
-    font-family: "DotGothic16", sans-serif;
-    font-weight: 100;
+.Header_title_block {
+    display: grid;
+    grid-column: 1 / 2;
+    grid-row: 1 / -1;
+    grid-template-columns: max-content auto;
+    grid-template-rows: 100%;
 }
 
-.Header_title {
-    font-size: 1.5rem;
+/* Main title text */
+.Header_title_block_main {
+    display: grid;
+    grid-column: 1 / 2;
+    grid-row: 1 / -1;
+    grid-template-columns: 100%;
+    grid-template-rows: 70% 30%;
 }
 
-#Header_title_year {
-    font-family: "DotGothic16", sans-serif;
-    font-weight: 100;
-    transition: all 300ms ease-out;
-}
-.Header_title:hover > #Header_title_year{
-    font-size: 1.52rem;
-    text-shadow: 2px 4px 2px rgb(178, 188, 197), 2px 4px 5px rgb(169, 176, 180);
+
+#Header_title_block_title {
+    grid-column: 1 / 2;
+    grid-row: 1 / 2;
+    font-family: "Kaisei Opti", serif;
+    font-weight: 300;
+    font-size: 2.45rem;
+    align-self: baseline;
 }
 
-.Header_title-sub {
-    font-size: 1rem;
+#Header_title_block_sub {
+    grid-column: 1 / 2;
+    grid-row: 2 / -1;
+    font-family: "M PLUS 1p", sans-serif;
+    font-weight: 300;
+    font-size: 1.25rem;
+    align-self: end;
+}
+
+/* Year block */
+.Header_title_block_year {
+    display: grid;
+    grid-column: 2 / -1;
+    grid-row: 1 / -1;
+    grid-template-columns: 70% 30%;
+    grid-template-rows: 100%;
+}
+
+#Header_title_block_year-2010 {
+    position: relative;
+    display: flex;
+    grid-column: 1 / 2;
+    grid-row: 1 / 2;
+    font-family: "Kaisei Opti", serif;
+    font-weight: 300;
+    font-size: 2.3rem;
+    color: #703cff;
+    opacity: 0.80;
+    transition: all 350ms ease-out;
+    z-index: 1;
+}
+
+#Header_title_block_year-2020 {
+    position: relative;
+    display: flex;
+    grid-column: 1 / 2;
+    grid-row: 1 / 2;
+    flex-direction: column-reverse;
+    font-family: "Kaisei Opti", serif;
+    font-weight: 300;
+    font-size: 2.3rem;
+    color: #703cff;
+    opacity: 0.80;
+    transition: all 350ms ease-out;
+    z-index: 3;
+}
+
+#Header_title_block_year-unit {
+    position: relative;
+    display: flex;
+    grid-column: 1 / -1;
+    grid-row: 1 / -1;
+    font-family: "Kaisei Opti", serif;
+    font-weight: 300;
+    font-size: 4.3rem;
+    justify-self: end;
+    align-self: start;
+    color: #dad9df;
+    transition: all 200ms ease-out;
+    z-index: 2;
+}
+
+.Header_title_block_main:hover 
+    ~ .Header_title_block_year
+    > #Header_title_block_year-2010 {
+        font-size: 3.4rem;
+        color: #4184ff;
+        text-shadow: 2px 4px 2px rgb(178, 188, 197), 2px 4px 5px rgb(169, 176, 180);
+        transition: all 350ms ease-in;
+        opacity: 0.90;
+        z-index: 4;
+}
+
+.Header_title_block_main:hover 
+    ~ .Header_title_block_year
+    > #Header_title_block_year-2020 {
+        font-size: 3.4rem;
+        text-shadow: 2px 4px 2px rgb(178, 188, 197), 2px 4px 5px rgb(169, 176, 180);
+        transition: all 350ms ease-in;
+        z-index: 3;
+}
+
+.Header_title_block_main:hover 
+    ~ .Header_title_block_year
+    > #Header_title_block_year-unit {
+        opacity: 0;
+        transition: all 200ms ease-in;
 }
