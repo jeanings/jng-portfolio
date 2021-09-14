@@ -2,6 +2,7 @@ import React from "react";
 import { useAppDispatch, useAppSelector } from '../hooks';
 import { handleSliders } from '../slices/slidersSlice';
 import { handleRawInput, mongoDbFetchData } from '../slices/dataSlice';
+import { clearAllSelections } from '../slices/selectionSlice';
 import "./SidebarOptions.css";
 
 
@@ -100,9 +101,6 @@ const SidebarOptions: React.FC = () => {
     const onSaving = (event: any) => {
         event.preventDefault();
 
-        // Save raw input.
-        dispatch(handleRawInput(slidersState.options));
-
         // Create MongoDB API payload.
         const collection: string = slidersState.options.age;
         const options: string = slidersState.options.material.concat(
@@ -110,6 +108,18 @@ const SidebarOptions: React.FC = () => {
             'stationDistanceMin', '.', slidersState.options.stationDist, '.',
             'type', '.', slidersState.options.buildingType
         );
+
+        // Save raw input.
+        const rawInputPayload = {
+            collection: collection,
+            options: options,
+            rawInput: slidersState.options
+        }
+        console.log('rawInput dispatch');
+        dispatch(handleRawInput(rawInputPayload));
+
+        // Clear selections state.
+        dispatch(clearAllSelections(true));        
 
         // Send to MongoDB thunk to get housing data, if not already retrieved.
         if (keyExists(collection, dataState.collections) == true) {
