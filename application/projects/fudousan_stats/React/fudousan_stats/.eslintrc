@@ -1,0 +1,13 @@
+{
+    "plugins": [
+        "react-redux",
+        "@typescript-eslint"
+    ],
+    "extends": [
+        "plugin:react-redux/recommended"
+    ],
+    "parser": "@typescript-eslint/parser"
+    // "rules": {
+    //     "import/no-webpack-loader-syntax": "off"
+    // }
+}

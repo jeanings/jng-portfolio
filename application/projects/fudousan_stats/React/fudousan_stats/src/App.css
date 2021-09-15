@@ -1,0 +1,9 @@
+.App {
+  min-height: 100%;
+  display: grid;
+  grid-template-columns: 16% 84%;
+  grid-template-rows: 6rem auto;
+  padding: 0.5vw;
+  background-color: #ffffff;
+  color: var(--options-font-inactive);
+}

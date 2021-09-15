@@ -1,0 +1,183 @@
+.Sidebar_options {
+    display: grid;
+    grid-template-columns: 100%;
+    grid-template-rows: repeat(5, 6rem) auto;
+    border: dashed 1px #cdcdcd;
+    border-top: none;
+    padding-top: 1.5vw;
+    padding-bottom: 2vw;
+    user-select: none;
+    transition: all 300ms ease-out;
+}
+
+.Sidebar_options.hide {
+    display: none;
+}
+
+.Sidebar_options_slider {
+    position: relative;
+    width: 100%;
+    margin-bottom: 1vw;
+    padding-left: 1vw;
+    padding-right: 1vw;
+    justify-self: center;
+}
+
+/* Slider text */
+.Sidebar_options_slider_text {
+    display: grid;
+    grid-template-columns: auto auto;
+}
+.Sidebar_options_slider:hover > .Sidebar_options_slider_text label {
+    opacity: 0;
+}
+.Sidebar_options_slider_text_label {
+    font-family: "Kaisei Opti", serif;
+    font-size: 1.15rem;
+    text-align: start;
+    transition: all 500ms ease-out;
+}
+.Sidebar_options_slider_text_selected {
+    color: var(--titles-font-colour);
+    font-family: "M PLUS 1p", san-serif;
+    font-weight: 300;
+    font-size: 0.85rem;
+    text-align: end;
+    align-self: end;
+}
+
+
+/* Slider markers */
+.Sidebar_options_slider_ruler {
+    display: flex;
+    justify-content: space-between;
+    user-select: none;
+}
+.Sidebar_options_slider_ruler p {
+    line-height: 1.5rem;
+    font-size: 0.75rem;
+    color: rgb(55, 77, 99);
+    opacity: 0.3;
+
+}
+
+/* Slider custom styling */
+.Sidebar_options_slider input[type="range"] {
+    -webkit-appearance: none;
+    width: 100%;
+    direction: rtl;
+}
+
+.Sidebar_options_slider > input[type="range"]:hover {
+    cursor: pointer;
+}
+
+.Sidebar_options_slider > input[type="range"]:active {
+    cursor: ew-resize;
+}
+
+
+.Sidebar_options_slider input[type="range"]::-webkit-slider-runnable-track {
+    -webkit-appearance: none;
+    height: 2px;
+    width: 100%;
+    background: lightgray;
+    transition: 200ms all ease-in-out;
+}
+.Sidebar_options_slider input[type="range"]::-moz-range-track {
+    height: 2px;
+    width: 100%;
+    background: lightgray;
+    transition: 200ms all ease-in-out;
+}
+
+
+.Sidebar_options_slider input[type="range"]::-webkit-slider-runnable-track:hover {
+    background: var(--titles-font-colour-fade);
+    box-shadow: 0px 0px 0px rgb(164, 176, 187), 1px 1px 2px rgb(196, 225, 253);
+    transition: 200ms all ease-in-out;
+}
+.Sidebar_options_slider input[type="range"]::-moz-range-track:hover {
+    background: var(--titles-font-colour-fade);
+    box-shadow: 0px 0px 0px rgb(164, 176, 187), 1px 1px 2px rgb(196, 225, 253);
+    transition: 200ms all ease-in-out;
+}
+
+
+.Sidebar_options_slider input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    height: 1.20rem;
+    width: 0.5rem;
+    margin-top: -0.6rem;
+    border-radius: 25%;
+    background: #dcceff;
+    border: 2px solid var(--titles-font-colour-fade);
+    transition: 200ms all ease-in-out;
+}
+.Sidebar_options_slider input[type="range"]::-moz-range-thumb {
+    height: 1.20rem;
+    width: 0.5rem;
+    margin-top: -0.6rem;
+    border-radius: 25%;
+    background: #dcceff;
+    border: 2px solid var(--titles-font-colour-fade);
+    transition: 200ms all ease-in-out;
+}
+
+
+.Sidebar_options_slider input[type="range"]::-webkit-slider-thumb:hover {
+    background: #ffffff;
+    border: 2px solid var(--titles-font-colour-fade);
+    box-shadow: 2px 2px 1px rgb(98, 120, 139), 0px 0px 1px slategrey;
+    transition: 200ms all ease-in-out;
+}
+.Sidebar_options_slider input[type="range"]::-moz-range-thumb:hover {
+    background: #ffffff;
+    border: 2px solid var(--titles-font-colour-fade);
+    box-shadow: 2px 2px 1px rgb(98, 120, 139), 0px 0px 1px slategrey;
+    transition: 200ms all ease-in-out;
+}
+
+
+.Sidebar_options_slider input[type="range"]::-webkit-slider-thumb:active {
+    height: 1.4rem;
+    margin-top: -0.7rem;
+}
+.Sidebar_options_slider input[type="range"]::-moz-range-thumb:active {
+    height: 1.4rem;
+    margin-top: -0.7rem;
+}
+
+
+/* Submission button */
+.Sidebar_options_save {
+    margin-top: 1vw;
+    padding-right: 1vw;
+    justify-self: end;
+}
+.Sidebar_options_save button {
+    cursor: pointer;
+    user-select: none;
+}
+#Sidebar_options_save_button {
+    border: none;
+    border-radius: 3px;
+    background: var(--titles-font-colour-fade);
+    padding: 0.25rem 0.4rem 0.25rem 0.4rem;
+    font-family: "M PLUS 1p", san-serif;
+    font-weight: 300;
+    font-size: 1rem;
+    color: #ffffff;
+    transition: 200ms all ease-in-out;
+}
+#Sidebar_options_save_button:hover {
+    font-size: 1.02rem;
+    box-shadow: 5px 5px 4px rgb(178, 188, 197), 2px 4px 5px rgb(169, 176, 180);
+    transition: 200ms all ease-in-out;
+}
+#Sidebar_options_save_button:active {
+    font-size: 1rem;
+    box-shadow: none;
+    transition: 100ms all ease-in-out;
+}
+

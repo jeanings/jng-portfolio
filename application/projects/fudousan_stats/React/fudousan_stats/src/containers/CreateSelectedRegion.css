@@ -1,0 +1,89 @@
+.Sidebar_regions_selected_item {
+    display: grid;
+    grid-template-columns: auto 2rem;
+    grid-template-rows: 100%;
+    margin-bottom: 0.45rem;
+}
+
+.Sidebar_regions_selected_item_name {
+    grid-column: 1 / 2;
+    grid-row: 1 / 2;
+    color: var(--options-font-inactive);
+    font-family: "M PLUS 1p", sans-serif;
+    font-weight: 300;
+    font-size: 1rem;
+    text-align: end;
+    /* align-self: end; */
+    text-decoration-line: line-through;
+    text-decoration-style: wavy;
+    text-decoration-thickness: 0.25rem;
+    text-decoration-color: transparent;
+    transition: all 200ms ease-out;
+}
+
+/* Strikeout region name on checkbox hover */
+.Sidebar_regions_selected_item_checkbox:hover
+    ~ .Sidebar_regions_selected_item_name {
+        text-decoration-color: var(--titles-font-colour);
+        transition: all 200ms ease-in;
+}
+
+.Sidebar_regions_selected_item_checkbox {
+    display: grid;
+    grid-column: 2 / -1;
+    grid-row: 1 / 2;
+    grid-template-columns: 100%;
+    grid-template-rows: 100%;
+    width: 1rem;
+    height: 1rem;
+    align-self: center;
+    justify-self: end;
+    transition: background-color 300ms;
+}
+
+/* Hide default checkbox */
+.Sidebar_regions_selected_item_checkbox input {
+    display: none;
+    grid-column: 1;
+}
+
+/* Custom checkbox */
+.Sidebar_regions_selected_item_checkbox_overlay {
+    height: 100%;
+    width: 100%;
+    grid-column: 1;
+    grid-row: 1;
+    opacity: 0.5;
+    justify-self: right;
+    align-self: center;
+    text-align: center;
+    color: #000000;
+    border: dashed 2px #000000;
+    transition: background-color 300ms;
+    cursor: pointer;
+}
+
+.Sidebar_regions_selected_item_checkbox_checked {
+    display: flex;
+    grid-column: 1;
+    grid-row: 1;
+    height: 100%;
+    width: 100%;
+    opacity: 0;
+    font-size: 1.2rem;
+    align-items: center;
+    cursor: pointer;
+    user-select: none;
+}
+
+.Sidebar_regions_selected_item_checkbox input:hover 
+    ~ .Sidebar_regions_selected_item_checkbox_checked {
+    opacity: 0.75;
+}
+.Sidebar_regions_selected_item_checkbox_checked.show {
+    opacity: 1;
+}
+.Sidebar_regions_selected_item_checkbox input:checked 
+    ~ .Sidebar_regions_selected_item_checkbox_overlay {
+    opacity: 1;
+}

@@ -1,0 +1,119 @@
+.Sidebar_regions_item {
+    display: grid;
+    grid-template-columns: auto 2rem;
+    grid-template-rows: 100%;
+    margin-bottom: 0.45rem;
+    animation-name: slide-down;
+    animation-fill-mode: forwards;
+    animation-duration: 500ms;
+    animation-timing-function: ease-in;
+}
+@keyframes slide-down {
+    0% {
+        height: 0rem;
+        opacity: 0;
+    }
+    50% {
+        opacity: 0.2;
+    }
+    100% {
+        height: 1.25rem;
+        opacity: 1;
+    }
+}
+
+.Sidebar_regions_item_name {
+    grid-column: 1 / 2;
+    grid-row: 1 / 2;
+    border: none;
+    background: none;
+    color: var(--options-font-inactive);
+    font-family: "M PLUS 1p", sans-serif;
+    font-weight: 300;
+    font-size: 1rem;
+    text-align: end;
+    align-self: end;
+    cursor: zoom-in;
+    text-decoration-line: underline;
+    text-decoration-style: dashed;
+    text-decoration-thickness: 0.32rem;
+    text-decoration-color: transparent;
+    transition: text-decoration-color 200ms ease-out;
+}
+.Sidebar_regions_item_name:hover,
+.Sidebar_regions_item_name.toggle {
+    color: #ffffff;
+    border-radius: 0.15rem;
+    background-color: var(--titles-font-colour-fade);
+    transition: background-color 300ms;
+}
+
+/* Underline region name on checkbox hover */
+.Sidebar_regions_item_checkbox.available:hover
+    ~ .Sidebar_regions_item_name.available {
+        text-decoration-color: var(--titles-font-colour-fade);
+        transition: text-decoration-color 200ms ease-in;
+    }
+
+/* Grey-out items that aren't in the data set (passive filtering) */
+.Sidebar_regions_item_name.unavailable {
+    opacity: 0.15;
+    cursor: not-allowed;
+    user-select: none
+}
+.Sidebar_regions_item_name.unavailable:hover {
+    opacity: 0.25;
+    background-color: dimgrey;
+    transition: background-color 300ms;
+}
+
+/* Checkbox positioning */
+.Sidebar_regions_item_checkbox {
+    display: grid;
+    grid-column: 2 / -1;
+    grid-row: 1 / 2;
+    width: 1rem;
+    height: 1rem;
+    align-self: baseline;
+    justify-self: end;
+    transition: background-color 300ms;
+}
+.Sidebar_regions_item_checkbox.unavailable {
+    display: none;
+}
+.Sidebar_regions_item_checkbox:hover {
+    color: #ffffff;
+    border-radius: 0.15rem;
+    background-color: var(--titles-font-colour-fade);
+}
+/* Hide default checkbox */
+.Sidebar_regions_item_checkbox input {
+    display: none;
+    grid-column: 1;
+}
+
+/* Checkbox custom styling */
+.Sidebar_regions_item_checkbox_overlay {
+    height: 100%;
+    width: 100%;
+    grid-column: 1;
+    grid-row: 1;
+    opacity: 0.5;
+    justify-self: right;
+    align-self: center;
+    border: dashed 2px #000000;
+    transition: background-color 300ms;
+    cursor: pointer;
+}
+
+.Sidebar_regions_item_checkbox input:checked 
+    ~ .Sidebar_regions_item_checkbox_overlay {
+        background-color: var(--options-font-inactive);
+        opacity: 0.70;
+        transition: background-color 300ms;
+}
+.Sidebar_regions_item_checkbox input:checked 
+    ~ .Sidebar_regions_item_checkbox_overlay:hover {
+        background-color: #cdcdcd;
+        transition: background-color 300ms;
+}

@@ -1,0 +1,45 @@
+.Sidebar_regions_selected {
+    display: none;
+}
+
+.Sidebar_regions_selected.open {
+    display: grid;
+    border-bottom: dashed 1px #cdcdcd;
+    padding-bottom: 0.5vw;
+    margin-bottom: 1.5vw;
+    animation-name: gradual_reveal;
+    animation-fill-mode: forwards;
+    animation-duration: 400ms;
+    animation-timing-function: ease-in;
+}
+@keyframes gradual_reveal {
+    0% {
+        opacity: 0;
+    }
+    50% {
+        opacity: 0.3;
+    }
+    100% {
+        opacity: 1;
+    }
+}
+
+.Sidebar_regions_selected_header {
+    color: var(--options-font-inactive);
+    justify-self: center;
+    font-family: "Kaisei Opti", serif;
+    font-size: 1.2rem;
+}
+
+.Sidebar_regions_selected_category {
+    justify-self: right;
+    padding-bottom: 0.75vw;
+}
+
+.Sidebar_regions_selected_category_name {
+    display: flex;
+    flex-direction: row-reverse;
+    font-size: 1.15rem;
+    color: var(--titles-font-colour);
+    user-select: none;
+}

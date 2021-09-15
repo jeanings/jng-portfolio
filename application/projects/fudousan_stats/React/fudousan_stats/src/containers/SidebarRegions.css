@@ -1,0 +1,127 @@
+.Sidebar_regions {
+    display: none; /* inline-block when active */
+    /* Max height minus other elements */
+    /*                     header   tabs   back button*/
+    max-height: calc(100vh - 6rem - 2rem - 2vw );
+    overflow-y: scroll;
+}
+
+.Sidebar_regions.show {
+    display: grid;
+    grid-template-rows: 5% auto;
+    border: dashed 1px #cdcdcd;
+    border-top: none;
+    padding-top: 1.5vw;
+    padding-bottom: 1.5vw;
+}
+
+/* Menu scrollbar */
+.Sidebar_regions::-webkit-scrollbar {
+    width: 0.5rem;
+}
+/* Scroll track above thumb */
+.Sidebar_regions::-webkit-scrollbar-track-piece {
+    background-color: #ffffff;
+}
+/* Scroll track below thumb */
+.Sidebar_regions::-webkit-scrollbar-track {
+    background-color: #ffffff;
+}
+/* Scroll direction buttons */
+.Sidebar_regions::-webkit-scrollbar-button {
+    display: none;
+}
+/* Scroll "pong" bar */
+.Sidebar_regions::-webkit-scrollbar-thumb {
+    background-color: rgb(182, 182, 182);
+    border-radius: 0.20rem;
+}
+.Sidebar_regions::-webkit-scrollbar-thumb:hover {
+    background-color: var(--titles-font-colour-fade);
+}
+
+/* Regions header area */
+.Sidebar_regions_header {
+    grid-row: 1 / 2;
+    display: grid;
+    grid-template-columns: auto 2rem;
+    padding-left: 1vw;
+    padding-right: 1.5vw;
+}
+
+/* Back button */
+.Sidebar_regions_header_back {
+    grid-column: 1 / 2;
+    justify-self: start;
+}
+
+.Sidebar_regions_header_back_button {
+    border: none;
+    border-radius: 3px;
+    background: var(--titles-font-colour-fade);
+    padding: 0.25rem 0.4rem 0.25rem 0.4rem;
+    font-family: "M PLUS 1p", san-serif;
+    font-weight: 300;
+    font-size: 1rem;
+    color: #ffffff;
+    opacity: 0.15;
+    cursor: not-allowed;
+    transition: 200ms all ease-in-out;
+}
+.Sidebar_regions_header_back_button.show {
+    opacity: 1;
+    cursor: zoom-out;
+}
+.Sidebar_regions_header_back_button.show:hover {
+    font-size: 1.02rem;
+    box-shadow: 5px 5px 4px rgb(178, 188, 197), 2px 4px 5px rgb(169, 176, 180);
+    transition: 200ms all ease-in-out;
+}
+.Sidebar_regions_header_back_button.show:active {
+    font-size: 1rem;
+    box-shadow: none;
+    transition: 100ms all ease-in-out;
+}
+
+#Sidebar_regions_header_back_button_arrow {
+    padding: 0.25rem;
+    font-size: 1rem;
+}
+
+/* Sidebar header selected list toggle */
+.Sidebar_regions_header_selected {
+    grid-column: 2 / -1 ;
+    justify-self: end;
+    align-self: center;
+}
+
+.Sidebar_regions_header_selected_button {
+    height: 1.2rem;
+    width: 1.2rem;
+    opacity: 0.5;
+    border: dashed 2px #000000;
+    cursor: pointer;
+}
+#Sidebar_regions_header_selected_button_arrow {
+    display: inline-block;
+    color: #000000;
+    opacity: 1;
+    transition: all 300ms ease-out;
+}
+#Sidebar_regions_header_selected_button_arrow:hover {
+    color: var(--titles-font-colour);
+}
+#Sidebar_regions_header_selected_button_arrow.open {
+    transform: rotate(180deg);
+    text-align: center;
+    color: var(--titles-font-colour);
+    transition: all 300ms ease-in;
+}
+
+/* Menu list area */
+.Sidebar_regions_list {
+    grid-row: 2 / -1;
+    margin-top: 1vw;
+    padding-left: 1vw;
+    padding-right: 1.5vw;
+}

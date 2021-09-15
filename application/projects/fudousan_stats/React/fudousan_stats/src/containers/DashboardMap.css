@@ -1,0 +1,16 @@
+.Dashboard_map_container {
+    position: relative;
+    min-height: 300px;
+    min-width: 100%;
+    grid-column: 1 / 2;
+    grid-row: 1 / -1;
+}
+
+.mapboxgl-canvas {
+    padding: 1vw 1vw 0 1vw;
+}
+
+.mapboxgl-ctrl, 
+.mapboxgl-ctrl-bottom-right {
+    padding: 0 1vw 0 1vw;
+}
