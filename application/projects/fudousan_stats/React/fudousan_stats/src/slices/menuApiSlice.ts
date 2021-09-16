@@ -8,12 +8,14 @@ import { RootState } from '../store';
 export const mongoDbFetchRegions = createAsyncThunk(
     'menuApi/fetchRegions',
     async (requestParam: object) => {// requestParam from CreateRegion's dispatched action.
-        const apiUrl: string = 'http://localhost:5000/projects/fudousan-stats/get-menu?';
+        // const apiUrl: string = 'http://localhost:5000/projects/fudousan-stats/get-menu?';    // for development use
+        const apiUrl = 'https://jeanings.space/projects/fudousan-stats/get-menu?';              // for GAE deployment
+
         
         // Async fetch requested data, calling backend API to MongoDB.
         try {
             const response: AxiosResponse = await fetchDb(apiUrl, requestParam);
-               
+
             if (response.status === 200) {
                 // Returns promise status, caught and handled by extra reducers in menuSlice. 
                 // console.log("SUCCESS: mongoDbFetchRegions called.", response);
@@ -122,6 +124,7 @@ const menuApiSlice = createSlice({
 
             .addCase(mongoDbFetchRegions.rejected, (state, action) => {
                 state.status = 'unsuccessful';
+                console.error("MongoDB menu fetch unsuccessful.", action);
             })
     }
 });

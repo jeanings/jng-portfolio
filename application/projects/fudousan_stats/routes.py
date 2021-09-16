@@ -4,7 +4,7 @@
 
 from flask import Blueprint, render_template
 from flask import current_app as app
-from flask import jsonify, request
+from flask import jsonify, request, send_from_directory
 # from .assets import build_assets      # COMMENT OUT FOR GAE DEPLOYMENT
 from bson.json_util import ObjectId
 from pathlib import Path
@@ -13,6 +13,13 @@ from urllib.parse import quote_plus
 import json, pymongo
 
 
+# Folder paths.
+REACT_PATH = Path.cwd() / 'application' / 'static' / 'builds' / 'projects' / 'fudousan_stats' / 'React'
+if REACT_PATH.exists():
+    react_templates_abs = REACT_PATH.resolve().as_posix()
+    react_static_abs = (REACT_PATH / 'static').resolve().as_posix()
+    
+    
 # JSON encoder for ObjectId type.
 class MongoEncoder(json.JSONEncoder):
     def default(self, obj):
@@ -24,9 +31,9 @@ app.json_encoder = MongoEncoder
 
 # Blueprint config.
 fudousan_stats_bp = Blueprint('fudousan_stats_bp', __name__,
-                    static_folder='build/static',                 # change for react build 
-                    template_folder='build')            # same
-                    # static, templates
+                    static_url_path='/static',
+                    static_folder='builds/projects/fudousan_stats/React/static',
+                    template_folder=react_templates_abs)
 # build_assets(app)      # COMMENT OUT FOR GAE DEPLOYMENT
 
 
@@ -47,11 +54,12 @@ except pymongo.errors.OperationFailure:
     print("Database operation error.")
 
 
-# Fudousan main route.
+# Fudousan stats main route.
 @fudousan_stats_bp.route('/fudousan-stats', methods=['GET'])
 @fudousan_stats_bp.route('/fudousan-stats/', methods=['GET'])
 def fudousan_stats():
-    return render_template('index.html', title="不動産取引価格")
+    # return render_template('fudousan_stats.html', title="不動産取引価格")
+    return send_from_directory(react_templates_abs, 'fudousan_stats.html')
 
 
 # Fudousan MongoDB get menu data route.
