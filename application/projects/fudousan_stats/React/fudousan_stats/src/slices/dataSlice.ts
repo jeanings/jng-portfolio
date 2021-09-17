@@ -8,8 +8,9 @@ import { RootState } from '../store';
 export const mongoDbFetchData = createAsyncThunk(
     'data/fetchData',
     async (requestParam: object) => {// requestParam from SidebarOptions' dispatched action.
-        const apiUrl: string = 'http://localhost:5000/projects/fudousan-stats/get-data?';
-        
+        // const apiUrl: string = 'http://localhost:5000/projects/fudousan-stats/get-data?';    // for development use
+        const apiUrl = 'https://jeanings.space/projects/fudousan-stats/get-data?';              // for GAE deployment
+
         // Async fetch requested data, calling backend API to MongoDB.
         try {
             const response: AxiosResponse = await fetchDb(apiUrl, requestParam);
@@ -108,7 +109,7 @@ const dataSlice = createSlice({
             })
 
             .addCase(mongoDbFetchData.rejected, (state, action) => {
-                // Do nothing.
+                console.error("MongoDB data fetch unsuccessful.", action);
             })
     }
 });
