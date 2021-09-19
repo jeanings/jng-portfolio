@@ -28,7 +28,7 @@ const DashboardMap: React.FC = () => {
         if (map.current === null) {
             map.current = new mapboxgl.Map({
                 container: mapContainer.current,
-                style: 'mapbox://styles/jeanings/cks7i4p090r9s18s3srb7d57l',
+                style: 'mapbox://styles/jeanings/cktoky46n1cw818kzolvwcpn5',
                 center: [mapState.lng, mapState.lat],
                 zoom: mapState.zoom,
                 bounds: [

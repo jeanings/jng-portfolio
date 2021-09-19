@@ -7,9 +7,9 @@ import { store } from './store';
 import * as serviceWorker from './serviceWorker';
 
 var FontFaceObserver = require('fontfaceobserver');
-export const fontDotGothic = new FontFaceObserver('DotGothic16');
-export const fontKaiseiOpti = new FontFaceObserver('Kaisei Opti');
-export const fontMPlus = new FontFaceObserver('M PLUS 1p');
+export const fontHinaMincho = new FontFaceObserver('Hina Mincho');  // serif
+export const fontKaiseiOpti = new FontFaceObserver('Kaisei Opti');  // serif
+export const fontMPlus = new FontFaceObserver('M PLUS 1p');         // sans-serif
 
 
 ReactDOM.render(

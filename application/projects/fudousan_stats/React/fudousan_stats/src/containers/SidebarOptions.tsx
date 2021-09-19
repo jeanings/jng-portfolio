@@ -61,7 +61,7 @@ const SidebarOptions: React.FC = () => {
         'wood': '木造',
         'stFrame': '鉄骨造',
         'reCon': '鉄筋コンクリート造',
-        'con':　'コンクリートブロック造'
+        'con':　'ブロック造'
     }
     
     

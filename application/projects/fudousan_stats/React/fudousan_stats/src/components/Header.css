@@ -53,7 +53,8 @@
     grid-template-rows: 100%;
 }
 
-#Header_title_block_year-2010 {
+#Header_title_block_year-2010,
+#Header_title_block_year-2010-1 {
     position: relative;
     display: flex;
     grid-column: 1 / 2;
@@ -61,10 +62,10 @@
     font-family: "Kaisei Opti", serif;
     font-weight: 300;
     font-size: 2.3rem;
-    color: #703cff;
-    opacity: 0.80;
+    color: var(--options-font-highlight);
+    opacity: 1;
     transition: all 350ms ease-out;
-    z-index: 1;
+    z-index: 3;
 }
 
 #Header_title_block_year-2020 {
@@ -76,10 +77,10 @@
     font-family: "Kaisei Opti", serif;
     font-weight: 300;
     font-size: 2.3rem;
-    color: #703cff;
-    opacity: 0.80;
+    color: var(--extra-highlight);
+    opacity: 1;
     transition: all 350ms ease-out;
-    z-index: 3;
+    z-index: 2;
 }
 
 #Header_title_block_year-unit {
@@ -92,20 +93,43 @@
     font-size: 4.3rem;
     justify-self: end;
     align-self: start;
-    color: #dad9df;
+    color: #cfd3c3;
     transition: all 200ms ease-out;
-    z-index: 2;
+    z-index: 1;
 }
 
 .Header_title_block_main:hover 
     ~ .Header_title_block_year
     > #Header_title_block_year-2010 {
         font-size: 3.4rem;
-        color: #4184ff;
         text-shadow: 2px 4px 2px rgb(178, 188, 197), 2px 4px 5px rgb(169, 176, 180);
         transition: all 350ms ease-in;
-        opacity: 0.90;
-        z-index: 4;
+        animation-name: fade-merge;
+        animation-timing-function: ease-in-out;
+        animation-duration: 350ms;
+        animation-fill-mode: forwards;
+        opacity: 1;
+        z-index: 2;
+}
+
+@keyframes fade-merge {
+    0% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0.9;
+    }
+
+    75% {
+        opacity: 0.85;
+    }
+
+    100% {
+        opacity: 0;
+        color: var(--options-font-active);
+    }
+
 }
 
 .Header_title_block_main:hover 

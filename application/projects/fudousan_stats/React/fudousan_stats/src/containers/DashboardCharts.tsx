@@ -1,6 +1,6 @@
 import React, { useEffect, useRef } from 'react';
 import { useAppSelector } from '../hooks';
-import { fontDotGothic, fontMPlus } from '../index';
+import { fontHinaMincho, fontMPlus } from '../index';
 import { Chart, LineElement, BarElement, ChartType, 
             Title, Legend, LegendItem, Tooltip, TooltipItem, CategoryScale, LinearScale,
             PointElement, ChartEvent, LineController, BarController, ChartDataset } from 'chart.js';
@@ -161,10 +161,13 @@ const DashboardCharts: React.FC = () => {
     const linePriceOptionScales = {
         x: {
             display: true,
+            // grid: {
+            //     color: '#9c9c9c'
+            // },
             ticks: {
                 font: {
                     family: "'M PLUS 1p', sans-serif",
-                    size: 12            // Font size in px.
+                    size: 13            // Font size in px.
                 }
             }
         },
@@ -173,7 +176,7 @@ const DashboardCharts: React.FC = () => {
             ticks: {
                 font: {
                     family: "'M PLUS 1p', sans-serif",
-                    size: 12
+                    size: 13
                 }
             }
         }
@@ -189,11 +192,11 @@ const DashboardCharts: React.FC = () => {
                 bottom: 20
             },
             font: {
-                family: "'M PLUS 1p', sans-serif",
+                family: "'Kaisei Opti', serif",
                 size: 24,               // Font size in px.
                 weight: 'normal'
             },
-            color: '#483d8b'
+            color: '#0c3f42'
         },
         legend: {
             display: true,
@@ -204,7 +207,7 @@ const DashboardCharts: React.FC = () => {
                 boxWidth: 30,
                 font: {
                     family: "'M PLUS 1p', sans-serif",
-                    size: 15
+                    size: 17
                 }
             },
             onClick: handleLegendClick, // Syncs both charts' clicks under Line's
@@ -212,7 +215,7 @@ const DashboardCharts: React.FC = () => {
             onLeave: handleLegendLeave  // Undo above
         },
         tooltip: {
-            backgroundColor: '#311d6990',
+            backgroundColor: '#0c3f4290',
             caretSize: 8,
             caretPadding: 10,
             cornerRadius: 3,
@@ -227,7 +230,7 @@ const DashboardCharts: React.FC = () => {
             },
             bodyFont: {
                 family: "'M PLUS 1p', sans-serif",
-                size: 13
+                size: 14
             },
             yAlign: 'bottom' as 'bottom'
         }
@@ -262,7 +265,7 @@ const DashboardCharts: React.FC = () => {
             ticks: {
                 font: {
                     family: "'M PLUS 1p', sans-serif",
-                    size: 12        // Font size in px.
+                    size: 13        // Font size in px.
                 }
             }
         },
@@ -272,7 +275,7 @@ const DashboardCharts: React.FC = () => {
             ticks: {
                 font: {
                     family: "'M PLUS 1p', sans-serif",
-                    size: 12
+                    size: 13
                 }
             }
         }
@@ -289,17 +292,17 @@ const DashboardCharts: React.FC = () => {
                 bottom: 20
             },
             font: {
-                family: "'M PLUS 1p', sans-serif",
+                family: "'Kaisei Opti', serif",
                 size: 24,               // Font size in px.
                 weight: 'normal'
             },
-            color: '#483d8b'
+            color: '#0c3f42'
         },
         legend: {
             display: false
         },
         tooltip: {
-            backgroundColor: '#311d6990',
+            backgroundColor: '#0c3f4290',
             caretSize: 8,
             cornerRadius: 3,
             displayColors: true,
@@ -313,7 +316,7 @@ const DashboardCharts: React.FC = () => {
             },
             bodyFont: {
                 family: "'M PLUS 1p', sans-serif",
-                size: 13
+                size: 14
             },
             footerFont: {
                 family: "'M PLUS 1p', sans-serif",
@@ -613,7 +616,7 @@ const DashboardCharts: React.FC = () => {
             let dataSet: number = chart.data.datasets.length;
             
             // Require notification text to load first.
-            fontDotGothic.load(null, 4000)
+            fontHinaMincho.load(null, 4000)
                 .then(function() {
                     if (dataSet === 0) {
                         let ctx = chart.ctx;
@@ -625,8 +628,10 @@ const DashboardCharts: React.FC = () => {
                         const yInitial: number = chart.height / 4.20;
                         ctx.textAlign = 'start';
                         ctx.textBaseline = 'middle';
-                        ctx.font = "24px DotGothic16";
-                        ctx.fillStyle = "#9d99a8";      // lightly lavender-tinted grey
+                        ctx.fillStyle = '#828a81';
+                        // ctx.font = "24px 'M PLUS 1p', san-serif";    // too clinical
+                        // ctx.font = "24px 'Kaisei Opti', serif";      // too bold
+                        ctx.font = "24px 'Hina Mincho', serif";
 
                         const lines: Array<string> = [
                             "Sorry! データが指定されていません",
