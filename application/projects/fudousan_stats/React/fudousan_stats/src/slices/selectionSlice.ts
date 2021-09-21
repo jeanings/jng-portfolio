@@ -48,8 +48,9 @@ const selectionSlice = createSlice({
             const level: string = action.payload.level;
             const name: string = action.payload.name;
 
-            state.count = state.count - 1;
             delete state.selected[level][name];
+            state.count = state.count - 1;
+            state.prevRemoved = name;
         },
         clearAllSelections: (state, action) => {
             const clearAll: boolean = action.payload;
