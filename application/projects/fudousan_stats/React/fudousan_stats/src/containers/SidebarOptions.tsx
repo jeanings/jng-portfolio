@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useRef } from "react";
 import { useAppDispatch, useAppSelector } from '../hooks';
 import { handleSliders } from '../slices/slidersSlice';
 import { handleRawInput, mongoDbFetchData } from '../slices/dataSlice';
@@ -11,6 +11,17 @@ const SidebarOptions: React.FC = () => {
     const dispatch = useAppDispatch();
     const slidersState = useAppSelector(state => state.sliders);
     const dataState = useAppSelector(state => state.data);
+    const refSubmitTimer = useRef<any>({timer: 0});
+
+
+    useEffect(() => {
+        /* ------------------------
+            SetTimeout instance.
+        ------------------------ */
+        return () => {
+            clearTimeout(refSubmitTimer.current.timer)
+        }
+    }, []);
 
     // Helper: for onSaving readability.
     function keyExists(inputKey: string, inputObj: object) {
@@ -100,6 +111,7 @@ const SidebarOptions: React.FC = () => {
     // Handle click on save button.
     const onSaving = (event: any) => {
         event.preventDefault();
+        clearTimeout(refSubmitTimer.current.timer);
 
         // Create MongoDB API payload.
         const collection: string = slidersState.options.age;
@@ -131,7 +143,27 @@ const SidebarOptions: React.FC = () => {
         } else {
             dispatch(mongoDbFetchData({"collection": collection, "options": options}));
         }
+
+        // Change view to regions menu.
+        refSubmitTimer.current.timer = setTimeout(() => {
+            const optionsTab = document.getElementById("Sidebar_tab_options");
+            const regionsTab = document.getElementById("Sidebar_tab_regions");
+            const optionsMenu = document.getElementsByClassName("Sidebar_options")[0];
+            const regionsMenu = document.getElementsByClassName("Sidebar_regions")[0];
+
+            optionsTab?.classList.add("hide");
+            optionsMenu.classList.add("hide");
+            regionsTab?.classList.add("show");
+            regionsMenu.classList.add("show");
+
+        }, 1250);
     }
+
+
+
+    
+    
+
 
 
     return (
