@@ -27,10 +27,11 @@
 #Sidebar_tab_options {
     border-top-left-radius: 5px;
     border-top-right-radius: 25px;
-    border-top: dashed 1px #cdcdcd;
-    border-left: dashed 1px #cdcdcd;
-    border-right: dashed 1px #cdcdcd;
-    border-bottom: none;    
+    border-top: double 3px var(--border-lines);
+    border-left: double 3px var(--border-lines);
+    border-right: double 3px var(--border-lines);
+    border-bottom: none;
+    background-color: var(--background);
 }
 #Sidebar_tab_options.hide {
     border-top-left-radius: 5px;
@@ -38,7 +39,7 @@
     border-top: none;
     border-left: none;
     border-right: none;
-    border-bottom: dashed 1px #cdcdcd;
+    border-bottom: double 3px var(--border-lines);
 }
 #Sidebar_tab_options_icon {
     opacity: 0.85;
@@ -54,15 +55,15 @@
     border-top: none;
     border-left: none;
     border-right: none;
-    border-bottom: dashed 1px #cdcdcd;
-    
+    border-bottom: double 3px var(--border-lines);
+    background-color: var(--background);
 }
 #Sidebar_tab_regions.show {
     border-top-right-radius: 5px;
     border-top-left-radius: 25px;
-    border-top: dashed 1px #cdcdcd;
-    border-left: dashed 1px #cdcdcd;
-    border-right: dashed 1px #cdcdcd;
+    border-top: double 3px var(--border-lines);
+    border-left: double 3px var(--border-lines);
+    border-right: double 3px var(--border-lines);
     border-bottom: none;
 }
 #Sidebar_tab_regions_icon {
@@ -75,7 +76,7 @@
 
 #Sidebar_tab_options:hover > .ionicon,
 #Sidebar_tab_regions:hover > .ionicon {
-    fill: var(--titles-font-colour-fade);
-    color: var(--titles-font-colour-fade);
+    fill: var(--options-font-active);
+    color: var(--options-font-active);
     opacity: 1;
 }
