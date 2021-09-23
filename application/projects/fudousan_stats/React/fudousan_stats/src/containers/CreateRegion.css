@@ -2,7 +2,9 @@
     display: grid;
     grid-template-columns: auto 2rem;
     grid-template-rows: 100%;
-    margin-bottom: 0.45rem;
+    min-height: 1.5rem;
+    max-height: 1.5rem;
+    margin-bottom: 0.5rem;
     animation-name: slide-down;
     animation-fill-mode: forwards;
     animation-duration: 500ms;
@@ -28,18 +30,19 @@
     border: none;
     background: none;
     color: var(--options-font-inactive);
-    font-family: "M PLUS 1p", sans-serif;
-    font-weight: 300;
-    font-size: 1rem;
+    font-family: "Hina Mincho", serif;
+    font-weight: 400;
+    font-size: 1.3rem;
     text-align: end;
     align-self: end;
     cursor: zoom-in;
     text-decoration-line: underline;
-    text-decoration-style: dashed;
-    text-decoration-thickness: 0.32rem;
+    text-decoration-style: dotted;
+    text-decoration-thickness: 0.10rem;
     text-decoration-color: transparent;
-    transition: text-decoration-color 200ms ease-out;
 }
+
+/* Region item button */
 .Sidebar_regions_item_name:hover,
 .Sidebar_regions_item_name.toggle {
     color: #ffffff;
@@ -51,9 +54,26 @@
 /* Underline region name on checkbox hover */
 .Sidebar_regions_item_checkbox.available:hover
     ~ .Sidebar_regions_item_name.available {
-        text-decoration-color: var(--titles-font-colour-fade);
-        transition: text-decoration-color 200ms ease-in;
+        animation-name: draw-underline;
+        animation-duration: 400ms;
+        animation-fill-mode: forwards;
+        animation-timing-function: ease-in-out;
+}
+
+@keyframes draw-underline {
+    0% {
+        text-decoration-thickness: 0.10rem;
     }
+
+    75% {
+        text-decoration-thickness: 0.12rem;
+    }
+
+    100% {
+        text-decoration-thickness: 0.35rem;
+        text-decoration-color: var(--extra-highlight);
+    }
+}
 
 /* Grey-out items that aren't in the data set (passive filtering) */
 .Sidebar_regions_item_name.unavailable {
@@ -72,8 +92,8 @@
     display: grid;
     grid-column: 2 / -1;
     grid-row: 1 / 2;
-    width: 1rem;
-    height: 1rem;
+    width: 1.2rem;
+    height: 1.2rem;
     align-self: baseline;
     justify-self: end;
     transition: background-color 300ms;
@@ -84,7 +104,7 @@
 .Sidebar_regions_item_checkbox:hover {
     color: #ffffff;
     border-radius: 0.15rem;
-    background-color: var(--titles-font-colour-fade);
+    background-color: var(--extra-highlight);
 }
 /* Hide default checkbox */
 .Sidebar_regions_item_checkbox input {
@@ -98,17 +118,17 @@
     width: 100%;
     grid-column: 1;
     grid-row: 1;
-    opacity: 0.5;
+    opacity: 0.7;
     justify-self: right;
     align-self: center;
-    border: dashed 2px #000000;
+    border: double 3px var(--options-font-inactive);
     transition: background-color 300ms;
     cursor: pointer;
 }
 
 .Sidebar_regions_item_checkbox input:checked 
     ~ .Sidebar_regions_item_checkbox_overlay {
-        background-color: var(--options-font-inactive);
+        background-color: var(--options-font-active);
         opacity: 0.70;
         transition: background-color 300ms;
 }

@@ -2,7 +2,7 @@
     display: grid;
     grid-template-columns: 100%;
     grid-template-rows: repeat(5, 6rem) auto;
-    border: dashed 1px #cdcdcd;
+    border: double 3px var(--border-lines);
     border-top: none;
     padding-top: 1.5vw;
     padding-bottom: 2vw;
@@ -33,15 +33,15 @@
 }
 .Sidebar_options_slider_text_label {
     font-family: "Kaisei Opti", serif;
-    font-size: 1.15rem;
+    font-size: 1.2rem;
     text-align: start;
     transition: all 500ms ease-out;
 }
 .Sidebar_options_slider_text_selected {
-    color: var(--titles-font-colour);
-    font-family: "M PLUS 1p", san-serif;
+    font-family: "Kaisei Opti", serif;
     font-weight: 300;
-    font-size: 0.85rem;
+    font-size: 1rem;
+    color: var(--options-font-active);
     text-align: end;
     align-self: end;
 }
@@ -56,8 +56,8 @@
 .Sidebar_options_slider_ruler p {
     line-height: 1.5rem;
     font-size: 0.75rem;
-    color: rgb(55, 77, 99);
-    opacity: 0.3;
+    color: var(--options-font-inactive);
+    opacity: 0.5;
 
 }
 
@@ -81,24 +81,26 @@
     -webkit-appearance: none;
     height: 2px;
     width: 100%;
-    background: lightgray;
+    background: var(--options-font-inactive);
+    opacity: 0.65;
     transition: 200ms all ease-in-out;
 }
 .Sidebar_options_slider input[type="range"]::-moz-range-track {
     height: 2px;
     width: 100%;
-    background: lightgray;
+    background: var(--options-font-inactive);
+    opacity: 0.65;
     transition: 200ms all ease-in-out;
 }
 
 
 .Sidebar_options_slider input[type="range"]::-webkit-slider-runnable-track:hover {
-    background: var(--titles-font-colour-fade);
+    background: var(--extra-highlight);
     box-shadow: 0px 0px 0px rgb(164, 176, 187), 1px 1px 2px rgb(196, 225, 253);
     transition: 200ms all ease-in-out;
 }
 .Sidebar_options_slider input[type="range"]::-moz-range-track:hover {
-    background: var(--titles-font-colour-fade);
+    background: var(--extra-highlight);
     box-shadow: 0px 0px 0px rgb(164, 176, 187), 1px 1px 2px rgb(196, 225, 253);
     transition: 200ms all ease-in-out;
 }
@@ -110,8 +112,8 @@
     width: 0.5rem;
     margin-top: -0.6rem;
     border-radius: 25%;
-    background: #dcceff;
-    border: 2px solid var(--titles-font-colour-fade);
+    background: var(--options-font-highlight);
+    border: 2px solid var(--options-font-inactive);
     transition: 200ms all ease-in-out;
 }
 .Sidebar_options_slider input[type="range"]::-moz-range-thumb {
@@ -119,21 +121,21 @@
     width: 0.5rem;
     margin-top: -0.6rem;
     border-radius: 25%;
-    background: #dcceff;
-    border: 2px solid var(--titles-font-colour-fade);
+    background: var(--options-font-highlight);
+    border: 2px solid var(--options-font-inactive);
     transition: 200ms all ease-in-out;
 }
 
 
 .Sidebar_options_slider input[type="range"]::-webkit-slider-thumb:hover {
     background: #ffffff;
-    border: 2px solid var(--titles-font-colour-fade);
+    border: 2px solid var(--extra-highlight);
     box-shadow: 2px 2px 1px rgb(98, 120, 139), 0px 0px 1px slategrey;
     transition: 200ms all ease-in-out;
 }
 .Sidebar_options_slider input[type="range"]::-moz-range-thumb:hover {
     background: #ffffff;
-    border: 2px solid var(--titles-font-colour-fade);
+    border: 2px solid var(--extra-highlight);
     box-shadow: 2px 2px 1px rgb(98, 120, 139), 0px 0px 1px slategrey;
     transition: 200ms all ease-in-out;
 }
@@ -164,19 +166,19 @@
     border-radius: 3px;
     background: var(--titles-font-colour-fade);
     padding: 0.25rem 0.4rem 0.25rem 0.4rem;
-    font-family: "M PLUS 1p", san-serif;
+    font-family: "Kaisei Opti", serif;
     font-weight: 300;
-    font-size: 1rem;
+    font-size: 1.2rem;
     color: #ffffff;
     transition: 200ms all ease-in-out;
 }
 #Sidebar_options_save_button:hover {
-    font-size: 1.02rem;
+    font-size: 1.25rem;
     box-shadow: 5px 5px 4px rgb(178, 188, 197), 2px 4px 5px rgb(169, 176, 180);
     transition: 200ms all ease-in-out;
 }
 #Sidebar_options_save_button:active {
-    font-size: 1rem;
+    font-size: 1.15rem;
     box-shadow: none;
     transition: 100ms all ease-in-out;
 }

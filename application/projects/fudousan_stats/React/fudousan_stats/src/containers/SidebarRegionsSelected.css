@@ -4,15 +4,14 @@
 
 .Sidebar_regions_selected.open {
     display: grid;
-    border-bottom: dashed 1px #cdcdcd;
-    padding-bottom: 0.5vw;
-    margin-bottom: 1.5vw;
-    animation-name: gradual_reveal;
+    border-bottom: solid 1px var(--border-lines);
+    margin-bottom: 2vw;
+    animation-name: gradual-reveal;
     animation-fill-mode: forwards;
     animation-duration: 400ms;
     animation-timing-function: ease-in;
 }
-@keyframes gradual_reveal {
+@keyframes gradual-reveal {
     0% {
         opacity: 0;
     }
@@ -25,10 +24,11 @@
 }
 
 .Sidebar_regions_selected_header {
-    color: var(--options-font-inactive);
     justify-self: center;
     font-family: "Kaisei Opti", serif;
-    font-size: 1.2rem;
+    font-size: 1.35rem;
+    color: var(--options-font-inactive);
+    padding-bottom: 0.75vw;
 }
 
 .Sidebar_regions_selected_category {
@@ -39,7 +39,8 @@
 .Sidebar_regions_selected_category_name {
     display: flex;
     flex-direction: row-reverse;
-    font-size: 1.15rem;
+    font-family: "Kaisei Opti", serif;
+    font-size: 1.35rem;
     color: var(--titles-font-colour);
     user-select: none;
 }

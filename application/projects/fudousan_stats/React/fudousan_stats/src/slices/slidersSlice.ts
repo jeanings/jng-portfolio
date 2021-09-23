@@ -3,6 +3,11 @@ import { RootState } from '../store';
 
 
 
+/* ---------------------------------------------------
+    Slice that saves user's search options to state.
+    Handles {silders} state.
+--------------------------------------------------- */
+
 // State for initial render.
 const initialState: SlidersProps = {
    options: {
@@ -14,13 +19,18 @@ const initialState: SlidersProps = {
    }
 }
 
-// Create selection slice.
+
 const slidersSlice = createSlice({
+    /* -------------------------------------------------------
+        Handles updates on user's filter options submission.
+    ------------------------------------------------------- */
     name: 'sliders',
     initialState,
     reducers: {
-        // Save options, essentially acting as a form.
         handleSliders: (state, action) => {
+            /* ----------------------------------------------
+                Save options, essentially acting as a form.
+            ---------------------------------------------- */
             const name = Object.keys(action.payload)[0];
             const value = Object.values(action.payload)[0];
 
@@ -47,6 +57,7 @@ type SlidersOptionsProps = {
     age: string,
     floorArea: string
 }
+
 
 // Selector for selection state.
 export const selectSliders = (state: RootState) => state.sliders;

@@ -4,17 +4,23 @@ import { RootState } from '../store';
 
 
 
-// Async thunk for fetching default plain regions hierarchy data.
+/* -------------------------------------------------------------
+    API for fetching regional heirarchy data for regions menu.
+    Handles updates to {menuApi}.
+------------------------------------------------------------- */
+
 export const mongoDbFetchRegions = createAsyncThunk(
+    /* -----------------------------------------------------------
+        Async thunk for fetching default regions hierarchy data.
+    ----------------------------------------------------------- */
     'menuApi/fetchRegions',
     async (requestParam: object) => {// requestParam from CreateRegion's dispatched action.
         // const apiUrl: string = 'http://localhost:5000/projects/fudousan-stats/get-menu?';    // for development use
         const apiUrl = 'https://jeanings.space/projects/fudousan-stats/get-menu?';              // for GAE deployment
 
-        
         // Async fetch requested data, calling backend API to MongoDB.
         try {
-            const response: AxiosResponse = await fetchDb(apiUrl, requestParam);
+            const response: AxiosResponse = await fetchMenu(apiUrl, requestParam);
 
             if (response.status === 200) {
                 // Returns promise status, caught and handled by extra reducers in menuSlice. 
@@ -23,22 +29,22 @@ export const mongoDbFetchRegions = createAsyncThunk(
             }
         } catch (error) {
             if (axios.isAxiosError(error.response)) {
-                console.log("ERROR: AxiosError, front/backend initial render.", error.response.data.error)
+                console.log("ERROR: AxiosError - Menu API fetch.", error.response.data.error)
             } else {
-                console.log("ERROR: Front/backend issue on initial render.", error);
+                console.log("ERROR: API call failed on menu fetch.", error);
             }
         }
     }
 );
 
 
-
-// Fetch helper function.
-export const fetchDb = (apiUrl: string, requestParam: object) => {
+export const fetchMenu = (apiUrl: string, requestParam: object) => {
+    /* ---------------------------------------------
+        Regions hierarchy names fetcher for thunk.
+    --------------------------------------------- */
     let mongoDbPromise = Promise.resolve(axios.get(apiUrl, {params: requestParam}));
     return mongoDbPromise;
 }
-
 
 
 // State for initial render.
@@ -51,20 +57,25 @@ const initialState: MenuApiProps = {
 }
 
 
-
-// Create MongoDB dynamic menu slice.
 const menuApiSlice = createSlice({
+    /* ------------------------------------------------------------------
+        Slice that handles fetching names of areas under regional type.
+    ------------------------------------------------------------------ */
     name: 'menuApi',
     initialState,
     reducers: {},
     extraReducers: (builder) => {
-        // Reducers for async thunk MongoDB API call.
+        /* ----------------------------------------------------
+            Reducers for async thunk MongoDB menu API calls.
+        ---------------------------------------------------- */
         builder
-            // Default regions hierarchy call.
             .addCase(mongoDbFetchRegions.fulfilled, (state, action) => {
-                // Handle state updates depending on initial render status.
+                /* ------------------------------------- 
+                    Updates state on successful fetch.
+                ------------------------------------- */
                 const category = Object.keys(action.meta.arg)[0];
 
+                // Handle state updates depending on initial render status.
                 if (state.status != 'successful') {
                     // Push each object in payload array into menu state.
                     action.payload.map((item: any) => {
@@ -80,10 +91,10 @@ const menuApiSlice = createSlice({
                             }
                         }
                     });
-                    // Set render status.
+
+                    // Set fetch status.
                     state.status = 'successful';
                 } else if (state.status === 'successful') {
-                    let newCategory: string;
                     const categoryMap = {
                         'regions': 'prefectures',
                         'prefectures': 'cities',
@@ -91,6 +102,7 @@ const menuApiSlice = createSlice({
                     }
                     
                     // Assign next category corresponding to 'parent' category.
+                    let newCategory: string;
                     for (let [key, value] of Object.entries(categoryMap)) {
                         if (category == key) {
                             newCategory = value;
@@ -119,10 +131,13 @@ const menuApiSlice = createSlice({
             })
 
             .addCase(mongoDbFetchRegions.pending, (state, action) => {
-                // Don't change status, breaks api call for some reason.
+                // Don't change status, breaks api call.
             })
 
             .addCase(mongoDbFetchRegions.rejected, (state, action) => {
+                /* ------------------------ 
+                    Catches fetch errors.
+                ------------------------ */
                 state.status = 'unsuccessful';
                 console.error("MongoDB menu fetch unsuccessful.", action);
             })
@@ -148,8 +163,6 @@ export type MongoObjectKeyVal = {
     count?: number
 }
 
-// type MongoObjectInitProps = Record<CategoryKeys, MongoObjectKeyVal>;
-// type MongoObjectProps = Record<CategoryKeys, MongoObjectKeyVal>;
 
 // Selector for menu state.
 export const selectMenu = (state: RootState) => state.menuApi; 

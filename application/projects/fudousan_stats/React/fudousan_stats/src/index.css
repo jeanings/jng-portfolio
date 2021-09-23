@@ -1,18 +1,20 @@
 :root {
-  --background: #00001e;
-  --transparent: #00001e00;
-  --titles-font-colour: #703cff;
-  --titles-font-colour-fade: #703cff85;
-  --options-font-inactive: darkslateblue;
-  --options-font-active: chocolate;
-  --options-font-highlight: gold;
+  --background: #f3eedd;
+  --transparent: #00000000;
+  --titles-font-colour: #138040;
+  --titles-font-colour-fade: #13804085;
+  --options-font-inactive: #0c3f42;
+  --options-font-active: #aa5506;
+  --options-font-highlight: #11773b;
+  --options-font-highlight2: #c9b610;
+  --border-lines: #9c9c9c;
+  --extra-highlight: #da7516; 
   overflow: hidden;
-  /* user-select: none; */
   font-size: 16px;
 }
 
 /* Import fonts */
-@import url('https://fonts.googleapis.com/css2?family=DotGothic16&family=Kaisei+Opti&family=M+PLUS+1p:wght@100;300&display=block');
+@import url('https://fonts.googleapis.com/css2?family=Hina+Mincho&family=Kaisei+Opti&family=M+PLUS+1p:wght@300&display=block');
 
 * {
   box-sizing: border-box;
