@@ -567,7 +567,7 @@ const DashboardCharts: React.FC = () => {
         let itemIndex: number = legendItem.datasetIndex;
         
         if (refLineChart.current !== null && refBarChart.current !== null) {
-            let lineMeta = refLineChart.current.getDatasetMeta(itemIndex);   // Same data set --> index,
+            let lineMeta = refLineChart.current.getDatasetMeta(itemIndex);   // Same data set, index
             let barMeta = refBarChart.current.getDatasetMeta(itemIndex);     // otherwise don't do this.
             
             // Toggle un/hide on click.
@@ -658,7 +658,7 @@ const DashboardCharts: React.FC = () => {
                         ctx.restore();
                     }
                 }, function() {
-                    console.error("Charts no-data fill text font 'DotGothic' timed out.");
+                    console.error("Charts no-data fill text font 'Hina Mincho' downloading timed out.");
                 });
         }
     }
@@ -667,15 +667,25 @@ const DashboardCharts: React.FC = () => {
     return (
         <div className="Dashboard_charts">
             <div className="Dashboard_charts_line-price">
+
                 <canvas id="Dashboard_charts_line-price_chart" 
                         ref={refLineChartContainer} />
+
             </div>
             <div className="Dashboard_charts_bar-count">
+
                 <canvas id="Dashboard_charts_bar-count_chart"
                         ref={refBarChartContainer} />
+                        
             </div>
             <div className="Dashboard_charts_citation">
-                ※資料： <a href="https://www.land.mlit.go.jp/webland/servlet/MainServlet" target="_blank">国土交通省</a>から作成。
+
+                ※資料： 
+                <a href="https://www.land.mlit.go.jp/webland/servlet/MainServlet" target="_blank">
+                    国土交通省
+                </a>
+                から作成。
+
             </div>
         </div>    
     );

@@ -12,11 +12,13 @@ const CreateRegion: React.FC<CreateRegionProps> = (props: CreateRegionProps) => 
         Creates individual region's clickable name-button and checkboxes.
         Subscribes to {data}, {menuApi}, {menuLevel}, {selection} states.
     -------------------------------------------------------------------- */
+    // Dispatch, selector hooks.
     const dispatch = useAppDispatch();
     const dataState = useAppSelector(state => state.data);
     const menuApiState = useAppSelector(state => state.menuApi);
     const menuLevelState = useAppSelector(state => state.menuLevel);
     const selectionState = useAppSelector(state => state.selection.selected);
+    // Other variables.
     const availability: string = checkAvailability();
     
 
@@ -158,6 +160,7 @@ const CreateRegion: React.FC<CreateRegionProps> = (props: CreateRegionProps) => 
 
     return (
         <div className={"Sidebar_regions_item" + " " + props.name}>
+
             <label className={"Sidebar_regions_item_checkbox" + " " + availability}>
                 <input type="checkbox" 
                     name={props.name}
@@ -167,6 +170,7 @@ const CreateRegion: React.FC<CreateRegionProps> = (props: CreateRegionProps) => 
                     onChange={onSelectionChange} />
                 <span className="Sidebar_regions_item_checkbox_overlay"></span>
             </label>
+
             <button className={"Sidebar_regions_item_name" + " " + availability} 
                     type="button" 
                     name={props.name}
@@ -175,6 +179,7 @@ const CreateRegion: React.FC<CreateRegionProps> = (props: CreateRegionProps) => 
                     onClick={onLevelChange}>
                 {props.name}
             </button>
+            
         </div>
     );
 }
@@ -187,23 +192,6 @@ interface CreateRegionProps {
     level: string,
     nextLevel: string,
     nextCategory: string,
-}
-
-interface ChartDataSetProps {
-    [index: string] : string | any
-    category: string,
-    partOf: {
-        'level 1': PartOfProps | null,
-        'level 2': PartOfProps | null,
-        'level 3': PartOfProps | null,
-        'level 4': PartOfProps | null,
-    }
-}
-
-type PartOfProps = {
-    [index: string] : string | any,
-    category: string,
-    name: string
 }
 
 

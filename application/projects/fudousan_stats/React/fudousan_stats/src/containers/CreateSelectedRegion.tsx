@@ -11,6 +11,7 @@ const CreateSelectedRegion: React.FC<CreateSelectedRegionProps> = (props: Create
     ------------------------------------------------------------ */
     const dispatch = useAppDispatch();
     
+
     const onDeleteRequest = (event: any) => {
         /* -----------------------------------------------------------
             Handle state change on selected regions' delete request.
@@ -42,17 +43,22 @@ const CreateSelectedRegion: React.FC<CreateSelectedRegionProps> = (props: Create
 
     return (
         <div className={"Sidebar_regions_selected_item" + " " + props.name}>
+
             <label className={"Sidebar_regions_selected_item_checkbox"}>
+
                 <input type="checkbox"
                     id={"Sidebar_regions_selected_item_checkbox" + "_" + props.name}
                     name={props.name}
                     data-category={props.category}
                     data-level={props.level}
                     onChange={onDeleteRequest} />
+                    
                 <span className={"Sidebar_regions_selected_item_checkbox_checked" + " " + props.name}>&#10006;</span>
                 <span className={"Sidebar_regions_selected_item_checkbox_overlay" + " " + props.name}></span>
             </label>
+
             <span className="Sidebar_regions_selected_item_name">{props.name}</span>
+
         </div>
     );
 }

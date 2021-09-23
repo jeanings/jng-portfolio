@@ -17,10 +17,12 @@ const SidebarRegions: React.FC = () => {
             - Adds/removes data from charts.
         Subscribes to {menuStore}, {menuLevel}, {menuApi} states.
     ---------------------------------------------------------------------------- */
+    // Dispatch, selector hooks.
     const dispatch = useAppDispatch();
     const menuStoreState = useAppSelector(state => state.menuStore);
     const menuLevelState = useAppSelector(state => state.menuLevel);
     const menuApiState = useAppSelector(state => state.menuApi);
+    // Level-related variables.
     const renderDirection: string = menuLevelState.direction;
     const renderedLength: number = Object.keys(menuStoreState.rendered).length;
     const currentLevel: string = 'level' + ' ' + (Object.keys(menuLevelState.active).length - 1);
@@ -45,7 +47,6 @@ const SidebarRegions: React.FC = () => {
             : 'level' + ' ' + (renderedLength);
         prevElemPropsList = menuStoreState.rendered[prevElementKey];
     }
- 
 
     // Create list of JSX elements for region items.
     if (menuApiState.status === 'successful'
@@ -60,7 +61,7 @@ const SidebarRegions: React.FC = () => {
                 })
             });
 
-            // Create payload for rendered menu items into state for retrieval on 'back' requests.
+            // Save all rendered menu items into state for retrieval on 'back' requests.
             menu.forEach((item: JSX.Element) => {
                 activeMenuElementsProps.push(item.props);
             });
@@ -69,10 +70,11 @@ const SidebarRegions: React.FC = () => {
                 [nextLevel]: activeMenuElementsProps
             }
 
-            // Save current list of menu props into state.
+            // Save current list of menu props in state.
             try {
                 if (menuStoreState.rendered[nextLevel][0].name !== activeMenuElementsProps[0].name) {
                     // Dispatch and write over the previous same-leveled geographic region.
+                    // If condition necessary or else infinite loops. 
                     dispatch(handleLevelStore(payload));
                 }
             } catch (TypeError) {
@@ -91,6 +93,7 @@ const SidebarRegions: React.FC = () => {
     }
 
 
+    // Handle 'back' button clicks.
     const handleBackButton = (event: any) => {
         /* ----------------------------------------------
             Handle 'back' button clicks.
@@ -108,6 +111,7 @@ const SidebarRegions: React.FC = () => {
     }
 
 
+    // Handle 'selected' button clicks.
     const handleSelectedButton = (event: any) => {
         /* --------------------------------------------
             Handle 'selected' button clicks.
@@ -126,7 +130,7 @@ const SidebarRegions: React.FC = () => {
             selectedList.remove("open");
         }
     }
-    
+
 
     /* ============================================================
                             Helper functions
@@ -162,14 +166,18 @@ const SidebarRegions: React.FC = () => {
         <form className="Sidebar_regions">
             <div className="Sidebar_regions_header">
                 <div className="Sidebar_regions_header_back">
-                    <button className={renderedLength <= 1 
-                                ? "Sidebar_regions_header_back_button"
-                                : "Sidebar_regions_header_back_button show"} 
+                    
+                    <button className=
+                                {renderedLength <= 1 
+                                    ? "Sidebar_regions_header_back_button"
+                                    : "Sidebar_regions_header_back_button show"} 
                             name="menuBack" 
                             onClick={handleBackButton}>
+
                         <span id="Sidebar_regions_header_back_button_arrow">
                             &#129140;
                         </span>
+
                         {nextLength === 0
                             ? ''
                             : nextLength === 1
@@ -177,15 +185,20 @@ const SidebarRegions: React.FC = () => {
                                 : menuLevelState.active[currentLevel].name + 'に'}
                         戻る
                     </button>
+
                 </div>
                 <div className="Sidebar_regions_header_selected">
+
                     <button className="Sidebar_regions_header_selected_button"
                             name="selectedList"
                             onClick={handleSelectedButton}>
+
                         <span id="Sidebar_regions_header_selected_button_arrow">
                             &#129155;
                         </span>
+
                     </button>
+
                 </div>
             </div>
             <div className="Sidebar_regions_list">

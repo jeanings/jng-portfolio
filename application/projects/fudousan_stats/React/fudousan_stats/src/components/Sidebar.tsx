@@ -6,7 +6,10 @@ import './Sidebar.css';
 
 
 
-const Sidebar: React.FC = () => {    
+const Sidebar: React.FC = () => {
+    /* -----------------------------------------------------
+        A main component - container for the sidebar menu.
+    ----------------------------------------------------- */
     return (
         <aside className='Sidebar'>
             <>

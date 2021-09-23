@@ -6,6 +6,9 @@ import './Dashboard.css';
 
 
 const Dashboard: React.FC = () => {
+     /* --------------------------------------------------------------------
+        A main component - container for the map and chart visualizations.
+    --------------------------------------------------------------------- */
     return (
         <main className="Dashboard">
             <DashboardMap />

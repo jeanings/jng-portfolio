@@ -1,7 +1,7 @@
 import React from "react";
 import { useAppSelector } from '../hooks';
-import CreateSelectedRegion from "./CreateSelectedRegion";
 import { v4 as uuidv4 } from 'uuid';
+import CreateSelectedRegion from "./CreateSelectedRegion";
 import "./SidebarRegionsSelected.css";
 
 
@@ -73,30 +73,54 @@ const SidebarRegionsSelected: React.FC = () => {
     return (
         <div className="Sidebar_regions_selected">
             <span className="Sidebar_regions_selected_header">選択した地域</span>
+
             {regionsExist 
-                ? <div className="Sidebar_regions_selected_category">
-                    <span className="Sidebar_regions_selected_category_name">地方</span>
-                    <div className="Sidebar_regions_selected_items">{selected['level 1']}</div>
-                </div> 
-                : ''}
+                ?   <div className="Sidebar_regions_selected_category">
+                        <span className="Sidebar_regions_selected_category_name">
+                            地方
+                        </span>
+
+                        <div className="Sidebar_regions_selected_items">
+                            {selected['level 1']}
+                        </div>
+                    </div> 
+                :   ''}
+
             {prefecturesExist
-                ? <div className="Sidebar_regions_selected_category">
-                    <span className="Sidebar_regions_selected_category_name">都道府県</span>
-                    <div className="Sidebar_regions_selected_items">{selected['level 2']}</div>
-                </div>
-                : ''}
+                ?   <div className="Sidebar_regions_selected_category">
+                        <span className="Sidebar_regions_selected_category_name">
+                            都道府県
+                        </span>
+
+                        <div className="Sidebar_regions_selected_items">
+                            {selected['level 2']}
+                        </div>
+                    </div>
+                :   ''}
+
             {citiesExist
-                ? <div className="Sidebar_regions_selected_category">
-                    <span className="Sidebar_regions_selected_category_name">市区町村</span>
-                    <div className="Sidebar_regions_selected_items">{selected['level 3']}</div>
-                </div>
-                : ''}
+                ?   <div className="Sidebar_regions_selected_category">
+                        <span className="Sidebar_regions_selected_category_name">
+                            市区町村
+                        </span>
+
+                        <div className="Sidebar_regions_selected_items">
+                            {selected['level 3']}
+                        </div>
+                    </div>
+                :   ''}
+
             {districtsExist
-                ? <div className="Sidebar_regions_selected_category">
-                    <span className="Sidebar_regions_selected_category_name">地区</span>
-                    <div className="Sidebar_regions_selected_items">{selected['level 4']}</div>
-                </div>
-                : ''}
+                ?   <div className="Sidebar_regions_selected_category">
+                        <span className="Sidebar_regions_selected_category_name">
+                            地区
+                        </span>
+
+                        <div className="Sidebar_regions_selected_items">
+                            {selected['level 4']}
+                        </div>
+                    </div>
+                :   ''}
         </div>
     );
 }

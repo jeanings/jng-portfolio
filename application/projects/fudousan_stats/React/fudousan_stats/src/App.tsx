@@ -10,6 +10,9 @@ import './App.css';
 
 
 const App: React.FC = () => {
+  /* --------------------------------
+    Starting point of the main app.
+  -------------------------------- */
   const dispatch = useAppDispatch();
 
   useEffect(() => {

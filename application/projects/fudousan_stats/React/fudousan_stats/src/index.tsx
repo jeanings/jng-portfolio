@@ -6,6 +6,8 @@ import App from './App';
 import { store } from './store';
 import * as serviceWorker from './serviceWorker';
 
+
+
 /* ------------------------------
   FontFace objects declaration
 ------------------------------ */

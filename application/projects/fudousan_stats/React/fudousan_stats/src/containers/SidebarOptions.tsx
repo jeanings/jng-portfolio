@@ -12,9 +12,11 @@ const SidebarOptions: React.FC = () => {
         Starting point of the app.  Dispatches requests to API for data retrieval.
         Subscribes to {sliders} and {data} states.
     ----------------------------------------------------------------------------- */
+    // Dispatch, selector hooks.
     const dispatch = useAppDispatch();
     const slidersState = useAppSelector(state => state.sliders);
     const dataState = useAppSelector(state => state.data);
+    // Submission tab-switch timeout ref.
     const refSubmitTimer = useRef<any>({timer: 0});
 
     const buildingType: SliderProps = {
@@ -56,9 +58,9 @@ const SidebarOptions: React.FC = () => {
     
     
     useEffect(() => {
-        /* ------------------------
+        /* -----------------------
             SetTimeout instance.
-        ------------------------ */
+        ----------------------- */
         return () => {
             clearTimeout(refSubmitTimer.current.timer)
         }
@@ -124,7 +126,7 @@ const SidebarOptions: React.FC = () => {
             collection: collection,
             options: options,
             rawInput: slidersState.options
-        }
+        };
 
         // Save raw input to state.
         dispatch(handleRawInput(rawInputPayload));
@@ -160,7 +162,7 @@ const SidebarOptions: React.FC = () => {
 
     /* ===================================================
                         Helper functions
-    ==================================================- */
+    =================================================== */
 
     function translateReplace(inputString: string, patternDict: SliderProps) {
         /* -------------------------------------------------------------------
@@ -173,9 +175,9 @@ const SidebarOptions: React.FC = () => {
 
 
     function keyExists(inputKey: string, inputObj: object) {
-        /* ----------------------------
-            For onSaving readability.
-        ---------------------------- */
+        /* --------------------------------------------------------
+            Checks for key existence (for onSaving readability.)
+        -------------------------------------------------------- */
         if (inputKey in inputObj) {
             return true;
         } else
@@ -185,19 +187,23 @@ const SidebarOptions: React.FC = () => {
 
     return (
         <form className="Sidebar_options">
-
             <div className="Sidebar_options_slider">
                 <div className="Sidebar_options_slider_text">
+
                     <label className="Sidebar_options_slider_text_label" htmlFor="buildingType">
                         住宅種類
                     </label>
+
                     <p className="Sidebar_options_slider_text_selected">
                         {translateReplace(slidersState.options.buildingType, buildingMatch)}
                     </p>
+
                 </div>
+
                 <input type="range" 
                     min="0" max="1" step="1"
                     name="buildingType" onChange={onSliderChange} />
+
                 <div className="Sidebar_options_slider_ruler">
                     <p>˥</p>
                     <p>˥</p>
@@ -206,9 +212,11 @@ const SidebarOptions: React.FC = () => {
 
             <div className="Sidebar_options_slider">
                 <div className="Sidebar_options_slider_text">
+
                     <label className="Sidebar_options_slider_text_label" htmlFor="stationDist">
                         駅徒歩分
                     </label>
+
                     <p className="Sidebar_options_slider_text_selected">
                         {slidersState.options.stationDist === '0_15' 
                             ? (slidersState.options.stationDist.replace('0_', '') + "分以下") 
@@ -216,10 +224,13 @@ const SidebarOptions: React.FC = () => {
                                 ? (slidersState.options.stationDist.replace('30_', '30') + "分以上")
                                 : slidersState.options.stationDist.replace('_', '～') + "分"}
                     </p>
+
                 </div>
+
                 <input type="range"
                     min="0" max="2" step="1"
                     name="stationDist" onChange={onSliderChange} />
+
                 <div className="Sidebar_options_slider_ruler">
                     <p>˥</p>
                     <p>˥</p>
@@ -229,16 +240,21 @@ const SidebarOptions: React.FC = () => {
 
             <div className="Sidebar_options_slider">
                 <div className="Sidebar_options_slider_text">
+
                     <label className="Sidebar_options_slider_text_label" htmlFor="material">
                         建物構造
                     </label>
+
                     <p className="Sidebar_options_slider_text_selected">
                         {translateReplace(slidersState.options.material, materialMatch)}
                     </p>
+
                 </div>
+
                 <input type="range" 
                     min="0" max="3" step="1"
                     name="material" onChange={onSliderChange} />
+
                 <div className="Sidebar_options_slider_ruler">
                     <p>˥</p>
                     <p>˥</p>
@@ -249,18 +265,23 @@ const SidebarOptions: React.FC = () => {
 
             <div className="Sidebar_options_slider">
                 <div className="Sidebar_options_slider_text">
+
                     <label className="Sidebar_options_slider_text_label" htmlFor="age">
                         建築年
                     </label>
+
                     <p className="Sidebar_options_slider_text_selected">
                         {slidersState.options.age === '1920_1960' 
                             ? (slidersState.options.age.replace('1920_', '')　+ "年前")
                             : (slidersState.options.age.replace('_', '～') + "年")}
                     </p>
+
                 </div>
+
                 <input type="range"
                     min="0" max="5" step="1"
                     name="age" onChange={onSliderChange} />
+
                 <div className="Sidebar_options_slider_ruler">
                     <p>˥</p>
                     <p>˥</p>
@@ -273,18 +294,23 @@ const SidebarOptions: React.FC = () => {
 
             <div className="Sidebar_options_slider">
                 <div className="Sidebar_options_slider_text">
+
                     <label className="Sidebar_options_slider_text_label" htmlFor="floorArea">
                         面積
                     </label>
+
                     <p className="Sidebar_options_slider_text_selected">
                         {slidersState.options.floorArea === '750_'
                             ? slidersState.options.floorArea.replace('_', '') + "m² 以上"
                             : slidersState.options.floorArea.replace('_', '～') + "m²"}
                     </p>
+
                 </div>
+
                 <input type="range" 
                     min="0" max="37" step="1"
                     name="floorArea" onChange={onSliderChange} />
+
                 <div className="Sidebar_options_slider_ruler">
                     <p>˥</p>
                     <p>˥</p>
@@ -309,10 +335,13 @@ const SidebarOptions: React.FC = () => {
             </div>
 
             <div className="Sidebar_options_save">
+
                 <label htmlFor="slidersSave"></label>
+
                 <button id="Sidebar_options_save_button" name="slidersSave" onClick={onSaving}>
                     条件を保存
                 </button>
+
             </div>
         </form>
     );

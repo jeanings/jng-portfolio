@@ -14,18 +14,20 @@ const DashboardMap: React.FC = () => {
         Mapbox GL JS component that adds interactive map zooming on menu item clicks. 
         Subscribes to {menuLevel} and {map} states.
     -------------------------------------------------------------------------------- */
+    // Dispatch, selector hooks.
     const dispatch = useAppDispatch();
     const menuLevelState = useAppSelector(state => state.menuLevel);
     const mapState = useAppSelector(state => state.map);
+    // Map refs.
     const mapContainer = useRef(null);
     const map = useRef<mapboxgl.map | null>(null);
     mapboxgl.accessToken = process.env.REACT_APP_DEV_MAPBOX;
 
 
     useEffect(() => {
-        /* -------------------------------------
+        /* ------------------------------------
             Initialize map on initial render.
-        ------------------------------------- */
+        ------------------------------------ */
         if (map.current === null) {
             map.current = new mapboxgl.Map({
                 container: mapContainer.current,
@@ -47,9 +49,9 @@ const DashboardMap: React.FC = () => {
 
 
     useEffect(() => {
-        /* ----------------------------------------------
+        /* --------------------------------------------
             Send region props to Mapbox Geocoder API.
-        ---------------------------------------------- */
+        -------------------------------------------- */
         const menuLevels = Object.entries(menuLevelState.active);
         let name: string = '';
         let type: string = '';
@@ -174,5 +176,6 @@ export type MapboxGeocoderProps = {
     types: string,
     partOf: string
 }
+
 
 export default DashboardMap;
