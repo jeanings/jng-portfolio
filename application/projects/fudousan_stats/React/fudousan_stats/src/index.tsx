@@ -6,6 +6,9 @@ import App from './App';
 import { store } from './store';
 import * as serviceWorker from './serviceWorker';
 
+/* ------------------------------
+  FontFace objects declaration
+------------------------------ */
 var FontFaceObserver = require('fontfaceobserver');
 export const fontHinaMincho = new FontFaceObserver('Hina Mincho');  // serif
 export const fontKaiseiOpti = new FontFaceObserver('Kaisei Opti');  // serif
@@ -21,21 +24,6 @@ ReactDOM.render(
   document.getElementById('root')
 );
 
-
-// Types setting
-type FontsProps = {
-  [index: string] : string | any
-}
-
-// const render: React.FC = () => {
-//   ReactDOM.render(
-//     <Provider store={store}>
-//       <App />,
-//     </Provider>,
-//     document.getElementById('root')
-//   );
-// }
-// render();
 
 // If you want your app to work offline and load faster, you can change
 // unregister() to register() below. Note this comes with some pitfalls.

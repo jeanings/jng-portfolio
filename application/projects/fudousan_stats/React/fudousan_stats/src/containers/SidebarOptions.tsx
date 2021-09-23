@@ -8,36 +8,15 @@ import "./SidebarOptions.css";
 
 
 const SidebarOptions: React.FC = () => {
+    /* -----------------------------------------------------------------------------
+        Starting point of the app.  Dispatches requests to API for data retrieval.
+        Subscribes to {sliders} and {data} states.
+    ----------------------------------------------------------------------------- */
     const dispatch = useAppDispatch();
     const slidersState = useAppSelector(state => state.sliders);
     const dataState = useAppSelector(state => state.data);
     const refSubmitTimer = useRef<any>({timer: 0});
 
-
-    useEffect(() => {
-        /* ------------------------
-            SetTimeout instance.
-        ------------------------ */
-        return () => {
-            clearTimeout(refSubmitTimer.current.timer)
-        }
-    }, []);
-
-    // Helper: for onSaving readability.
-    function keyExists(inputKey: string, inputObj: object) {
-        if (inputKey in inputObj) {
-            return true;
-        } else
-            return false;
-    }
-
-    // Helper: translate (replace) backend-use English to user-facing Japanese.
-    function translateReplace(inputString: string, patternDict: SliderProps) {
-        if (inputString in patternDict) {
-            return patternDict[inputString];
-        } 
-    }
-    
     const buildingType: SliderProps = {
         '1': 'house', '0': 'condo'
     }
@@ -76,8 +55,21 @@ const SidebarOptions: React.FC = () => {
     }
     
     
-    // Handle changes on sliders.
+    useEffect(() => {
+        /* ------------------------
+            SetTimeout instance.
+        ------------------------ */
+        return () => {
+            clearTimeout(refSubmitTimer.current.timer)
+        }
+    }, []);
+
+
+
     const onSliderChange = (event: any) => {
+        /* -----------------------------
+            Handle changes on sliders.
+        ----------------------------- */
         const name: string = event.target.name;
         const value: string = event.target.value;
         let slider;
@@ -104,30 +96,37 @@ const SidebarOptions: React.FC = () => {
                 [name]: floorArea[value]
             }
         }
+
         dispatch(handleSliders(slider));
     }
 
-
-    // Handle click on save button.
+    
     const onSaving = (event: any) => {
+        /* --------------------------------------
+            Handle click on save-submit button.
+        -------------------------------------- */
         event.preventDefault();
+        
+        // Reset previous timer.
         clearTimeout(refSubmitTimer.current.timer);
 
         // Create MongoDB API payload.
         const collection: string = slidersState.options.age;
         const options: string = slidersState.options.material.concat(
-            '-', slidersState.options.floorArea, '.',
-            'stationDistanceMin', '.', slidersState.options.stationDist, '.',
-            'type', '.', slidersState.options.buildingType
+            '-', slidersState.options.floorArea, 
+            '.', 'stationDistanceMin', 
+            '.', slidersState.options.stationDist, 
+            '.', 'type', 
+            '.', slidersState.options.buildingType
         );
 
-        // Save raw input.
         const rawInputPayload = {
             collection: collection,
             options: options,
             rawInput: slidersState.options
         }
-        console.log('rawInput dispatch');
+
+        // Save raw input to state.
         dispatch(handleRawInput(rawInputPayload));
 
         // Clear selections state.
@@ -138,7 +137,7 @@ const SidebarOptions: React.FC = () => {
             if (keyExists(options, dataState.collections[collection]) == false) {
                 dispatch(mongoDbFetchData({"collection": collection, "options": options}));
             } else {
-                console.log("Reusing existing data -->", collection, options);
+                // console.log("Reusing existing data -->", collection, options);
             }
         } else {
             dispatch(mongoDbFetchData({"collection": collection, "options": options}));
@@ -155,15 +154,33 @@ const SidebarOptions: React.FC = () => {
             optionsMenu.classList.add("hide");
             regionsTab?.classList.add("show");
             regionsMenu.classList.add("show");
-
         }, 1250);
     }
 
 
+    /* ===================================================
+                        Helper functions
+    ==================================================- */
 
-    
-    
+    function translateReplace(inputString: string, patternDict: SliderProps) {
+        /* -------------------------------------------------------------------
+            Translate (replace) backend-use English to user-facing Japanese.
+        ------------------------------------------------------------------- */
+        if (inputString in patternDict) {
+            return patternDict[inputString];
+        } 
+    }
 
+
+    function keyExists(inputKey: string, inputObj: object) {
+        /* ----------------------------
+            For onSaving readability.
+        ---------------------------- */
+        if (inputKey in inputObj) {
+            return true;
+        } else
+            return false;
+    }
 
 
     return (
@@ -306,5 +323,6 @@ const SidebarOptions: React.FC = () => {
 export interface SliderProps {
     [index: string]: string 
 }
+
 
 export default SidebarOptions;

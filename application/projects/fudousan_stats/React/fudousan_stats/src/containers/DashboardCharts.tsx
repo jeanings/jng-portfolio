@@ -7,6 +7,7 @@ import { Chart, LineElement, BarElement, ChartType,
 import { fadedColours, solidColours } from '../imports/chartColourSets';
 import './DashboardCharts.css';
 
+// Register the required chart components.
 Chart.register(LineElement, BarElement, PointElement, 
     LineController, BarController, CategoryScale, LinearScale, 
     Title, Legend, Tooltip);
@@ -14,9 +15,10 @@ Chart.register(LineElement, BarElement, PointElement,
 
 
 const DashboardCharts: React.FC = () => {
-    /* -------------------------------------------------------------------------------
-        Chart.js component that subscribes to {data} and {selection} states.
-    ------------------------------------------------------------------------------- */
+    /* --------------------------------------------------------------------------
+        Chart.js component that builds charts on regions addition and removal. 
+        Subscribes to {data} and {selection} states.
+    -------------------------------------------------------------------------- */
     // Dispatch, selector hooks.
     const selectState = useAppSelector(state => state.selection);
     const dataState = useAppSelector(state => state.data);

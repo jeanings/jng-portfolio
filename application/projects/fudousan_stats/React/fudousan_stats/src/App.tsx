@@ -9,13 +9,15 @@ import './App.css';
 
 
 
-
 const App: React.FC = () => {
   const dispatch = useAppDispatch();
 
-  // Initial render menu item request.
   useEffect(() => {
+    /* ---------------------------------
+      Initial render menu item request.
+    --------------------------------- */
     const initParam: object = {'country': 'j'};
+    
     dispatch(mongoDbFetchRegions(initParam));
   }, []);
 

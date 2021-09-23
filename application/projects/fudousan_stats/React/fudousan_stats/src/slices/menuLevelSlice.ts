@@ -3,23 +3,32 @@ import { RootState } from '../store';
 
 
 
+/* -----------------------------------------------------
+    Slice that keeps track of what's currently in view.
+    Handles updates to {menuLevel} state.
+------------------------------------------------------ */
+
 // State for initial render.
 const initialState: MenuLevelProps = {
     active: {},
     direction: 'zoom in'
 }
 
-// Create menu item slice.
+
 const menuLevelSlice = createSlice({
+    /* -------------------------------------------------------------------------------
+        Handles what is currently in view, direction of render, and level deletion.
+    ------------------------------------------------------------------------------- */
     name: 'menuLevel',
     initialState,
     reducers: {
-        // Save 'markers' of which region was accessed in menu.
         handleMenuLevel: (state, action) => {
+            /* -------------------------------------------------------
+                Save markers for which region was accessed in menu.
+            ------------------------------------------------------- */
             const level: string = Object.keys(action.payload)[0];
             const category: string = action.payload[level].category;
             const name: string = action.payload[level].name;
-            // console.log('handleMenu:', level, category);
             
             state.active = {
                 ...state.active,
@@ -29,12 +38,16 @@ const menuLevelSlice = createSlice({
                 }
             }    
         },
-        // Switch for telling SidebarRegions which 'direction' to render.
         handleRenderDirection: (state, action) => {
+            /* -----------------------------------------------------------------
+                Switch for telling SidebarRegions which direction to render.
+            ----------------------------------------------------------------- */
             state.direction = action.payload;
         },
-        // Remove current menu level marker.
         handleMenuLevelRemoval: (state, action) => {
+            /* -------------------------------
+                Remove current level marker.
+            ------------------------------- */
             const level: string = action.payload;
             delete state.active[level];
         }

@@ -6,9 +6,15 @@ import './CreateSelectedRegion.css';
 
 
 const CreateSelectedRegion: React.FC<CreateSelectedRegionProps> = (props: CreateSelectedRegionProps) => {
+    /* ------------------------------------------------------------
+        Creates individual selected region's text and checkboxes.
+    ------------------------------------------------------------ */
     const dispatch = useAppDispatch();
     
     const onDeleteRequest = (event: any) => {
+        /* -----------------------------------------------------------
+            Handle state change on selected regions' delete request.
+        ----------------------------------------------------------- */
         const crossMarkClass = "Sidebar_regions_selected_item_checkbox_checked" + " " + event.target.name;
         const crossMarkElem = document.getElementsByClassName(crossMarkClass)[0];
         const levelClass = "Sidebar_regions_selected_item_checkbox" + "_" + event.target.name;
@@ -24,11 +30,12 @@ const CreateSelectedRegion: React.FC<CreateSelectedRegionProps> = (props: Create
             crossMarkElem.classList.add("show");
         }
 
-        // Send selection removal request.
         const clearRequest = {
             level: level,
             name: name
         }
+
+        // Send selection removal request.
         dispatch(clearSelection(clearRequest));
     }
   

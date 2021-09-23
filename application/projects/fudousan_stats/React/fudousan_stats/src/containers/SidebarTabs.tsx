@@ -4,6 +4,10 @@ import "./SidebarTabs.css";
 
 
 const SidebarTabs: React.FC = () => {
+    /* --------------------------------------------------------
+        Component that handles drawing the tabs of the menu.
+    -------------------------------------------------------- */
+
     const onTabClicked = (event: any) => {
         event.preventDefault();
         const optionsTab = document.getElementById("Sidebar_tab_options")?.classList;
@@ -59,5 +63,6 @@ const SidebarTabs: React.FC = () => {
         </form>
     );
 }
+
 
 export default SidebarTabs;

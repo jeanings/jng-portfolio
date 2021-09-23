@@ -10,9 +10,10 @@ import './DashboardMap.css';
 
 
 const DashboardMap: React.FC = () => {
-    /* ----------------------------------------------------------------------------
-        Mapbox GL JS component that subscribes to {menuLevel} and {map} states.
-    ---------------------------------------------------------------------------- */
+    /* --------------------------------------------------------------------------------
+        Mapbox GL JS component that adds interactive map zooming on menu item clicks. 
+        Subscribes to {menuLevel} and {map} states.
+    -------------------------------------------------------------------------------- */
     const dispatch = useAppDispatch();
     const menuLevelState = useAppSelector(state => state.menuLevel);
     const mapState = useAppSelector(state => state.map);

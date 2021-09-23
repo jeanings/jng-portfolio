@@ -4,8 +4,15 @@ import { RootState } from '../store';
 
 
 
-// Async thunk for fetching sales data based on chosen options.
+/* --------------------------------------
+    API for fetching data from MongoDB.
+    Handles updates to {data} state.
+-------------------------------------- */
+
 export const mongoDbFetchData = createAsyncThunk(
+    /* ---------------------------------------------------------------
+        Async thunk for fetching sales data based on chosen options.
+    --------------------------------------------------------------- */
     'data/fetchData',
     async (requestParam: object) => {// requestParam from SidebarOptions' dispatched action.
         // const apiUrl: string = 'http://localhost:5000/projects/fudousan-stats/get-data?';    // for development use
@@ -13,7 +20,7 @@ export const mongoDbFetchData = createAsyncThunk(
 
         // Async fetch requested data, calling backend API to MongoDB.
         try {
-            const response: AxiosResponse = await fetchDb(apiUrl, requestParam);
+            const response: AxiosResponse = await fetchData(apiUrl, requestParam);
                
             if (response.status === 200) {
                 // Returns promise status, caught and handled by extra reducers in dataSlice. 
@@ -22,22 +29,22 @@ export const mongoDbFetchData = createAsyncThunk(
             }
         } catch (error) {
             if (axios.isAxiosError(error.response)) {
-                console.log("ERROR: AxiosError, front/backend initial render.", error.response.data.error)
+                console.log("ERROR: AxiosError - MongoDB fetch.", error.response.data.error)
             } else {
-                console.log("ERROR: Front/backend issue on initial render.", error);
+                console.log("ERROR: API call failed on MongoDB fetch.", error);
             }
         }
     }
 );
 
 
-
-// Fetch helper function.
-export const fetchDb = (apiUrl: string, requestParam: object) => {
+export const fetchData = (apiUrl: string, requestParam: object) => {
+    /* -----------------------------
+        MongoDB fetcher for thunk.
+    ------------------------------*/
     let mongoDbPromise = Promise.resolve(axios.get(apiUrl, {params: requestParam}));
     return mongoDbPromise;
 }
-
 
 
 // State for initial render.
@@ -57,31 +64,39 @@ const initialState: DataProps = {
 }
 
 
-
-// Create MongoDB dyanmic menu slice.
 const dataSlice = createSlice({
+    /* ----------------------------------------------
+        Slice that handles updates to {data} state.
+    ---------------------------------------------- */
     name: 'data',
     initialState,
     reducers: {
         handleRawInput: (state, action) => {
+            /* ------------------------------------------
+                Saves submitted option values to state.
+            ------------------------------------------ */
             const collection = action.payload.collection;
             const options = action.payload.options;
             const rawInput = action.payload.rawInput;
-            console.log('handleRawInput', action.payload);
-            // Update state.
+            
             state.currentOptions.collection = collection;
             state.currentOptions.options = options;
             state.currentOptions.rawInput = rawInput;
         }
     },
     extraReducers: (builder) => {
-        // Reducers for async thunk MongoDB API call.
+        /* ----------------------------------------------
+            Reducers for async thunk MongoDB API calls.
+        ---------------------------------------------- */
         builder
-            // Sales data call.
             .addCase(mongoDbFetchData.fulfilled, (state, action) => {
+                /* ------------------------------------- 
+                    Updates state on successful fetch.
+                ------------------------------------- */
                 let payloadCollection: string = '';
                 let payloadOptions: string = '';
-                
+
+
                 // Save call parameters.
                 for (let [key, val] of Object.entries(action.meta.arg)) {
                     if (key === 'collection') {
@@ -91,7 +106,6 @@ const dataSlice = createSlice({
                     }
                 }
 
-                
                 // Update data state.
                 state.currentOptions.collection = payloadCollection;
                 state.currentOptions.options = payloadOptions;
@@ -109,6 +123,9 @@ const dataSlice = createSlice({
             })
 
             .addCase(mongoDbFetchData.rejected, (state, action) => {
+                /* ------------------------ 
+                    Catches fetch errors.
+                ------------------------ */
                 console.error("MongoDB data fetch unsuccessful.", action);
             })
     }

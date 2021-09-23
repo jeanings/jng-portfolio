@@ -7,7 +7,12 @@ import "./SidebarRegionsSelected.css";
 
 
 const SidebarRegionsSelected: React.FC = () => {
+    /* --------------------------------------------------------
+        Creates list of selected regions for quick deletion.
+        Subscribes to {selection} state.
+    -------------------------------------------------------- */
     const selectionState = useAppSelector(state => state.selection.selected);
+    
     let selected: SelectedProps = {
         'level 1': [],
         'level 2': [],
@@ -33,9 +38,35 @@ const SidebarRegionsSelected: React.FC = () => {
     const citiesExist: boolean = checkExistence('level 3');
     const districtsExist: boolean = checkExistence('level 4');
 
-    // Helper: check category existence. '地方' 
+
+    /* ===========================================================
+                            Helper functions
+    =========================================================== */
+
     function checkExistence(level: string) {
+        /* -----------------------------------
+            Check category existence. '地方'
+        ----------------------------------- */ 
         return selected[level].length === 0 ? false : true;
+    }
+
+
+    function createSelectedItem(name: string, category: string, level: string) {
+        /* ---------------------------------------------
+            Generate selected items for deletion list.
+        --------------------------------------------- */
+        let selectedItem: JSX.Element;
+
+        selectedItem = (
+            <CreateSelectedRegion
+                key={uuidv4()}
+                name={name}
+                category={category}
+                level={level}
+            />
+        )
+
+        return selectedItem;
     }
     
 
@@ -68,23 +99,6 @@ const SidebarRegionsSelected: React.FC = () => {
                 : ''}
         </div>
     );
-}
-
-
-// Helper: generate selected items for deletion list.
-function createSelectedItem(name: string, category: string, level: string) {
-    let selectedItem: JSX.Element;
-
-
-    selectedItem = (
-        <CreateSelectedRegion
-            key={uuidv4()}
-            name={name}
-            category={category}
-            level={level}
-        />
-    )
-    return selectedItem;
 }
 
 

@@ -4,18 +4,28 @@ import MenuElementProps from '../containers/SidebarRegions';
 
 
 
+/* --------------------------------------------------------------------------
+    Slice that saves JSX element props that were rendered (parent regions).
+    Used in re-rendering previous menu items when 'back' is pressed.
+-------------------------------------------------------------------------- */
+
 // State for initial render.
 const initialState: MenuStoreProps = {
     rendered: {}
 }
 
-// Create toggle slice.
+
 const menuStoreSlice = createSlice({
+    /* ---------------------------------------------------------------------------------
+        Slice that handles saving and removing of previously rendered elements' props.
+    --------------------------------------------------------------------------------- */
     name: 'menuStore',
     initialState,
     reducers: {
-        // Save previously rendered menu elements for recreating when 'back'ed.
         handleLevelStore: (state, action) => {
+            /* ----------------------------------------------------------------
+                Saves previous props for recreating menu items when 'back'ed.
+            ---------------------------------------------------------------- */
             const level: string = Object.keys(action.payload)[0];
             const elemPropsList: Array<typeof MenuElementProps> = action.payload[level];
             
@@ -26,8 +36,10 @@ const menuStoreSlice = createSlice({
                 }
             }
         },
-        // Delete current level in state to render previous menu.
         handleStoreRemoval: (state, action) => {
+            /* -----------------------------------------------------------------------
+                Delete current level in state to trigger rendering of previous menu.
+            ----------------------------------------------------------------------- */
             const level: string = action.payload;
             delete state.rendered[level];
         }
