@@ -511,7 +511,35 @@ const DashboardCharts: React.FC = () => {
             const useFaded: string = fadedColours[i];
             const useSolid: string = solidColours[i];
 
-            if (drawnFadedColours.includes(useFaded) === true) {
+
+            if (drawnFadedColours.length >= fadedColours.length) {
+                // When user's number of selections exceed colours in set.
+                const randomSolid = randomHsl() as string;
+                const randomFaded = randomSolid.replace(/1[)]/, '0.7)');
+
+                // For line chart.
+                let priceRegionalData: ChartDataSetProps = {
+                    'label': regionItem.id,
+                    'data': regionItem.price,
+                    'borderColor': randomSolid,
+                    'backgroundColor': randomFaded,
+                };
+        
+                // For bar chart.
+                let countRegionalData: ChartDataSetProps = {
+                    'label': regionItem.id,
+                    'data': regionItem.count,
+                    'backgroundColor': randomFaded
+                };
+                
+                // Return as combined object.
+                let chartDataSet: RegionSetProps = {
+                    'price': priceRegionalData,
+                    'count': countRegionalData
+                };
+
+                return chartDataSet;
+            } else if (drawnFadedColours.includes(useFaded) === true) {
                 continue;
             } else if (drawnFadedColours.includes(useFaded) === false) {
                 // For line chart.
@@ -537,6 +565,37 @@ const DashboardCharts: React.FC = () => {
 
                 return chartDataSet;
             }
+        }
+
+
+        function randomHsl() {
+            /* ---------------------------
+                Random colour generator. hsla(235, 100%, 50%, .5)
+            --------------------------- */
+            const hue: string = Math.floor((Math.random() * 360)).toString();
+            const saturation: string = getRandomIntInclusive(70, 99).toString() + '%';
+            const lightness: string = getRandomIntInclusive(35, 70).toString() + '%';
+            const alpha: string = '1';
+
+            const hslaValue: string = 
+                'hsla'.concat('(',
+                    hue, ',',
+                    saturation, ',',
+                    lightness, ',',
+                    alpha, ')'
+                );
+
+            return hslaValue;
+        }
+
+
+        function getRandomIntInclusive(min: number, max: number) {
+            /* ------------------------------------------------------------------------------------------------
+                https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Math/random 
+            ------------------------------------------------------------------------------------------------ */
+            min = Math.ceil(min);
+            max = Math.floor(max);
+            return Math.floor(Math.random() * (max - min + 1) + min); //The maximum is inclusive and the minimum is inclusive
         }
     }
 
