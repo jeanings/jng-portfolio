@@ -1,41 +1,44 @@
 // Colour set for chart items.
 const solidAlpha: string = '0.95' + ')';
 export const solidColours: Array<string> = [
-    'rgba(18,17,18,' + solidAlpha,     // black
-    'rgba(119,45,134,' + solidAlpha,   // purple, wine
-    'rgba(93,31,227,' + solidAlpha,    // purple
-    'rgba(85,126,244,' + solidAlpha,   // blue-sky
-    'rgba(85,198,244,' + solidAlpha,   // blue, robin egg
-    'rgba(154,187,187,' + solidAlpha,  // blue-green, sea foam
-    'rgba(213,210,137,' + solidAlpha,  // yellow-green, dry grass
-    'rgba(226,166,62,' + solidAlpha,   // orange-yellow, egg yolk
-    'rgba(246,109,55,' + solidAlpha,   // orange, candied orange 
-    'rgba(255,8,0,' + solidAlpha,      // red
-    'rgba(251,47,226,' + solidAlpha,   // pink, hot
-    'rgba(253,144,125,' + solidAlpha,  // pink, lemonade
-    'rgba(255,241,23,' + solidAlpha,   // yellow, lemon
-    'rgba(168,186,24,' + solidAlpha,   // green, bright moss
-    'rgba(46,110,26,' + solidAlpha,    // green, British racing
-    'rgba(12,62,107,' + solidAlpha     // blue, navy
+    'rgba(0,0,0,' + solidAlpha,         // black
+    'rgba(13,112,83,' + solidAlpha,     // green - spruce
+    'rgba(0,171,60,' + solidAlpha,      // green - grass
+    'rgba(197,198,38,' + solidAlpha,    // green
+    'rgba(255,155,32,' + solidAlpha,    // yellow - golden kiwi
+    'rgba(255,59,0,' + solidAlpha,      // orange - pale sunset
+    'rgba(171,42,23,' + solidAlpha,     // red - bright orange-red
+    'rgba(121,67,28,' + solidAlpha,     // red - maroon
+    'rgba(126,114,88,' + solidAlpha,    // brown - milk chocolate
+    'rgba(66,88,94,' + solidAlpha,      // grey - dark taupe
+    'rgba(66,138,158,' + solidAlpha,    // blue - dark slate
+    'rgba(31,122,194,' + solidAlpha,    // blue - petrol
+    'rgba(22,36,226,' + solidAlpha,     // blue - sky
+    'rgba(93,22,226,' + solidAlpha,     // blue - electric
+    'rgba(171,12,238,' + solidAlpha,    // purple - royal
+    'rgba(245,7,235,' + solidAlpha,     // purple - Prince
+    'rgba(144,5,119,' + solidAlpha      // purple - wine
 ];
 
 
 const fadedAlpha: string = '0.70' + ')';
 export const fadedColours: Array<string> = [
-    'rgba(18,17,18,' + fadedAlpha,     // black
-    'rgba(119,45,134,' + fadedAlpha,   // purple, wine
-    'rgba(93,31,227,' + fadedAlpha,    // purple
-    'rgba(85,126,244,' + fadedAlpha,   // blue-sky
-    'rgba(85,198,244,' + fadedAlpha,   // blue, robin egg
-    'rgba(154,187,187,' + fadedAlpha,  // blue-green, sea foam
-    'rgba(213,210,137,' + fadedAlpha,  // yellow-green, dry grass
-    'rgba(226,166,62,' + fadedAlpha,   // orange-yellow, egg yolk
-    'rgba(246,109,55,' + fadedAlpha,   // orange, candied orange 
-    'rgba(255,8,0,' + fadedAlpha,      // red
-    'rgba(251,47,226,' + fadedAlpha,   // pink, hot
-    'rgba(253,144,125,' + fadedAlpha,  // pink, lemonade
-    'rgba(255,241,23,' + fadedAlpha,   // yellow, lemon
-    'rgba(168,186,24,' + fadedAlpha,   // green, bright moss
-    'rgba(46,110,26,' + fadedAlpha,    // green, British racing
-    'rgba(12,62,107,' + fadedAlpha     // blue, navy
+    'rgba(0,0,0,' + fadedAlpha,
+    'rgba(13,112,83,' + fadedAlpha,
+    'rgba(0,171,60,' + fadedAlpha,
+    'rgba(197,198,38,' + fadedAlpha,
+    'rgba(255,155,32,' + fadedAlpha,
+    'rgba(255,59,0,' + fadedAlpha,
+    'rgba(171,42,23,' + fadedAlpha,
+    'rgba(121,67,28,' + fadedAlpha,
+    'rgba(126,114,88,' + fadedAlpha,
+    'rgba(66,88,94,' + fadedAlpha,
+    'rgba(66,138,158,' + fadedAlpha,
+    'rgba(31,122,194,' + fadedAlpha,
+    'rgba(22,36,226,' + fadedAlpha,
+    'rgba(93,22,226,' + fadedAlpha,
+    'rgba(171,12,238,' + fadedAlpha,
+    'rgba(245,7,235,' + fadedAlpha,
+    'rgba(144,5,119,' + fadedAlpha
+
 ];

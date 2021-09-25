@@ -5,6 +5,11 @@ import { MapboxGeocoderProps } from '../containers/DashboardMap';
 
 
 
+/* --------------------------------------------------
+    API for fetching geocoder data from Mapbox API.
+    Handles updates to {map} state.
+-------------------------------------------------- */
+
 export const mapboxFetchGeo = createAsyncThunk(
     /* -------------------------------------------------- 
         Async thunk for fetching Mapbox geocoder data.
@@ -25,22 +30,21 @@ export const mapboxFetchGeo = createAsyncThunk(
             }
         } catch (error) {
             if (axios.isAxiosError(error.response)) {
-                console.log("ERROR: AxiosError, front/backend initial render.", error.response.data.error)
+                console.log("ERROR: AxiosError - Mapbox geocoder fetch.", error.response.data.error)
             } else {
-                console.log("ERROR: Front/backend issue on initial render.", error);
+                console.log("ERROR: API call failed on Mapbox geocoder fetch.", error);
             }
         }
     }
 );
 
 
-
 export const fetchGeo = (apiUrl: string, requestGeo: MapboxGeocoderProps) => {
-    /* ------------------------------
-        Helper: fetcher for thunk.
-    ------------------------------ */
+    /* ------------------------------------
+        Mapbox geocode fetcher for thunk.
+    ------------------------------------ */
     const accessToken = process.env.REACT_APP_DEV_MAPBOX as string;
-    // const type: string = '&types=' + requestGeo.types;   // Including type returns poor results
+    const type: string = '&types=' + requestGeo.types;   // Not used: including returns poor results
     const country: string = '&country=jp';
     const language: string = '&language=ja';
     const worldview: string = '&worldview=jp';
@@ -68,8 +72,8 @@ export const fetchGeo = (apiUrl: string, requestGeo: MapboxGeocoderProps) => {
 
 // State for initial render.
 const initialState: MapProps = {
-    lng: 137.57,
-    lat: 35.91,
+    lng: 137.57,        //  Centres on Japan such that most of
+    lat: 35.91,         //  the country is shown/bounded on map.
     zoom: 4.35,
     bounds: {
         ne: {lng: 151.1719, lat: 46.3044},
@@ -80,27 +84,36 @@ const initialState: MapProps = {
 
 const mapSlice = createSlice({
     /* -------------------------------------------------------
-        Slice to handle bounds and coordinates updating for
+        Slice that handles bounds and coordinates updating for
         interactive map actions on menu item clicks.
     ------------------------------------------------------- */
     name: 'map',
     initialState,
     reducers: {
-        // Initialize map only once.
         handleMapInit: (state, action) => {
+            /* ----------------------------------
+                Sets status for initial render.
+            ---------------------------------- */
             const loadStatus: boolean = action.payload;
             state.loaded = loadStatus;
         },
-        // Update bounding coords for region change.
         handleBoundsUpdate: (state, action) => {
+            /* ---------------------------------------------
+                Updates bounding coords for region change.
+            --------------------------------------------- */
             const newBounds: BoundsProps = action.payload;
             state.bounds = newBounds;
         }
     },
     extraReducers: (builder) => {
-        // Reducers for async thunk Mapbox Geocoder API call.
+        /* ------------------------------------------------------
+            Reducers for async thunk Mapbox Geocoder API calls.
+        ------------------------------------------------------ */
         builder
             .addCase(mapboxFetchGeo.fulfilled, (state, action) => {
+                /* ------------------------------------- 
+                    Updates state on successful fetch.
+                ------------------------------------- */
                 const geoData = action.payload.features[0];
                 let sameSwLng: boolean;
                 let sameNeLat: boolean;
@@ -113,7 +126,7 @@ const mapSlice = createSlice({
                 } else {
                     [sameSwLng, sameNeLat] = [false, false];
                 }
-                unchanged = sameSwLng === true || sameNeLat === true ? true : false;
+                unchanged = (sameSwLng === true) || (sameNeLat === true) ? true : false;
 
                 // Update bounds (non-districts) or coordinates (districts).
                 if (geoData.bbox !== undefined && unchanged === false) {
@@ -125,12 +138,12 @@ const mapSlice = createSlice({
                     [state.bounds.sw.lng, state.bounds.sw.lat,
                         state.bounds.ne.lng, state.bounds.ne.lat] = geoData.bbox;
                 } else {
-                    // Update lng lat centres.
-                    // (Mapbox free tier doesn't provide such tight local boundaries)
+                    // Update lng lat centres, mainly for district level regions.
+                    // (Mapbox free tier doesn't provide resolution down to local boundaries)
                     [state.lng, state.lat] = geoData.center;
-                    state.zoom = 15;     // Arbitrary zoom level
+                    state.zoom = 15;     // Arbitrary zoom level for estimated district area.
                     
-                    // Remove bounding box since it's not provided. 
+                    // Remove bounding box since it's not provided.
                     [state.bounds.sw.lng, state.bounds.sw.lat,
                         state.bounds.ne.lng, state.bounds.ne.lat] = [null, null, null, null];
                 }
@@ -141,7 +154,9 @@ const mapSlice = createSlice({
             })
 
             .addCase(mapboxFetchGeo.rejected, (state, action) => {
-                // Unsuccessful update.
+                /* ------------------------ 
+                    Catches fetch errors.
+                ------------------------ */
                 console.log("Mapbox geocoder API call unsuccessful.")
             })
     }
@@ -168,6 +183,7 @@ type BoundsCoordProps = {
     lng: number | null,
     lat: number | null
 }
+
 
 // Selector for selection state.
 export const mapSelection = (state: RootState) => state.map;

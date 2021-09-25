@@ -14,3 +14,8 @@
 .mapboxgl-ctrl-bottom-right {
     padding: 0 1vw 0 1vw;
 }
+
+.mapboxgl-ctrl.mapboxgl-ctrl-attrib {
+    background-color: var(--transparent);
+    opacity: 0.50;
+}
