@@ -2,6 +2,7 @@
     display: grid;
     grid-template-columns: 100%;
     grid-template-rows: repeat(5, 6rem) auto;
+    row-gap: 2rem;
     border: double 3px var(--border-lines);
     border-top: none;
     padding-top: 1.5vw;
@@ -17,7 +18,6 @@
 .Sidebar_options_slider {
     position: relative;
     width: 100%;
-    margin-bottom: 1vw;
     padding-left: 1vw;
     padding-right: 1vw;
     justify-self: center;
@@ -26,24 +26,28 @@
 /* Slider text */
 .Sidebar_options_slider_text {
     display: grid;
-    grid-template-columns: auto auto;
+    grid-template-rows: auto auto;
 }
-.Sidebar_options_slider:hover > .Sidebar_options_slider_text label {
-    opacity: 0;
+/* Hover over slider highlights option choice */
+.Sidebar_options_slider:hover 
+    > .Sidebar_options_slider_text p {
+        color: var(--extra-highlight);
+        font-size: 1.05rem;
+        transition: all 250ms ease-out;
 }
 .Sidebar_options_slider_text_label {
     font-family: "Kaisei Opti", serif;
     font-size: 1.2rem;
-    text-align: start;
-    transition: all 500ms ease-out;
+    text-align: center;
 }
 .Sidebar_options_slider_text_selected {
     font-family: "Kaisei Opti", serif;
     font-weight: 300;
     font-size: 1rem;
     color: var(--options-font-active);
-    text-align: end;
+    text-align: center;
     align-self: end;
+    transition: all 250ms ease-in;
 }
 
 
@@ -55,9 +59,9 @@
 }
 .Sidebar_options_slider_ruler p {
     line-height: 1.5rem;
-    font-size: 0.75rem;
+    font-size: 1rem;
     color: var(--options-font-inactive);
-    opacity: 0.5;
+    opacity: 0.30;
 
 }
 
