@@ -1,123 +1,102 @@
-// Loading screen
 window.onload = function() {
-  const loader = document.getElementById("loading");
-  const pageIndex = document.getElementById("index-loader");
-  // const pageOthers = document.getElementById("pages-loader");
-  const currentPath = window.location.pathname;
+	/* ------------------------
+		Loader for main page.
+	------------------------ */
 
-  loader.classList.add("lift");
-
-  if (currentPath == "/") {
-    setTimeout(function() {
-      pageIndex.classList.add("show");
-      loader.classList.add("hide");
-    }, 1000);
-  }
-  //  else if (currentPath == "/gallery") {
-  //     setTimeout(function() {
-  //       pageOthers.classList.add("show");
-  //       loader.classList.add("hide");
-  //     }, 100);
-  // }
+	// loader.classList.add("reveal");
+	checkImagesLoaded();
+	greetUser();
+    parallaxScroll();
 };
 
-// Index parallax scroll effect.
-(function parallaxScroll() {
-  window.addEventListener("scroll", function(event) {
-    var depthField, distance, dofOpacity, layer, scrollDepth, scrollFx;
-    var maxScrollDist = 400;
-    var scrollDist = window.pageYOffset;
-    var layers = document.getElementsByClassName("layers");
-    // var godzilla = document.getElementById("layer10godzilla");
-    // var offsetShow = document.getElementById("offset");
-    // offsetShow.textContent = scrollDist;
 
-    for (var i = 0; i < layers.length; i++) {
-      layer = layers[i]
+function checkImagesLoaded() {
+	/* -------------------------------------------------
+		Load all images before lifting loader overlay.
+		https://stackoverflow.com/a/60949881/14181584
+	------------------------------------------------- */
+	const loader = document.getElementsByClassName("loading")[0];
+	const container = document.getElementsByClassName("container")[0];
+	const images = document.images;
 
-      // Elevation parallax effect based on scroll distance.
-      distance = layer.getAttribute("data-distance");
-      scrollDepth = scrollDist * distance * 0.5;
-      scrollFx = "translateY(" + scrollDepth + "px)";
-      // scrollFxLat = "translateX(" + scrollDepth - 200 + "px)";
-      if (scrollDist < 200) { 
-        layer.style.transform = scrollFx;
-      }
+	Promise.all(Array.from(images).map(img => {
+		if (img.complete) 
+			return Promise.resolve(img.naturalHeight !== 0);
 
-      // if (scrollDist > 500) {
-      //   godzilla.style.transform = scrollFxLat;
-      // }
+		return new Promise(resolve => {
+			img.addEventListener("load", () => resolve(true));
+			img.addEventListener("error", () => resolve(false));
+		});
+	}))
+		.then(results => {
+			if (results.every(response => response)) {
+				loader.classList.add("fade");
+				loader.classList.add("hide");
+				container.classList.add("fade");
+				container.classList.add("show");
+			} else
+				console.log("Index images loaded; some may be broken.");
+				loader.classList.add("fade");
+				loader.classList.add("hide");
+				container.classList.add("fade");
+				container.classList.add("show");
+		});
+}
 
-      // Depth focus effect, depthFields (1 to 6):
-      //  1 = background apartment complex
-      //  2 = elevated roadway, river
-      //  3 = fields, middle 2x tallest apartments
-      //  4 = middle lowrise apartments
-      //  5 = side apartments
-      //  6 = foreground
-      //  11~66 = blurred versions
-      depthField = layer.getAttribute("data-dof");
-      if (scrollDist <= 25) {
-        if (depthField < 11) {
-          dofOpacity = 1;
-        } else if (depthField >= 11) {
-          dofOpacity = 0;
-        }
-      // Background apartment row.
-      } else if (scrollDist > 25 && scrollDist <= 85) {
-          if (depthField == 1) {
-            dofOpacity = (maxScrollDist - scrollDist) / maxScrollDist;
-        } else if (depthField == 11) {
-            dofOpacity = scrollDist / maxScrollDist;
-        } else if (depthField > 11) {
-            dofOpacity = 0
-        } else {
-            dofOpacity = 1;
-        }
-      // Bridge.
-      } else if (scrollDist > 85 && scrollDist <= 150) {
-          if (depthField <= 2) {
-            dofOpacity = (maxScrollDist - scrollDist) / maxScrollDist;
-          } else if (depthField >= 11 && depthField <= 22) {
-              dofOpacity = scrollDist / maxScrollDist;
-          } else if (depthField > 22) {
-              dofOpacity = 0
-          } else {
-              dofOpacity = 1;
-          }
-      // Middle 2x apartments.
-      } else if (scrollDist > 150 && scrollDist <= 225) {
-          if (depthField <= 3) {
-            dofOpacity = (maxScrollDist - scrollDist) / maxScrollDist;
-          } else if (depthField >= 11 && depthField <= 33) {
-              dofOpacity = scrollDist / maxScrollDist;
-          } else if (depthField > 33) {
-              dofOpacity = 0
-          } else {
-              dofOpacity = 1;
-          }
-      // Middle lowrise apartments, side.
-      } else if (scrollDist > 225 && scrollDist <= 350) {
-          if (depthField <= 4) {
-            dofOpacity = (maxScrollDist - scrollDist) / maxScrollDist;
-          } else if (depthField >= 11 && depthField <= 44) {
-              dofOpacity = scrollDist / maxScrollDist;
-          } else if (depthField > 44) {
-              dofOpacity = 0
-          } else {
-              dofOpacity = 1;
-          }
-      // Foreground.
-      } else if (scrollDist > 350) {
-          if (depthField <= 5) {
-            dofOpacity = (maxScrollDist - scrollDist) / maxScrollDist;
-          } else if (depthField >= 11 && depthField <= 66) {
-              dofOpacity = scrollDist / maxScrollDist;
-          } else {
-              dofOpacity = 1;
-          }
-      }
-      layer.style.opacity = dofOpacity;
-    }
-  });
-})();
+
+function greetUser() {
+	/* -------------------------
+		Header title/greeting.
+	------------------------- */
+	const headerGreet = document.getElementById("header_title_text");
+	const time = new Date();
+	const hour = time.getHours();
+	
+	if (hour >= 0 && hour < 5) {
+		headerGreet.textContent = "Good evening!";
+	} else if (hour >= 5 && hour < 12) {
+		headerGreet.textContent = "Good morning!";
+	} else if (hour >= 12 && hour < 18) {
+		headerGreet.textContent = "Good afternoon!";
+	} else if (hour >= 18) {
+		headerGreet.textContent = "Good evening!";
+	}
+}
+
+
+function parallaxScroll() {
+	/* --------------------------
+		Parallax scroll effect.
+	-------------------------- */
+	window.addEventListener("scroll", function(event) {
+		let layerDistance, layer, scrollDepth, scrollFx;
+		let scrollDist = window.pageYOffset;
+		let windowWidth = window.innerWidth;
+		let windowHeight = window.innerHeight;
+		let picFrame = document.getElementsByClassName("index_cityscape")[0];
+		let picFrameWidth = getComputedStyle(picFrame).width.replace('px', '');
+		let picFrameHeight = getComputedStyle(picFrame).height.replace('px', '');
+		let layers = document.getElementsByClassName("index_cityscape_layers");
+
+		// Elevation parallax effect based on scroll distance.
+		for (var i = 0; i < layers.length; i++) {
+			layer = layers[i]
+			layerDistance = layer.getAttribute("data-distance");
+			scrollDepth = scrollDist * layerDistance * 0.175;
+			scrollFx = 'translateY('.concat(scrollDepth, 'px)');
+
+			if (scrollDist < 800) {
+				// Shift layers' y-axis position.
+				layer.style.transform = scrollFx;
+			}
+		}
+
+		// "Zoom" into frame if scrolled more than 150px.
+		if (scrollDist >= 150) {
+			let zoomPercent = 50 + (scrollDist / windowHeight * 12.5);
+			let widenPercent = Math.floor(zoomRatio).toString().concat('%');
+			picFrame.style.width = widenPercent;
+		} else
+			picFrame.style.width = "50%";		
+	});
+};

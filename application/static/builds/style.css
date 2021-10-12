@@ -11,39 +11,98 @@
     -webkit-box-sizing: border-box;
     margin: 0;
     padding: 0;
+    scroll-behavior: smooth;
 }
 
-#loading {
+
+/* ------------------------------------------------------------ */
+/*                            Fonts                             */
+/* ------------------------------------------------------------ */
+
+/*
+h1 {
+    font-family: 'Sansita Swashed', cursive;
+    font-size: 4rem;
+    text-shadow: 5px 5px #cdcdcd;
+}
+
+h2 {
+    font-family: 'Sansita Swashed', cursive;
+    font-size: 2rem;
+}
+
+p {
+    font-family: 'Grenze', serif;
+    font-size: 1.75rem;
+    font-size: 1.75rem;
+}
+    p:first-letter {
+        font-family: 'Sansita Swashed', cursive;
+        color: rgb(122, 199, 21);
+        font-size: 4rem;
+        margin-top: -0.5rem;
+        margin-bottom: -0.28em;
+        margin-right: 0.35rem;
+        float: left;
+    }
+
+a {
+    color: rgb(122, 199, 21);
+    text-decoration: none;
+    transition: all 500ms;
+}
+    a:visited {
+        color: rgb(122, 199, 21);
+    }
+
+    a:hover {
+        background: #d4d4d4;
+        color: #5f5c5b;
+        transition: all 500ms;
+    }
+*/
+
+/* ------------------------------------------------------------ */
+/*                          Loader                              */
+/* ------------------------------------------------------------ */
+.loading {
     display: grid;
     width: 100vw;
     height: 100vh;
-    position: relative;
-    top: 0;
-    left: 0;
-    grid-template-columns: repeat(3, 1fr);
-    grid-template-rows: repeat(3, 1fr);
-    background: #5f5c5b;
+    /* position: relative; */
+    /* top: 0;
+    left: 0; */
+    grid-template-columns: repeat(3, 33%);
+    grid-template-rows: repeat(5, 20%);
+    /* background: #5f5c5b; */
+    background: #312c2b;
     user-select: none;
     z-index: 100;
 }
-    #loading > h2 {
-        grid-column: 2 / 3;
-        grid-row: 3 / 3;
-        font-family: 'VT323', monospace;
-        font-size: 2.5rem;
-        align-self: start;
-        justify-self: center;
-    }
-    #dripper {
-        display: inline-block;
+
+    #loading_image {
         grid-column: 2 / 3;
         grid-row: 2 / 3;
-        align-self: center;
+        padding-left: 2.5rem;
         justify-self: center;
         pointer-events: none;
     }
 
-    @keyframes loadFade {
+    #loading_text {
+        grid-column: 2 / 3;
+        grid-row: 3 / 4;
+        font-family: 'Sansita Swashed', cursive;
+        font-size: 2.2rem;
+        color: antiquewhite;
+        align-self: center;
+        justify-self: center;
+    }
+
+    .loading.fade {
+        animation-name: load-fade-out;
+        animation-duration: 2000ms;
+    }
+    @keyframes load-fade-out {
         0% {
             opacity: 1;
         }
@@ -51,43 +110,10 @@
             opacity: 0;
         }
     }
-    #loading.lift {
-        animation-name: loadFade;
-        animation-duration: 3000ms;
-        z-index: 0;
-    }
-    #loading.hide {
+
+    .loading.hide {
         display: none;
     }
-
-#index-loader {
-    display: none;
-}
-    #index-loader.show {
-        display: unset;
-        overflow-x: hidden !important; /* fix */
-        font-family: 'Antic Slab', serif;
-        margin: 0 !important;
-        padding: 0 !important;
-    }
-
-    .index-section {
-        height: 100vh;
-    }
-/*  For use with loading page.
-#pages-loader {
-    display: none;
-}
-    #pages-loader.show {
-        display: grid;
-        font-family: 'Antic Slab', serif;
-        margin: 5rem 7rem 7rem 7rem;
-        grid-template-areas: 
-            "header"
-            "body";
-    }
-*/
-
 
 #pages-loader {
     display: grid;
@@ -116,33 +142,6 @@
     font-family: 'FontAwesome' !important;
 }
 
-h1 {
-    font-family: 'Abel', sans-serif;
-    font-size: 4rem;
-    text-shadow: 5px 5px #cdcdcd;
-}
-
-h2 {
-    font-family: 'Abel', sans-serif;
-    font-size: 2rem;
-}
-
-p {
-    font-family: 'Antic Slab', serif;
-    font-size: 1.5rem;
-
-}
-
-p:first-letter {
-    font-family: 'Antic Slab', serif;
-    font-weight: 700;
-    color: rgb(122, 199, 21);
-    font-size: 4rem;
-    margin-top: -0.5rem;
-    margin-bottom: -0.28em;
-    margin-right: 0.35rem;
-    float: left;
-}
 
 .pages-body p:first-letter {
     font-family: 'Antic Slab', serif;
@@ -155,21 +154,7 @@ p:first-letter {
     float: left;
 }
 
-a {
-    color: rgb(122, 199, 21);
-    text-decoration: none;
-    transition: all 500ms;
-}
 
-    a:visited {
-        color: rgb(122, 199, 21);
-    }
-
-    a:hover {
-        background: #d4d4d4;
-        color: #5f5c5b;
-        transition: all 500ms;
-    }
 
 .top-bg {
     width: calc(100% - 14rem);
@@ -305,22 +290,24 @@ a {
 /* ----------------------------------------------------------------------- */
 /*                             Header + Navbar                             */
 /* ----------------------------------------------------------------------- */
-.top {
+.header {
     display: grid;
-    grid-area: header;
-    grid-template-columns: 1fr 1fr;
-    grid-template-rows: 1fr;
+    /* grid-area: header; */
+    grid-column: 1;
+    grid-row: 1 / 2;
+    grid-template-columns: 50% 50%;
+    grid-template-rows: 100%;
     grid-template-areas: 
         "title  menu";
     align-items: end;
 }
-    .top .top-greet h1 {
-        float: left;
+    .header_title h1 {
+        /* float: left;
         position: relative;
         top: 3rem; 
         left: 7rem;
         animation-name: fromLeft;
-        animation-duration: 1500ms;
+        animation-duration: 1500ms; */
         z-index: 10;
     }
     .top .top-greet-pages {
