@@ -2,11 +2,12 @@ window.onload = function() {
 	/* ------------------------
 		Loader for main page.
 	------------------------ */
+	let picFrame = document.getElementsByClassName("index_cityscape")[0];
+	let initPicFrameWidthPercent = getComputedStyle(picFrame).width;
 
-	// loader.classList.add("reveal");
 	checkImagesLoaded();
 	greetUser();
-    parallaxScroll();
+    parallaxScroll(initPicFrameWidthPercent);
 };
 
 
@@ -64,19 +65,19 @@ function greetUser() {
 }
 
 
-function parallaxScroll() {
+function parallaxScroll(initPicFrameWidthPercent) {
 	/* --------------------------
 		Parallax scroll effect.
 	-------------------------- */
 	window.addEventListener("scroll", function(event) {
+		let container = document.getElementsByClassName("container show")[0];
+		let picFrame = document.getElementsByClassName("index_cityscape")[0];
+		let layers = document.getElementsByClassName("index_cityscape_layers");
 		let layerDistance, layer, scrollDepth, scrollFx;
 		let scrollDist = window.pageYOffset;
-		let windowWidth = window.innerWidth;
-		let windowHeight = window.innerHeight;
-		let picFrame = document.getElementsByClassName("index_cityscape")[0];
-		let picFrameWidth = getComputedStyle(picFrame).width.replace('px', '');
-		let picFrameHeight = getComputedStyle(picFrame).height.replace('px', '');
-		let layers = document.getElementsByClassName("index_cityscape_layers");
+		let scrollHeight = container.scrollHeight;
+		let zoom = Math.floor(initPicFrameWidthPercent.replace('%', ''));
+		
 
 		// Elevation parallax effect based on scroll distance.
 		for (var i = 0; i < layers.length; i++) {
@@ -92,11 +93,11 @@ function parallaxScroll() {
 		}
 
 		// "Zoom" into frame if scrolled more than 150px.
-		if (scrollDist >= 150) {
-			let zoomPercent = 50 + (scrollDist / windowHeight * 12.5);
-			let widenPercent = Math.floor(zoomRatio).toString().concat('%');
+		if (scrollDist >= 150 && scrollDist < scrollHeight * 0.6) {
+			let newZoom = zoom + (scrollDist / scrollHeight * 25);
+			let widenPercent = Math.floor(newZoom).toString().concat('%');
 			picFrame.style.width = widenPercent;
 		} else
-			picFrame.style.width = "50%";		
+			picFrame.style.width = initPicFrameWidthPercent;
 	});
 };

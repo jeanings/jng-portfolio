@@ -1,10 +1,12 @@
 #------------------------------------------
 # Assets for index page.
 #------------------------------------------
+from flask import current_app as app
 from flask_assets import Bundle, Environment
 
 
 def build_assets(app):
+    DEBUG_MODE = app.config['FLASK_DEBUG']
     assets = Environment(app)
         
     # Automatically build and merge assets.
@@ -25,11 +27,10 @@ def build_assets(app):
                     filters='jsmin',
                     output='dist/js/index.js')
 
-
     # Register and build in development mode.
     assets.register('index_css', css_bundle)
     assets.register('index_js', js_bundle)
 
-    if app.config['FLASK_DEBUG'] == True:
+    if DEBUG_MODE == 'True':
         css_bundle.build()
         js_bundle.build()
