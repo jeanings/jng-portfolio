@@ -70,26 +70,39 @@ function parallaxScroll(initPicFrameWidthPercent) {
 		Parallax scroll effect.
 	-------------------------- */
 	window.addEventListener("scroll", function(event) {
+		// let container = document.getElementsByClassName("container show")[0];
+		// let scrollHeight = container.scrollHeight;
 		let container = document.getElementsByClassName("container show")[0];
+		let scrollWidth = container.scrollWidth;
+		let scrollHeight = container.scrollHeight;
+		let orientation = (window.innerWidth > window.innerHeight) ? 'landscape' : 'portrait';
 		let picFrame = document.getElementsByClassName("index_cityscape")[0];
 		let layers = document.getElementsByClassName("index_cityscape_layers");
 		let layerDistance, layer, scrollDepth, scrollFx;
 		let scrollDist = window.pageYOffset;
-		let scrollHeight = container.scrollHeight;
+		let scrollDistHeightRatio = scrollDist / scrollHeight; 
 		let zoom = Math.floor(initPicFrameWidthPercent.replace('%', ''));
 		
+		console.log('inner w', window.innerWidth, 'w', scrollWidth,);
+
 
 		// Elevation parallax effect based on scroll distance.
 		for (var i = 0; i < layers.length; i++) {
 			layer = layers[i]
 			layerDistance = layer.getAttribute("data-distance");
-			scrollDepth = scrollDist * layerDistance * 0.175;
-			scrollFx = 'translateY('.concat(scrollDepth, 'px)');
 
-			if (scrollDist < 800) {
-				// Shift layers' y-axis position.
-				layer.style.transform = scrollFx;
+			if (scrollDistHeightRatio <= 0.4) {
+				if (orientation === 'landscape') {
+					scrollDepth = scrollDist * layerDistance * 0.20;
+				} else if (orientation === 'portrait') {
+					scrollDepth = scrollDist * layerDistance * 0.10;
+				}
 			}
+
+			// Shift layers' y-axis position.
+			// console.log('scrollDepth', scrollDepth);
+			scrollFx = 'translateY('.concat(scrollDepth, 'px)');
+			layer.style.transform = scrollFx;
 		}
 
 		// "Zoom" into frame if scrolled more than 150px.
