@@ -209,6 +209,10 @@ body {
         grid-column: 1;
         grid-row: 4 / 5;
     }
+
+    .index_about_text p {   /* for observer fade-in reveal */
+        transition: opacity 750ms ease-in-out;
+    }
     
     .index_about_text a {
         font-style: italic;
