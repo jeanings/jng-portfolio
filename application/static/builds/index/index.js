@@ -8,6 +8,7 @@ window.onload = function() {
 	checkImagesLoaded();
 	greetUser();
     parallaxScroll(initPicFrameWidthPercent);
+	aboutTextObserver();
 };
 
 
@@ -114,3 +115,45 @@ function parallaxScroll(initPicFrameWidthPercent) {
 			picFrame.style.width = initPicFrameWidthPercent;
 	});
 };
+
+
+function aboutTextObserver() {
+	/* ----------------------------------------------
+		Fade-in text gradually as it comes to view.
+	---------------------------------------------- */
+	let observer;
+	let threshold = [0, 0.20, 0.40, 0.60, 0.80, 1];
+	let observerOptions = {
+		root: null,		// threshold based on null (viewport), not element. 
+		rootMargin: '0px',
+		threshold: threshold
+	};
+
+	// Observer constructor - calls handleObservation when threshold is crossed.
+	observer = new IntersectionObserver(handleObservation, observerOptions);
+
+	// Observe targets.
+	let para1Elem = document.getElementsByClassName("index_about_text_para1")[0];
+	let para2Elem = document.getElementsByClassName("index_about_text_para2")[0];
+	let para3Elem = document.getElementsByClassName("index_about_text_para3")[0];
+	let para4Elem = document.getElementsByClassName("index_about_text_para4")[0];
+	let elemList = [para1Elem, para2Elem, para3Elem, para4Elem];
+
+	elemList.forEach(element => {
+		observer.observe(element);
+	});
+	
+
+	function handleObservation(entries, observer) {
+		/* --------------------------------------------
+			Observer callback for fading in elements.
+		-------------------------------------------- */
+		entries.forEach(entry => {
+			if (entry.intersectionRatio >= 0.80) {
+				entry.target.style.opacity = "1";
+			} else if (entry.intersectionRatio < 0.80) {
+				entry.target.style.opacity = "0";
+			}
+		});
+	}
+}
