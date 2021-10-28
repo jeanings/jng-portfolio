@@ -10,7 +10,7 @@
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
         <!-- <link href="https://fonts.googleapis.com/css2?family=Antic+Slab&family=Libre+Caslon+Display&family=Libre+Caslon+Text&family=Lobster&display=swap" rel="stylesheet"> -->
         <link href="https://fonts.googleapis.com/css2?family=Grenze:wght@200&family=Sansita+Swashed:wght@800&display=swap" rel="stylesheet">
-        <script src="https://kit.fontawesome.com/6bf4161487.js"></script>
+        <!-- <script src="https://kit.fontawesome.com/6bf4161487.js"></script> -->
         <title>
             {% block title %}{% endblock %}
         </title>
@@ -19,7 +19,7 @@
     <body>
         <div class="loading">
             <div id="loading_image">
-                <img src="https://storage.googleapis.com/jn-portfolio/misc/loading.gif" id="dripper">
+                <img src="https://storage.googleapis.com/jn-portfolio/misc/loading.gif" id="loading_image_dripper">
             </div>
             <h2 id="loading_text">Loading...</h2>
         </div>
@@ -29,6 +29,7 @@
                 <div class="header_title">
                     <h1 id="header_title_text"></h1>
                 </div>
+                {% include "index/nav.html" %}
             </header>
 
             {% block content %}        
