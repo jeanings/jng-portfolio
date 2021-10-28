@@ -50,9 +50,9 @@ body {
     grid-template-columns: 100%;
     grid-template-rows: 100%;
     margin-top: 3rem;
-    border: #000000 double 4px;
+    border: #ffffff double 4px;
     padding: 3rem;
-    background: #000000;
+    background: #ffffff;
     justify-items: center;
     /* -------  x      y      blur   spread  colour -------- */
     box-shadow: 0.5rem 0.5rem 0.9rem 0.05rem rgba(0, 0, 0, 0.3);
