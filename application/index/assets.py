@@ -22,7 +22,6 @@ def build_assets(app):
                     output='dist/css/index.css')
 
     js_bundle = Bundle(
-                    'builds/main.js',
                     'builds/nav.js',
                     'builds/index/index.js',
                     filters='jsmin',
