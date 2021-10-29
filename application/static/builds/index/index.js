@@ -6,10 +6,10 @@ window.onload = function() {
 	let initPicFrameWidthPercent = getComputedStyle(picFrame).width;
 
 	checkImagesLoaded();
-	greetUser();
     parallaxScroll(initPicFrameWidthPercent);
 	aboutTextObserver();
 };
+
 
 
 function checkImagesLoaded() {
@@ -45,25 +45,6 @@ function checkImagesLoaded() {
 		});
 }
 
-
-function greetUser() {
-	/* -------------------------
-		Header title/greeting.
-	------------------------- */
-	const headerGreet = document.getElementById("header_title_text");
-	const time = new Date();
-	const hour = time.getHours();
-	
-	if (hour >= 0 && hour < 5) {
-		headerGreet.textContent = "Good evening!";
-	} else if (hour >= 5 && hour < 12) {
-		headerGreet.textContent = "Good morning!";
-	} else if (hour >= 12 && hour < 18) {
-		headerGreet.textContent = "Good afternoon!";
-	} else if (hour >= 18) {
-		headerGreet.textContent = "Good evening!";
-	}
-}
 
 
 function parallaxScroll(initPicFrameWidthPercent) {
@@ -115,6 +96,7 @@ function parallaxScroll(initPicFrameWidthPercent) {
 			picFrame.style.width = initPicFrameWidthPercent;
 	});
 };
+
 
 
 function aboutTextObserver() {

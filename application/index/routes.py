@@ -17,4 +17,4 @@ assets.build_assets(app)      # COMMENT OUT FOR GAE DEPLOYMENT
 # Index route.
 @index_bp.route('/', methods=['GET'])
 def index():
-    return render_template('index.html', title="Welcome.")
+    return render_template('index.html', title="Some personal site on the web / jeanings.space")
