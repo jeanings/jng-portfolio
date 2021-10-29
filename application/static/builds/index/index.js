@@ -52,8 +52,6 @@ function parallaxScroll(initPicFrameWidthPercent) {
 		Parallax scroll effect.
 	-------------------------- */
 	window.addEventListener("scroll", function(event) {
-		// let container = document.getElementsByClassName("container show")[0];
-		// let scrollHeight = container.scrollHeight;
 		let container = document.getElementsByClassName("container show")[0];
 		let scrollWidth = container.scrollWidth;
 		let scrollHeight = container.scrollHeight;
@@ -65,8 +63,6 @@ function parallaxScroll(initPicFrameWidthPercent) {
 		let scrollDistHeightRatio = scrollDist / scrollHeight; 
 		let zoom = Math.floor(initPicFrameWidthPercent.replace('%', ''));
 		
-		console.log('inner w', window.innerWidth, 'w', scrollWidth,);
-
 
 		// Elevation parallax effect based on scroll distance.
 		for (var i = 0; i < layers.length; i++) {
@@ -82,7 +78,6 @@ function parallaxScroll(initPicFrameWidthPercent) {
 			}
 
 			// Shift layers' y-axis position.
-			// console.log('scrollDepth', scrollDepth);
 			scrollFx = 'translateY('.concat(scrollDepth, 'px)');
 			layer.style.transform = scrollFx;
 		}
