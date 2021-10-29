@@ -2,19 +2,6 @@
 /*                      Portrait view - general                      */
 /* ----------------------------------------------------------------- */
 @media screen and (orientation: portrait) {
-    
-    /* ----- Loader start ----- */
-    #loading_image {
-        align-self: center;
-    }
-    /* ----- Loader start ----- */
-
-    /* ----- Menu start ----- */
-    .header_menu_list_name {
-        font-size: 1.5rem;
-    }
-    /* ----- Menu start ----- */
-
     .container.show {
         display: grid;
         grid-template-columns: 50% 50%;
@@ -74,21 +61,6 @@
     and (-webkit-min-device-pixel-ratio: 1.5) 
     and (min-width: 700px)
     and (max-width: 1200px) {
-
-    /* ----- Loader ----- */
-    #loading_start {
-        align-self: flex-start;
-    }
-    /* ----- Loader ----- */
-
-    /* ----- Menu ----- */
-    .header_menu_list_name {
-        font-size: 2rem;
-    }
-    .ionicon {
-        width: 1.5rem;
-    }
-    /* ----- Menu ----- */
     
     .index_about_text {
         font-size: 2rem;
@@ -133,68 +105,6 @@
     /* and (-webkit-min-device-pixel-ratio: 1.5)  */
     and (min-width: 2400px) {
 
-    /* ----- Loader start ----- */
-    #loading_image {
-        align-self: flex-end;
-    }
-
-    #loading_text {
-        font-size: 4rem;
-        align-self: flex-start;
-    }
-    /* ----- Loader end ----- */
-
-    /* ----- Menu start ----- */
-    .header_menu {
-        height: 4rem;
-        grid-template-columns: auto 4rem;
-    }
-
-    .header_menu_list_name {
-        font-size: 2.5rem;
-    }
-
-    .ionicon {
-        width: 2rem;
-    }
-
-    @keyframes menu-highlight {
-        0% {
-            text-decoration-color: var(--color-accent-primary);
-            text-decoration-thickness: 3px;
-        }
-        65% {
-            text-decoration-color: var(--color-accent-primary);
-            text-decoration-thickness: 8px;
-        }
-        100% {
-            text-decoration-color: var(--color-accent-secondary);
-            text-decoration-thickness: 8px;
-        }
-    }
-
-    #header_menu_toggle_stroke1 {
-        width: 2rem;
-        height: 2rem;
-        border-left: var(--color-accent-primary) solid 10px;
-        border-bottom: transparent solid 10px;
-    }
-        #header_menu_toggle_stroke1.toggle {
-            height: 3rem;
-        }
-    
-    #header_menu_toggle_stroke2 {
-        width: 2rem;
-        height: 2rem;
-        border-left: var(--color-accent-secondary) solid 10px;
-        border-top: transparent solid 10px;
-    }
-        #header_menu_toggle_stroke2.toggle {
-            height: 3rem;
-            margin-bottom: 1rem;
-        }
-    /* ----- Menu end ----- */
-
     .index_cityscape {
         margin-top: 4rem;
     }
@@ -227,69 +137,7 @@
 @media screen and (orientation: landscape) 
     /* and (-webkit-min-device-pixel-ratio: 1.5)  */
     and (min-width: 3600px) {
-    
-    /* ----- Loader start ----- */
-    #loading_image {
-        align-self: flex-end;
-    }
-
-    #loading_text {
-        font-size: 4rem;
-        align-self: flex-start;
-    }
-    /* ----- Loader end ----- */
-
-    /* ----- Menu start ----- */
-    .header_menu {
-        height: 6rem;
-        grid-template-columns: auto 6rem;
-    }
-
-    .header_menu_list_name {
-        font-size: 3.5rem;
-    }
-
-    .ionicon {
-        width: 2.5rem;
-    }
-
-    @keyframes menu-highlight {
-        0% {
-            text-decoration-color: var(--color-accent-primary);
-            text-decoration-thickness: 4px;
-        }
-        65% {
-            text-decoration-color: var(--color-accent-primary);
-            text-decoration-thickness: 10px;
-        }
-        100% {
-            text-decoration-color: var(--color-accent-secondary);
-            text-decoration-thickness: 10px;
-        }
-    }
-
-    #header_menu_toggle_stroke1 {
-        width: 3rem;
-        height: 3rem;
-        border-left: var(--color-accent-primary) solid 12px;
-        border-bottom: transparent solid 12px;
-    }
-        #header_menu_toggle_stroke1.toggle {
-            height: 4.5rem;
-        }
-    
-    #header_menu_toggle_stroke2 {
-        width: 3rem;
-        height: 3rem;
-        border-left: var(--color-accent-secondary) solid 12px;
-        border-top: transparent solid 12px;
-    }
-        #header_menu_toggle_stroke2.toggle {
-            height: 4.5rem;
-            margin-bottom: 2rem;
-        }
-    /* ----- Menu end ----- */
-
+ 
     .index_cityscape {
         margin-top: 6rem;
         border: black double 12px;

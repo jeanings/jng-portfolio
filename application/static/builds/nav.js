@@ -1,24 +1,3 @@
-// Navbar hide on homepage plus change greeting text
-// (function hideMenu() {
-//     const currentPath = window.location.pathname;
-//     const menuItems = document.getElementById("menu");
-  
-//     if (currentPath == "/") {
-//       document.getElementById("navbar").style.display = 'none';
-//     } else if (currentPath == "/gallery") {
-//       document.getElementById("greeting").textContent = "Gallery";
-//       menuItems.childNodes[5].style.display = "none";
-//     } else if (currentPath == "/projects") {
-//       document.getElementById("greeting").textContent = "Projects";
-//       menuItems.childNodes[7].style.display = "none";
-//     } else if (currentPath == "/projects/tokaido_urban_hike") {
-//       document.getElementById("greeting").textContent = "Urban Hiking the 東海道";
-//     } else {
-//       document.getElementById("greeting").textContent = "Page not found!";
-//     }
-//   })();
-  
-
 (function handleMenuItems() {
     /* ------------------------------------------------------------------
         Changes menu targets to 'top' if currently viewing target page.
