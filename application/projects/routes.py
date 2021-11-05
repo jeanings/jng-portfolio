@@ -17,4 +17,4 @@ build_assets(app)
 # Projects route.
 @projects_bp.route("/projects", methods=['GET'])
 def projects():
-    return render_template("projects.html", title="Projects")
+    return render_template("projects.html", title="Some personal projects / jeanings.space")

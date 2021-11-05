@@ -3,19 +3,52 @@
     {{ title }}
 {% endblock %}
 {% block content %}     
-<section>
-    <div class="projects-container">
-        <div class="projects-grid">
-            <div class="showcase-container">
-                
+<section class="projects">
+
+    <div class="projects_labels">
+        <div class="projects_labels_track">
+            <div class="projects_labels_track_months">
+                JAN
             </div>
-            <div class="showcase-container">
-                
+            <div class="projects_labels_track_months">
+                APR
             </div>
-            <div class="showcase-container">
-                
+            <div class="projects_labels_track_months">
+                JUL
+            </div>
+            <div class="projects_labels_track_months">
+                OCT
             </div>
         </div>
     </div>
+
+    <div class="projects_timeline">
+
+        <div class="projects_timeline_year" id="projects_timeline_year_2021">
+            <span class="projects_timeline_year_title">
+                2021
+            </span>
+            {% include "projects/grid_year.html" %}
+        </div>
+
+        <div class="projects_timeline_year" id="projects_timeline_year_2020">
+            <span class="projects_timeline_year_title">
+                2020
+            </span>
+            {% include "projects/grid_year.html" %}
+        </div>
+
+        <div class="projects_timeline_year" id="projects_timeline_year_2019">
+            <span class="projects_timeline_year_title">
+                2019
+            </span>
+            {% include "projects/grid_year.html" %}
+        </div>
+
+    </div>
+
+    <div class="projects_content">
+    </div>
+
 </section>
 {% endblock %}
