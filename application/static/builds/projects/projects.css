@@ -6,8 +6,10 @@ body {
     --color-accent-primary: rgb(187, 199, 21);
     --color-accent-secondary: rgb(42, 184, 124);
     --color-text: #cdcdcd;
-    --color-gridlines-major: #cdcdcd30;
-    --color-gridlines-minor: #cdcdcd20;
+    --color-gridlines-major: #cdcdcd60;
+    --color-gridlines-minor: #cdcdcd40;
+    --sub-proj-border-width: 0.3rem;
+    --sub-proj-border-width-hover: 0.5rem;
     background: var(--color-bg);
 }
 
@@ -39,17 +41,17 @@ body {
             grid-column: 1;
             grid-row: 1;
             padding-top: 3rem;
-            padding-left: 3rem;
-            padding-right: 3rem;
+            padding-left: 6rem;
+            padding-right: 6rem;
             display: grid;
             grid-template-columns: 100%;
-            grid-template-rows: 5% 25% 70%;
+            grid-template-rows: 5% 28% 67%;
         }
             .projects_labels {
                 grid-column: 1;
                 grid-row: 1 / 2;
                 display: grid;
-                grid-template-columns: 10% 90%;
+                grid-template-columns: 6% 94%;
                 grid-template-rows: 100%;
                 user-select: none;
             }
@@ -66,7 +68,7 @@ body {
                         margin-left: -1rem;
                         font-family: 'Grenze';
                         font-size: 1rem;
-                        color: var(--color-accent-secondary);
+                        color: var(--color-text);
                         align-self: center;
                         writing-mode: vertical-rl;
                         transform: rotate(180deg);
@@ -78,13 +80,14 @@ body {
                 display: grid;
                 grid-template-columns: 100%;
                 grid-template-rows: repeat(3, 1fr);
+                row-gap: 1.5rem;
                 user-select: none;
             }
 
                 .projects_timeline_year {
                     grid-column: 1;
                     display: grid;
-                    grid-template-columns: 10% 90%;
+                    grid-template-columns: 6% 94%;
                     grid-template-rows: 100%;
                 }
 
@@ -104,9 +107,10 @@ body {
                         grid-column: 1 / 2;
                         text-align: center;
                         align-self: center;
-                        color: var(--color-accent-primary);
+                        color: var(--color-text);
                         font-family: 'Grenze';
                         font-size: 3rem;
+                        text-align: left;
                     }
 
                     .projects_timeline_year_grid {
@@ -149,11 +153,12 @@ body {
                             .projects_timeline_year_grid_apr_jul,
                             .projects_timeline_year_grid_jul_oct,
                             .projects_timeline_year_grid_oct_dec {
-                                border-bottom: var(--color-gridlines-major) dotted 2px;
+                                border-top: var(--color-gridlines-minor) dotted 1px;
+                                border-bottom: var(--color-gridlines-minor) dotted 1px;
                                 border-left: var(--color-gridlines-major) dotted 2px;
                             }
 
-                            #projects_timeline_year_2019 
+                            /* #projects_timeline_year_2019 
                                 .projects_timeline_year_grid_jan_apr,
                             #projects_timeline_year_2019
                                 .projects_timeline_year_grid_apr_jul,
@@ -162,7 +167,7 @@ body {
                             #projects_timeline_year_2019
                                 .projects_timeline_year_grid_oct_dec {
                                     border-bottom: none;
-                            }
+                            } */
 
                             .row1,
                             .row2,
@@ -186,4 +191,29 @@ body {
             .projects_content {
                 grid-column: 1;
                 grid-row: 3 / -1;
+                padding-top: 3rem;
+                display: grid;
+                grid-template-columns: 50% 50%;
+                grid-template-rows: 100%;
+                font-family: 'Grenze';
+                font-size: 1.5rem;
+                color: var(--color-text);
             }
+
+                .projects_content_main {
+                    grid-column: 1 / 2;
+                    grid-row: 1;
+                    display: grid;
+                    grid-template-columns: 100%;
+                    grid-template-rows: auto;
+                    row-gap: 0.10rem;
+                }
+
+                .projects_content_sub {
+                    grid-column: 2 / -1;
+                    grid-row: 1;
+                    display: grid;
+                    grid-template-columns: 100%;
+                    grid-template-rows: auto;
+                    row-gap: 0.10rem;
+                }

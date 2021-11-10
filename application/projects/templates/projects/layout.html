@@ -8,6 +8,12 @@
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
         <link href="https://fonts.googleapis.com/css2?family=Grenze:wght@200&family=Sansita+Swashed:wght@800&display=swap" rel="stylesheet">
+        <script type="text/javascript">
+            const mainProjects = {{ main_projects|tojson }};
+            const subProjects = {{ sub_projects|tojson }};
+            const mainColours = {{ main_colours|tojson }};
+            const subColours = {{ sub_colours|tojson }};
+        </script>
         <title>
             {% block title %}{% endblock %}
         </title>
