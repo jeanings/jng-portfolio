@@ -1,6 +1,11 @@
 /* ---------------------------------------------------------------------- */
 /*                              Projects page                             */
 /* ---------------------------------------------------------------------- */
+::selection {
+    background: var(--color-text);
+    color: var(--color-bg);
+}
+
 body {
     --color-bg: #312c2b;
     --color-accent-primary: rgb(187, 199, 21);
@@ -10,6 +15,9 @@ body {
     --color-gridlines-minor: #cdcdcd40;
     --sub-proj-border-width: 0.3rem;
     --sub-proj-border-width-hover: 0.5rem;
+    --main-proj-border-width: 0.5rem;
+    --main-proj-border-width-hover: 0.8rem;
+
     background: var(--color-bg);
 }
 
@@ -43,105 +51,113 @@ body {
             padding-top: 3rem;
             padding-left: 6rem;
             padding-right: 6rem;
+            padding-bottom: 3rem;
             display: grid;
             grid-template-columns: 100%;
-            grid-template-rows: 5% 28% 67%;
+            grid-template-rows: 33% 67%;
+            row-gap: 3rem;
         }
-            .projects_labels {
-                grid-column: 1;
-                grid-row: 1 / 2;
-                display: grid;
-                grid-template-columns: 6% 94%;
-                grid-template-rows: 100%;
-                user-select: none;
-            }
-
-                .projects_labels_track {
-                    grid-column: 2 / -1;
-                    grid-row: 1;
-                    display: grid;
-                    grid-template-columns: repeat(4, 1fr);
-                    grid-template-rows: 100%;
-                }
-
-                    .projects_labels_track_months {
-                        margin-left: -1rem;
-                        font-family: 'Grenze';
-                        font-size: 1rem;
-                        color: var(--color-text);
-                        align-self: center;
-                        writing-mode: vertical-rl;
-                        transform: rotate(180deg);
-                    }
 
             .projects_timeline{
                 grid-column: 1;
-                grid-row: 2 / 3;
+                grid-row: 1 / 2;
                 display: grid;
                 grid-template-columns: 100%;
-                grid-template-rows: repeat(3, 1fr);
-                row-gap: 1.5rem;
+                grid-template-rows: 12% 88%;
                 user-select: none;
             }
-
-                .projects_timeline_year {
+                .projects_timeline_labels {
                     grid-column: 1;
+                    grid-row: 1 / 2;
                     display: grid;
                     grid-template-columns: 6% 94%;
                     grid-template-rows: 100%;
+                    user-select: none;
                 }
 
-                #projects_timeline_year_2021 {
+                    .projects_timeline_labels_track {
+                        grid-column: 2 / -1;
+                        grid-row: 1;
+                        display: grid;
+                        grid-template-columns: repeat(4, 1fr);
+                        grid-template-rows: 100%;
+                    }
+
+                        .projects_timeline_labels_track_months {
+                            margin-left: -1rem;
+                            font-family: 'Grenze';
+                            font-size: 1rem;
+                            color: var(--color-text);
+                            align-self: center;
+                            writing-mode: vertical-rl;
+                            transform: rotate(180deg);
+                        }
+                
+                .projects_timeline_grid {
+                    grid-column: 1;
+                    grid-row: 2 / -1;
+                    display: grid;
+                    row-gap: 1rem;
+                }
+
+                    .projects_timeline_grid_year {
+                        grid-column: 1;
+                        display: grid;
+                        grid-template-columns: 6% 94%;
+                        grid-template-rows: 4.5rem;   /* Dictates height of grid's rows */
+                    }
+
+                #projects_timeline_grid_year_2021 {
                     grid-row: 1 / 2;
                 }
 
-                #projects_timeline_year_2020 {
+                #projects_timeline_grid_year_2020 {
                     grid-row: 2 / 3;
                 }
 
-                #projects_timeline_year_2019 {
+                #projects_timeline_grid_year_2019 {
                     grid-row: 3 / 4;
                 }
 
-                    .projects_timeline_year_title {
+                    .projects_timeline_grid_year_title {
                         grid-column: 1 / 2;
-                        text-align: center;
-                        align-self: center;
                         color: var(--color-text);
                         font-family: 'Grenze';
-                        font-size: 3rem;
-                        text-align: left;
+                        font-size: 2.5rem;
+                        display: flex;
+                        flex-direction: column;
+                        justify-content: center;
                     }
 
-                    .projects_timeline_year_grid {
+                    .projects_timeline_grid_year_axes {
                         grid-column: 2 / -1;
                         display: grid;
                         grid-template-columns: repeat(4, 1fr);
                         grid-template-rows: 100%;
                     }
 
-                        .projects_timeline_year_grid_jan_apr {
+                        .projects_timeline_grid_year_axes_jan_apr {
                             grid-column: 1 / 2;
                             grid-row: 1;
                             display: grid;
                             grid-template-columns: 100%;
                             grid-template-rows: repeat(4, 1fr);
                         }
-                        .projects_timeline_year_grid_apr_jul {
+                        .projects_timeline_grid_year_axes_apr_jul {
                             grid-column: 2 / 3;
                             grid-row: 1;
                             display: grid;
                             grid-template-columns: 100%;
                             grid-template-rows: repeat(4, 1fr);
                         }
-                        .projects_timeline_year_grid_jul_oct {
+                        .projects_timeline_grid_year_axes_jul_oct {
                             grid-column: 3 / 4;
                             grid-row: 1;
                             display: grid;
                             grid-template-columns: 100%;
                             grid-template-rows: repeat(4, 1fr);
                         }   
-                        .projects_timeline_year_grid_oct_dec {
+                        .projects_timeline_grid_year_axes_oct_dec {
                             grid-column: 4 / -1;
                             grid-row: 1;
                             display: grid;
@@ -149,25 +165,14 @@ body {
                             grid-template-rows: repeat(4, 1fr);
                         }
 
-                            .projects_timeline_year_grid_jan_apr,
-                            .projects_timeline_year_grid_apr_jul,
-                            .projects_timeline_year_grid_jul_oct,
-                            .projects_timeline_year_grid_oct_dec {
+                            .projects_timeline_grid_year_axes_jan_apr,
+                            .projects_timeline_grid_year_axes_apr_jul,
+                            .projects_timeline_grid_year_axes_jul_oct,
+                            .projects_timeline_grid_year_axes_oct_dec {
                                 border-top: var(--color-gridlines-minor) dotted 1px;
-                                border-bottom: var(--color-gridlines-minor) dotted 1px;
-                                border-left: var(--color-gridlines-major) dotted 2px;
+                                border-bottom: var(--color-gridlines-major) dashed 1px;
+                                border-left: var(--color-gridlines-major) dashed 1px;
                             }
-
-                            /* #projects_timeline_year_2019 
-                                .projects_timeline_year_grid_jan_apr,
-                            #projects_timeline_year_2019
-                                .projects_timeline_year_grid_apr_jul,
-                            #projects_timeline_year_2019
-                                .projects_timeline_year_grid_jul_oct,
-                            #projects_timeline_year_2019
-                                .projects_timeline_year_grid_oct_dec {
-                                    border-bottom: none;
-                            } */
 
                             .row1,
                             .row2,
@@ -190,30 +195,259 @@ body {
 
             .projects_content {
                 grid-column: 1;
-                grid-row: 3 / -1;
-                padding-top: 3rem;
+                grid-row: 2 / -1;
                 display: grid;
                 grid-template-columns: 50% 50%;
                 grid-template-rows: 100%;
+                column-gap: 2rem;
                 font-family: 'Grenze';
-                font-size: 1.5rem;
+                font-size: 1.25rem;
                 color: var(--color-text);
             }
 
-                .projects_content_main {
+                .projects_content a {
+                    color: var(--color-text);
+                    text-decoration: none;
+                    cursor: pointer;
+                    transition: all 500ms;
+                }
+                
+                    .projects_content a:visited {
+                        color: var(--color-text);
+                    }
+                
+                    .projects_content a:hover {
+                        background: var(--color-text);
+                        color: var(--color-bg);
+                        transition: all 500ms;
+                    }
+
+                .projects_content_main_frame {
                     grid-column: 1 / 2;
+                    grid-row: 1;
+                    margin-bottom: 1rem;
+                    outline: transparent 0px solid;
+                    outline-offset: 0.5rem;
+                    transition: all 500ms ease-in-out;
+                }
+
+                .projects_content_sub_frame {
+                    grid-column: 2 / -1;
+                    grid-row: 1;
+                    margin-bottom: 1rem;
+                    outline: transparent 0px solid;
+                    outline-offset: 0.5rem;
+                    transition: all 500ms ease-in-out;
+                }
+
+                .projects_content_container {
                     grid-row: 1;
                     display: grid;
                     grid-template-columns: 100%;
-                    grid-template-rows: auto;
-                    row-gap: 0.10rem;
+                    grid-auto-rows: max-content;
+                    row-gap: 1rem;
+                    transition: all 700ms ease-in-out;
+                    overflow-y: scroll;
+                    overflow-x: hidden;
+                    padding-right: 1.5rem;
+                    padding-bottom: 3rem;
+                }
+
+                .projects_content_main {
+                    grid-column: 1 / 2;
                 }
 
                 .projects_content_sub {
                     grid-column: 2 / -1;
-                    grid-row: 1;
-                    display: grid;
-                    grid-template-columns: 100%;
-                    grid-template-rows: auto;
-                    row-gap: 0.10rem;
                 }
+
+                    /* Content scrollbar */
+                    .projects_content_container::-webkit-scrollbar {
+                        width: 0.5rem;
+                    }
+                    /* Scroll track above thumb */
+                    .projects_content_container::-webkit-scrollbar-track-piece {
+                        background-color: var(--background);
+                    }
+                    /* Scroll track below thumb */
+                    .projects_content_container::-webkit-scrollbar-track {
+                        background-color: var(--background);
+                    }
+                    /* Scroll direction buttons */
+                    .projects_content_container::-webkit-scrollbar-button {
+                        display: none;
+                    }
+                    /* Scroll "pong" bar */
+                    .projects_content_container::-webkit-scrollbar-thumb {
+                        background-color: var(--color-gridlines-minor);
+                        border-radius: 0.20rem;
+                    }
+                    .projects_content_container::-webkit-scrollbar-thumb:hover {
+                        background-color: var(--color-gridlines-major);
+                    }
+
+                    .projects_content_main_container,
+                    .projects_content_sub_container {
+                        display: grid;
+                        grid-template-columns: 15% 85%;
+                        grid-template-rows: 100%;
+                    }
+
+                    .projects_content_main_header_container,
+                    .projects_content_sub_header_container {
+                        display: grid;
+                        grid-template-columns: 100%;
+                        grid-auto-rows: auto;
+                        transition: all 700ms ease-in-out;
+                    }
+
+                        .projects_content_main_header_item,
+                        .projects_content_sub_header_item {
+                            display: grid;
+                            grid-template-columns: 15% 85%;
+                            grid-template-rows: 100%;
+                        }
+
+                        #projects_content_main_header_category,
+                        #projects_content_sub_header_category {
+                            grid-template-columns: max-content;
+                        }
+                            
+                        .projects_content_main_text,
+                        .projects_content_sub_text {
+                            grid-column: 2 / -1;
+                            grid-row: 1;
+                        }
+
+
+                        #projects_content_main_header_category_text, 
+                        #projects_content_sub_header_category_text {
+                            grid-column: 1;
+                            grid-row: 1;
+                            text-align: left;
+                            align-self: end;
+                            font-size: 1rem;
+                        }
+
+                            #projects_content_main_header_category_text_git,
+                            #projects_content_sub_header_category_text_git {
+                                grid-column: 2;
+                                grid-row: 1;
+                                padding-left: 0.5rem;
+                                /* display: flex; */
+                            }
+
+                                .ionicon.git {
+                                    vertical-align: middle;
+                                    fill: var(--color-text);
+                                }
+
+                                #projects_content_main_header_category_text_git a:hover,
+                                #projects_content_sub_header_category_text_git a:hover {
+                                    background: unset;
+                                    color: unset;
+                                    transition: all 500ms;
+                                }
+
+                                #projects_content_main_header_category_text_git:hover
+                                    > svg,
+                                #projects_content_sub_header_category_text_git:hover
+                                    > svg  {
+                                        fill: var(--color-text);
+                                        transition: all 500ms;
+                                    }
+                            
+                        #projects_content_main_header_title_text,
+                        #projects_content_sub_header_title_text {
+                            grid-column: 1 / -1;
+                            grid-row: 1;
+                            padding-bottom: 1rem;
+                            text-align: left;
+                            font-size: 1.75rem;
+                        }
+
+                        .projects_content_main_info_container,
+                        .projects_content_sub_info_container {
+                            display: grid;
+                            grid-template-columns: 100%;
+                            grid-auto-rows: auto;
+                            row-gap: 0.5rem;
+                            transition: all 700ms ease-in-out;
+                        }
+
+                            .projects_content_main_info_item,
+                            .projects_content_sub_info_item {
+                                display: grid;
+                                grid-template-columns: 15% 85%;
+                                grid-template-rows: 100%;
+                            }
+                            
+                            #projects_content_main_info_item_components_text,
+                            #projects_content_sub_info_item_components_text {
+                                display: flex;
+                                flex-direction: column;
+                                align-items: flex-start;
+                            }
+
+                                #projects_content_main_info_item_components button,
+                                #projects_content_sub_info_item_componentOf button {
+                                    background: none;
+                                    border: none;
+                                    font-family: 'Grenze';
+                                    font-size: 1.25rem;
+                                    color: var(--color-text);
+                                    cursor: pointer;
+                                    transition: all 500ms;
+                                }
+
+                                    #projects_content_main_info_item_components button:hover,
+                                    #projects_content_sub_info_item_componentOf button:hover {
+                                        background: var(--color-text);
+                                        color: var(--color-bg);
+                                        transition: all 500ms;
+                                    }
+
+                                    #projects_content_main_info_item_components i {
+                                        pointer-events: none;
+                                    }
+
+                            #projects_content_main_info_item_stack_text,
+                            #projects_content_sub_info_item_stack_text {
+                                display: grid;
+                                grid-template-columns: 100%;
+                                grid-template-rows: 50% 50%;
+                            }
+
+                                .projects_content_main_info_item_stack_text_backend,
+                                .projects_content_sub_info_item_stack_text_backend {
+                                    grid-column: 1;
+                                    grid-row: 1 / 2;
+                                    display: flex;
+                                    column-gap: 1rem;
+                                }
+
+                                .projects_content_main_info_item_stack_text_frontend,
+                                .projects_content_sub_info_item_stack_text_frontend {
+                                    grid-column: 1;
+                                    grid-row: 2 / -1;
+                                    display: flex;
+                                    column-gap: 1.5rem;
+                                }
+
+                        #projects_content_main_description_text,
+                        #projects_content_sub_description_text {
+                            grid-column: 1 / -1;
+                            grid-row: 1;
+                            padding-top: 2rem;
+                            text-align: left;
+                        }
+
+                            #projects_content_main_description_text p,
+                            #projects_content_sub_description_text p {
+                                padding-top: 1rem;
+                            }
+
+                        
+                        
+
+                        

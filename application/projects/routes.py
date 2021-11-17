@@ -54,5 +54,4 @@ def projects():
         main_projects=main_projects,
         sub_projects=sub_projects,
         main_colours=main_colours['mainColours'],
-        sub_colours=sub_colours['subColours']
     )

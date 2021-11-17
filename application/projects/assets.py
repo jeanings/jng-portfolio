@@ -13,18 +13,26 @@ def build_assets(app):
     Environment.auto_build = True
     Environment.debug = False
 
+    # Miniaturize if not in debug mode.
+    if DEBUG_MODE == 'False':
+        css_min = 'cssmin'
+        js_min = 'jsmin'
+    else:
+        css_min = None
+        js_min = None
+
     css_bundle = Bundle(
                     'builds/style.css',
                     'builds/media_res.css',
                     'builds/projects/projects.css',
                     # 'builds/projects/projects_media_res.css',
-                    filters='cssmin',
+                    filters=css_min,
                     output='dist/css/projects.css')
 
     js_bundle = Bundle(
                     'builds/nav.js',
                     'builds/projects/projects.js',
-                    filters='jsmin',
+                    filters=js_min,
                     output='dist/js/projects.js')
 
     # Register and build in development mode.
