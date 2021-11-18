@@ -3,63 +3,101 @@
     {{ title }}
 {% endblock %}
 {% block content %}       
-<section class="index-section">
-    <div class="cityscape">
-        <div class="layers deep-dof" id="layer1" data-distance="-0.50" data-dof="6"></div>
-        <div class="layers shallow-dof" id="layer1b" data-distance="-0.50" data-dof="66"></div>
-        <div class="layers deep-dof" id="layer2" data-distance="-0.50" data-dof="6"></div>
-        <div class="layers shallow-dof" id="layer2b" data-distance="-0.50" data-dof="66"></div>
-        <div class="layers shallow-dof" id="layer2c" data-distance="-0.50" data-dof="66"></div>         
-        <div class="layers deep-dof" id="layer3" data-distance="-0.50" data-dof="5"></div>
-        <div class="layers shallow-dof" id="layer3b" data-distance="-0.50" data-dof="55"></div>
-        <div class="layers deep-dof" id="layer4" data-distance="0.15" data-dof="5"></div>
-        <div class="layers shallow-dof" id="layer4b" data-distance="0.15" data-dof="55"></div>
-        <div class="layers deep-dof" id="layer5" data-distance="0.20" data-dof="4"></div>
-        <div class="layers shallow-dof" id="layer5b" data-distance="0.20" data-dof="44"></div>
-        <div class="layers deep-dof" id="layer6" data-distance="0.25" data-dof="4"></div>
-        <div class="layers shallow-dof" id="layer6b" data-distance="0.25" data-dof="44"></div>
-        <div class="layers deep-dof" id="layer7" data-distance="0.35" data-dof="3"></div>
-        <div class="layers shallow-dof" id="layer7b" data-distance="0.35" data-dof="33"></div>
-        <div class="layers deep-dof" id="layer8" data-distance="0.45" data-dof="3"></div>
-        <div class="layers shallow-dof" id="layer8b" data-distance="0.45" data-dof="33"></div>
-        <div class="layers deep-dof" id="layer9" data-distance="0.60" data-dof="3"></div>
-        <div class="layers shallow-dof" id="layer9b" data-distance="0.60" data-dof="33"></div>
-        <div class="layers deep-dof" id="layer10" data-distance="0.70" data-dof="2"></div>
-        <div class="layers shallow-dof" id="layer10b" data-distance="0.70" data-dof="22"></div>
-            <!-- <div class="layers shallow-dof" id=layer10godzilla data-distance="0.70" dada-dof="zilla"></div> -->
-        <div class="layers deep-dof" id="layer11" data-distance="0.80" data-dof="2"></div>
-        <div class="layers shallow-dof" id="layer11b" data-distance="0.80" data-dof="22"></div>
-        <div class="layers deep-dof" id="layer12" data-distance="0.98" data-dof="1"></div>                
-        <div class="layers shallow-dof" id="layer12b" data-distance="0.98" data-dof="11"></div>
-        <div class="layers" id="layer13" data-distance="1" data-dof="6"></div>
-        <!-- <div class="layers" id="offset"></div> -->
+<section class="index">
+    <div class="index_cityscape">
+        <img src="https://storage.googleapis.com/jn-portfolio/index/images/city01.png"
+                class="index_cityscape_layers dof-deep" 
+                id="layer1"
+                data-distance="0"
+                data-dof="6">
+        <img src="https://storage.googleapis.com/jn-portfolio/index/images/city02.png"
+                class="index_cityscape_layers dof-deep" 
+                id="layer2"
+                data-distance="0" 
+                data-dof="6">
+        <img src="https://storage.googleapis.com/jn-portfolio/index/images/city03.png"
+                class="index_cityscape_layers dof-deep" 
+                id="layer3" 
+                data-distance="0"
+                data-dof="5">
+        <img src="https://storage.googleapis.com/jn-portfolio/index/images/city04.png"
+                class="index_cityscape_layers dof-deep" 
+                id="layer4" 
+                data-distance="0.15"
+                data-dof="5">
+        <img src="https://storage.googleapis.com/jn-portfolio/index/images/city05.png"
+                class="index_cityscape_layers dof-deep" 
+                id="layer5" 
+                data-distance="0.20" 
+                data-dof="4">
+        <img src="https://storage.googleapis.com/jn-portfolio/index/images/city06.png"
+                class="index_cityscape_layers dof-deep" 
+                id="layer6" 
+                data-distance="0.25"
+                data-dof="4">
+        <img src="https://storage.googleapis.com/jn-portfolio/index/images/city07.png"
+                class="index_cityscape_layers dof-deep" 
+                id="layer7" 
+                data-distance="0.30" 
+                data-dof="3">
+        <img src="https://storage.googleapis.com/jn-portfolio/index/images/city08.png"
+                class="index_cityscape_layers dof-deep" 
+                id="layer8" 
+                data-distance="0.35" 
+                data-dof="3">
+        <img src="https://storage.googleapis.com/jn-portfolio/index/images/city09.png"
+                class="index_cityscape_layers dof-deep" 
+                id="layer9" 
+                data-distance="0.50" 
+                data-dof="3">
+        <img src="https://storage.googleapis.com/jn-portfolio/index/images/city10.png"
+                class="index_cityscape_layers dof-deep" 
+                id="layer10" 
+                data-distance="0.70"
+                data-dof="2">
+        <img src="https://storage.googleapis.com/jn-portfolio/index/images/city11.png"
+                class="index_cityscape_layers dof-deep" 
+                id="layer11" 
+                data-distance="0.80" 
+                data-dof="2">
+        <img src="https://storage.googleapis.com/jn-portfolio/index/images/city12.png"
+                class="index_cityscape_layers dof-deep" 
+                id="layer12" 
+                data-distance="1" 
+                data-dof="1">
+        <div id="index_cityscape_layers_bg"></div>
     </div>
 
-    <div class="about-container" id="about">
-        <h1>About</h1>
-        <p>
-            Hello (world)!  First of all, thank you for visiting.  I'm Jeanings and what you're seeing is 
-            technically my first-ever website, built from scratch using basic CSS, HTML, and vanilla 
-            Javascript in the front and served with Python and Flask in the back.  
-            Technicalities aside, a short background on how I got here.  
-            <br></br>
-            In my previous life, I hold a bachelor's in materials engineering, spent several years 
-            in a plant's quality control lab before getting burnt-out and left that behind without much planned.
-            From there, I took some time off to travel in Japan and tried new things that would've never
-            crossed the mind of my previous risk-averse self.  
-            <br></br>
-            During my travels, I had the opportunity
-            to work in a b&b style inn right on a UNESCO World Heritage hiking trail rife with ginormous 
-            insects, all of which are unknown and may as well be alien life forms to this west coast Canadian.  At that cozy inn
-            where international guests come and go, I got to meet and chat with people from all walks of
-            life.  And it was from these conversations that led me to the idea of learning how to program
-            by utilizing the countless free resources on the net with the small goal of building something - anything -
-            that piques my attention.
-            <br></br>
-            So here we are.  If you read all that and still have some time, take a peek at the 
-            <a href="/gallery">gallery</a> or head to the <a href="/projects">projects</a> section to see 
-            what keeps me busy.  
-        </p>
+    <div class="index_about" id="index_about">
+        <div class="index_about_text">
+            <p class="index_about_text_para1">
+                <span id="index_about_text_first_letter">H</span>ello!  
+                I'm Jeanings and welcome to my <span id="index_about_text_para1_tiny1">tiny</span>, 
+                <span id="index_about_text_para1_tiny2">tiny</span> corner on the web that I use as a creative outlet 
+                and digital playground.  What you see is technically my first-ever website, built from scratch using 
+                basic CSS, HTML, plain Javascript and served with Flask on Google's App Engine.  
+                Technicalities aside, a short background on how I got here.  
+            </p>
+            <p class="index_about_text_para2">
+                In my early adult life, I did a bachelor's in materials engineering and then spent several years 
+                in a plastics plant's quality control lab.  Looked like a proper chemist mixing concoctions and all that.  
+                Until I realized the only enjoyment I get from chemistry is extracting compounds of roasted beans of a 
+                certain tropical berry, and not from my actual occupation.  So, I left that behind without much planned 
+                and took some time off to travel in Japan on a working holiday visa. 
+            </p>
+            <p class="index_about_text_para3">
+                During my travels there, I had the opportunity to work in a B&B style inn right on a UNESCO World Heritage 
+                hiking trail rife with ginormous insects, all of which were very alien to this west coast Canadian.  
+                At that cozy inn where international guests come and go, I got to meet and chat with people from all walks of
+                life.  And it was from these conversations that led me to the idea of trying my hand at learning how to program
+                by utilizing the countless free resources on the web with the small goal of building something — anything —
+                that piques my interest.
+            </p>
+            <p class="index_about_text_para4">
+                So here we are.  If you read all that and still have some time, take a peek at the 
+                <a href="/projects">projects</a> section to see what keeps me busy.
+            </p>
+        </div>
     </div>
 </section>
 {% endblock %}
