@@ -5,26 +5,36 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <meta http-equiv="X-UA-Compatible" content="ie=edge">
         {% include 'projects/script1.html' %}
-        <link href="https://fonts.googleapis.com/css?family=Abel|Antic+Slab|VT323&display=swap" rel="stylesheet">
-        <script src="https://kit.fontawesome.com/6bf4161487.js"></script>
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Grenze:wght@200&family=Sansita+Swashed:wght@800&display=swap" rel="stylesheet">
+        <script type="text/javascript">
+            const mainProjects = {{ main_projects|tojson }};
+            const subProjects = {{ sub_projects|tojson }};
+            const mainColours = {{ main_colours|tojson }};
+        </script>
         <title>
             {% block title %}{% endblock %}
         </title>
     </head>
-    
-    <body class="pages-body"></body>
-        <div class="pages-body" id="pages-loader">
-            <header class="top">
-                <div class="top-greet-pages">
-                    <h1 id="greeting">Welcome.</h1>
-                </div>
-                {% include 'nav.html' %}
-            </header>
-        
-{% block content %}        
-{% endblock %}
 
+    <body>
+        <div class="loading">
+            <div id="loading_image">
+                <img src="https://storage.googleapis.com/jn-portfolio/misc/loading.gif" id="loading_image_dripper">
+            </div>
+            <h2 id="loading_text">Loading...</h2>
         </div>
+
+        <div class="container">
+            <header class="header">
+                {% include "projects/nav.html" %}
+            </header>
+
+            {% block content %}        
+            {% endblock %}
+        </div>
+
         {% include 'projects/script2.html' %}
     </body>
 </html>
