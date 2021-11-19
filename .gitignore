@@ -22,6 +22,8 @@ application/projects/tokaido/tools/data/
 application/projects/tokaido/tools/journal/
 application/projects/fudousan/tools/
 application/projects/fudousan_stats/tools/
+application/projects/japan_real_estate_choropleth/tools/
+application/projects/japan_real_estate_dashboard/tools/
 application/projects/tools/mongodb_projects_insert.py
 application/projects/tools/projects_list_main.json
 application/projects/tools/projects_list_sub.json
