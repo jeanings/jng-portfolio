@@ -1,5 +1,5 @@
 #------------------------------------------
-# Assets for tokaido page.
+# Assets for Japan real estate choropleth.
 #------------------------------------------
 from flask import current_app as app
 from flask_assets import Bundle, Environment
@@ -23,22 +23,23 @@ def build_assets(app):
         js_min = None
 
     css_bundle = Bundle(
-                    'builds/projects/tokaido/style.css',
-                    'builds/projects/tokaido/tokaido.css',
-                    'builds/projects/tokaido/tokaido_media_res.css',
+                    'builds/projects/japan_real_estate_choropleth/style.css',
+                    'builds/projects/japan_real_estate_choropleth/japan_real_estate_choropleth.css',
+                    'builds/projects/japan_real_estate_choropleth/japan_real_estate_choropleth_media_res.css',
                     filters=css_min,
-                    output='dist/css/tokaido.css')
+                    output='dist/css/japan_real_estate_choropleth.css')
 
     js_bundle = Bundle(
                     'builds/main.js',
-                    'builds/projects/tokaido/nav.js',
-                    'builds/projects/tokaido/tokaido.js',
+                    'builds/projects/japan_real_estate_choropleth/nav.js',
+                    'builds/projects/japan_real_estate_choropleth/japan_real_estate_choropleth.js',
                     filters=js_min,
-                    output='dist/js/tokaido.js')
+                    output='dist/js/japan_real_estate_choropleth.js')
+
 
     # Register and build in development mode.
-    assets.register('tokaido_css', css_bundle)
-    assets.register('tokaido_js', js_bundle)
+    assets.register('japan_real_estate_choropleth_css', css_bundle)
+    assets.register('japan_real_estate_choropleth_js', js_bundle)
 
     if DEBUG_MODE == 'True':
         css_bundle.build()

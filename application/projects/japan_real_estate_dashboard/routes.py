@@ -1,11 +1,11 @@
-#------------------------------------------
-# Route for real estate stats page.
-#------------------------------------------
+#----------------------------------------------
+# Route for Japan real estate dashboard page.
+#----------------------------------------------
 
 from flask import Blueprint, render_template
 from flask import current_app as app
 from flask import jsonify, request, send_from_directory
-# from .assets import build_assets      # COMMENT OUT FOR GAE DEPLOYMENT
+from .assets import build_assets
 from bson.json_util import ObjectId
 from pathlib import Path
 from pymongo import MongoClient
@@ -14,7 +14,7 @@ import json, pymongo
 
 
 # Folder paths.
-REACT_PATH = Path.cwd() / 'application' / 'static' / 'builds' / 'projects' / 'fudousan_stats' / 'React'
+REACT_PATH = Path.cwd() / 'application' / 'static' / 'builds' / 'projects' / 'japan_real_estate_dashboard' / 'React'
 if REACT_PATH.exists():
     react_templates_abs = REACT_PATH.resolve().as_posix()
     react_static_abs = (REACT_PATH / 'static').resolve().as_posix()
@@ -30,11 +30,11 @@ app.json_encoder = MongoEncoder
 
 
 # Blueprint config.
-fudousan_stats_bp = Blueprint('fudousan_stats_bp', __name__,
-                    static_url_path='/static',
-                    static_folder='builds/projects/fudousan_stats/React/static',
-                    template_folder=react_templates_abs)
-# build_assets(app)      # COMMENT OUT FOR GAE DEPLOYMENT
+japan_real_estate_dashboard_bp = Blueprint('japan_real_estate_dashboard_bp', __name__,
+    static_url_path='/static',
+    static_folder='builds/projects/fudousan_stats/React/static',
+    template_folder=react_templates_abs
+)
 
 
 # MongoDB login variables.
@@ -54,17 +54,23 @@ except pymongo.errors.OperationFailure:
     print("Database operation error.")
 
 
-# Fudousan stats main route.
-@fudousan_stats_bp.route('/fudousan-stats', methods=['GET'])
-@fudousan_stats_bp.route('/fudousan-stats/', methods=['GET'])
-def fudousan_stats():
-    # return render_template('fudousan_stats.html', title="不動産取引価格")
-    return send_from_directory(react_templates_abs, 'fudousan_stats.html')
+# EN Japan real estate dashboard stats main route.
+@japan_real_estate_dashboard_bp.route('/japan-real-estate-dashboard-2010-2020', methods=['GET'])
+@japan_real_estate_dashboard_bp.route('/japan-real-estate-dashboard-2010-2020/', methods=['GET'])
+def japan_real_estate_dashboard_en():
+    return send_from_directory(react_templates_abs, 'japan_real_estate_dashboard_en.html')
 
 
-# Fudousan MongoDB get menu data route.
-@fudousan_stats_bp.route('/fudousan-stats/get-menu', methods=['GET'])
-def fudousan_stats_menu_data():
+# JP Japan real estate dashboard stats main route.
+@japan_real_estate_dashboard_bp.route('/fudousan-kakaku-hikaku-2010-2020', methods=['GET'])
+@japan_real_estate_dashboard_bp.route('/fudousan-kakaku-hikaku-2010-2020/', methods=['GET'])
+def japan_real_estate_dashboard_jp():
+    return send_from_directory(react_templates_abs, 'japan_real_estate_dashboard_jp.html')
+
+
+# Japan real estate dashboard MongoDB get menu data route.
+@japan_real_estate_dashboard_bp.route('/japan-real-estate-dashboard-2010-2020/get-menu', methods=['GET'])
+def japan_real_estate_dashboard_menu_data():
     try:
         # /get-menu?region=asdf&name=asdf
         country = request.args.get('country', None)
@@ -129,9 +135,9 @@ def fudousan_stats_menu_data():
     return jsonify(list(results))
 
 
-# Fudousan MongoDB get sales data route.
-@fudousan_stats_bp.route('/fudousan-stats/get-data', methods=['GET'])
-def fudousan_stats_price_data():
+# Japan real estate dashboard MongoDB get sales data route.
+@japan_real_estate_dashboard_bp.route('/japan-real-estate-comparison-2010-2020/get-data', methods=['GET'])
+def japan_real_estate_dashboard_price_data():
     try:
         # /get-data?collection=1980_1990&options=stFrame-100_150
         collection = request.args.get('collection', None)
@@ -148,15 +154,7 @@ def fudousan_stats_price_data():
             { options : 
                 { '$type': 'object' } } }, 
         { '$project': 
-            { 'regions': '$' + options + '.regions' } }  # <-- cannot encode, try in Compass
+            { 'regions': '$' + options + '.regions' } }
     ])
-    
-    """
-    { '$project': 
-            { 'regions': 
-                { '$objectToArray': '$' + options + '.regions' } } }
-    
-    """
-
 
     return jsonify(list(results))
