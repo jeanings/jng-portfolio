@@ -4,9 +4,10 @@
 from flask import current_app as app
 from flask_assets import Bundle, Environment
 
+DEBUG_MODE = app.config['FLASK_DEBUG']
+
 
 def build_assets(app):
-    DEBUG_MODE = app.config['FLASK_DEBUG']
     assets = Environment(app)
         
     # Automatically build and merge assets.
@@ -42,3 +43,4 @@ def build_assets(app):
     if DEBUG_MODE == 'True':
         css_bundle.build()
         js_bundle.build()
+        

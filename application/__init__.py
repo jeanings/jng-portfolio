@@ -26,20 +26,20 @@ def create_app():
     # Import blueprints, routes for application.
     with app.app_context():
         from .index import routes as index
-        from .gallery import routes as gallery
         from .projects import routes as projects
+        from .projects.gallery import routes as gallery
         from .projects.tokaido import routes as tokaido
-        from .projects.fudousan import routes as fudousan
-        from .projects.fudousan_stats import routes as fudousan_stats   # change for react?
+        from .projects.japan_real_estate_choropleth import routes as japan_real_estate_choropleth
+        from .projects.japan_real_estate_dashboard import routes as japan_real_estate_dashboard
 
         db.create_all()
 
         app.register_blueprint(index.index_bp)
-        app.register_blueprint(gallery.gallery_bp)
         app.register_blueprint(projects.projects_bp)
+        app.register_blueprint(gallery.gallery_bp, url_prefix="/projects")
         app.register_blueprint(tokaido.tokaido_bp, url_prefix="/projects")
-        app.register_blueprint(fudousan.fudousan_bp, url_prefix="/projects")
-        app.register_blueprint(fudousan_stats.fudousan_stats_bp, url_prefix="/projects/")
+        app.register_blueprint(japan_real_estate_choropleth.japan_real_estate_choropleth_bp, url_prefix="/projects")
+        app.register_blueprint(japan_real_estate_dashboard.japan_real_estate_dashboard_bp, url_prefix="/projects")
         app.register_error_handler(404, page_not_found)
 
         return app

@@ -17,8 +17,10 @@ DEBUG_MODE = app.config['FLASK_DEBUG']
 
 # Blueprint config.
 projects_bp = Blueprint('projects_bp', __name__, 
-                        static_folder='static', 
-                        template_folder='templates')
+    static_folder='static', 
+    template_folder='templates'
+)
+
 if DEBUG_MODE == 'True':
     build_assets(app)
 
@@ -50,7 +52,7 @@ def projects():
         sub_projects.append(sub_project) 
 
     return render_template("projects.html", 
-        title="Some personal projects / jeanings.space",
+        title="Some personal projects  ——  jeanings.space",
         main_projects=main_projects,
         sub_projects=sub_projects,
         main_colours=main_colours['mainColours'],

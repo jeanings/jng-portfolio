@@ -2,46 +2,7 @@
 /*              Defaults & uncategorized styling                */
 /* ------------------------------------------------------------ */
 :root {
-    --title-font-colour: cornsilk;
-    --title-font-shadow: orangered;
-    --para-bg-colour: whitesmoke;
-    --para-first-letter-colour: orangered;
-    --para-font-colour: #000000;
-    --tooltip-bg-colour: #2e2b2b;
-    --tooltip-font-colour: cornsilk;
-    --tracker-font-colour: dimgrey;
-    --tracker-toggle-colour: orangered;
-    --tracker-bg-colour: whitesmoke;
-    --selection-bg-colour: #4a5543;
-    --selection-font-colour: cornsilk;
-    --link-hover-bg-colour: #f4f80b;
-    --link-font-colour: #000000;
-    --spider-pin-colour: orangered;
-    --spider-leg-colour: #000000;
-}
-
-[data-theme="dark-mode"] {
-    --title-font-colour: #050217;
-    --title-font-shadow: goldenrod;
-    --para-bg-colour: dimgrey;
-    --para-first-letter-colour: gold;
-    --para-font-colour: lightgrey;
-    --tooltip-bg-colour: lightgrey;
-    --tooltip-font-colour: dimgrey;
-    --tracker-font-colour: dimgrey;
-    --tracker-toggle-colour: gold;
-    --tracker-bg-colour: dimgrey;
-    --selection-bg: darkslategrey;
-    --selection-font-colour: gold;
-    --link-hover-bg-colour: #f4f80b;
-    --link-font-colour: #000000;
-    --spider-pin-colour: gold;
-    --spider-leg-colour: whitesmoke;
-}
-
-::selection {
-    color: var(--selection-font-colour);
-    background-color: var(--selection-bg-colour);
+    --primary-color: grey;
 }
 
 * {
@@ -113,12 +74,26 @@
     .index-section {
         height: 100vh;
     }
+/*  For use with loading page.
+#pages-loader {
+    display: none;
+}
+    #pages-loader.show {
+        display: grid;
+        font-family: 'Antic Slab', serif;
+        margin: 5rem 7rem 7rem 7rem;
+        grid-template-areas: 
+            "header"
+            "body";
+    }
+*/
 
 
 #pages-loader {
     display: grid;
+    /* overflow-x: hidden;  BREAKS STICKY IN GALLERY */
     font-family: 'Antic Slab', serif;
-    margin: 0rem 7rem 7rem 7rem;
+    margin: 5rem 7rem 7rem 7rem;
     grid-template-areas: 
         "header"
         "body";
@@ -144,7 +119,7 @@
 h1 {
     font-family: 'Abel', sans-serif;
     font-size: 4rem;
-    /* text-shadow: 5px 5px #cdcdcd; */
+    text-shadow: 5px 5px #cdcdcd;
 }
 
 h2 {
@@ -158,19 +133,30 @@ p {
 
 }
 
+p:first-letter {
+    font-family: 'Antic Slab', serif;
+    font-weight: 700;
+    color: rgb(122, 199, 21);
+    font-size: 4rem;
+    margin-top: -0.5rem;
+    margin-bottom: -0.28em;
+    margin-right: 0.35rem;
+    float: left;
+}
+
 .pages-body p:first-letter {
     font-family: 'Antic Slab', serif;
     font-weight: 700;
-    color: var(--para-first-letter-colour);
-    font-size: 6.7rem;
-    margin-top: -1.45rem;
+    color: rgb(122, 199, 21);
+    font-size: 3.25rem;
+    margin-top: -0.5rem;
     margin-bottom: -0.28em;
     margin-right: 0.35rem;
     float: left;
 }
 
 a {
-    color: var(--para-first-letter-colour);
+    color: rgb(122, 199, 21);
     text-decoration: none;
     transition: all 500ms;
 }
@@ -322,78 +308,39 @@ a {
 .top {
     display: grid;
     grid-area: header;
-    grid-template-columns: 1fr;
-    grid-template-rows: 2fr;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 1fr;
     grid-template-areas: 
-        "title"
-        "menu";
+        "title  menu";
     align-items: end;
 }
-    .top .top-greet-pages {
-        display: grid;
+    .top .top-greet h1 {
+        float: left;
         position: relative;
-        grid-area: title;
-        grid-template-columns: 1fr 1fr;
-        grid-template-rows: auto;
-        grid-template-areas:
-            "spread-L           spread-R"
-            "blank              intro"
-            "instructions-L     instructions-R";
-        grid-row-gap: 25rem;
-        align-items: start;
+        top: 3rem; 
+        left: 7rem;
+        animation-name: fromLeft;
+        animation-duration: 1500ms;
         z-index: 10;
     }
-        .top-greet-pages h1 {
-            /* animation-name: fromLeft;
-            animation-duration: 1500ms; */
-            font-size: 15rem;
-            grid-area: spread;
-            user-select: none;
-        }
-        @keyframes textShadow {
-            100% {
-                text-shadow: 15px 15px 0px var(--title-font-shadow);
-            }
-        }
-        @keyframes textShadowRev {
-            100% {
-                text-shadow: -15px 15px 0px var(--title-font-shadow);
-            }
-        }
-        .top-greet-pages .map-title {
-            color: var(--title-font-colour);
-            animation-delay: 2000ms;
-            animation-duration: 2500ms;
-            animation-fill-mode: forwards;
-            transition: all 500ms;
-        }
-        #map-title-eng {
-            grid-area: spread-L;
-            text-align: right;
-            animation-name: textShadow;
-        }
-        #map-title-jpn {
-            grid-area: spread-R;
-            text-align: left;
-            writing-mode: vertical-lr;
-            letter-spacing: 5.5rem;
-            padding: 1rem 0 0 0;
-            animation-name: textShadow;
-        }
-        
-    .nav {
-        display: grid;
-        /* grid-template-columns: auto; */
-        grid-auto-flow: column;
-        grid-template-areas: 
-            "slider   toggle";
-        position: fixed;
-        top: 2rem;
-        right: 3.5rem;
-        grid-area: menu;
-        align-content: flex-end;
-        justify-content: flex-end;
+    .top .top-greet-pages {
+        display: flex;
+        position: relative;
+        grid-area: title;
+        align-items: flex-end;
         z-index: 10;
+    }
+        /* .top-greet-pages h1 {
+            animation-name: fromLeft;
+            animation-duration: 1500ms;
+        } */
+    .top .nav {
+        display: flex;
+        height: 100%;
+        grid-area: menu;
+        /* float: right; */
+        align-items: flex-end;
+        justify-content: flex-end;
 
         user-select: none;
         -webkit-user-select: none; /* Safari */
@@ -402,7 +349,10 @@ a {
         animation-name: fromRightShort;
         animation-duration: 1500ms;
     }
-        .nav-list {
+        .nav h2 {
+            font-size: 2.5rem;
+        }
+        .nav .nav-list {
             display: none;
         }
             .nav-list li {
@@ -410,42 +360,32 @@ a {
             }
             .nav-list a {
                 font-family: 'Abel', sans-serif;
-                font-size: 2.25rem;
+                font-size: 2rem;
                 text-decoration: none;
                 transition: 400ms ease-in-out;
             }
             .nav-list a,
             .nav-list a:visited {
-                color: var(--title-font-colour);
+                color: black;
             }
             .nav-list a:hover {
-                color: var(--title-font-colour);
-                background: var(--title-font-shadow);
+                color: rgb(122, 199, 21);
             }
-        #menu.slide-toggle {
+        .nav #menu.slide-toggle {
             display: grid;
-            height: auto;
+            height: 70%;
             grid-auto-flow: column;
-            margin: 0 3rem;
+            grid-column-gap: 1rem;
+            margin: 0 1.5rem;
             align-items: center;
-            background: var(--para-font-colour);
-            opacity: 0.75;
 
             animation-name: fromRightMenu;
             animation-duration: 500ms;
         }
-        #menu.slide-toggle a {
-            padding: 0 1rem;
-        }
-        #menu-buttons {
-            grid-area: slider;
-            position: fixed;
-            color: var(--para-font-colour);
-            font-size: 2.5rem;
-            right: 6rem;
+        .nav #menu-buttons {
             cursor: pointer;
         }
-        #menu-open.toggle {
+        .nav #menu-open.toggle {
             opacity: 0;
             transform: rotate(-180deg);
             -o-transform: rotate(-180deg);
@@ -454,68 +394,9 @@ a {
             -webkit-transform: rotate(-180deg);
             transition: all 500ms;
         }
-        #menu-close {
+        .nav #menu-close {
             display: none;
         }
-        #menu-close.toggle {
+        .nav #menu-close.toggle {
             display: inline-block;
         }
-
-        .theme-toggle-wrapper {
-            display: inline-block;
-            grid-area: toggle;
-        }
-        .theme-toggle {
-            display: inline-block;
-            position: relative;
-            right: -2rem;
-            width: 60px;
-            height: 30px;
-        }
-        .theme-toggle input {
-            display: none;
-        }
-        .theme-toggle-wrapper .tooltip {
-            display: inline-block;
-            position: relative;
-            height: 30px;
-            width: 60px;
-        }
-            .theme-toggle-wrapper .tooltip .tooltiptext {
-                top: -2.5rem;
-                left: 0;
-                padding: 4px 2px 4px 2px;
-                border-radius: 5px;
-                font-size: 0.75rem;
-            }
-            .theme-toggle-wrapper .tooltipLhover .tooltiptext {
-                visibility: visible;
-            }
-        .slider {
-            top: 0.55rem;
-            position: absolute;
-            cursor: pointer;
-        }
-        .slider:before { /* sun */ 
-            position: absolute;
-            height: 30px;
-            width: 30px;
-            border-radius: 50%;
-            content: "\f185";
-            background-color: cornsilk;
-            color: orangered;
-            text-align: center;
-            font-size: 1.1rem;
-            font-family: "Font Awesome 5 Free";
-            font-weight: 900;
-            transition: 500ms ease-out;
-            
-        }
-            input:checked + .slider:before { /* sun to moon */
-                background-color: #050217;
-                color: gold;
-                content: "\f186";
-                transform: translate(30px) rotateZ(240deg);
-                transition: 500ms ease-out;
-            }       
-        
