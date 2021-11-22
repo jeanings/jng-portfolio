@@ -25,7 +25,6 @@
     grid-template-rows: 70% 30%;
 }
 
-
 #Header_title_block_title {
     grid-column: 1 / 2;
     grid-row: 1 / 2;
@@ -35,6 +34,10 @@
     align-self: baseline;
 }
 
+    .Header_title_block_main.en #Header_title_block_title {
+        font-size: 2.75rem;   
+    }
+
 #Header_title_block_sub {
     grid-column: 1 / 2;
     grid-row: 2 / -1;
@@ -43,6 +46,10 @@
     font-size: 1.25rem;
     align-self: end;
 }
+
+    .Header_title_block_main.en #Header_title_block_sub {
+        font-size: 0.75rem;   
+    }
 
 /* Year block */
 .Header_title_block_year {

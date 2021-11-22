@@ -4,6 +4,7 @@ import { handleSliders } from '../slices/slidersSlice';
 import { handleRawInput, mongoDbFetchData, MongoDbDataFetchProps } from '../slices/dataSlice';
 import { clearAllSelections } from '../slices/selectionSlice';
 import { SidebarOptSet } from '../imports/languageSet';
+import { useMediaQuery } from 'react-responsive';
 import './SidebarOptions.css';
 
 

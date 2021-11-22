@@ -1,11 +1,12 @@
 import React, { useEffect } from 'react';
-import { useAppDispatch } from './hooks';
+import { useAppDispatch, useAppSelector } from './hooks';
 import Header from './components/Header';
 import Sidebar from './components/Sidebar';
 import Dashboard from './components/Dashboard';
 import { mongoDbFetchRegions, MongoDbMenuFetchProps } from './slices/menuApiSlice';
 import { handleLanguage, LocaleProps } from './slices/languageSlice';
 import { PayloadAction } from '@reduxjs/toolkit';
+import { useMediaQuery } from 'react-responsive';
 import './App.css';
 
 export const DEV_MODE = process.env.REACT_APP_DEV_MODE;
@@ -18,6 +19,7 @@ const App: React.FC = () => {
         Starting point of the main app.
     -------------------------------- */
     const dispatch = useAppDispatch();
+    const languageState = useAppSelector(state => state.language);
     const hrefBase = window.location.href;
     const hrefEN = process.env.REACT_APP_HREF_EN;
     const hrefJP = process.env.REACT_APP_HREF_JP;
@@ -53,9 +55,14 @@ const App: React.FC = () => {
         dispatch(mongoDbFetchRegions(initMenuParam));
     }, []);
 
-  
+    
+    /* ===========================================
+                    Media queries
+    =========================================== */
+
+
     return (
-        <div className='App'>
+        <div className={languageState.en === true ? 'App en' : 'App'}>
             <Header />
             <Sidebar />
             <Dashboard />

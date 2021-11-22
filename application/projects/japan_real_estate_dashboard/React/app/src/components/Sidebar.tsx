@@ -2,6 +2,7 @@ import React from 'react';
 import SidebarTabs from '../containers/SidebarTabs';
 import SidebarOptions from '../containers/SidebarOptions';
 import SidebarRegions from '../containers/SidebarRegions';
+import { useMediaQuery } from 'react-responsive';
 import './Sidebar.css';
 
 

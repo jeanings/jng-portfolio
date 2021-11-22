@@ -42,7 +42,7 @@ export const SidebarOptSet = {
     'en': {
         'buildingType': 'Category',
         'buildingMatch': {
-            'house': 'single-family house',
+            'house': 'detached house',
             'condo': 'apartment, condo'
         },
         'stationDist': 'Nearest station on foot',

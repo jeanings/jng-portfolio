@@ -1,6 +1,7 @@
 import React from 'react';
 import { useAppSelector } from '../hooks';
 import { HeaderSet } from '../imports/languageSet';
+import { useMediaQuery } from 'react-responsive';
 import './Header.css';
 
 
@@ -17,7 +18,7 @@ const Dashboard: React.FC = () => {
         <main className="Header">
             <div className="Header_title_block">
 
-                <div className="Header_title_block_main">
+                <div className={locale === 'en' ? "Header_title_block_main en" : "Header_title_block_main"}>
                     <span id="Header_title_block_title">
                         {HeaderSet[locale].main.title}
                     </span>

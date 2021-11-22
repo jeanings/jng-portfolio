@@ -1,6 +1,7 @@
 import React from 'react';
 import DashboardMap from '../containers/DashboardMap';
 import DashboardCharts from '../containers/DashboardCharts';
+import { useMediaQuery } from 'react-responsive';
 import './Dashboard.css';
 
 

@@ -3,6 +3,7 @@ import { useAppSelector } from '../hooks';
 import { v4 as uuidv4 } from 'uuid';
 import CreateSelectedRegion from "./CreateSelectedRegion";
 import { SidebarRegSelectSet } from '../imports/languageSet';
+import { useMediaQuery } from 'react-responsive';
 import "./SidebarRegionsSelected.css";
 
 

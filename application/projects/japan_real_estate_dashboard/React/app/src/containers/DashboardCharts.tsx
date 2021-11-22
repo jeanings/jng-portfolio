@@ -8,6 +8,7 @@ import { fadedColours, solidColours } from '../imports/chartColourSets';
 import { DashboardChartsSet } from '../imports/languageSet';
 import { LocaleProps } from '../slices/languageSlice';
 import { DEV_LANG } from '../App';
+import { useMediaQuery } from 'react-responsive';
 import './DashboardCharts.css';
 
 

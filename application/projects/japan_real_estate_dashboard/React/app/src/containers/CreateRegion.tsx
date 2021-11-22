@@ -4,15 +4,16 @@ import { handleMenuLevel, handleRenderDirection } from '../slices/menuLevelSlice
 import { handleSelection } from '../slices/selectionSlice';
 import { mongoDbFetchRegions, MongoDbMenuFetchProps } from '../slices/menuApiSlice';
 import { DEV_MODE } from '../App';
+import { useMediaQuery } from 'react-responsive';
 import './CreateRegion.css';
 
 
 
 const CreateRegion: React.FC<CreateRegionProps> = (props: CreateRegionProps) => {
-    /* --------------------------------------------------------------------
+    /* -------------------------------------------------------------------------------
         Creates individual region's clickable name-button and checkboxes.
-        Subscribes to {data}, {menuApi}, {menuLevel}, {selection} states.
-    -------------------------------------------------------------------- */
+        Subscribes to {data}, {menuApi}, {menuLevel}, {selection}, {language} states.
+    ------------------------------------------------------------------------------- */
     // Dispatch, selector hooks.
     const dispatch = useAppDispatch();
     const dataState = useAppSelector(state => state.data);
@@ -186,7 +187,7 @@ const CreateRegion: React.FC<CreateRegionProps> = (props: CreateRegionProps) => 
                     data-category={props.category}
                     data-level={props.level}
                     onClick={onLevelChange}>
-                {languageState.en === true
+                {locale === 'en'
                     ? props.category === 'regions'
                         // Kanto region etc
                         ? props.name.concat(' region')
@@ -195,9 +196,15 @@ const CreateRegion: React.FC<CreateRegionProps> = (props: CreateRegionProps) => 
                             ? props.name  === 'Tokyo'
                                 ? props.name.concat(' Metropolis') 
                                 : props.name
-                            // other categories
-                            : props.name
-                    // languageState.jp
+                            // Funabashi 'City'
+                            : props.category === 'cities'
+                                ? props.name.replace(',', ', ')
+                                    .replace(' Village', '')
+                                    .replace(' Town', '')
+                                    .replace(' City', '')
+                                    .replace(' County', '')
+                                : props.name
+                    // locale === 'jp'
                     : props.name }
             </button>
             

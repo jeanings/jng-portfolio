@@ -7,6 +7,7 @@ import { DEV_LANG } from '../App';
 // @ts-ignore
 import mapboxgl from 'mapbox-gl'; 
 import 'mapbox-gl/dist/mapbox-gl.css';
+import { useMediaQuery } from 'react-responsive';
 import './DashboardMap.css';
 
 

@@ -1,6 +1,7 @@
 import React from 'react';
-import { useAppDispatch } from '../hooks';
+import { useAppDispatch, useAppSelector } from '../hooks';
 import { clearSelection } from '../slices/selectionSlice';
+import { useMediaQuery } from 'react-responsive';
 import './CreateSelectedRegion.css';
 
 
@@ -10,6 +11,8 @@ const CreateSelectedRegion: React.FC<CreateSelectedRegionProps> = (props: Create
         Creates individual selected region's text and checkboxes.
     ------------------------------------------------------------ */
     const dispatch = useAppDispatch();
+    const languageState = useAppSelector(state => state.language);
+    const locale = languageState.en === true ? 'en' : 'jp';
     
 
     const onDeleteRequest = (event: any) => {
@@ -57,7 +60,27 @@ const CreateSelectedRegion: React.FC<CreateSelectedRegionProps> = (props: Create
                 <span className={"Sidebar_regions_selected_item_checkbox_overlay" + " " + props.name}></span>
             </label>
 
-            <span className="Sidebar_regions_selected_item_name">{props.name}</span>
+            <span className="Sidebar_regions_selected_item_name">
+                {locale === 'en'
+                    ? props.category === 'regions'
+                        // Kanto region etc
+                        ? props.name.concat(' region')
+                        : props.category === 'prefectures'
+                            // Tokyo
+                            ? props.name  === 'Tokyo'
+                                ? props.name.concat(' Metropolis') 
+                                : props.name
+                            // Funabashi 'City'
+                            : props.category === 'cities'
+                                ? props.name.replace(',', ', ')
+                                    .replace(' Village', '')
+                                    .replace(' Town', '')
+                                    .replace(' City', '')
+                                    .replace(' County', '')
+                                : props.name
+                    // locale === 'jp'
+                    : props.name }
+            </span>
 
         </div>
     );
