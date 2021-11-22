@@ -1,21 +1,24 @@
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef } from 'react';
 import { useAppDispatch, useAppSelector } from '../hooks';
 import { handleSliders } from '../slices/slidersSlice';
-import { handleRawInput, mongoDbFetchData } from '../slices/dataSlice';
+import { handleRawInput, mongoDbFetchData, MongoDbDataFetchProps } from '../slices/dataSlice';
 import { clearAllSelections } from '../slices/selectionSlice';
-import "./SidebarOptions.css";
+import { SidebarOptSet } from '../imports/languageSet';
+import './SidebarOptions.css';
 
 
 
 const SidebarOptions: React.FC = () => {
     /* -----------------------------------------------------------------------------
         Starting point of the app.  Dispatches requests to API for data retrieval.
-        Subscribes to {sliders} and {data} states.
+        Subscribes to {sliders}, {data}, {language} states.
     ----------------------------------------------------------------------------- */
     // Dispatch, selector hooks.
     const dispatch = useAppDispatch();
     const slidersState = useAppSelector(state => state.sliders);
     const dataState = useAppSelector(state => state.data);
+    const languageState = useAppSelector(state => state.language);
+    const locale = languageState.en === true ? 'en' : 'jp';
     // Submission tab-switch timeout ref.
     const refSubmitTimer = useRef<any>({timer: 0});
 
@@ -44,18 +47,6 @@ const SidebarOptions: React.FC = () => {
         '3': '600_650', '2': '650_700', '1': '700_750', '0': '750_'
     }
 
-    // Replace pattern dicts.
-    const buildingMatch = {
-        'house': '一戸建て',
-        'condo': 'マンション等'
-    }
-    const materialMatch = {
-        'wood': '木造',
-        'stFrame': '鉄骨造',
-        'reCon': '鉄筋コンクリート造',
-        'con':　'ブロック造'
-    }
-    
     
     useEffect(() => {
         /* -----------------------
@@ -123,6 +114,7 @@ const SidebarOptions: React.FC = () => {
         );
 
         const rawInputPayload = {
+            lang: locale,
             collection: collection,
             options: options,
             rawInput: slidersState.options
@@ -137,12 +129,24 @@ const SidebarOptions: React.FC = () => {
         // Send to MongoDB thunk to get housing data, if not already retrieved.
         if (keyExists(collection, dataState.collections) == true) {
             if (keyExists(options, dataState.collections[collection]) == false) {
-                dispatch(mongoDbFetchData({"collection": collection, "options": options}));
+                let mongoDbRequest: MongoDbDataFetchProps = {
+                    'lang': locale,
+                    'collection': collection,
+                    'options': options
+                };
+
+                dispatch(mongoDbFetchData(mongoDbRequest));
             } else {
                 // console.log("Reusing existing data -->", collection, options);
             }
         } else {
-            dispatch(mongoDbFetchData({"collection": collection, "options": options}));
+            let mongoDbRequest: MongoDbDataFetchProps = {
+                'lang': locale,
+                'collection': collection,
+                'options': options
+            };
+
+            dispatch(mongoDbFetchData(mongoDbRequest));
         }
 
         // Change view to regions menu.
@@ -156,7 +160,7 @@ const SidebarOptions: React.FC = () => {
             optionsMenu.classList.add("hide");
             regionsTab?.classList.add("show");
             regionsMenu.classList.add("show");
-        }, 1250);
+        }, 750);
     }
 
 
@@ -191,11 +195,11 @@ const SidebarOptions: React.FC = () => {
                 <div className="Sidebar_options_slider_text">
 
                     <label className="Sidebar_options_slider_text_label" htmlFor="buildingType">
-                        住宅種類
+                        {SidebarOptSet[locale].buildingType}
                     </label>
 
                     <p className="Sidebar_options_slider_text_selected">
-                        {translateReplace(slidersState.options.buildingType, buildingMatch)}
+                        {translateReplace(slidersState.options.buildingType, SidebarOptSet[locale].buildingMatch)}
                     </p>
 
                 </div>
@@ -214,15 +218,24 @@ const SidebarOptions: React.FC = () => {
                 <div className="Sidebar_options_slider_text">
 
                     <label className="Sidebar_options_slider_text_label" htmlFor="stationDist">
-                        駅徒歩分
+                        {SidebarOptSet[locale].stationDist}
                     </label>
 
                     <p className="Sidebar_options_slider_text_selected">
-                        {slidersState.options.stationDist === '0_15' 
-                            ? (slidersState.options.stationDist.replace('0_', '') + "分以下") 
-                            : slidersState.options.stationDist === '30_' 
-                                ? (slidersState.options.stationDist.replace('30_', '30') + "分以上")
-                                : slidersState.options.stationDist.replace('_', '～') + "分"}
+                        {locale === 'en'
+                            ? slidersState.options.stationDist === '0_15'
+                                ? SidebarOptSet[locale].stationDistSelect.under + ' ' + slidersState.options.stationDist.replace('0_', '')
+                                    + SidebarOptSet[locale].stationDistSelect.min 
+                                : slidersState.options.stationDist === '30_' 
+                                    ? SidebarOptSet[locale].stationDistSelect.above + ' ' + slidersState.options.stationDist.replace('30_', '30')
+                                        + SidebarOptSet[locale].stationDistSelect.min 
+                                    : slidersState.options.stationDist.replace('_', '～') + SidebarOptSet[locale].stationDistSelect.min
+                            // locale === 'jp'
+                            : slidersState.options.stationDist === '0_15'
+                                ? slidersState.options.stationDist.replace('0_', '') + SidebarOptSet[locale].stationDistSelect.under 
+                                : slidersState.options.stationDist === '30_' 
+                                    ? slidersState.options.stationDist.replace('30_', '30') + SidebarOptSet[locale].stationDistSelect.above
+                                    : slidersState.options.stationDist.replace('_', '～') + SidebarOptSet[locale].stationDistSelect.min}
                     </p>
 
                 </div>
@@ -242,11 +255,11 @@ const SidebarOptions: React.FC = () => {
                 <div className="Sidebar_options_slider_text">
 
                     <label className="Sidebar_options_slider_text_label" htmlFor="material">
-                        建物構造
+                        {SidebarOptSet[locale].material}
                     </label>
 
                     <p className="Sidebar_options_slider_text_selected">
-                        {translateReplace(slidersState.options.material, materialMatch)}
+                        {translateReplace(slidersState.options.material, SidebarOptSet[locale].materialMatch)}
                     </p>
 
                 </div>
@@ -267,13 +280,19 @@ const SidebarOptions: React.FC = () => {
                 <div className="Sidebar_options_slider_text">
 
                     <label className="Sidebar_options_slider_text_label" htmlFor="age">
-                        建築年
+                        {SidebarOptSet[locale].age}
                     </label>
 
                     <p className="Sidebar_options_slider_text_selected">
-                        {slidersState.options.age === '1920_1960' 
-                            ? (slidersState.options.age.replace('1920_', '')　+ "年前")
-                            : (slidersState.options.age.replace('_', '～') + "年")}
+                        {locale === 'en'
+                            ? slidersState.options.age === '1920_1960' 
+                                ? SidebarOptSet[locale].ageSelect.before + ' ' + slidersState.options.age.replace('1920_', '')
+                                : slidersState.options.age.replace('_', '～') + SidebarOptSet[locale].ageSelect.year
+                            // locale === 'jp'
+                            : slidersState.options.age === '1920_1960' 
+                                ? slidersState.options.age.replace('1920_', '')　+ SidebarOptSet[locale].ageSelect.before
+                                : slidersState.options.age.replace('_', '～') + SidebarOptSet[locale].ageSelect.year}
+                    
                     </p>
 
                 </div>
@@ -296,12 +315,12 @@ const SidebarOptions: React.FC = () => {
                 <div className="Sidebar_options_slider_text">
 
                     <label className="Sidebar_options_slider_text_label" htmlFor="floorArea">
-                        面積
+                        {SidebarOptSet[locale].floorArea}
                     </label>
 
                     <p className="Sidebar_options_slider_text_selected">
                         {slidersState.options.floorArea === '750_'
-                            ? slidersState.options.floorArea.replace('_', '') + "m² 以上"
+                            ? slidersState.options.floorArea.replace('_', '') + "m²" + SidebarOptSet[locale].floorSelect.above
                             : slidersState.options.floorArea.replace('_', '～') + "m²"}
                     </p>
 
@@ -339,7 +358,7 @@ const SidebarOptions: React.FC = () => {
                 <label htmlFor="slidersSave"></label>
 
                 <button id="Sidebar_options_save_button" name="slidersSave" onClick={onSaving}>
-                    条件を保存
+                    {SidebarOptSet[locale].onSaving}
                 </button>
 
             </div>

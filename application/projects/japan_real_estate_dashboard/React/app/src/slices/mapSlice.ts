@@ -2,6 +2,7 @@ import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import axios, { AxiosResponse } from 'axios';
 import { RootState } from '../store';
 import { MapboxGeocoderProps } from '../containers/DashboardMap';
+import { DEV_MODE } from '../App';
 
 
 
@@ -23,7 +24,8 @@ export const mapboxFetchGeo = createAsyncThunk(
 
             if (response.status === 200) {
                 // Returns promise status, caught and handled by extra reducers in mapSlice. 
-                // console.log("SUCCESS: mapboxFetchGeo called.", response);
+                if (DEV_MODE === 'True')
+                    console.log("SUCCESS: mapboxFetchGeo called.", response);
                 return (await response.data);
             } else {
                 console.log("ERROR: mapboxFetchGeo response failed.", response);
@@ -44,26 +46,39 @@ export const fetchGeo = (apiUrl: string, requestGeo: MapboxGeocoderProps) => {
         Mapbox geocode fetcher for thunk.
     ------------------------------------ */
     const accessToken = process.env.REACT_APP_DEV_MAPBOX as string;
-    const type: string = '&types=' + requestGeo.types;   // Not used: including returns poor results
+    const type: string = '&types=' + requestGeo.types;   // Not used in JP: including returns poor results
     const country: string = '&country=jp';
-    const language: string = '&language=ja';
+    const language: string = requestGeo.lang === 'en' ? '&language=en' : '&language=ja';
     const worldview: string = '&worldview=jp';
     const resultsLimit: string = '&limit=' + '1';
 
-    const settings: string = '.json?access_token='.concat(
-        accessToken, 
-        country, 
-        language, 
-        worldview, 
-        resultsLimit
-    );
+    const settings: string = requestGeo.lang === 'en'
+        ? '.json?access_token='.concat(
+                accessToken, 
+                country,
+                type,
+                language, 
+                worldview, 
+                resultsLimit
+            )
+        : '.json?access_token='.concat(
+                accessToken, 
+                country,
+                language, 
+                worldview, 
+                resultsLimit
+            );
 
     const requestUrl: string = apiUrl.concat(
-        requestGeo.partOf,
-        requestGeo.name,
+        encodeURIComponent(requestGeo.partOf),
+        encodeURIComponent('+'),
+        encodeURIComponent(requestGeo.name),
         settings
     );
-        
+    
+    if (DEV_MODE === 'True')
+        console.log("Mapbox API request url:", requestUrl);
+
     let geocoderPromise = Promise.resolve(axios.get(requestUrl));
 
     return geocoderPromise;

@@ -2,7 +2,8 @@ import React from 'react';
 import { useAppDispatch, useAppSelector } from '../hooks';
 import { handleMenuLevel, handleRenderDirection } from '../slices/menuLevelSlice';
 import { handleSelection } from '../slices/selectionSlice';
-import { mongoDbFetchRegions } from '../slices/menuApiSlice';
+import { mongoDbFetchRegions, MongoDbMenuFetchProps } from '../slices/menuApiSlice';
+import { DEV_MODE } from '../App';
 import './CreateRegion.css';
 
 
@@ -18,6 +19,8 @@ const CreateRegion: React.FC<CreateRegionProps> = (props: CreateRegionProps) => 
     const menuApiState = useAppSelector(state => state.menuApi);
     const menuLevelState = useAppSelector(state => state.menuLevel);
     const selectionState = useAppSelector(state => state.selection.selected);
+    const languageState = useAppSelector(state => state.language);
+    const locale = languageState.en === true ? 'en' : 'jp';
     // Other variables.
     const availability: string = checkAvailability();
     
@@ -44,10 +47,15 @@ const CreateRegion: React.FC<CreateRegionProps> = (props: CreateRegionProps) => 
             if (props.category != 'districts') {
                 // Send to MongoDB thunk to get menu data (if first time retrieving).
                 if (!menuApiState[props.nextCategory][props.name]) {
-                    let mongoDbRequest: object = {[props.category]: props.name};
+                    let mongoDbRequest: MongoDbMenuFetchProps = {
+                        'lang': locale,
+                        [props.category]: props.name
+                    };
+
                     dispatch(mongoDbFetchRegions(mongoDbRequest));
                 } else {
-                    // console.log("Reusing menu data: ", category, name);
+                    if (DEV_MODE === 'True')
+                        console.log("Reusing menu data: ", props.category, name);
                 }
             }
         }
@@ -107,7 +115,8 @@ const CreateRegion: React.FC<CreateRegionProps> = (props: CreateRegionProps) => 
         try {
             dataSet = dataState.collections[age][options];
         } catch (TypeError) {
-            // console.log("Data set doesn't exist with these parameters.", dataSet);
+            if (DEV_MODE === 'True')
+                console.log("Data set doesn't exist with these parameters.", dataSet);
         }
         
         if (dataSet === undefined) {
@@ -177,7 +186,19 @@ const CreateRegion: React.FC<CreateRegionProps> = (props: CreateRegionProps) => 
                     data-category={props.category}
                     data-level={props.level}
                     onClick={onLevelChange}>
-                {props.name}
+                {languageState.en === true
+                    ? props.category === 'regions'
+                        // Kanto region etc
+                        ? props.name.concat(' region')
+                        : props.category === 'prefectures'
+                            // Tokyo
+                            ? props.name  === 'Tokyo'
+                                ? props.name.concat(' Metropolis') 
+                                : props.name
+                            // other categories
+                            : props.name
+                    // languageState.jp
+                    : props.name }
             </button>
             
         </div>
