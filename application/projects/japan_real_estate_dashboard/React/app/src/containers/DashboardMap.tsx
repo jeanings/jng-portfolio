@@ -3,11 +3,10 @@ import { useAppDispatch, useAppSelector } from '../hooks';
 import { handleBoundsUpdate, mapboxFetchGeo } from '../slices/mapSlice';
 import { regionCoords } from '../imports/regionCoords';
 import { LocaleProps } from '../slices/languageSlice';
-import { DEV_LANG } from '../App';
+import { DEV_LANG, getMediaQueries  } from '../App';
 // @ts-ignore
 import mapboxgl from 'mapbox-gl'; 
 import 'mapbox-gl/dist/mapbox-gl.css';
-import { useMediaQuery } from 'react-responsive';
 import './DashboardMap.css';
 
 
@@ -177,13 +176,19 @@ const DashboardMap: React.FC = () => {
             }
         }
     }, [mapState.bounds, mapState.lng]);
+
+
+    /* -----------------------------------------------------
+                        CSS classes
+    ------------------------------------------------------*/
+    const classBase: string = 'Dashboard_map_container';
         
     
     return (
         <div 
             id="map" 
             ref={mapContainer} 
-            className="Dashboard_map_container">
+            className={getMediaQueries(classBase, locale)}>
         </div>
     );
 }

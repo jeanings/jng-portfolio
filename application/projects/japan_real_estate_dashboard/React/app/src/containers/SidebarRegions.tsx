@@ -6,7 +6,7 @@ import { v4 as uuidv4 } from 'uuid';
 import CreateRegion from './CreateRegion';
 import SidebarRegionsSelected from './SidebarRegionsSelected';
 import { SidebarRegSet } from '../imports/languageSet';
-import { useMediaQuery } from 'react-responsive';
+import { getMediaQueries } from '../App';
 import './SidebarRegions.css';
 
 
@@ -145,8 +145,8 @@ const SidebarRegions: React.FC = () => {
         /* -----------------------------------------
             Generate menu items for regions list.
         ----------------------------------------- */
-        let levelNum:number = parseInt(level.replace(/\D/g, ''));
-        let category:string = categories[level];
+        let levelNum: number = parseInt(level.replace(/\D/g, ''));
+        let category: string = categories[level];
         let nextLevel: string = 'level ' + (levelNum + 1);
         let nextCategory: string = categories[nextLevel];
         let menuItem: JSX.Element;
@@ -167,15 +167,21 @@ const SidebarRegions: React.FC = () => {
     }
 
 
+    /* -----------------------------------------------------
+                        CSS classes
+    ------------------------------------------------------*/
+    const classBase: string = 'Sidebar_regions';
+
+
     return (
-        <form className="Sidebar_regions">
-            <div className="Sidebar_regions_header">
-                <div className="Sidebar_regions_header_back">
+        <form className={getMediaQueries(classBase, locale)}>
+            <div className={getMediaQueries(classBase.concat('_header'), locale)}>
+                <div className={getMediaQueries(classBase.concat('_header_back'), locale)}>
                     
                     <button className=
                                 {renderedLength <= 1 
-                                    ? "Sidebar_regions_header_back_button"
-                                    : "Sidebar_regions_header_back_button show"} 
+                                    ? getMediaQueries(classBase.concat('_header_back_button'), locale)
+                                    : getMediaQueries(classBase.concat('_header_back_button show'), locale)} 
                             name="menuBack" 
                             onClick={handleBackButton}>
 
@@ -202,9 +208,9 @@ const SidebarRegions: React.FC = () => {
                     </button>
 
                 </div>
-                <div className="Sidebar_regions_header_selected">
+                <div className={getMediaQueries(classBase.concat('_header_selected'), locale)}>
 
-                    <button className="Sidebar_regions_header_selected_button"
+                    <button className={getMediaQueries(classBase.concat('_header_selected_button'), locale)}
                             name="selectedList"
                             onClick={handleSelectedButton}>
 
@@ -216,9 +222,9 @@ const SidebarRegions: React.FC = () => {
 
                 </div>
             </div>
-            <div className="Sidebar_regions_list">
+            <div className={getMediaQueries(classBase.concat('_list'), locale)}>
                 <SidebarRegionsSelected />
-                <div className="Sidebar_regions_list_menu">
+                <div className={getMediaQueries(classBase.concat('_list_menu'), locale)}>
                     {menu}
                 </div>
             </div>

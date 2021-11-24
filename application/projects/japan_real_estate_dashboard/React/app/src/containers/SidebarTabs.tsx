@@ -1,5 +1,6 @@
 import React from "react";
-import { useMediaQuery } from 'react-responsive';
+import { useAppSelector } from '../hooks';
+import { getMediaQueries } from '../App';
 import "./SidebarTabs.css";
 
 
@@ -8,15 +9,20 @@ const SidebarTabs: React.FC = () => {
     /* --------------------------------------------------------
         Component that handles drawing the tabs of the menu.
     -------------------------------------------------------- */
+    const languageState = useAppSelector(state => state.language);
+    const locale = languageState.en === true ? 'en' : 'jp';
+    // const SidebarOptions = getMediaQueries("Sidebar_options", locale);
+    // const SidebarRegions = getMediaQueries("Sidebar_regions", locale);
+    
 
     const onTabClicked = (event: any) => {
         event.preventDefault();
         const optionsTab = document.getElementById("Sidebar_tab_options")?.classList;
         const optionsIcon = document.getElementById("Sidebar_tab_options_icon")?.classList;
-        const optionsPage = document.getElementsByClassName("Sidebar_options")[0].classList;
+        const optionsPage = document.getElementsByClassName("Sidebar_options")[0]?.classList;
         const regionsTab = document.getElementById("Sidebar_tab_regions")?.classList;
         const regionsIcon = document.getElementById("Sidebar_tab_regions_icon")?.classList;
-        const regionsPage = document.getElementsByClassName("Sidebar_regions")[0].classList;
+        const regionsPage = document.getElementsByClassName("Sidebar_regions")[0]?.classList;
 
         if (event.target.id === "Sidebar_tab_regions" 
             || event.target.id === "Sidebar_tab_regions_icon") {
@@ -39,9 +45,14 @@ const SidebarTabs: React.FC = () => {
         }
     }
 
+    /* -----------------------------------------------------
+                        CSS classes
+    ------------------------------------------------------*/
+    const classBase: string = 'Sidebar_tab';
+
 
     return (
-        <form className="Sidebar_tab">
+        <form className={getMediaQueries(classBase, locale)}>
 
             <button id="Sidebar_tab_options"
                     onClick={onTabClicked}>

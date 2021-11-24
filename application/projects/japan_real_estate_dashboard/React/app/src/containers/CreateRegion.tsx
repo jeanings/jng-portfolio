@@ -4,7 +4,7 @@ import { handleMenuLevel, handleRenderDirection } from '../slices/menuLevelSlice
 import { handleSelection } from '../slices/selectionSlice';
 import { mongoDbFetchRegions, MongoDbMenuFetchProps } from '../slices/menuApiSlice';
 import { DEV_MODE } from '../App';
-import { useMediaQuery } from 'react-responsive';
+import { getMediaQueries } from '../App';
 import './CreateRegion.css';
 
 
@@ -168,20 +168,26 @@ const CreateRegion: React.FC<CreateRegionProps> = (props: CreateRegionProps) => 
     }
 
 
-    return (
-        <div className={"Sidebar_regions_item" + " " + props.name}>
+    /* -----------------------------------------------------
+                        CSS classes
+    ------------------------------------------------------*/
+    const classBase: string = 'Sidebar_regions_item';
 
-            <label className={"Sidebar_regions_item_checkbox" + " " + availability}>
+
+    return (
+        <div className={getMediaQueries(classBase.concat(' ', props.name), locale)}>
+
+            <label className={getMediaQueries(classBase.concat('_checkbox', ' ', availability), locale)}>
                 <input type="checkbox" 
                     name={props.name}
                     data-category={props.category}
                     data-level={props.level}
                     checked={getChecked()}
                     onChange={onSelectionChange} />
-                <span className="Sidebar_regions_item_checkbox_overlay"></span>
+                <span className={getMediaQueries(classBase.concat('_checkbox_overlay'), locale)}></span>
             </label>
-
-            <button className={"Sidebar_regions_item_name" + " " + availability} 
+            
+            <button className={getMediaQueries(classBase.concat('_name', ' ', availability), locale)} 
                     type="button" 
                     name={props.name}
                     data-category={props.category}

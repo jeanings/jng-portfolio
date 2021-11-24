@@ -1,21 +1,73 @@
 .Dashboard_map_container {
     position: relative;
-    min-height: 300px;
+    min-height: 19rem;
     min-width: 100%;
     grid-column: 1 / 2;
     grid-row: 1 / -1;
 }
 
 .mapboxgl-canvas {
-    padding: 1vw 1vw 0 1vw;
+    padding: 0.5rem;
 }
 
 .mapboxgl-ctrl, 
 .mapboxgl-ctrl-bottom-right {
-    padding: 0 1vw 0 1vw;
+    padding: 0rem 1rem 0rem 1rem;
 }
 
 .mapboxgl-ctrl.mapboxgl-ctrl-attrib {
     background-color: var(--transparent);
     opacity: 0.50;
+}
+
+
+
+
+@media screen and (orientation: landscape) 
+  and (max-width: 5000px) {
+}
+.Dashboard_map_container.screen_4k {
+}
+
+
+
+@media screen and (orientation: landscape) 
+  and (max-width: 2800px) {
+   
+}
+.Dashboard_map_container.screen_1440 {
+}
+
+
+
+@media screen and (orientation: landscape) 
+  and (max-width: 2000px) {
+
+}
+.Dashboard_map_container.screen_1080 {
+}
+
+
+
+
+@media screen and (orientation: landscape) 
+  and (max-width: 1700px) {
+
+}
+.Dashboard_map_container.portable_hd_land {
+}
+
+
+
+.Dashboard_map_container.portable_hd_port {
+}
+
+
+
+@media screen and (orientation: portrait) {
+
+}
+.Dashboard_map_container.portrait {
+    grid-column: 2 / -1;
+    grid-row: 2 / 3;
 }

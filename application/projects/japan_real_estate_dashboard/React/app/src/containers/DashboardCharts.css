@@ -4,7 +4,7 @@
     display: grid;
     height: 100%;
     width: 100%;
-    padding: 0.5vw 0.5vw 0 0.5vw;
+    padding: 0.5rem 0.5rem 0rem 0.5rem;
     grid-template-columns: 100%;
     grid-template-rows: 52% 43% 5%;
 }
@@ -43,6 +43,74 @@
 .Dashboard_charts_citation a:hover {
     background-color: var(--titles-font-colour);
     color: #ffffff;
-    border-radius: 2px;
+    border-radius: 0.15rem;
     transition: all 200ms ease-out;
 }
+
+
+
+@media screen and (orientation: landscape) 
+  and (max-width: 5000px) {
+}
+.Dashboard_charts.screen_4k {
+}
+
+
+
+@media screen and (orientation: landscape) 
+  and (max-width: 2800px) {
+   
+}
+.Dashboard_charts.screen_1440 {
+}
+
+
+
+@media screen and (orientation: landscape) 
+  and (max-width: 2000px) {
+
+}
+.Dashboard_charts.screen_1080 {
+}
+
+
+
+
+@media screen and (orientation: landscape) 
+  and (max-width: 1700px) {
+
+}
+.Dashboard_charts.portable_hd_land {
+}
+
+
+
+.Dashboard_charts.portable_hd_port {
+}
+
+
+
+@media screen and (orientation: portrait) {
+
+}
+.Dashboard_charts.portrait {
+    grid-column: 1 / -1;
+    grid-row: 3 / -1;
+    grid-template-columns: 50% 50%;
+    grid-template-rows: 95% 5%;
+}
+
+    .Dashboard_charts_line-price.portrait {
+        grid-row: 1 / 2;
+        grid-column: 1 / 2;
+    }
+
+    .Dashboard_charts_bar-count.portrait {
+        grid-row: 1 / 2;
+        grid-column: 2 / -1;
+    }
+
+    .Dashboard_charts_citation.portrait {
+        grid-column: 2 / -1;
+        grid-row: 2 / -1;
+    }

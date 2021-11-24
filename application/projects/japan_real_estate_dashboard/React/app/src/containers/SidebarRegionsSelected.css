@@ -4,8 +4,8 @@
 
 .Sidebar_regions_selected.open {
     display: grid;
-    border-bottom: solid 1px var(--border-lines);
-    margin-bottom: 2vw;
+    border-bottom: solid 0.06rem var(--border-lines);
+    margin-bottom: 2rem;
     animation-name: gradual-reveal;
     animation-fill-mode: forwards;
     animation-duration: 400ms;
@@ -28,12 +28,12 @@
     font-family: "Kaisei Opti", serif;
     font-size: 1.35rem;
     color: var(--options-font-inactive);
-    padding-bottom: 0.75vw;
+    padding-bottom: 1rem;
 }
 
 .Sidebar_regions_selected_category {
     justify-self: right;
-    padding-bottom: 0.75vw;
+    padding-bottom: 1rem;
 }
 
 .Sidebar_regions_selected_category_name {
@@ -43,4 +43,60 @@
     font-size: 1.35rem;
     color: var(--titles-font-colour);
     user-select: none;
+}
+
+
+.Sidebar_regions_selected.en {
+}
+
+
+/* ----------------------------------
+            Media queries
+-----------------------------------*/
+@media screen and (orientation: landscape) 
+  and (max-width: 5000px) {
+}
+.Sidebar_regions_selected.screen_4k {
+}
+
+
+
+@media screen and (orientation: landscape) 
+  and (max-width: 2800px) {
+   
+}
+.Sidebar_regions_selected.screen_1440 {
+}
+
+
+
+@media screen and (orientation: landscape) 
+  and (max-width: 2000px) {
+
+}
+.Sidebar_regions_selected.screen_1080 {
+}
+
+
+
+
+@media screen and (orientation: landscape) 
+  and (max-width: 1700px) {
+
+}
+.Sidebar_regions_selected.portable_hd_land {
+}
+
+
+
+.Sidebar_regions_selected.portable_hd_port {
+}
+
+
+
+@media screen and (orientation: portrait) {
+
+}
+.Sidebar_regions_selected.portrait {
+
 }

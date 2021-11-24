@@ -4,6 +4,7 @@ import { v4 as uuidv4 } from 'uuid';
 import CreateSelectedRegion from "./CreateSelectedRegion";
 import { SidebarRegSelectSet } from '../imports/languageSet';
 import { useMediaQuery } from 'react-responsive';
+import { getMediaQueries } from '../App';
 import "./SidebarRegionsSelected.css";
 
 
@@ -72,6 +73,12 @@ const SidebarRegionsSelected: React.FC = () => {
 
         return selectedItem;
     }
+
+    /* -----------------------------------------------------
+                        CSS classes
+    ------------------------------------------------------*/
+    const classBase: string = 'Sidebar_regions_item';
+
     
 
     return (

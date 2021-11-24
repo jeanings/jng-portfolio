@@ -2,8 +2,9 @@
   min-height: 100%;
   display: grid;
   grid-template-columns: 16% 84%;
-  grid-template-rows: 6rem auto;
-  padding: 0.5vw;
+  grid-template-rows: 5.75rem auto;
+  row-gap: 1rem;
+  padding: 0.5rem;
   background-color: var(--background);
   color: var(--options-font-inactive);
 }
@@ -11,3 +12,82 @@
 .App.en {
   grid-template-columns: 18% 82%;
 }
+
+
+/* ----------------------------------
+            Media queries
+-----------------------------------*/
+@media screen and (orientation: landscape) 
+  and (max-width: 5000px) {
+    :root {
+      --root-font-size: 40px;
+    }
+}
+.App.screen_4k {
+}
+
+
+
+@media screen and (orientation: landscape) 
+  and (max-width: 2800px) {
+    :root {
+      --root-font-size: 24px;
+    }
+}
+.App.screen_1440 {
+}
+
+
+
+@media screen and (orientation: landscape) 
+  and (max-width: 2000px) {
+    :root {
+      --root-font-size: 16px;
+    }
+}
+.App.screen_1080 {
+}
+
+
+
+
+@media screen and (orientation: landscape) 
+  and (max-width: 1700px) {
+    :root {
+      --root-font-size: 14px;
+    }
+}
+.App.portable_hd_land {
+}
+
+
+
+.App.portable_hd_port {
+}
+
+
+
+@media screen and (orientation: portrait) {
+  :root {
+    --root-font-size: 14px;
+  }
+}
+.App.portrait {
+  grid-template-columns: 50% 50%;
+  grid-template-rows: 8% 50% 42%;
+  row-gap: 0rem;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+

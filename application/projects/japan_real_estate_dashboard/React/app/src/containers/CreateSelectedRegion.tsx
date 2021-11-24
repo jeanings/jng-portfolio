@@ -1,7 +1,7 @@
 import React from 'react';
 import { useAppDispatch, useAppSelector } from '../hooks';
 import { clearSelection } from '../slices/selectionSlice';
-import { useMediaQuery } from 'react-responsive';
+import { getMediaQueries } from '../App';
 import './CreateSelectedRegion.css';
 
 
@@ -42,6 +42,12 @@ const CreateSelectedRegion: React.FC<CreateSelectedRegionProps> = (props: Create
         // Send selection removal request.
         dispatch(clearSelection(clearRequest));
     }
+
+
+    /* -----------------------------------------------------
+                        CSS classes
+    ------------------------------------------------------*/
+    const classBase: string = 'Sidebar_regions_selected';
   
 
     return (
