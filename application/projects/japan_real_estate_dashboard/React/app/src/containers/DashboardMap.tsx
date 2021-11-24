@@ -1,7 +1,9 @@
 import React, { useEffect, useRef} from 'react';
 import { useAppDispatch, useAppSelector } from '../hooks';
 import { handleBoundsUpdate, mapboxFetchGeo } from '../slices/mapSlice';
-import regionCoords from '../imports/regionCoords';
+import { regionCoords } from '../imports/regionCoords';
+import { LocaleProps } from '../slices/languageSlice';
+import { DEV_LANG, getMediaQueries  } from '../App';
 // @ts-ignore
 import mapboxgl from 'mapbox-gl'; 
 import 'mapbox-gl/dist/mapbox-gl.css';
@@ -18,11 +20,26 @@ const DashboardMap: React.FC = () => {
     const dispatch = useAppDispatch();
     const menuLevelState = useAppSelector(state => state.menuLevel);
     const mapState = useAppSelector(state => state.map);
-    // Map refs.
+    // Get language (can't get map to work well with language state)
+    const hrefBase = window.location.href;
+    const localhost = process.env.REACT_APP_LOCALHOST;
+    const hrefEN = process.env.REACT_APP_HREF_EN;
+    const hrefJP = process.env.REACT_APP_HREF_JP;
+    const locale: LocaleProps["lang"] = hrefBase === hrefEN
+        ? 'en'
+        : hrefBase === hrefJP
+            ? 'jp'
+            : hrefBase === localhost
+                ? DEV_LANG      // set for dev
+                : 'jp';     // placeholder, ignore
+    // Map defaults, refs.
+    mapboxgl.accessToken = process.env.REACT_APP_DEV_MAPBOX;
     const mapContainer = useRef(null);
     const map = useRef<mapboxgl.map | null>(null);
-    mapboxgl.accessToken = process.env.REACT_APP_DEV_MAPBOX;
-
+    var mapStyle: string = locale === 'en'
+            ? process.env.REACT_APP_MAPBOX_STYLE_EN!
+            : process.env.REACT_APP_MAPBOX_STYLE_JP!;
+        
 
     useEffect(() => {
         /* ------------------------------------
@@ -31,7 +48,7 @@ const DashboardMap: React.FC = () => {
         if (map.current === null) {
             map.current = new mapboxgl.Map({
                 container: mapContainer.current,
-                style: 'mapbox://styles/jeanings/cktoky46n1cw818kzolvwcpn5',
+                style: mapStyle,
                 center: [mapState.lng, mapState.lat],
                 zoom: mapState.zoom,
                 bounds: [
@@ -45,7 +62,7 @@ const DashboardMap: React.FC = () => {
                 dragRotate: false
             });
         }
-    });
+    }, []);
 
 
     useEffect(() => {
@@ -78,7 +95,7 @@ const DashboardMap: React.FC = () => {
                 partOf = '';
 
                 // Exception: Tokyo prefecture (bounding box from Mapbox way too big).
-                if (name === '東京都') {
+                if (name === '東京都' || name === 'Tokyo') {
                     updateBounds = {
                         sw: {lng: 138.9396, lat: 35.4955},
                         ne: {lng: 139.9244, lat: 35.8984}
@@ -91,6 +108,7 @@ const DashboardMap: React.FC = () => {
             }
 
             const mapboxRequest: MapboxGeocoderProps = {
+                lang: locale as 'en' | 'jp',
                 name: name,
                 types: type,
                 partOf: partOf
@@ -101,8 +119,8 @@ const DashboardMap: React.FC = () => {
             // Current view: region type.
             name = menuLevelState.active['level 1'].name;
             updateBounds = {
-                sw: {lng: regionCoords[name].sw.lng, lat: regionCoords[name].sw.lat},
-                ne: {lng: regionCoords[name].ne.lng, lat: regionCoords[name].ne.lat}
+                sw: {lng: regionCoords[locale][name].sw.lng, lat: regionCoords[locale][name].sw.lat},
+                ne: {lng: regionCoords[locale][name].ne.lng, lat: regionCoords[locale][name].ne.lat}
             };
 
             dispatch(handleBoundsUpdate(updateBounds));
@@ -158,13 +176,19 @@ const DashboardMap: React.FC = () => {
             }
         }
     }, [mapState.bounds, mapState.lng]);
+
+
+    /* -----------------------------------------------------
+                        CSS classes
+    ------------------------------------------------------*/
+    const classBase: string = 'Dashboard_map_container';
         
     
     return (
         <div 
             id="map" 
             ref={mapContainer} 
-            className="Dashboard_map_container">
+            className={getMediaQueries(classBase, locale)}>
         </div>
     );
 }
@@ -172,6 +196,7 @@ const DashboardMap: React.FC = () => {
 
 // Types setting.
 export type MapboxGeocoderProps = {
+    lang: 'en' | 'jp',
     name: string,
     types: string,
     partOf: string

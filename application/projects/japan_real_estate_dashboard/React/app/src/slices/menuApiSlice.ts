@@ -1,6 +1,7 @@
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
 import axios, { AxiosResponse, AxiosError } from 'axios';
 import { RootState } from '../store';
+import { DEV_MODE } from '../App';
 
 
 
@@ -14,9 +15,10 @@ export const mongoDbFetchRegions = createAsyncThunk(
         Async thunk for fetching default regions hierarchy data.
     ----------------------------------------------------------- */
     'menuApi/fetchRegions',
-    async (requestParam: object) => {// requestParam from CreateRegion's dispatched action.
-        // const apiUrl: string = 'http://localhost:5000/projects/fudousan-stats/get-menu?';    // for development use
-        const apiUrl = 'https://jeanings.space/projects/fudousan-stats/get-menu?';              // for GAE deployment
+    async (requestParam: MongoDbMenuFetchProps) => {// requestParam from CreateRegion's dispatched action.
+        const apiUrl: string = DEV_MODE === 'True'
+            ? process.env.REACT_APP_API_MENU_DEV!
+            : process.env.REACT_APP_API_MENU!;
 
         // Async fetch requested data, calling backend API to MongoDB.
         try {
@@ -24,7 +26,8 @@ export const mongoDbFetchRegions = createAsyncThunk(
 
             if (response.status === 200) {
                 // Returns promise status, caught and handled by extra reducers in menuSlice. 
-                // console.log("SUCCESS: mongoDbFetchRegions called.", response);
+                if (DEV_MODE === 'True')
+                    console.log("SUCCESS: Menu API called.", response);
                 return (await response.data);
             }
         } catch (error) {
@@ -73,8 +76,7 @@ const menuApiSlice = createSlice({
                 /* ------------------------------------- 
                     Updates state on successful fetch.
                 ------------------------------------- */
-                const category = Object.keys(action.meta.arg)[0];
-
+                const category = Object.keys(action.meta.arg)[1];
                 // Handle state updates depending on initial render status.
                 if (state.status != 'successful') {
                     // Push each object in payload array into menu state.
@@ -163,6 +165,14 @@ export type MongoObjectKeyVal = {
     count?: number
 }
 
+export type MongoDbMenuFetchProps = {
+    [index: string]: string | any,
+    lang: 'en' | 'jp' | 'dev',
+    country?: string,
+    region?: string,
+    prefecture?: string,
+    city?: string
+}
 
 // Selector for menu state.
 export const selectMenu = (state: RootState) => state.menuApi; 

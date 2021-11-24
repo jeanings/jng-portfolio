@@ -4,79 +4,142 @@
     height: 100%;
 }
 
-.Sidebar_tab button {
-    background-color: #ffffff;
-    cursor: pointer;
+    .Sidebar_tab button {
+        background-color: #ffffff;
+        cursor: pointer;
+    }
+
+        /* SVG icon styling */
+        .ionicon {
+            width: 1.25rem;
+            height: 1.25rem;
+            cursor: pointer;
+            fill: var(--options-font-inactive);
+            color: var(--options-font-inactive);
+            transition: all 200ms ease-in-out;
+            -moz-transition: all 200ms ease-in-out;
+            -webkit-transition: all 200ms ease-in-out;
+        }
+
+        .ionicon path {
+            pointer-events: none;
+        }
+
+    #Sidebar_tab_options {
+        border-top-left-radius: 0.3rem;
+        border-top-right-radius: 1.6rem;
+        border-top: double 0.2rem var(--border-lines);
+        border-left: double 0.2rem var(--border-lines);
+        border-right: double 0.2rem var(--border-lines);
+        border-bottom: none;
+        background-color: var(--background);
+    }
+
+        #Sidebar_tab_options.hide {
+            border-top-left-radius: 0.3rem;
+            border-top-right-radius: 1.6rem;
+            border-top: none;
+            border-left: none;
+            border-right: none;
+            border-bottom: double 0.2rem var(--border-lines);
+        }
+
+        #Sidebar_tab_options_icon {
+            opacity: 0.85;
+            transition: all 200ms ease-in-out;
+        }
+
+            #Sidebar_tab_options_icon.hide {
+                opacity: 0.25;
+            }
+
+    #Sidebar_tab_regions {
+        border-top-right-radius: 0.3rem;
+        border-top-left-radius: 1.6rem;
+        border-top: none;
+        border-left: none;
+        border-right: none;
+        border-bottom: double 0.2rem var(--border-lines);
+        background-color: var(--background);
+    }
+
+        #Sidebar_tab_regions.show {
+            border-top-right-radius: 0.3rem;
+            border-top-left-radius: 1.6rem;
+            border-top: double 0.2rem var(--border-lines);
+            border-left: double 0.2rem var(--border-lines);
+            border-right: double 0.2rem var(--border-lines);
+            border-bottom: none;
+        }
+
+        #Sidebar_tab_regions_icon {
+            opacity: 0.25;
+            transition: all 200ms ease-in-out;
+        }
+
+            #Sidebar_tab_regions_icon.show {
+                opacity: 0.85;
+            }
+
+    #Sidebar_tab_options:hover > .ionicon,
+    #Sidebar_tab_regions:hover > .ionicon {
+        fill: var(--options-font-active);
+        color: var(--options-font-active);
+        opacity: 1;
+    }
+
+
+.Sidebar_tab.en {
 }
 
-/* SVG icon styling */
-.ionicon {
-    width: 1.25rem;
-    height: 1.25rem;
-    cursor: pointer;
-    fill: var(--options-font-inactive);
-    color: var(--options-font-inactive);
-    transition: all 200ms ease-in-out;
-    -moz-transition: all 200ms ease-in-out;
-    -webkit-transition: all 200ms ease-in-out;
-}
-.ionicon path {
-    pointer-events: none;
+
+/* ----------------------------------
+            Media queries
+-----------------------------------*/
+@media screen and (orientation: landscape) 
+  and (max-width: 5000px) {
+}   
+.Sidebar_tab.screen_4k {
 }
 
-#Sidebar_tab_options {
-    border-top-left-radius: 5px;
-    border-top-right-radius: 25px;
-    border-top: double 3px var(--border-lines);
-    border-left: double 3px var(--border-lines);
-    border-right: double 3px var(--border-lines);
-    border-bottom: none;
-    background-color: var(--background);
+
+
+@media screen and (orientation: landscape) 
+  and (max-width: 2800px) {
+   
 }
-#Sidebar_tab_options.hide {
-    border-top-left-radius: 5px;
-    border-top-right-radius: 25px;
-    border-top: none;
-    border-left: none;
-    border-right: none;
-    border-bottom: double 3px var(--border-lines);
-}
-#Sidebar_tab_options_icon {
-    opacity: 0.85;
-    transition: all 200ms ease-in-out;
-}
-#Sidebar_tab_options_icon.hide {
-    opacity: 0.25;
+.Sidebar_tab.screen_1440 {
 }
 
-#Sidebar_tab_regions {
-    border-top-right-radius: 5px;
-    border-top-left-radius: 25px;
-    border-top: none;
-    border-left: none;
-    border-right: none;
-    border-bottom: double 3px var(--border-lines);
-    background-color: var(--background);
+
+
+@media screen and (orientation: landscape) 
+  and (max-width: 2000px) {
+
 }
-#Sidebar_tab_regions.show {
-    border-top-right-radius: 5px;
-    border-top-left-radius: 25px;
-    border-top: double 3px var(--border-lines);
-    border-left: double 3px var(--border-lines);
-    border-right: double 3px var(--border-lines);
-    border-bottom: none;
-}
-#Sidebar_tab_regions_icon {
-    opacity: 0.25;
-    transition: all 200ms ease-in-out;
-}
-#Sidebar_tab_regions_icon.show {
-    opacity: 0.85;
+.Sidebar_tab.screen_1080 {
 }
 
-#Sidebar_tab_options:hover > .ionicon,
-#Sidebar_tab_regions:hover > .ionicon {
-    fill: var(--options-font-active);
-    color: var(--options-font-active);
-    opacity: 1;
+
+
+
+@media screen and (orientation: landscape) 
+  and (max-width: 1700px) {
+
+}
+.Sidebar_tab.portable_hd_land {
+}
+
+
+
+.Sidebar_tab.portable_hd_port {
+}
+
+
+
+@media screen and (orientation: portrait) {
+
+}
+.Sidebar_tab.portrait {
+
 }

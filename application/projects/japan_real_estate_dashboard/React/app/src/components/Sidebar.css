@@ -4,6 +4,67 @@
     display: grid;
     grid-template-columns: 100%;
     grid-template-rows: 2rem auto;
-    /* border: dashed 1px #cdcdcd; */
-    padding: 0.5vw;
+    padding: 0.5rem;
+}
+
+
+.Sidebar.en {
+}
+
+
+/* ----------------------------------
+            Media queries
+-----------------------------------*/
+@media screen and (orientation: landscape) 
+  and (max-width: 5000px) {
+}
+.Sidebar.screen_4k {
+}
+
+
+
+@media screen and (orientation: landscape) 
+  and (max-width: 2800px) {
+   
+}
+.Sidebar.screen_1440 {
+}
+
+
+
+@media screen and (orientation: landscape) 
+  and (max-width: 2000px) {
+
+}
+.Sidebar.screen_1080 {
+}
+
+
+
+
+@media screen and (orientation: landscape) 
+  and (max-width: 1700px) {
+
+}
+.Sidebar.portable_hd_land {
+}
+
+
+
+.Sidebar.portable_hd_port {
+}
+
+
+
+@media screen and (orientation: portrait) {
+
+}
+.Sidebar.portrait {
+    grid-column: 1 / 2;
+    grid-row: 2 / 3;
+    display: grid;
+    grid-template-columns: 100%;
+    grid-template-rows: 2rem auto;
+    padding: 0.5rem;
+    z-index: 2;
 }

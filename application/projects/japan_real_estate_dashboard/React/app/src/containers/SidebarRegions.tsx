@@ -1,11 +1,14 @@
-import React from "react";
+import React from 'react';
 import { useAppDispatch, useAppSelector } from '../hooks';
 import { handleLevelStore, handleStoreRemoval } from '../slices/menuStoreSlice';
 import { handleRenderDirection, handleMenuLevelRemoval } from '../slices/menuLevelSlice';
 import { v4 as uuidv4 } from 'uuid';
-import CreateRegion from "./CreateRegion";
-import SidebarRegionsSelected from "./SidebarRegionsSelected";
-import "./SidebarRegions.css";
+import CreateRegion from './CreateRegion';
+import SidebarRegionsSelected from './SidebarRegionsSelected';
+import { SidebarRegSet } from '../imports/languageSet';
+import { getMediaQueries } from '../App';
+import './SidebarRegions.css';
+
 
 
 
@@ -22,6 +25,8 @@ const SidebarRegions: React.FC = () => {
     const menuStoreState = useAppSelector(state => state.menuStore);
     const menuLevelState = useAppSelector(state => state.menuLevel);
     const menuApiState = useAppSelector(state => state.menuApi);
+    const languageState = useAppSelector(state => state.language);
+    const locale = languageState.en === true ? 'en' : 'jp';
     // Level-related variables.
     const renderDirection: string = menuLevelState.direction;
     const renderedLength: number = Object.keys(menuStoreState.rendered).length;
@@ -140,8 +145,8 @@ const SidebarRegions: React.FC = () => {
         /* -----------------------------------------
             Generate menu items for regions list.
         ----------------------------------------- */
-        let levelNum:number = parseInt(level.replace(/\D/g, ''));
-        let category:string = categories[level];
+        let levelNum: number = parseInt(level.replace(/\D/g, ''));
+        let category: string = categories[level];
         let nextLevel: string = 'level ' + (levelNum + 1);
         let nextCategory: string = categories[nextLevel];
         let menuItem: JSX.Element;
@@ -162,15 +167,21 @@ const SidebarRegions: React.FC = () => {
     }
 
 
+    /* -----------------------------------------------------
+                        CSS classes
+    ------------------------------------------------------*/
+    const classBase: string = 'Sidebar_regions';
+
+
     return (
-        <form className="Sidebar_regions">
-            <div className="Sidebar_regions_header">
-                <div className="Sidebar_regions_header_back">
+        <form className={getMediaQueries(classBase, locale)}>
+            <div className={getMediaQueries(classBase.concat('_header'), locale)}>
+                <div className={getMediaQueries(classBase.concat('_header_back'), locale)}>
                     
                     <button className=
                                 {renderedLength <= 1 
-                                    ? "Sidebar_regions_header_back_button"
-                                    : "Sidebar_regions_header_back_button show"} 
+                                    ? getMediaQueries(classBase.concat('_header_back_button'), locale)
+                                    : getMediaQueries(classBase.concat('_header_back_button show'), locale)} 
                             name="menuBack" 
                             onClick={handleBackButton}>
 
@@ -178,18 +189,28 @@ const SidebarRegions: React.FC = () => {
                             &#129140;
                         </span>
 
-                        {nextLength === 0
-                            ? ''
-                            : nextLength === 1
-                                ? '地域全体に'
-                                : menuLevelState.active[currentLevel].name + 'に'}
-                        戻る
+                        {locale === 'en'
+                            ? nextLength === 0
+                                ? ''
+                                : nextLength === 1  
+                                    // Return to -- region
+                                    ? SidebarRegSet[locale].backBtn.toReturn + ' ' + SidebarRegSet[locale].backBtn.generalReg
+                                    // Return to -- prefecture etc.
+                                    : SidebarRegSet[locale].backBtn.toReturn + ' ' + menuLevelState.active[currentLevel].name
+                            // locale === 'jp'
+                            : nextLength === 0
+                                ? ''
+                                : nextLength === 1
+                                    // ～(地域)にもどる
+                                    ? SidebarRegSet[locale].backBtn.generalReg + SidebarRegSet[locale].backBtn.toReturn
+                                    // ～県(など)にもどる
+                                    : menuLevelState.active[currentLevel].name + SidebarRegSet[locale].backBtn.toReturn}
                     </button>
 
                 </div>
-                <div className="Sidebar_regions_header_selected">
+                <div className={getMediaQueries(classBase.concat('_header_selected'), locale)}>
 
-                    <button className="Sidebar_regions_header_selected_button"
+                    <button className={getMediaQueries(classBase.concat('_header_selected_button'), locale)}
                             name="selectedList"
                             onClick={handleSelectedButton}>
 
@@ -201,9 +222,9 @@ const SidebarRegions: React.FC = () => {
 
                 </div>
             </div>
-            <div className="Sidebar_regions_list">
+            <div className={getMediaQueries(classBase.concat('_list'), locale)}>
                 <SidebarRegionsSelected />
-                <div className="Sidebar_regions_list_menu">
+                <div className={getMediaQueries(classBase.concat('_list_menu'), locale)}>
                     {menu}
                 </div>
             </div>

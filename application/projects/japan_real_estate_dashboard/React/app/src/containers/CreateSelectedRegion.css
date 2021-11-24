@@ -1,100 +1,160 @@
 .Sidebar_regions_selected_item {
     display: grid;
-    grid-template-columns: auto 2rem;
+    grid-template-columns: auto 1.2rem;
     grid-template-rows: 100%;
+    column-gap: 0.6rem;
     margin-bottom: 0.20rem;
     min-height: 1.3rem;
 }
 
-.Sidebar_regions_selected_item_name {
-    grid-column: 1 / 2;
-    grid-row: 1 / 2;
-    color: var(--options-font-inactive);
-    font-family: "Hina Mincho", serif;
-    font-weight: 400;
-    font-size: 1.2rem;
-    text-align: end;
-    align-self: end;
-    text-decoration-line: line-through;
-    text-decoration-style: wavy;
-    text-decoration-thickness: 0.10rem;
-    text-decoration-color: transparent;
-}
-
-/* Strikeout region name on checkbox hover */
-.Sidebar_regions_selected_item_checkbox:hover
-    ~ .Sidebar_regions_selected_item_name {
-        animation-name: draw-underline;
-        animation-duration: 450ms;
-        animation-fill-mode: forwards;
-        animation-timing-function: ease-in-out;
-}
-
-@keyframes draw-underline {
-    0% {
+    .Sidebar_regions_selected_item_name {
+        grid-column: 1 / 2;
+        grid-row: 1 / 2;
+        color: var(--options-font-inactive);
+        font-family: "Hina Mincho", serif;
+        font-weight: 400;
+        font-size: 1.2rem;
+        text-align: end;
+        align-self: end;
+        text-decoration-line: line-through;
+        text-decoration-style: wavy;
         text-decoration-thickness: 0.10rem;
+        text-decoration-color: transparent;
     }
 
-    100% {
-        text-decoration-thickness: 0.3rem;
-        text-decoration-color: var(--extra-highlight);
-    }
+        /* Strikeout region name on checkbox hover */
+        .Sidebar_regions_selected_item_checkbox:hover
+            ~ .Sidebar_regions_selected_item_name {
+                animation-name: draw-underline;
+                animation-duration: 450ms;
+                animation-fill-mode: forwards;
+                animation-timing-function: ease-in-out;
+        }
+
+            @keyframes draw-underline {
+                0% {
+                    text-decoration-thickness: 0.10rem;
+                }
+
+                100% {
+                    text-decoration-thickness: 0.3rem;
+                    text-decoration-color: var(--extra-highlight);
+                }
+            }
+
+        .Sidebar_regions_selected_item_checkbox {
+            display: grid;
+            grid-column: 2 / -1;
+            grid-row: 1 / 2;
+            grid-template-columns: 100%;
+            grid-template-rows: 100%;
+            width: 1.2rem;
+            height: 1.2rem;
+            align-self: center;
+            justify-self: end;
+        }
+
+            /* Hide default checkbox */
+            .Sidebar_regions_selected_item_checkbox input {
+                display: none;
+                grid-column: 1;
+            }
+
+            /* Custom checkbox */
+            .Sidebar_regions_selected_item_checkbox_overlay {
+                height: 100%;
+                width: 100%;
+                grid-column: 1;
+                grid-row: 1;
+                opacity: 0.7;
+                justify-self: right;
+                align-self: center;
+                text-align: center;
+                border: double 0.2rem var(--options-font-inactive);
+                cursor: pointer;
 }
 
-.Sidebar_regions_selected_item_checkbox {
-    display: grid;
-    grid-column: 2 / -1;
-    grid-row: 1 / 2;
-    grid-template-columns: 100%;
-    grid-template-rows: 100%;
-    width: 1.2rem;
-    height: 1.2rem;
-    align-self: center;
-    justify-self: end;
+                .Sidebar_regions_selected_item_checkbox_checked {
+                    display: flex;
+                    grid-column: 1;
+                    grid-row: 1;
+                    height: 100%;
+                    width: 100%;
+                    opacity: 0;
+                    font-size: 1.4rem;
+                    color: var(--extra-highlight);
+                    align-items: center;
+                    cursor: pointer;
+                    user-select: none;
+                }
+
+                    .Sidebar_regions_selected_item_checkbox input:hover 
+                        ~ .Sidebar_regions_selected_item_checkbox_checked {
+                        opacity: 0.75;
+                    }
+
+                        .Sidebar_regions_selected_item_checkbox_checked.show {
+                            opacity: 1;
+                        }
+
+                    .Sidebar_regions_selected_item_checkbox input:checked 
+                        ~ .Sidebar_regions_selected_item_checkbox_overlay {
+                        opacity: 1;
+                    }
+
+
+
+.Sidebar_regions_selected_item.en {
 }
 
-/* Hide default checkbox */
-.Sidebar_regions_selected_item_checkbox input {
-    display: none;
-    grid-column: 1;
+
+/* ----------------------------------
+            Media queries
+-----------------------------------*/
+@media screen and (orientation: landscape) 
+  and (max-width: 5000px) {
+}
+.Sidebar_regions_selected_item.screen_4k {
 }
 
-/* Custom checkbox */
-.Sidebar_regions_selected_item_checkbox_overlay {
-    height: 100%;
-    width: 100%;
-    grid-column: 1;
-    grid-row: 1;
-    opacity: 0.7;
-    justify-self: right;
-    align-self: center;
-    text-align: center;
-    border: double 3px var(--options-font-inactive);
-    cursor: pointer;
+
+
+@media screen and (orientation: landscape) 
+  and (max-width: 2800px) {
+   
+}
+.Sidebar_regions_selected_item.screen_1440 {
 }
 
-.Sidebar_regions_selected_item_checkbox_checked {
-    display: flex;
-    grid-column: 1;
-    grid-row: 1;
-    height: 100%;
-    width: 100%;
-    opacity: 0;
-    font-size: 1.4rem;
-    color: var(--extra-highlight);
-    align-items: center;
-    cursor: pointer;
-    user-select: none;
+
+
+@media screen and (orientation: landscape) 
+  and (max-width: 2000px) {
+
+}
+.Sidebar_regions_selected_item.screen_1080 {
 }
 
-.Sidebar_regions_selected_item_checkbox input:hover 
-    ~ .Sidebar_regions_selected_item_checkbox_checked {
-    opacity: 0.75;
+
+
+
+@media screen and (orientation: landscape) 
+  and (max-width: 1700px) {
+
 }
-.Sidebar_regions_selected_item_checkbox_checked.show {
-    opacity: 1;
+.Sidebar_regions_selected_item.portable_hd_land {
 }
-.Sidebar_regions_selected_item_checkbox input:checked 
-    ~ .Sidebar_regions_selected_item_checkbox_overlay {
-    opacity: 1;
+
+
+
+.Sidebar_regions_selected_item.portable_hd_port {
+}
+
+
+
+@media screen and (orientation: portrait) {
+
+}
+.Sidebar_regions_selected_item.portrait {
+
 }
