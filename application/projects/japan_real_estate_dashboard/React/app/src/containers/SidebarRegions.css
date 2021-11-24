@@ -8,7 +8,7 @@
 
 .Sidebar_regions.show {
     display: grid;
-    grid-template-rows: 10% auto;
+    grid-template-rows: 12% auto;
     border: double 0.2rem var(--border-lines);
     border-top: none;
     padding-top: 1.5rem;
