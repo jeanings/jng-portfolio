@@ -45,9 +45,7 @@ MDB_PASS = quote_plus(MONGODB_KEY)
 
 # MongoDB connection.
 try:
-    client = MongoClient(f'mongodb+srv://{MONGODB_ID}:{MDB_PASS}@portfolio.8frim.mongodb.net/fudousan?retryWrites=true&w=majority')
-    db = client.fudousan
-    collection_regions = db.geo_hierarchy
+    client = MongoClient(f'mongodb+srv://{MONGODB_ID}:{MDB_PASS}@portfolio.8frim.mongodb.net/fudousan?retryWrites=true&w=majority')    
 except pymongo.errors.AutoReconnect:
     print("Reconnecting to database due to connection failure / is lost.")
 except pymongo.errors.OperationFailure:
@@ -73,14 +71,24 @@ def japan_real_estate_dashboard_jp():
 def japan_real_estate_dashboard_menu_data():
     try:
         # /get-menu?region=asdf&name=asdf
+        language = request.args.get('lang', None)
         country = request.args.get('country', None)
         region = request.args.get('regions', None)
         prefecture = request.args.get('prefectures', None)
         city = request.args.get('cities', None)
+
+        if language == 'en':
+            db = client.fudousan_en
+        elif language == 'jp':
+            db = client.fudousan_jp
+
+        collection_regions = db.geo_hierarchy
+
     except pymongo.errors.AutoReconnect:
         print("Reconnecting to database due to connection failure / is lost.")
     except pymongo.errors.OperationFailure:
         print("Database operation error.")
+
 
     if country:
         # Retrieves every region.
@@ -132,17 +140,28 @@ def japan_real_estate_dashboard_menu_data():
             { '$project': 
                 { '_id._id': 1, '_id.name': 1, '_id.count': 1, '_id.partOf': 1 } }
         ])
-    return jsonify(list(results))
+
+    response = jsonify(list(results))
+
+    return response
 
 
 # Japan real estate dashboard MongoDB get sales data route.
-@japan_real_estate_dashboard_bp.route('/japan-real-estate-comparison-2010-2020/get-data', methods=['GET'])
+@japan_real_estate_dashboard_bp.route('/japan-real-estate-dashboard-2010-2020/get-data', methods=['GET'])
 def japan_real_estate_dashboard_price_data():
     try:
         # /get-data?collection=1980_1990&options=stFrame-100_150
+        language = request.args.get('lang', None);
         collection = request.args.get('collection', None)
         options = request.args.get('options', None)
+
+        if language == 'en':
+            db = client.fudousan_en
+        elif language == 'jp':
+            db = client.fudousan_jp
+
         collection_data = db[collection]
+
     except pymongo.errors.AutoReconnect:
         print("Reconnecting to database due to connection failure / is lost.")
     except pymongo.errors.OperationFailure:
@@ -157,4 +176,6 @@ def japan_real_estate_dashboard_price_data():
             { 'regions': '$' + options + '.regions' } }
     ])
 
-    return jsonify(list(results))
+    response = jsonify(list(results))
+
+    return response

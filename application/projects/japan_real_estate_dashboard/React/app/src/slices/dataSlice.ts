@@ -1,6 +1,7 @@
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
 import axios, { AxiosResponse, AxiosError } from 'axios';
 import { RootState } from '../store';
+import { DEV_MODE } from '../App';
 
 
 
@@ -14,9 +15,10 @@ export const mongoDbFetchData = createAsyncThunk(
         Async thunk for fetching sales data based on chosen options.
     --------------------------------------------------------------- */
     'data/fetchData',
-    async (requestParam: object) => {// requestParam from SidebarOptions' dispatched action.
-        // const apiUrl: string = 'http://localhost:5000/projects/fudousan-stats/get-data?';    // for development use
-        const apiUrl = 'https://jeanings.space/projects/fudousan-stats/get-data?';              // for GAE deployment
+    async (requestParam: MongoDbDataFetchProps) => {// requestParam from SidebarOptions' dispatched action.
+        const apiUrl: string = DEV_MODE === 'True'
+            ? process.env.REACT_APP_API_DATA_DEV!
+            : process.env.REACT_APP_API_DATA!;
 
         // Async fetch requested data, calling backend API to MongoDB.
         try {
@@ -24,14 +26,15 @@ export const mongoDbFetchData = createAsyncThunk(
                
             if (response.status === 200) {
                 // Returns promise status, caught and handled by extra reducers in dataSlice. 
-                // console.log("SUCCESS: mongoDbFetchData called.", response);
+                if (DEV_MODE === 'True')
+                    console.log("SUCCESS: Data API called.", response);
                 return (await response.data);
             }
         } catch (error) {
             if (axios.isAxiosError(error.response)) {
-                console.log("ERROR: AxiosError - MongoDB fetch.", error.response.data.error)
+                console.log("ERROR: AxiosError - Data API fetch.", error.response.data.error)
             } else {
-                console.log("ERROR: API call failed on MongoDB fetch.", error);
+                console.log("ERROR: API call failed on data fetch.", error);
             }
         }
     }
@@ -153,6 +156,13 @@ type CurrentProps = {
         age: string,
         floorArea: string
     }
+}
+
+export type MongoDbDataFetchProps = {
+    [index: string]: string | any,
+    lang: 'en' | 'jp',
+    collection: string,
+    options: string
 }
 
 

@@ -5,7 +5,12 @@ import { Chart, LineElement, BarElement, ChartType,
             Title, Legend, LegendItem, Tooltip, TooltipItem, CategoryScale, LinearScale,
             PointElement, ChartEvent, LineController, BarController, ChartDataset } from 'chart.js';
 import { fadedColours, solidColours } from '../imports/chartColourSets';
+import { DashboardChartsSet } from '../imports/languageSet';
+import { chartConfigs, widthToFontSize, widthToLineSpacing } from '../imports/chartMediaQueryPresets';
+import { LocaleProps } from '../slices/languageSlice';
+import { DEV_LANG, getMediaQueries  } from '../App';
 import './DashboardCharts.css';
+
 
 // Register the required chart components.
 Chart.register(LineElement, BarElement, PointElement, 
@@ -17,7 +22,7 @@ Chart.register(LineElement, BarElement, PointElement,
 const DashboardCharts: React.FC = () => {
     /* --------------------------------------------------------------------------
         Chart.js component that builds charts on regions addition and removal. 
-        Subscribes to {data} and {selection} states.
+        Subscribes to {data}, {selection}, {language} states.
     -------------------------------------------------------------------------- */
     // Dispatch, selector hooks.
     const selectState = useAppSelector(state => state.selection);
@@ -27,6 +32,19 @@ const DashboardCharts: React.FC = () => {
     const refLineChart = useRef<any>(null);
     const refBarChartContainer = useRef<any>(null);
     const refBarChart = useRef<any>(null);
+    // Get language (can't get charts to work well with language state)
+    const hrefBase = window.location.href;
+    const hrefEN = process.env.REACT_APP_HREF_EN;
+    const hrefJP = process.env.REACT_APP_HREF_JP;
+    const localhost = process.env.REACT_APP_LOCALHOST;
+    const viewportWidth = window.innerWidth;
+    const locale: LocaleProps["lang"] = hrefBase === hrefEN
+        ? 'en'
+        : hrefBase === hrefJP
+            ? 'jp'
+            : hrefBase === localhost
+                ? DEV_LANG      // set for dev
+                : 'jp';     // placeholder, ignore
 
 
     useEffect(() => {
@@ -34,7 +52,6 @@ const DashboardCharts: React.FC = () => {
             Instantiate chartjs canvas on initial render.
         ------------------------------------------------- */
         if (refLineChart.current === null) {
-
             // Require title, axes font to load first.
             fontMPlus.load(null, 4000)
                 .then(function() {
@@ -128,11 +145,12 @@ const DashboardCharts: React.FC = () => {
     ========================================= */
 
     // X axis labels shared with bar chart.
-    const xAxisYears: Array<string> = [
-        '2010年', '2011年', '2012年', '2013年', '2014年', 
-        '2015年', '2016年', '2017年', '2018年', '2019年', 
-        '2020年'
+    var xAxisYearNum: Array<string> = [
+        '2010', '2011', '2012', '2013', '2014', 
+        '2015', '2016', '2017', '2018', '2019', 
+        '2020'
     ];
+    const xAxisYears = xAxisYearNum.map(yearNum => yearNum.concat(DashboardChartsSet[locale].xAxis));
     
 
     const linePriceData = {
@@ -144,17 +162,17 @@ const DashboardCharts: React.FC = () => {
     // Chart grid elements options.
     const linePriceOptionElements = {
         line: {
-            borderWidth: 3,
+            borderWidth: getChartMediaQuery(viewportWidth, chartConfigs.line.elements.line.borderWidth),
             fill: false,
             spanGaps: false             // Misrepresents data, so keep at 'false'
         },
         point: {
             pointStyle: 'crossRot',
-            radius: 7,
-            borderWidth: 1,
-            hoverBorderWidth: 3,
-            hoverRadius: 12,
-            hitRadius: 8                // Increases proximity range of hover.
+            radius: getChartMediaQuery(viewportWidth, chartConfigs.line.elements.point.radius),
+            borderWidth: getChartMediaQuery(viewportWidth, chartConfigs.line.elements.point.borderWidth),
+            hoverBorderWidth: getChartMediaQuery(viewportWidth, chartConfigs.line.elements.point.hoverBorderWidth),
+            hoverRadius: getChartMediaQuery(viewportWidth, chartConfigs.line.elements.point.hoverRadius),
+            hitRadius: getChartMediaQuery(viewportWidth, chartConfigs.line.elements.point.hitRadius)                // Increases proximity range of hover.
         }
     };
 
@@ -169,7 +187,7 @@ const DashboardCharts: React.FC = () => {
             ticks: {
                 font: {
                     family: "'M PLUS 1p', sans-serif",
-                    size: 13            // Font size in px.
+                    size: getChartMediaQuery(viewportWidth, chartConfigs.line.scales.x.tickSize)            // Font size in px.
                 }
             }
         },
@@ -178,7 +196,7 @@ const DashboardCharts: React.FC = () => {
             ticks: {
                 font: {
                     family: "'M PLUS 1p', sans-serif",
-                    size: 13
+                    size: getChartMediaQuery(viewportWidth, chartConfigs.line.scales.y.tickSize) 
                 }
             }
         }
@@ -189,13 +207,13 @@ const DashboardCharts: React.FC = () => {
     const linePriceOptionPlugins = {
         title: {
             display: true,
-            text: '取引平均価格（万円）',
+            text: DashboardChartsSet[locale].linePriceOptionPlugins.title,
             padding: {
-                bottom: 20
+                bottom: getChartMediaQuery(viewportWidth, chartConfigs.line.plugins.title.paddingBottom) 
             },
             font: {
                 family: "'Kaisei Opti', serif",
-                size: 24,               // Font size in px.
+                size: getChartMediaQuery(viewportWidth, chartConfigs.line.plugins.title.fontSize),               // Font size in px.
                 weight: 'normal'
             },
             color: '#0c3f42'
@@ -204,12 +222,12 @@ const DashboardCharts: React.FC = () => {
             display: true,
             position: 'bottom' as 'bottom',
             labels: {
-                padding: 15,            // Adds vertical space between legend items
-                boxHeight: 13,          // Height of coloured box in px.
-                boxWidth: 30,
+                padding: getChartMediaQuery(viewportWidth, chartConfigs.line.plugins.legend.labels.padding),            // Adds vertical space between legend items
+                boxHeight: getChartMediaQuery(viewportWidth, chartConfigs.line.plugins.legend.labels.box.height),          // Height of coloured box in px.
+                boxWidth: getChartMediaQuery(viewportWidth, chartConfigs.line.plugins.legend.labels.box.width),
                 font: {
                     family: "'M PLUS 1p', sans-serif",
-                    size: 17
+                    size: getChartMediaQuery(viewportWidth, chartConfigs.line.plugins.legend.labels.fontSize)
                 }
             },
             onClick: handleLegendClick, // Syncs both charts' clicks under Line's
@@ -218,21 +236,21 @@ const DashboardCharts: React.FC = () => {
         },
         tooltip: {
             backgroundColor: '#0c3f4290',
-            caretSize: 8,
-            caretPadding: 10,
-            cornerRadius: 3,
+            caretSize: getChartMediaQuery(viewportWidth, chartConfigs.line.plugins.tooltip.caret.size),
+            caretPadding: getChartMediaQuery(viewportWidth, chartConfigs.line.plugins.tooltip.caret.padding),
+            cornerRadius: getChartMediaQuery(viewportWidth, chartConfigs.line.plugins.tooltip.cornerRadius),
             displayColors: true,
             intersect: false,           // Tooltip shows when in proximity of point
             multiKeyBackground: '#00000000',
-            padding: 10,
+            padding: getChartMediaQuery(viewportWidth, chartConfigs.line.plugins.tooltip.padding),
             position: 'average' as 'average',
             titleFont: {
                 family: "'M PLUS 1p', sans-serif",
-                size: 15
+                size: getChartMediaQuery(viewportWidth, chartConfigs.line.plugins.tooltip.titleFontSize)
             },
             bodyFont: {
                 family: "'M PLUS 1p', sans-serif",
-                size: 14
+                size: getChartMediaQuery(viewportWidth, chartConfigs.line.plugins.tooltip.bodyFontSize)
             },
             yAlign: 'bottom' as 'bottom'
         }
@@ -267,7 +285,7 @@ const DashboardCharts: React.FC = () => {
             ticks: {
                 font: {
                     family: "'M PLUS 1p', sans-serif",
-                    size: 13        // Font size in px.
+                    size: getChartMediaQuery(viewportWidth, chartConfigs.bar.scales.x.tickSize)       // Font size in px.
                 }
             }
         },
@@ -277,7 +295,7 @@ const DashboardCharts: React.FC = () => {
             ticks: {
                 font: {
                     family: "'M PLUS 1p', sans-serif",
-                    size: 13
+                    size: getChartMediaQuery(viewportWidth, chartConfigs.bar.scales.y.tickSize)
                 }
             }
         }
@@ -288,14 +306,14 @@ const DashboardCharts: React.FC = () => {
     const barCountOptionPlugins = {
         title: {
             display: true,
-            text: '取引件数',
+            text: DashboardChartsSet[locale].barCountOptionPlugins.title,
             padding: {
-                top: 20,
-                bottom: 20
+                top: getChartMediaQuery(viewportWidth, chartConfigs.bar.plugins.title.padding.top),
+                bottom: getChartMediaQuery(viewportWidth, chartConfigs.bar.plugins.title.padding.bottom)
             },
             font: {
                 family: "'Kaisei Opti', serif",
-                size: 24,               // Font size in px.
+                size: getChartMediaQuery(viewportWidth, chartConfigs.bar.plugins.title.fontSize),               // Font size in px.
                 weight: 'normal'
             },
             color: '#0c3f42'
@@ -305,25 +323,25 @@ const DashboardCharts: React.FC = () => {
         },
         tooltip: {
             backgroundColor: '#0c3f4290',
-            caretSize: 8,
-            cornerRadius: 3,
+            caretSize: getChartMediaQuery(viewportWidth, chartConfigs.bar.plugins.tooltip.caretSize),
+            cornerRadius: getChartMediaQuery(viewportWidth, chartConfigs.bar.plugins.tooltip.cornerRadius),
             displayColors: true,
             intersect: true,
             multiKeyBackground: '#00000000',
-            padding: 10,
+            padding: getChartMediaQuery(viewportWidth, chartConfigs.bar.plugins.tooltip.padding),
             position: 'average' as 'average',
             titleFont: {
                 family: "'M PLUS 1p', sans-serif",
-                size: 15
+                size: getChartMediaQuery(viewportWidth, chartConfigs.bar.plugins.tooltip.titleFontSize)
             },
             bodyFont: {
                 family: "'M PLUS 1p', sans-serif",
-                size: 14
+                size: getChartMediaQuery(viewportWidth, chartConfigs.bar.plugins.tooltip.bodyFontSize)
             },
             footerFont: {
                 family: "'M PLUS 1p', sans-serif",
                 weight: 'normal',
-                size: 14
+                size: getChartMediaQuery(viewportWidth, chartConfigs.bar.plugins.tooltip.footerFontSize)
             },
             yAlign: 'bottom' as 'bottom',
             callbacks: {
@@ -600,6 +618,27 @@ const DashboardCharts: React.FC = () => {
     }
 
 
+    function getChartMediaQuery(viewportWidth: number, preset: ChartMediaQueryPreset) {
+        /* ----------------------------------------------------------------------------
+            Helper function that spits out the preset values for responsive styling.
+        ---------------------------------------------------------------------------- */
+        const queryConstant: number = 
+            viewportWidth <= 1000
+                ? preset.isPortrait
+                : viewportWidth <= 1700
+                    ? preset.isPortableLandscape
+                    : viewportWidth <= 2000
+                        ? preset.isScreen1080
+                        : viewportWidth <= 2800
+                            ? preset.isScreen1440
+                            : viewportWidth >= 2900
+                                ? preset.isScreen4k
+                                : preset.fallback;
+    
+        return queryConstant;
+    }
+
+
     /* ==============================================
             Chartjs event, callback functions
     ============================================== */
@@ -614,7 +653,7 @@ const DashboardCharts: React.FC = () => {
             sum += tooltipItem.parsed.y;
         });
 
-        return '総計: ' + sum;
+        return DashboardChartsSet[locale].barCountSum + sum;
     }
 
 
@@ -675,7 +714,9 @@ const DashboardCharts: React.FC = () => {
         id: 'noDataNotify',
         afterDraw: (chart: Chart) => {
             let dataSet: number = chart.data.datasets.length;
-            
+            const fontSize = getChartMediaQuery(viewportWidth, widthToFontSize) + 'px';
+            const ySpacingMultiple = getChartMediaQuery(viewportWidth, widthToLineSpacing);
+
             // Require notification text to load first.
             fontHinaMincho.load(null, 4000)
                 .then(function() {
@@ -684,27 +725,23 @@ const DashboardCharts: React.FC = () => {
                         ctx.save();
 
                         // Canvas drawing styling.
-                        const xInitial: number = chart.width / 4.25;
+                        const xInitial: number = chart.width / 6;
                         const xMax: number = chart.width / 1.2;
                         const yInitial: number = chart.height / 4.20;
+                        
+
                         ctx.textAlign = 'start';
                         ctx.textBaseline = 'middle';
                         ctx.fillStyle = '#828a81';
-                        // ctx.font = "24px 'M PLUS 1p', san-serif";    // too clinical
-                        // ctx.font = "24px 'Kaisei Opti', serif";      // too bold
-                        ctx.font = "24px 'Hina Mincho', serif";
+                        // 'M PLUS 1p', san-serif    // too clinical
+                        // 'Kaisei Opti', serif      // too bold
+                        ctx.font = fontSize.concat("'Hina Mincho', serif");
 
-                        const lines: Array<string> = [
-                            "Sorry! データが指定されていません",
-                            "検索条件を確認してください😔",
-                            "１）検索条件を選んでセーブして💾",
-                            "２）🌏のタブを押して興味ある地域を選定、",
-                            "３）データはここに表示します😎"
-                        ];
+                        const lines: Array<string> = DashboardChartsSet[locale].noDataNotify;
 
                         // Draw text lines.
                         lines.forEach((line: string, index:number) => {
-                            const ySpacing: number = yInitial + index * 35;
+                            const ySpacing: number = yInitial + index * ySpacingMultiple;
 
                             ctx.fillText(
                                 line,                                   // text
@@ -723,27 +760,34 @@ const DashboardCharts: React.FC = () => {
     }
 
 
+    /* -----------------------------------------------------
+                        CSS classes
+    ------------------------------------------------------*/
+    const classBase: string = 'Dashboard_charts';
+
+
+
     return (
-        <div className="Dashboard_charts">
-            <div className="Dashboard_charts_line-price">
+        <div className={getMediaQueries(classBase, locale)}>
+            <div className={getMediaQueries(classBase.concat('_line-price'), locale)}>
 
                 <canvas id="Dashboard_charts_line-price_chart" 
                         ref={refLineChartContainer} />
 
             </div>
-            <div className="Dashboard_charts_bar-count">
+            <div className={getMediaQueries(classBase.concat('_bar-count'), locale)}>
 
                 <canvas id="Dashboard_charts_bar-count_chart"
                         ref={refBarChartContainer} />
                         
             </div>
-            <div className="Dashboard_charts_citation">
+            <div className={getMediaQueries(classBase.concat('_citation'), locale)}>
 
-                ※資料： 
+                {DashboardChartsSet[locale].citation.lineA}
                 <a href="https://www.land.mlit.go.jp/webland/servlet/MainServlet" target="_blank">
-                    国土交通省
+                    {DashboardChartsSet[locale].citation.link}
                 </a>
-                から作成。
+                {DashboardChartsSet[locale].citation.lineB}
 
             </div>
         </div>    
@@ -797,6 +841,15 @@ type ChartDataSetProps = {
     backgroundColor?: string,
     borderColor?: string
 }
+
+type ChartMediaQueryPreset = {
+    isPortrait: number,
+    isPortableLandscape: number,
+    isScreen1080: number,
+    isScreen1440: number,
+    isScreen4k: number,
+    fallback: number
+};
 
 
 export default DashboardCharts;

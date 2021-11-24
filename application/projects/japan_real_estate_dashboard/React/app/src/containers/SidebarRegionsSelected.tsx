@@ -2,6 +2,9 @@ import React from "react";
 import { useAppSelector } from '../hooks';
 import { v4 as uuidv4 } from 'uuid';
 import CreateSelectedRegion from "./CreateSelectedRegion";
+import { SidebarRegSelectSet } from '../imports/languageSet';
+import { useMediaQuery } from 'react-responsive';
+import { getMediaQueries } from '../App';
 import "./SidebarRegionsSelected.css";
 
 
@@ -12,6 +15,8 @@ const SidebarRegionsSelected: React.FC = () => {
         Subscribes to {selection} state.
     -------------------------------------------------------- */
     const selectionState = useAppSelector(state => state.selection.selected);
+    const languageState = useAppSelector(state => state.language);
+    const locale = languageState.en === true ? 'en' : 'jp';
     
     let selected: SelectedProps = {
         'level 1': [],
@@ -68,16 +73,24 @@ const SidebarRegionsSelected: React.FC = () => {
 
         return selectedItem;
     }
+
+    /* -----------------------------------------------------
+                        CSS classes
+    ------------------------------------------------------*/
+    const classBase: string = 'Sidebar_regions_item';
+
     
 
     return (
         <div className="Sidebar_regions_selected">
-            <span className="Sidebar_regions_selected_header">選択した地域</span>
+            <span className="Sidebar_regions_selected_header">
+                {SidebarRegSelectSet[locale].header}
+            </span>
 
             {regionsExist 
                 ?   <div className="Sidebar_regions_selected_category">
                         <span className="Sidebar_regions_selected_category_name">
-                            地方
+                            {SidebarRegSelectSet[locale].region}
                         </span>
 
                         <div className="Sidebar_regions_selected_items">
@@ -89,7 +102,7 @@ const SidebarRegionsSelected: React.FC = () => {
             {prefecturesExist
                 ?   <div className="Sidebar_regions_selected_category">
                         <span className="Sidebar_regions_selected_category_name">
-                            都道府県
+                            {SidebarRegSelectSet[locale].prefecture}
                         </span>
 
                         <div className="Sidebar_regions_selected_items">
@@ -101,7 +114,7 @@ const SidebarRegionsSelected: React.FC = () => {
             {citiesExist
                 ?   <div className="Sidebar_regions_selected_category">
                         <span className="Sidebar_regions_selected_category_name">
-                            市区町村
+                            {SidebarRegSelectSet[locale].city}
                         </span>
 
                         <div className="Sidebar_regions_selected_items">
@@ -113,7 +126,7 @@ const SidebarRegionsSelected: React.FC = () => {
             {districtsExist
                 ?   <div className="Sidebar_regions_selected_category">
                         <span className="Sidebar_regions_selected_category_name">
-                            地区
+                            {SidebarRegSelectSet[locale].district}
                         </span>
 
                         <div className="Sidebar_regions_selected_items">

@@ -1,9 +1,10 @@
 .Sidebar_regions_item {
     display: grid;
-    grid-template-columns: auto 2rem;
+    grid-template-columns: auto 1.2rem;
     grid-template-rows: 100%;
-    min-height: 1.5rem;
-    max-height: 1.5rem;
+    column-gap: 0.3rem;
+    min-height: 1.2rem;
+    max-height: 1.2rem;
     margin-bottom: 0.5rem;
     animation-name: slide-down;
     animation-fill-mode: forwards;
@@ -29,12 +30,13 @@
     grid-row: 1 / 2;
     border: none;
     background: none;
+    padding-right: 0.25rem;
     color: var(--options-font-inactive);
     font-family: "Hina Mincho", serif;
     font-weight: 400;
-    font-size: 1.3rem;
+    font-size: 1.2rem;
     text-align: end;
-    align-self: end;
+    align-self: center;
     cursor: zoom-in;
     text-decoration-line: underline;
     text-decoration-style: dotted;
@@ -74,6 +76,8 @@
         text-decoration-color: var(--extra-highlight);
     }
 }
+
+
 
 /* Grey-out items that aren't in the data set (passive filtering) */
 .Sidebar_regions_item_name.unavailable {
@@ -121,7 +125,7 @@
     opacity: 0.7;
     justify-self: right;
     align-self: center;
-    border: double 3px var(--options-font-inactive);
+    border: double 0.2rem var(--options-font-inactive);
     transition: background-color 300ms;
     cursor: pointer;
 }
@@ -136,4 +140,60 @@
     ~ .Sidebar_regions_item_checkbox_overlay:hover {
         background-color: #cdcdcd;
         transition: background-color 300ms;
+}
+
+
+.Sidebar_regions_item.en {
+}
+
+
+/* ----------------------------------
+            Media queries
+-----------------------------------*/
+@media screen and (orientation: landscape) 
+  and (max-width: 5000px) {
+}
+.Sidebar_regions_item.screen_4k {
+}
+
+
+
+@media screen and (orientation: landscape) 
+  and (max-width: 2800px) {
+   
+}
+.Sidebar_regions_item.screen_1440 {
+}
+
+
+
+@media screen and (orientation: landscape) 
+  and (max-width: 2000px) {
+
+}
+.Sidebar_regions_item.screen_1080 {
+}
+
+
+
+
+@media screen and (orientation: landscape) 
+  and (max-width: 1700px) {
+
+}
+.Sidebar_regions_item.portable_hd_land {
+}
+
+
+
+.Sidebar_regions_item.portable_hd_port {
+}
+
+
+
+@media screen and (orientation: portrait) {
+
+}
+.Sidebar_regions_item.portrait {
+
 }

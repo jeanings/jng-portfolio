@@ -6,6 +6,7 @@ import menuApiReducer from './slices/menuApiSlice';
 import slidersReducer from './slices/slidersSlice';
 import dataReducer from './slices/dataSlice';
 import mapReducer from './slices/mapSlice';
+import languageReducer from './slices/languageSlice';
 
 
 
@@ -17,7 +18,8 @@ export const store = configureStore({
     menuApi: menuApiReducer,
     sliders: slidersReducer,
     data: dataReducer,
-    map: mapReducer
+    map: mapReducer,
+    language: languageReducer
   }
 });
 
