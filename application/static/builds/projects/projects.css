@@ -169,9 +169,9 @@ body {
                             .projects_timeline_grid_year_axes_apr_jul,
                             .projects_timeline_grid_year_axes_jul_oct,
                             .projects_timeline_grid_year_axes_oct_dec {
-                                border-top: var(--color-gridlines-minor) dotted 1px;
-                                border-bottom: var(--color-gridlines-major) dashed 1px;
-                                border-left: var(--color-gridlines-major) dashed 1px;
+                                border-top: var(--color-gridlines-minor) dotted 0.06rem;
+                                border-bottom: var(--color-gridlines-major) dashed 0.06rem;
+                                border-left: var(--color-gridlines-major) dashed 0.06rem;
                             }
 
                             .row1,
@@ -181,7 +181,7 @@ body {
                                 display: grid;
                                 grid-template-columns: repeat(3, 1fr);
                                 grid-template-rows: 100%;
-                                border-bottom: var(--color-gridlines-minor) dotted 1px;
+                                border-bottom: var(--color-gridlines-minor) dotted 0.06rem;
                             }
 
                             .row4 {
@@ -190,7 +190,7 @@ body {
 
                             .col1,
                             .col2 {
-                                border-right: var(--color-gridlines-minor) dotted 1px;
+                                border-right: var(--color-gridlines-minor) dotted 0.06rem;
                             }
 
             .projects_content {
@@ -226,7 +226,7 @@ body {
                     grid-column: 1 / 2;
                     grid-row: 1;
                     margin-bottom: 1rem;
-                    outline: transparent 0px solid;
+                    outline: transparent 0rem solid;
                     outline-offset: 0.5rem;
                     transition: all 500ms ease-in-out;
                 }
@@ -235,7 +235,7 @@ body {
                     grid-column: 2 / -1;
                     grid-row: 1;
                     margin-bottom: 1rem;
-                    outline: transparent 0px solid;
+                    outline: transparent 0rem solid;
                     outline-offset: 0.5rem;
                     transition: all 500ms ease-in-out;
                 }

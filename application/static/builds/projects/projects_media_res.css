@@ -1,0 +1,307 @@
+/* ----------------------------------------------------------------- */
+/*              Landscape view - 3840x2160, high-res                 */
+/* ----------------------------------------------------------------- */
+@media screen and (orientation: landscape) 
+    /* and (-webkit-min-device-pixel-ratio: 1.5)  */
+    and (max-width: 5000px) {
+    
+}
+
+
+/* ----------------------------------------------------------------- */
+/*            Landscape view - 2560x1440 plus, high-res              */
+/* ----------------------------------------------------------------- */
+@media screen and (orientation: landscape) 
+    /* and (-webkit-min-device-pixel-ratio: 1.5)  */
+    and (max-width: 2800px) {
+
+}
+
+
+/* ----------------------------------------------------------------- */
+/*            Landscape view - 1920x1080 standard                    */
+/* ----------------------------------------------------------------- */
+@media screen and (orientation: landscape) 
+    /* and (-webkit-min-device-pixel-ratio: 1.5)  */
+    and (max-width: 2000px) {
+
+}
+
+
+/* ----------------------------------------------------------------- */
+/*                Landscape view - under 1920x1080                   */
+/* ----------------------------------------------------------------- */
+@media screen and (orientation: landscape) 
+    /* and (-webkit-min-device-pixel-ratio: 1.5) */
+    and (max-width: 1800px) {
+
+    .projects {
+        padding-left: 2rem;
+        padding-right: 2rem;
+    }
+}
+
+
+/* ----------------------------------------------------------------- */
+/*                Landscape view - tablets, notebooks                */
+/* ----------------------------------------------------------------- */
+@media screen and (orientation: landscape) 
+    /* and (-webkit-min-device-pixel-ratio: 1.5) */
+    and (max-width: 1600px) {
+
+    .projects {
+        padding-left: 2rem;
+        padding-right: 2rem;
+    }
+}
+
+
+/* ----------------------------------------------------------------- */
+/*                Landscape view - mobile devices                    */
+/* ----------------------------------------------------------------- */
+@media screen and (orientation: landscape) 
+    /* and (-webkit-min-device-pixel-ratio: 1.5) */
+    and (max-width: 1200px) {
+
+    .projects {
+        padding-left: 2rem;
+        padding-right: 2rem;
+    }
+}
+
+
+/* ----------------------------------------------------------------- */
+/*                      Portrait view - general                      */
+/* ----------------------------------------------------------------- */
+@media screen and (orientation: portrait) {
+    .projects_content {
+        grid-template-columns: 100%;
+        grid-template-rows: 50% 50%;
+        row-gap: 3rem;
+    }
+
+        .projects_content_main_frame,
+        .projects_content_main {
+            grid-column: 1;
+            grid-row: 1 / 2;
+        }
+
+        .projects_content_sub_frame,
+        .projects_content_sub {
+            grid-column: 1;
+            grid-row: 2 / -1;
+        }
+}
+
+
+/* ----------------------------------------------------------------- */
+/*                Portrait view - high-res tablets                   */
+/* ----------------------------------------------------------------- */
+@media screen
+    and (-webkit-min-device-pixel-ratio: 1.5) 
+    and (max-width: 1200px) {
+
+    .projects {
+        padding-left: 2rem;
+        padding-right: 2rem;
+        grid-template-rows: 30% 70%;
+    }
+
+        .projects_timeline_grid_year_title {
+            writing-mode: vertical-lr;
+        }
+
+        .projects_timeline_grid_year {
+            grid-template-rows: 6.5rem;
+        }
+
+        .projects_content {
+            grid-template-columns: 100%;
+            grid-template-rows: 50% 50%;
+            row-gap: 3rem;
+        }
+
+            .projects_content_main_frame,
+            .projects_content_main {
+                grid-column: 1;
+                grid-row: 1 / 2;
+            }
+
+            .projects_content_sub_frame,
+            .projects_content_sub {
+                grid-column: 1;
+                grid-row: 2 / -1;
+            }
+
+                .projects_content_main_info_container, 
+                .projects_content_sub_info_container {
+                    row-gap: 1.5rem;
+                }
+
+                .projects_content_main_info_item, 
+                .projects_content_sub_info_item {
+                    grid-template-columns: 100%;
+                    grid-template-rows: 1.5rem auto;
+                    row-gap: 0.75rem;
+                }
+
+                    .projects_content_main_label,
+                    .projects_content_sub_label {
+                        grid-column: 1;
+                        grid-row: 1 / 2;
+                    }
+
+                    .projects_content_main_text,
+                    .projects_content_sub_text {
+                        grid-column: 1;
+                        grid-row: 2 / -1;
+                    }
+
+                        #projects_content_main_info_item_components button,
+                        #projects_content_sub_info_item_componentOf button {
+                            align-self: flex-start;
+                            text-align: left;
+                        }
+}
+
+
+/* ----------------------------------------------------------------- */
+/*               Portrait view - non-mobile screens                  */
+/* ----------------------------------------------------------------- */
+@media screen and (orientation: portrait)
+    /* and (-webkit-min-device-pixel-ratio: 1.5)  */
+    and (max-width: 1200px) {
+
+    .projects {
+        padding-left: 2rem;
+        padding-right: 2rem;
+        grid-template-rows: 30% 70%;
+    }
+
+        .projects_timeline_grid_year_title {
+            writing-mode: vertical-lr;
+        }
+
+        .projects_timeline_grid_year {
+            grid-template-rows: 6.5rem;
+        }
+
+        .projects_content {
+            grid-template-columns: 100%;
+            grid-template-rows: 50% 50%;
+            row-gap: 3rem;
+        }
+
+            .projects_content_main_frame,
+            .projects_content_main {
+                grid-column: 1;
+                grid-row: 1 / 2;
+            }
+
+            .projects_content_sub_frame,
+            .projects_content_sub {
+                grid-column: 1;
+                grid-row: 2 / -1;
+            }
+
+                .projects_content_main_info_container, 
+                .projects_content_sub_info_container {
+                    row-gap: 1.5rem;
+                }
+
+                .projects_content_main_info_item, 
+                .projects_content_sub_info_item {
+                    grid-template-columns: 100%;
+                    grid-template-rows: 1.5rem auto;
+                    row-gap: 0.75rem;
+                }
+
+                    .projects_content_main_label,
+                    .projects_content_sub_label {
+                        grid-column: 1;
+                        grid-row: 1 / 2;
+                    }
+
+                    .projects_content_main_text,
+                    .projects_content_sub_text {
+                        grid-column: 1;
+                        grid-row: 2 / -1;
+                    }
+
+                        #projects_content_main_info_item_components button,
+                        #projects_content_sub_info_item_componentOf button {
+                            align-self: flex-start;
+                            text-align: left;
+                        }
+}
+
+
+/* ----------------------------------------------------------------- */
+/*                 Portrait view - mobile devices                    */
+/* ----------------------------------------------------------------- */
+@media screen and (orientation: portrait) 
+    and (-webkit-min-device-pixel-ratio: 1.5) 
+    and (max-width: 600px) {
+
+    .projects {
+        padding-left: 2rem;
+        padding-right: 2rem;
+        grid-template-rows: 35% 65%;
+    }
+
+        .projects_timeline_grid_year_title {
+            writing-mode: vertical-lr;
+        }
+
+        .projects_timeline_grid_year {
+            grid-template-rows: 5rem;
+        }
+
+        .projects_content {
+            grid-template-columns: 100%;
+            grid-template-rows: 50% 50%;
+            row-gap: 3rem;
+        }
+
+            .projects_content_main_frame,
+            .projects_content_main {
+                grid-column: 1;
+                grid-row: 1 / 2;
+            }
+
+            .projects_content_sub_frame,
+            .projects_content_sub {
+                grid-column: 1;
+                grid-row: 2 / -1;
+            }
+
+                .projects_content_main_info_container, 
+                .projects_content_sub_info_container {
+                    row-gap: 1.5rem;
+                }
+
+                .projects_content_main_info_item, 
+                .projects_content_sub_info_item {
+                    grid-template-columns: 100%;
+                    grid-template-rows: 1.5rem auto;
+                    row-gap: 0.75rem;
+                }
+
+                    .projects_content_main_label,
+                    .projects_content_sub_label {
+                        grid-column: 1;
+                        grid-row: 1 / 2;
+                    }
+
+                    .projects_content_main_text,
+                    .projects_content_sub_text {
+                        grid-column: 1;
+                        grid-row: 2 / -1;
+                    }
+
+                        #projects_content_main_info_item_components button,
+                        #projects_content_sub_info_item_componentOf button {
+                            align-self: flex-start;
+                            text-align: left;
+                        }
+}                  
