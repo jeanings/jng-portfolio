@@ -24,9 +24,9 @@ def build_assets(app):
 
     css_bundle = Bundle(
                     'builds/style.css',
-                    'builds/media_res.css',
                     'builds/projects/projects.css',
-                    # 'builds/projects/projects_media_res.css',
+                    'builds/media_res.css',
+                    'builds/projects/projects_media_res.css',
                     filters=css_min,
                     output='dist/css/projects.css')
 

@@ -23,8 +23,8 @@
     display: grid;
     width: 100vw;
     height: 100vh;
-    grid-template-columns: repeat(3, 33%);
-    grid-template-rows: repeat(5, 20%);
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: repeat(4, 1fr);
     background: #312c2b;
     user-select: none;
     z-index: 100;
@@ -33,19 +33,20 @@
     #loading_image {
         grid-column: 2 / 3;
         grid-row: 2 / 3;
-        padding-left: 2.5rem;
-        justify-self: center;
+        display: flex;
+        justify-content: center;
         pointer-events: none;
     }
 
     #loading_text {
         grid-column: 2 / 3;
         grid-row: 3 / 4;
+        display: flex;
+        align-self: flex-start;
+        justify-content: center;
         font-family: 'Sansita Swashed', cursive;
-        font-size: 2.2rem;
+        font-size: 3rem;
         color: antiquewhite;
-        align-self: center;
-        justify-self: center;
     }
 
     .loading.fade {

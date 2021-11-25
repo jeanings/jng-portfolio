@@ -154,7 +154,7 @@ function fillGrid() {
 					Object.values(projectElements).forEach(elem => {
 						elem.classList.remove("hover");
 						mainContentFrame.style.outlineColor = 'transparent';
-						mainContentFrame.style.outlineWidth = '0px';
+						mainContentFrame.style.outlineWidth = '0rem';
 						mainContentContainer.style.opacity = 1;
 					});	
 				});
@@ -258,7 +258,7 @@ function fillGrid() {
 					Object.values(projectElements).forEach(elem => {
 						elem.classList.remove("hover");
 						subContentFrame.style.outlineColor = 'transparent';
-						subContentFrame.style.outlineWidth = '0px';
+						subContentFrame.style.outlineWidth = '0rem';
 						subContentContainer.style.opacity = 1;
 					});	
 				});

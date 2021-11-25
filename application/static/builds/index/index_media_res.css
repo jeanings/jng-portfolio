@@ -3,10 +3,6 @@
 /* ----------------------------------------------------------------- */
 @media screen and (orientation: portrait) {
 
-    :root {
-        --root-font-size: 14px;
-    }
-
     .container.show {
         display: grid;
         grid-template-columns: 50% 50%;
@@ -32,10 +28,6 @@
     /* and (-webkit-min-device-pixel-ratio: 1.5)  */
     and (min-width: 700px)
     and (max-width: 1200px) {
-
-    :root {
-        --root-font-size: 14px;
-    }
     
     .index_cityscape {
         width: 70%;
@@ -52,9 +44,6 @@
     and (min-width: 700px)
     and (max-width: 1200px) {
 
-    :root {
-        --root-font-size: 14px;
-    }
 }
 
 
@@ -64,10 +53,6 @@
 @media screen and (orientation: landscape) 
     and (-webkit-min-device-pixel-ratio: 1.5)
     and (max-width: 1800px) {
-    
-    :root {
-        --root-font-size: 14px;
-    }
 
     .index_cityscape {
         width: 70%;
@@ -81,10 +66,7 @@
 @media screen and (orientation: landscape) 
     /* and (-webkit-min-device-pixel-ratio: 1.5)  */
     and (min-width: 2400px) {
-        
-    :root {
-        --root-font-size: 24px;
-    }
+
 }
 
 
@@ -94,8 +76,5 @@
 @media screen and (orientation: landscape) 
     /* and (-webkit-min-device-pixel-ratio: 1.5)  */
     and (min-width: 3600px) {
-    
-    :root {
-        --root-font-size: 40px;
-    }
+
 }
