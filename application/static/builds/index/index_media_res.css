@@ -2,6 +2,11 @@
 /*                      Portrait view - general                      */
 /* ----------------------------------------------------------------- */
 @media screen and (orientation: portrait) {
+
+    :root {
+        --root-font-size: 14px;
+    }
+
     .container.show {
         display: grid;
         grid-template-columns: 50% 50%;
@@ -11,29 +16,11 @@
     .index_cityscape {
         width: 80%;
         height: 90vh;
-        margin-top: 3rem;
-        padding: 1rem;
+        padding: 2rem;
     }
 
     .index_about {
         padding: 20vh 10vw 20vh 10vw;
-    }
-
-    .index_about_text {
-        font-size: 1.25rem;
-    }
-
-    #index_about_text_first_letter {
-        font-size: 4.5rem;
-        margin-bottom: -1rem;
-    }
-    
-    #index_about_text_para1_tiny1 {
-        font-size: 1rem;
-    }
-
-    #index_about_text_para1_tiny2 {
-        font-size: 0.85rem;
     }
 }
 
@@ -45,11 +32,14 @@
     /* and (-webkit-min-device-pixel-ratio: 1.5)  */
     and (min-width: 700px)
     and (max-width: 1200px) {
+
+    :root {
+        --root-font-size: 14px;
+    }
     
     .index_cityscape {
         width: 70%;
-        margin-top: 3rem;
-        padding: 2.5rem;
+        padding: 3rem;
     }
 }
 
@@ -61,22 +51,10 @@
     and (-webkit-min-device-pixel-ratio: 1.5) 
     and (min-width: 700px)
     and (max-width: 1200px) {
-    
-    .index_about_text {
-        font-size: 2rem;
-    }
 
-    #index_about_text_first_letter {
-        font-size: 6rem;
+    :root {
+        --root-font-size: 14px;
     }
-
-    #index_about_text_para1_tiny1 {
-        font-size: 1.75rem;
-    }
-
-    #index_about_text_para1_tiny2 {
-        font-size: 1.5rem;
-    } 
 }
 
 
@@ -86,14 +64,13 @@
 @media screen and (orientation: landscape) 
     and (-webkit-min-device-pixel-ratio: 1.5)
     and (max-width: 1800px) {
+    
+    :root {
+        --root-font-size: 14px;
+    }
 
     .index_cityscape {
         width: 70%;
-        padding: 2rem;
-    }
-
-    .index_about {
-        padding: 24vh 12vw 20vh 12vw;
     }
 }
 
@@ -104,29 +81,9 @@
 @media screen and (orientation: landscape) 
     /* and (-webkit-min-device-pixel-ratio: 1.5)  */
     and (min-width: 2400px) {
-
-    .index_cityscape {
-        margin-top: 4rem;
-    }
-
-    .index_about_text {
-        row-gap: 4rem;
-        font-size: 3rem;
-    }
-
-    #index_about_text_first_letter {
-        font-size: 9.5rem;
-        margin-top: -2rem;
-        margin-bottom: -1rem;
-        margin-right: 1rem;
-    }
-    
-    #index_about_text_para1_tiny1 {
-        font-size: 2.75rem;
-    }
-
-    #index_about_text_para1_tiny2 {
-        font-size: 2.25rem;
+        
+    :root {
+        --root-font-size: 24px;
     }
 }
 
@@ -137,35 +94,8 @@
 @media screen and (orientation: landscape) 
     /* and (-webkit-min-device-pixel-ratio: 1.5)  */
     and (min-width: 3600px) {
- 
-    .index_cityscape {
-        margin-top: 6rem;
-        border: black double 12px;
-        padding: 9rem;
-        box-shadow: 2rem 2rem 3rem 0.5rem rgb(0 0 0 / 30%);
-    }
-
-    .index_cityscape_layers_bg {
-        box-shadow: 0.3rem 0.3rem 0.5rem rgb(0 0 0 / 30%) inset;
-    }
-
-    .index_about_text {
-        row-gap: 5rem;
-        font-size: 5rem;
-    }
-
-    #index_about_text_first_letter {
-        font-size: 15rem;
-        margin-top: -2.5rem;
-        margin-bottom: -2rem;
-        margin-right: 1rem;
-    }
     
-    #index_about_text_para1_tiny1 {
-        font-size: 4.25rem;
-    }
-
-    #index_about_text_para1_tiny2 {
-        font-size: 3.5rem;
+    :root {
+        --root-font-size: 40px;
     }
 }
