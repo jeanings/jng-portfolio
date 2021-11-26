@@ -66,7 +66,6 @@ const App: React.FC = () => {
 
     return (
         <div className={getMediaQueries(classBase, locale)}>
-            <Navbar />
             <Header />
             <Sidebar />
             <Dashboard />

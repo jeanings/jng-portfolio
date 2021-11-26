@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom';
 import { Provider } from 'react-redux';
 import './index.css';
 import App from './App';
+import Navbar from './components/Navbar';
 import { store } from './store';
 import * as serviceWorker from './serviceWorker';
 
@@ -20,6 +21,7 @@ export const fontMPlus = new FontFaceObserver('M PLUS 1p');         // sans-seri
 ReactDOM.render(
   <React.StrictMode>
     <Provider store={store}>
+      <Navbar />
       <App />
     </Provider>
   </React.StrictMode>,
