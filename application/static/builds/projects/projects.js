@@ -35,7 +35,11 @@ function fillGrid() {
 	/* -----------------------------------------------------
 		Fill in timeline grid with corresponding projects.
 	------------------------------------------------------*/
-	const styleSheet = document.styleSheets[0];
+	const newStyleSheet = document.createElement("style");
+	newStyleSheet.appendChild(document.createTextNode(''));
+	document.head.appendChild(newStyleSheet);
+	const newStyleSheetPos = Object.keys(document.styleSheets).length - 1;
+	const styleSheet = document.styleSheets[newStyleSheetPos];
 	const yearElementIdString = "projects_timeline_grid_year_";
 	const quarterElemMap = {
 		"Q1": ".projects_timeline_grid_year_axes_jan_apr",
