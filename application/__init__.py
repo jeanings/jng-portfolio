@@ -10,6 +10,12 @@ from config import Config
 db = SQLAlchemy()
 
 
+def error_404(e):
+  """ 404 error handler. """
+  return render_template('/error_404/templates/error_404.html', 
+    title="Oops, you're lost!  ——  jeanings.space"), 404
+
+
 def create_app():
     """ Initiate Flask application factory. """
     app = Flask(__name__)
@@ -21,8 +27,6 @@ def create_app():
     # Import blueprints, routes for application.
     with app.app_context():
         from .index import routes as index
-        from .resume import routes as resume
-        # from .error_404 import routes as error_404
         from .projects import routes as projects
         from .projects.gallery import routes as gallery
         from .projects.tokaido import routes as tokaido
@@ -32,13 +36,11 @@ def create_app():
         db.create_all()
 
         app.register_blueprint(index.index_bp)
-        app.register_blueprint(resume.resume_bp)
         app.register_blueprint(projects.projects_bp)
         app.register_blueprint(gallery.gallery_bp, url_prefix="/projects")
         app.register_blueprint(tokaido.tokaido_bp, url_prefix="/projects")
         app.register_blueprint(japan_real_estate_choropleth.japan_real_estate_choropleth_bp, url_prefix="/projects")
         app.register_blueprint(japan_real_estate_dashboard.japan_real_estate_dashboard_bp, url_prefix="/projects")
-        # app.register_blueprint(error404.error404_bp)
-        # app.register_error_handler(404, error_404)
+        app.register_error_handler(404, error_404)
 
         return app
