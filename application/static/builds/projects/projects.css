@@ -381,6 +381,10 @@ body {
                                 grid-template-columns: 15% 85%;
                                 grid-template-rows: 100%;
                             }
+
+                            #projects_content_main_info_item_url_text {
+                                display: grid;
+                            }
                             
                             #projects_content_main_info_item_components_text,
                             #projects_content_sub_info_item_components_text {
