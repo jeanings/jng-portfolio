@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta http-equiv="X-UA-Compatible" content="ie=edge">
+        {% include 'resume/script1.html' %}
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Raleway:wght@300;400&family=Space+Mono&family=Grenze:wght@200&family=Sansita+Swashed:wght@800&display=swap" rel="stylesheet">
+        <title>
+            {% block title %}{% endblock %}
+        </title>
+    </head>
+
+    <body>
+        <!-- <div class="loading">
+            <div id="loading_image">
+                <img src="https://storage.googleapis.com/jn-portfolio/misc/loading.gif" id="loading_image_dripper">
+            </div>
+            <h2 id="loading_text">Loading...</h2>
+        </div> -->
+
+        <div class="container">
+            <header class="header">
+                {% include "resume/nav.html" %}
+            </header>
+
+            {% block content %}        
+            {% endblock %}
+        </div>
+
+        {% include 'resume/script2.html' %}
+    </body>
+</html>
