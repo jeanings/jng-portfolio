@@ -288,7 +288,7 @@ function fillGrid() {
 			'main': {
 				'title': 'projects_content_main_header_title_text',
 				'git': 'projects_content_main_header_category_text_git',
-				'url': 'projects_content_main_info_item_url_text_url',
+				'url': 'projects_content_main_info_item_url_text',
 				'component': 'projects_content_main_info_item_components_text',
 				'date': 'projects_content_main_info_item_date_text',
 				'stack': 'projects_content_main_info_item_stack_text',
@@ -377,8 +377,28 @@ function fillGrid() {
 				gitElem.children[0].children[0].style.pointerEvents = 'none';
 			}
 
-			urlElem.textContent = project.url;
-			urlElem.href = project.url;
+			if (project.url) {
+				let newChildren = [];
+				Object.values(project.url).forEach(lang => {
+					if (Object.keys(lang).length !== 0 ) {
+						let itemText = lang.emoji.concat('  ', lang.address);
+						let url = lang.address;
+						let newElem = document.createElement('a');
+						let newElemText = document.createTextNode(itemText);
+
+						newElem.setAttribute('href', url);
+						newElem.setAttribute('target', '_blank');
+						newElem.appendChild(newElemText);
+						newChildren.push(newElem);
+						console.log(newElem);
+					}
+				});
+
+				// Replace set of children.
+				urlElem.replaceChildren(...newChildren);
+			}
+			
+
 			dateElem.innerHTML = Object.keys(project.year)[0].concat(' ', project.season);
 			textElem.innerHTML = project.objectives;
 			updateChildren(componentElem, componentKey, category);
@@ -393,7 +413,6 @@ function fillGrid() {
 				-------------------------------------- */
 				let newChildren = [];
 	
-
 				if (sectionKey == 'backend' || sectionKey == 'frontend') {
 					// For stack sections.
 					Object.entries(project.stack[sectionKey]).forEach(stackItem => {
