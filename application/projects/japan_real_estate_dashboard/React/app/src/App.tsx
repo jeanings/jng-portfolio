@@ -40,6 +40,12 @@ const App: React.FC = () => {
                     ? DEV_LANG  // set for dev
                     : 'jp'  // placeholder, ignore
 
+        if (locale === 'jp') {
+            document.getElementsByTagName('title')[0].textContent = "不動産取引価格比較ツール：　2010年～2020年  ——  jeanings.space";
+        } else if (locale === 'en') {
+            document.getElementsByTagName('title')[0].textContent = "Japan real estate transactions of 2010-2020  ——  jeanings.space";
+        }
+
         const languagePayload: object = {
             [locale]: true,
         };
