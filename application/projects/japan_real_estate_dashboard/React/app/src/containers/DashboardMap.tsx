@@ -33,7 +33,7 @@ const DashboardMap: React.FC = () => {
                 ? DEV_LANG      // set for dev
                 : 'jp';     // placeholder, ignore
     // Map defaults, refs.
-    mapboxgl.accessToken = DEV_MODE === 'True' ? process.env.REACT_APP_DEV_MAPBOX : process.env.REACT_APP_DEV_MODE;
+    mapboxgl.accessToken = DEV_MODE === 'True' ? process.env.REACT_APP_DEV_MAPBOX : process.env.REACT_APP_PROD_MAPBOX;
     const mapContainer = useRef(null);
     const map = useRef<mapboxgl.map | null>(null);
     var mapStyle: string = locale === 'en'
