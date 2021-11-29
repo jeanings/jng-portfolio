@@ -15,28 +15,10 @@ const Navbar: React.FC = () => {
 
 
     useEffect(() => {
-        handleMenuItems();
         menuToggle();
         blendToggleBackground();
     }, []);
   
-
-
-    function handleMenuItems() {
-        /* ------------------------------------------------------------------
-            Changes menu targets to 'top' if currently viewing target page.
-        ------------------------------------------------------------------ */
-        const currentPath = window.location.pathname;
-        const projectsLink = document.getElementById("Navbar_menu_list_item_projects")!;
-        const resumeLink = document.getElementById("Navbar_menu_list_item_resume")!;
-    
-    
-        if (currentPath === '/projects') {
-            projectsLink.setAttribute('onClick', 'window.location.href="/#"');
-        } else if (currentPath === '/resume') {
-            resumeLink.setAttribute('onClick', 'window.location.href="/#"');
-        }
-    }
       
       
     function menuToggle() {
@@ -90,7 +72,7 @@ const Navbar: React.FC = () => {
             Handle clicks to redirect to pages.
         -------------------------------------- */
         event.preventDefault();
-        const element = event.target.parentElement.id;
+        const element = event.target.id;
 
         if (element === "Navbar_menu_list_item_about")
             window.location.href = 'https://jeanings.space/#index_about';
