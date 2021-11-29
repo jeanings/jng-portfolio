@@ -716,46 +716,57 @@ const DashboardCharts: React.FC = () => {
             let dataSet: number = chart.data.datasets.length;
             const fontSize = getChartMediaQuery(viewportWidth, widthToFontSize) + 'px';
             const ySpacingMultiple = getChartMediaQuery(viewportWidth, widthToLineSpacing);
+            const preferredFont: string = "'Hina Mincho', serif";
+            const fallbackFont: string = "'Meiryo'";
 
             // Require notification text to load first.
             fontHinaMincho.load(null, 4000)
                 .then(function() {
-                    if (dataSet === 0) {
-                        let ctx = chart.ctx;
-                        ctx.save();
-
-                        // Canvas drawing styling.
-                        const xInitial: number = chart.width / 6;
-                        const xMax: number = chart.width / 1.2;
-                        const yInitial: number = chart.height / 4.20;
-                        
-
-                        ctx.textAlign = 'start';
-                        ctx.textBaseline = 'middle';
-                        ctx.fillStyle = '#828a81';
-                        // 'M PLUS 1p', san-serif    // too clinical
-                        // 'Kaisei Opti', serif      // too bold
-                        ctx.font = fontSize.concat("'Hina Mincho', serif");
-
-                        const lines: Array<string> = DashboardChartsSet[locale].noDataNotify;
-
-                        // Draw text lines.
-                        lines.forEach((line: string, index:number) => {
-                            const ySpacing: number = yInitial + index * ySpacingMultiple;
-
-                            ctx.fillText(
-                                line,                                   // text
-                                xInitial,                               // x position
-                                index === 0 ? yInitial : ySpacing,      // y position
-                                xMax                                    // x constraint
-                            );
-                        });
-
-                        ctx.restore();
-                    }
+                    drawGraph(preferredFont);
                 }, function() {
-                    console.error("Charts no-data fill text font 'Hina Mincho' downloading timed out.");
+                    console.error("'Hina Mincho' font download timed out.  Using fallback 'Meiryo'.");
+                    drawGraph(fallbackFont);
                 });
+
+            
+            function drawGraph(fontStr: string) {
+                /* ---------------------------------------
+                    Helper: draws graph with preset text.
+                --------------------------------------- */
+                if (dataSet === 0) {
+                    let ctx = chart.ctx;
+                    ctx.save();
+
+                    // Canvas drawing styling.
+                    const xInitial: number = chart.width / 6;
+                    const xMax: number = chart.width / 1.2;
+                    const yInitial: number = chart.height / 4.20;
+                    
+
+                    ctx.textAlign = 'start';
+                    ctx.textBaseline = 'middle';
+                    ctx.fillStyle = '#828a81';
+                    // 'M PLUS 1p', san-serif    // too clinical
+                    // 'Kaisei Opti', serif      // too bold
+                    ctx.font = fontSize.concat(fontStr);
+
+                    const lines: Array<string> = DashboardChartsSet[locale].noDataNotify;
+
+                    // Draw text lines.
+                    lines.forEach((line: string, index:number) => {
+                        const ySpacing: number = yInitial + index * ySpacingMultiple;
+
+                        ctx.fillText(
+                            line,                                   // text
+                            xInitial,                               // x position
+                            index === 0 ? yInitial : ySpacing,      // y position
+                            xMax                                    // x constraint
+                        );
+                    });
+
+                    ctx.restore();
+                }
+            }
         }
     }
 
