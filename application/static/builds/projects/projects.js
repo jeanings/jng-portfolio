@@ -407,7 +407,7 @@ function fillGrid() {
 			updateChildren(componentElem, componentKey, category);
 			updateChildren(backendElem, 'backend', category);
 			updateChildren(frontendElem, 'frontend', category);
-
+			document.getElementById(gitElem.id).scrollIntoView();
 	
 			function updateChildren(sectionElem, sectionKey, category) {
 				/* --------------------------------------
