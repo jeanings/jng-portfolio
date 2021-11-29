@@ -4,7 +4,7 @@ import menuLevelReducer from './slices/menuLevelSlice';
 import menuStoreReducer from './slices/menuStoreSlice';
 import menuApiReducer from './slices/menuApiSlice';
 import slidersReducer from './slices/slidersSlice';
-import dataReducer from './slices/dataSlice';
+import dataApiReducer from './slices/dataApiSlice';
 import mapReducer from './slices/mapSlice';
 import languageReducer from './slices/languageSlice';
 
@@ -17,7 +17,7 @@ export const store = configureStore({
     menuStore: menuStoreReducer,
     menuApi: menuApiReducer,
     sliders: slidersReducer,
-    data: dataReducer,
+    dataApi: dataApiReducer,
     map: mapReducer,
     language: languageReducer
   }

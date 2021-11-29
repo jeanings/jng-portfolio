@@ -12,11 +12,11 @@ import './CreateRegion.css';
 const CreateRegion: React.FC<CreateRegionProps> = (props: CreateRegionProps) => {
     /* -------------------------------------------------------------------------------
         Creates individual region's clickable name-button and checkboxes.
-        Subscribes to {data}, {menuApi}, {menuLevel}, {selection}, {language} states.
+        Subscribes to {dataApi}, {menuApi}, {menuLevel}, {selection}, {language} states.
     ------------------------------------------------------------------------------- */
     // Dispatch, selector hooks.
     const dispatch = useAppDispatch();
-    const dataState = useAppSelector(state => state.data);
+    const dataState = useAppSelector(state => state.dataApi);
     const menuApiState = useAppSelector(state => state.menuApi);
     const menuLevelState = useAppSelector(state => state.menuLevel);
     const selectionState = useAppSelector(state => state.selection.selected);

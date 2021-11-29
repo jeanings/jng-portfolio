@@ -97,7 +97,7 @@
         -moz-user-select: none; /* Old versions of Firefox */
         -ms-user-select: none; /* Internet Explorer/Edge */
         transition: all 300ms ease-in-out;
-        z-index: 1;
+        z-index: 15;
     }
 
         .header_menu.toggle {
@@ -148,6 +148,7 @@
                     color: var(--color-text);
                     text-decoration: none;
                     transition: all 300ms ease-in-out;
+                    pointer-events: none;
                 }
 
                     .header_menu_list_name:visited {

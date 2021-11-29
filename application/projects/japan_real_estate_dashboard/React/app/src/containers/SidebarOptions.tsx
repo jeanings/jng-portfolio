@@ -1,7 +1,7 @@
 import React, { useEffect, useRef } from 'react';
 import { useAppDispatch, useAppSelector } from '../hooks';
 import { handleSliders } from '../slices/slidersSlice';
-import { handleRawInput, mongoDbFetchData, MongoDbDataFetchProps } from '../slices/dataSlice';
+import { handleRawInput, mongoDbFetchData, MongoDbDataApiFetchProps } from '../slices/dataApiSlice';
 import { clearAllSelections } from '../slices/selectionSlice';
 import { SidebarOptSet } from '../imports/languageSet';
 import { getMediaQueries } from '../App';
@@ -17,7 +17,7 @@ const SidebarOptions: React.FC = () => {
     // Dispatch, selector hooks.
     const dispatch = useAppDispatch();
     const slidersState = useAppSelector(state => state.sliders);
-    const dataState = useAppSelector(state => state.data);
+    const dataState = useAppSelector(state => state.dataApi);
     const languageState = useAppSelector(state => state.language);
     const locale = languageState.en === true ? 'en' : 'jp';
     // Submission tab-switch timeout ref.
@@ -130,7 +130,7 @@ const SidebarOptions: React.FC = () => {
         // Send to MongoDB thunk to get housing data, if not already retrieved.
         if (keyExists(collection, dataState.collections) == true) {
             if (keyExists(options, dataState.collections[collection]) == false) {
-                let mongoDbRequest: MongoDbDataFetchProps = {
+                let mongoDbRequest: MongoDbDataApiFetchProps = {
                     'lang': locale,
                     'collection': collection,
                     'options': options
@@ -141,7 +141,7 @@ const SidebarOptions: React.FC = () => {
                 // console.log("Reusing existing data -->", collection, options);
             }
         } else {
-            let mongoDbRequest: MongoDbDataFetchProps = {
+            let mongoDbRequest: MongoDbDataApiFetchProps = {
                 'lang': locale,
                 'collection': collection,
                 'options': options
