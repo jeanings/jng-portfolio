@@ -3,15 +3,18 @@
         Changes menu targets to 'top' if currently viewing target page.
     ------------------------------------------------------------------ */
     const currentPath = window.location.pathname;
+    const aboutLink = document.getElementById("header_menu_list_item_about");
     const projectsLink = document.getElementById("header_menu_list_item_projects");
     const resumeLink = document.getElementById("header_menu_list_item_resume");
 
 
-    if (currentPath === '/projects') {
-        projectsLink.setAttribute('onClick', 'window.location.href="/#"');
-    } else if (currentPath === '/resume') {
-        resumeLink.setAttribute('onClick', 'window.location.href="/#"');
-    }
+    if (currentPath === '/' || currentPath === '/#index_about') {
+        aboutLink.setAttribute('onClick', 'window.location.href="/#index_about"');
+    } else if (currentPath === '/projects' || currentPath === '/projects#top') {
+        projectsLink.setAttribute('onClick', 'window.location.href="/projects#top"');
+    } else if (currentPath === '/resume/' || currentPath === '/resume#top') {
+        resumeLink.setAttribute('onClick', 'window.location.href="/resume#top"');
+    } 
 })();
   
   

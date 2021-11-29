@@ -148,6 +148,7 @@
                     color: var(--color-text);
                     text-decoration: none;
                     transition: all 300ms ease-in-out;
+                    pointer-events: none;
                 }
 
                     .header_menu_list_name:visited {
