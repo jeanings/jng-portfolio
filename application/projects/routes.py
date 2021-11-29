@@ -41,6 +41,7 @@ collection_sub = db['sub']
 
 # Projects route.
 @projects_bp.route("/projects", methods=['GET'])
+@projects_bp.route("/projects/", methods=['GET'])
 def projects():
     main_projects = []
     sub_projects = []
