@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useAppDispatch, useAppSelector } from '../hooks';
 import { handleLevelStore, handleStoreRemoval } from '../slices/menuStoreSlice';
 import { handleRenderDirection, handleMenuLevelRemoval } from '../slices/menuLevelSlice';
@@ -6,7 +6,7 @@ import { v4 as uuidv4 } from 'uuid';
 import CreateRegion from './CreateRegion';
 import SidebarRegionsSelected from './SidebarRegionsSelected';
 import { SidebarRegSet } from '../imports/languageSet';
-import { getMediaQueries } from '../App';
+import { DEV_MODE, getMediaQueries } from '../App';
 import './SidebarRegions.css';
 
 
@@ -18,13 +18,14 @@ const SidebarRegions: React.FC = () => {
         - Clicks on region items zoom into region, both in the menu and on map.
         - Select/deselect on checkboxes adds/removes region from selection state.
             - Adds/removes data from charts.
-        Subscribes to {menuStore}, {menuLevel}, {menuApi} states.
+        Subscribes to {menuStore}, {menuLevel}, {menuApi}, {dataApi} states.
     ---------------------------------------------------------------------------- */
     // Dispatch, selector hooks.
     const dispatch = useAppDispatch();
     const menuStoreState = useAppSelector(state => state.menuStore);
     const menuLevelState = useAppSelector(state => state.menuLevel);
     const menuApiState = useAppSelector(state => state.menuApi);
+    const dataApiState = useAppSelector(state => state.dataApi);
     const languageState = useAppSelector(state => state.language);
     const locale = languageState.en === true ? 'en' : 'jp';
     // Level-related variables.
@@ -38,7 +39,7 @@ const SidebarRegions: React.FC = () => {
         'level 1': 'prefectures',
         'level 2': 'cities',
         'level 3': 'districts'
-    }
+    };
     const nextCategory: string = categories[nextLevel];    
     let menu: Array<JSX.Element> = [];
     let prevElementKey: string;
@@ -52,6 +53,36 @@ const SidebarRegions: React.FC = () => {
             : 'level' + ' ' + (renderedLength);
         prevElemPropsList = menuStoreState.rendered[prevElementKey];
     }
+
+
+    useEffect(() => {
+        /* ------------------------------------------------------------
+            Provide message about no data on selected filter options.
+            Give suggestion on options for available data.
+        ------------------------------------------------------------ */
+        const collection: string = dataApiState.currentOptions.collection;
+        const options: string = dataApiState.currentOptions.options;
+        const notifyElem = document.getElementsByClassName("Sidebar_regions_notify")[0];
+
+        try {
+            let request = dataApiState.collections[collection][options];
+            
+            if (request === undefined) {
+                // Notify user about unavailable data.
+                console.log('no data', request);
+
+                notifyElem.classList.add("show");
+            } else if (request) {
+                notifyElem.classList.remove("show");
+            }
+        } catch (TypeError) {
+            if (DEV_MODE)
+                console.log("No data from API call: initial render.");
+        }
+
+
+    }, [dataApiState]);
+
 
     // Create list of JSX elements for region items.
     if (menuApiState.status === 'successful'
@@ -227,6 +258,44 @@ const SidebarRegions: React.FC = () => {
                 <div className={getMediaQueries(classBase.concat('_list_menu'), locale)}>
                     {menu}
                 </div>
+            </div>
+
+            <div className={getMediaQueries(classBase.concat('_notify'), locale)}>
+                <span className={getMediaQueries(classBase.concat('_notify_note'), locale)}>
+                    {SidebarRegSet[locale].noDataNotify.note}
+                </span>
+                <ul className={getMediaQueries(classBase.concat('_notify_rec'), locale)}
+                    id="Sidebar_regions_notify_rec_house">
+                    {SidebarRegSet[locale].noDataNotify.houseRec.type}
+                    <li className={getMediaQueries(classBase.concat('_notify_rec_item'), locale)}>
+                        {SidebarRegSet[locale].noDataNotify.houseRec.material}
+                    </li>
+                    <li className={getMediaQueries(classBase.concat('_notify_rec_item'), locale)}>
+                        {SidebarRegSet[locale].noDataNotify.houseRec.station}
+                    </li>
+                    <li className={getMediaQueries(classBase.concat('_notify_rec_item'), locale)}>
+                        {SidebarRegSet[locale].noDataNotify.houseRec.age}
+                    </li>
+                    <li className={getMediaQueries(classBase.concat('_notify_rec_item'), locale)}>
+                        {SidebarRegSet[locale].noDataNotify.houseRec.area}
+                    </li>
+                </ul>
+                <ul className={getMediaQueries(classBase.concat('_notify_rec'), locale)}
+                    id="Sidebar_regions_notify_rec_condo">
+                    {SidebarRegSet[locale].noDataNotify.condoRec.type}
+                    <li className={getMediaQueries(classBase.concat('_notify_rec_item'), locale)}>
+                        {SidebarRegSet[locale].noDataNotify.condoRec.material}
+                    </li>
+                    <li className={getMediaQueries(classBase.concat('_notify_rec_item'), locale)}>
+                        {SidebarRegSet[locale].noDataNotify.condoRec.station}
+                    </li>
+                    <li className={getMediaQueries(classBase.concat('_notify_rec_item'), locale)}>
+                        {SidebarRegSet[locale].noDataNotify.condoRec.age}
+                    </li>
+                    <li className={getMediaQueries(classBase.concat('_notify_rec_item'), locale)}>
+                        {SidebarRegSet[locale].noDataNotify.condoRec.area}
+                    </li>
+                </ul>
             </div>
         </form>
     );

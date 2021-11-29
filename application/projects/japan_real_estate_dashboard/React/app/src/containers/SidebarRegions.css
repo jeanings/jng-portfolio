@@ -135,6 +135,42 @@
     padding-right: 1rem;
 }
 
+.Sidebar_regions_notify {
+    grid-row: 3 / -1;
+    display: none;
+    grid-template-columns: 100%;
+    grid-template-rows: auto;
+    padding-left: 1rem;
+    padding-right: 1rem;
+    font-size: 0.9rem;
+    color: var(--options-font-inactive);
+    align-items: flex-start;
+    text-align: center;
+    opacity: 0;
+    user-select: none;
+}
+
+    .Sidebar_regions_notify.show {
+        display: grid;
+        opacity: 1;
+    }
+
+        .Sidebar_regions_notify_note {
+            grid-column: 1 / -1;
+            grid-row: 1 / 2;
+        }
+
+        .Sidebar_regions_notify_rec {
+            grid-column: 1 / -1;
+            display: grid;
+            justify-items: start;
+            list-style-position: inside;
+            list-style-type: square;
+            font-size: 0.80rem;
+            justify-items: start;
+            padding-left: 1.5rem;
+        }
+
 
 .Sidebar_regions.en {
 }
