@@ -14,8 +14,8 @@ export const mongoDbFetchData = createAsyncThunk(
     /* ---------------------------------------------------------------
         Async thunk for fetching sales data based on chosen options.
     --------------------------------------------------------------- */
-    'data/fetchData',
-    async (requestParam: MongoDbDataFetchProps) => {// requestParam from SidebarOptions' dispatched action.
+    'dataApi/fetchData',
+    async (requestParam: MongoDbDataApiFetchProps) => {// requestParam from SidebarOptions' dispatched action.
         const apiUrl: string = DEV_MODE === 'True'
             ? process.env.REACT_APP_API_DATA_DEV!
             : process.env.REACT_APP_API_DATA!;
@@ -51,7 +51,7 @@ export const fetchData = (apiUrl: string, requestParam: object) => {
 
 
 // State for initial render.
-const initialState: DataProps = {
+const initialState: DataApiProps = {
     currentOptions: {
         collection: '',
         options: '',
@@ -67,11 +67,11 @@ const initialState: DataProps = {
 }
 
 
-const dataSlice = createSlice({
+const dataApiSlice = createSlice({
     /* ----------------------------------------------
         Slice that handles updates to {data} state.
     ---------------------------------------------- */
-    name: 'data',
+    name: 'dataApi',
     initialState,
     reducers: {
         handleRawInput: (state, action) => {
@@ -136,7 +136,7 @@ const dataSlice = createSlice({
 
 
 // Types setting.
-export interface DataProps {
+export interface DataApiProps {
     [index: string]: string | any,
     currentOptions: CurrentProps,
     collections: {
@@ -158,7 +158,7 @@ type CurrentProps = {
     }
 }
 
-export type MongoDbDataFetchProps = {
+export type MongoDbDataApiFetchProps = {
     [index: string]: string | any,
     lang: 'en' | 'jp',
     collection: string,
@@ -166,10 +166,10 @@ export type MongoDbDataFetchProps = {
 }
 
 
-// Selector for menu state.
-export const selectData = (state: RootState) => state.data; 
+// Selector for data api state.
+export const selectDataApi = (state: RootState) => state.dataApi; 
 
 // Export actions, reducers.
-const { actions, reducer } = dataSlice;
+const { actions, reducer } = dataApiSlice;
 export const { handleRawInput } = actions;
 export default reducer;

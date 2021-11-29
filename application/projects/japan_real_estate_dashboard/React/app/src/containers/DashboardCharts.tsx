@@ -26,7 +26,7 @@ const DashboardCharts: React.FC = () => {
     -------------------------------------------------------------------------- */
     // Dispatch, selector hooks.
     const selectState = useAppSelector(state => state.selection);
-    const dataState = useAppSelector(state => state.data);
+    const dataState = useAppSelector(state => state.dataApi);
     // Chart refs.
     const refLineChartContainer = useRef<any>(null);
     const refLineChart = useRef<any>(null);

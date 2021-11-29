@@ -107,13 +107,47 @@ export const SidebarRegSet = {
         'backBtn': {
             'generalReg': 'regions',
             'toReturn': 'Return to'
-        } 
+        },
+        'noDataNotify': {
+            'note': 'No data found for requested options. Please give these a try:',
+            'houseRec': {
+                'type': 'detached house',
+                'material': 'wooden', 
+                'station': 'under 15min', 
+                'age': '1980~1990', 
+                'area': '120~130m²'
+            },
+            'condoRec': {
+                'type': 'apartment',
+                'material': 'rebar concrete',
+                'station': 'under 15min',
+                'age': '2000~2010',
+                'area': '90~100m²'
+            }
+        }
     },
     'jp': {
         'backBtn': {
             'generalReg': '地域全体',
             'toReturn': 'に戻る'
-        } 
+        },
+        'noDataNotify': {
+            'note': '申し訳ありませんが、その条件のデータは存在しませんでした。ぜひ以下の条件を試してみてください。',
+            'houseRec': {
+                'type': '一戸建て',
+                'material': '木造', 
+                'station': '15分以下', 
+                'age': '1980～1990年', 
+                'area': '120～130m²'
+            },
+            'condoRec': {
+                'type': 'マンション',
+                'material': '鉄筋コンクリート造',
+                'station': '15分以下',
+                'age': '2000～2010年',
+                'area': '90～100m²'
+            }
+        }
     }
 };
 

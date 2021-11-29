@@ -3,7 +3,7 @@ import { useAppDispatch, useAppSelector } from '../hooks';
 import { handleBoundsUpdate, mapboxFetchGeo } from '../slices/mapSlice';
 import { regionCoords } from '../imports/regionCoords';
 import { LocaleProps } from '../slices/languageSlice';
-import { DEV_LANG, getMediaQueries  } from '../App';
+import { DEV_MODE, DEV_LANG, getMediaQueries  } from '../App';
 // @ts-ignore
 import mapboxgl from 'mapbox-gl'; 
 import 'mapbox-gl/dist/mapbox-gl.css';
@@ -33,7 +33,7 @@ const DashboardMap: React.FC = () => {
                 ? DEV_LANG      // set for dev
                 : 'jp';     // placeholder, ignore
     // Map defaults, refs.
-    mapboxgl.accessToken = process.env.REACT_APP_DEV_MAPBOX;
+    mapboxgl.accessToken = DEV_MODE === 'True' ? process.env.REACT_APP_DEV_MAPBOX : process.env.REACT_APP_DEV_MODE;
     const mapContainer = useRef(null);
     const map = useRef<mapboxgl.map | null>(null);
     var mapStyle: string = locale === 'en'
