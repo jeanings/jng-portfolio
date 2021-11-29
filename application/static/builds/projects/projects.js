@@ -394,7 +394,6 @@ function fillGrid() {
 						newElem.setAttribute('target', '_blank');
 						newElem.appendChild(newElemText);
 						newChildren.push(newElem);
-						console.log(newElem);
 					}
 				});
 
@@ -409,7 +408,6 @@ function fillGrid() {
 			updateChildren(backendElem, 'backend', category);
 			updateChildren(frontendElem, 'frontend', category);
 
-	
 	
 			function updateChildren(sectionElem, sectionKey, category) {
 				/* --------------------------------------
