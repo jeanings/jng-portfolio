@@ -25,6 +25,7 @@ def build_assets(app):
     css_bundle = Bundle(
                     'builds/projects/japan_real_estate_choropleth/style.css',
                     'builds/projects/japan_real_estate_choropleth/japan_real_estate_choropleth.css',
+                    'builds/media_res.css',
                     'builds/projects/japan_real_estate_choropleth/japan_real_estate_choropleth_media_res.css',
                     filters=css_min,
                     output='dist/css/japan_real_estate_choropleth.css')
