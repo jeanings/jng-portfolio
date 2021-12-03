@@ -18,6 +18,8 @@
     --link-font-colour: #000000;
     --spider-pin-colour: orangered;
     --spider-leg-colour: #000000;
+    --root-font-size: 16px;
+    font-size: var(--root-font-size);
 }
 
 [data-theme="dark-mode"] {
@@ -118,7 +120,7 @@
 #pages-loader {
     display: grid;
     font-family: 'Antic Slab', serif;
-    margin: 0rem 7rem 7rem 7rem;
+    margin: 0rem 1.5vw 0vw 1.5vw;
     grid-template-areas: 
         "header"
         "body";
@@ -134,7 +136,7 @@
         display: grid;
         height: auto;
         padding: 0rem 4rem 4rem 4rem;
-        border: dashed 1px #cdcdcd;
+        border: dashed 0.06rem #cdcdcd;
     }
     
 .fa {
@@ -144,7 +146,6 @@
 h1 {
     font-family: 'Abel', sans-serif;
     font-size: 4rem;
-    /* text-shadow: 5px 5px #cdcdcd; */
 }
 
 h2 {
@@ -190,44 +191,6 @@ a {
     height: 200vh;
     position: absolute;
     z-index: -2;
-}
-
-@keyframes fromTop {
-    0% {
-        transform: translateY(150px);
-        -o-transform: translateY(150px);
-        -ms-transform: translateY(150px);
-        -moz-transform: translateY(150px);
-        -webkit-transform: translateY(150px);
-        opacity: 0;
-    }
-    100%{
-        transform: translate(0);
-        -o-transform: translate(0);
-        -ms-transform: translate(0);
-        -moz-transform: translate(0);
-        -webkit-transform: translate(0);
-        opacity: 1;
-    }
-}
-
-@keyframes fromLeft {
-    0% {
-        transform: translateX(-100px);
-        -o-transform: translateX(-100px);
-        -ms-transform: translateX(-100px);
-        -moz-transform: translateX(-100px);
-        -webkit-transform: translateX(-100px);
-        opacity: 0;
-    }
-    100% {
-        transform: translate(0);
-        -o-transform: translate(0);
-        -ms-transform: translate(0);
-        -moz-transform: translate(0);
-        -webkit-transform: translate(0);
-        opacity: 1;
-    }
 }
 
 @keyframes fromRight {
@@ -352,12 +315,12 @@ a {
         }
         @keyframes textShadow {
             100% {
-                text-shadow: 15px 15px 0px var(--title-font-shadow);
+                text-shadow: 0.9rem 0.9rem 0rem var(--title-font-shadow);
             }
         }
         @keyframes textShadowRev {
             100% {
-                text-shadow: -15px 15px 0px var(--title-font-shadow);
+                text-shadow: -0.9rem 0.9rem 0rem var(--title-font-shadow);
             }
         }
         .top-greet-pages .map-title {
@@ -388,8 +351,8 @@ a {
         grid-template-areas: 
             "slider   toggle";
         position: fixed;
-        top: 2rem;
-        right: 3.5rem;
+        top: 0.5rem;
+        right: 2.5rem;
         grid-area: menu;
         align-content: flex-end;
         justify-content: flex-end;
@@ -426,7 +389,7 @@ a {
             display: grid;
             height: auto;
             grid-auto-flow: column;
-            margin: 0 3rem;
+            margin: 0 1rem;
             align-items: center;
             background: var(--para-font-colour);
             opacity: 0.75;
@@ -435,14 +398,14 @@ a {
             animation-duration: 500ms;
         }
         #menu.slide-toggle a {
-            padding: 0 1rem;
+            padding: 0rem 1rem;
         }
         #menu-buttons {
             grid-area: slider;
             position: fixed;
             color: var(--para-font-colour);
             font-size: 2.5rem;
-            right: 6rem;
+            right: 5rem;
             cursor: pointer;
         }
         #menu-open.toggle {
@@ -469,8 +432,8 @@ a {
             display: inline-block;
             position: relative;
             right: -2rem;
-            width: 60px;
-            height: 30px;
+            width: 3.6rem;
+            height: 1.8rem;
         }
         .theme-toggle input {
             display: none;
@@ -478,14 +441,14 @@ a {
         .theme-toggle-wrapper .tooltip {
             display: inline-block;
             position: relative;
-            height: 30px;
-            width: 60px;
+            height: 1.8rem;
+            width: 3.6rem;
         }
             .theme-toggle-wrapper .tooltip .tooltiptext {
-                top: -2.5rem;
-                left: 0;
-                padding: 4px 2px 4px 2px;
-                border-radius: 5px;
+                top: -0.2rem;
+                left: -3.8rem;
+                padding: 0.24rem 0.12rem 0.24rem 0.12rem;
+                border-radius: 0.3rem;
                 font-size: 0.75rem;
             }
             .theme-toggle-wrapper .tooltipLhover .tooltiptext {
@@ -498,8 +461,8 @@ a {
         }
         .slider:before { /* sun */ 
             position: absolute;
-            height: 30px;
-            width: 30px;
+            height: 1.8rem;
+            width: 1.8rem;
             border-radius: 50%;
             content: "\f185";
             background-color: cornsilk;
@@ -515,7 +478,7 @@ a {
                 background-color: #050217;
                 color: gold;
                 content: "\f186";
-                transform: translate(30px) rotateZ(240deg);
+                transform: translate(1.8rem) rotateZ(240deg);
                 transition: 500ms ease-out;
             }       
         

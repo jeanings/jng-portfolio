@@ -25,7 +25,8 @@ def build_assets(app):
     css_bundle = Bundle(
                     'builds/projects/tokaido/style.css',
                     'builds/projects/tokaido/tokaido.css',
-                    'builds/projects/tokaido/tokaido_media_res.css',
+                    'builds/media_res.css',
+                    # 'builds/projects/tokaido/tokaido_media_res.css',
                     filters=css_min,
                     output='dist/css/tokaido.css')
 
