@@ -45,7 +45,7 @@
     and (max-width: 1800px) {
 
     :root {
-        --root-font-size: 16px;
+        --root-font-size: 15px;
     }
 }
 
@@ -58,7 +58,7 @@
     and (max-width: 1600px) {
 
     :root {
-        --root-font-size: 16px;
+        --root-font-size: 14px;
     }
 }
 
@@ -87,27 +87,25 @@
 
 
 /* ----------------------------------------------------------------- */
-/*                Portrait view - high-res tablets                   */
+/*               Portrait view - non-mobile screens                  */
 /* ----------------------------------------------------------------- */
-@media screen
-    and (-webkit-min-device-pixel-ratio: 1.5) 
+@media screen and (orientation: portrait)
     and (max-width: 1200px) {
 
     :root {
-        --root-font-size: 16px;
+        --root-font-size: 14px;
     }
 }
 
 
 /* ----------------------------------------------------------------- */
-/*               Portrait view - non-mobile screens                  */
+/*               Portrait view - tablets                             */
 /* ----------------------------------------------------------------- */
 @media screen and (orientation: portrait)
-    /* and (-webkit-min-device-pixel-ratio: 1.5)  */
-    and (max-width: 1200px) {
+    and (max-width: 900px) {
 
     :root {
-        --root-font-size: 16px;
+        --root-font-size: 13px;
     }
 }
 

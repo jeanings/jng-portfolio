@@ -5,228 +5,36 @@
 
 /* High DPI 4K display desktops ==================================== */
 /* ================================================================== */
-@media screen and (orientation:landscape) and (min-width: 3800px) {
-    .nav h2 {
-        font-size: 4rem;
-    }
-    .nav-list a {
-        font-size: 6.5rem;
-    }
-    #menu.slide-toggle {
-        margin-top: 0.25vh;
-        margin-right: 4.5vw;
-    }
-    #menu-buttons {
-        font-size: 8rem;
-    }
-
-
+@media screen and (orientation:landscape) and 
+    (min-width: 3800px) {
     /* Main Mapbox geocoder search box */
     .mapboxgl-ctrl-geocoder {
         bottom: 21vh !important;
         right: 1.5vw !important;
         min-width: 100px !important;
-        width: 20vw !important;
         height: 5vh !important;
-        line-height: 5rem !important;
+        line-height: 2rem !important;
     }
-    /* Search icon and placeholder text */
-    .mapboxgl-ctrl-geocoder--icon {
-        width: 5rem !important;
-        height: 5rem !important;
-        left: 1rem !important;
-    }
+   
     /* Placeholder text */
     .mapboxgl-ctrl-geocoder--input {
-        margin-left: 6.5rem !important;
-        font-size: 3rem !important;
+        /* margin-left: 6.5rem !important; */
+        /* font-size: 3rem !important; */
     }
     /* Search results */
     /* Default results list */
     .mapboxgl-ctrl-geocoder .suggestions {
-        font-size: 3rem !important;
+        /* font-size: 3rem !important; */
     }
 
     /* Popups */
     .mapboxgl-popup {
-        font-size: 2.5rem !important;
+        font-size: 1rem !important;
     }
     .mapboxgl-popup-content {
-        line-height: 4rem;
-        padding: 1.5rem !important;
+        line-height: 1rem;
+        padding: 0.5rem !important;
     }
-
-    
-    #detached-icon, 
-    #condo-icon {
-        width: 10rem;
-        height: 10rem;
-    }
-    .filter-menu .filter-options-container {
-        row-gap: 6rem;
-    }
-    @keyframes filterSheath {
-        0% {
-            left: 0;
-            background-color: var(--background);
-        }
-        100% {
-            left: -21.5vw;
-            background-color: var(--transparent);
-        }
-    }
-    @keyframes filterUnsheath {
-        0% {
-            left: -21.5vw;
-        }
-        100% {
-            left: 0;
-        }
-    }
-
-    
-    .filter-options {
-        font-size: 4rem;
-    }
-    .radio-list {
-        padding-top: 2.5rem;
-    }
-    .radio-item {
-        font-size: 2.5rem;
-    }
-    .radio-text {
-        padding-left: 2.25rem;
-    }
-    #sqm {
-        font-size: 3.5rem;
-    }
-    .filter-options.box-footage .radio-list {
-        column-gap: 7rem;
-    }
-    .filter-options.box-age .radio-list {
-        column-gap: 6rem;
-    }
-    .radio-item input:checked ~ .radio-text:after {
-        font-size: 3.5rem;
-        top: -1.15rem;
-        left: -2.5rem;
-        animation-name: spriteWiggle;
-        animation-delay: 0ms;
-        animation-duration: 750ms;
-        animation-timing-function: ease-out;
-    }
-        @keyframes spriteWiggle {
-            0% {
-                transform: translateX(-10px) rotateY(180deg);
-            }
-            30% {
-                transform: translateX(10px) rotateY(180deg);
-            }
-            100% {
-                transform: translateX(0px) rotateY(180deg);
-            }
-        }
-        .radio-text:before {
-            width: 4rem;
-            left: -2rem;
-            opacity: 0.65;
-            border-bottom: 4px dashed var(--options-font-inactive);
-            transition: all 750ms ease;
-            -moz-transition: all 750ms ease;
-            -webkit-transition: all 750ms ease;
-        }
-        .radio-item input:focus ~ .radio-text:before {
-            border-bottom: 4px solid;
-        }
-        .fas.fa-search {
-            font-size: 10rem;
-        }
-        .submit-parameters-check {
-            font-size: 2.5rem;
-            padding: 3rem 5rem 3rem 5rem;
-        }
-        #submit-tooltip-text {
-            font-size: 2.25rem;
-            margin: 2rem;
-            border-radius: 2rem;
-            padding: 20px 32px 20px 32px;
-        }
-        #submit-tooltip-text:after {
-            border: 2.5rem solid transparent;
-            border-left-color: var(--options-font-inactive);
-            border-right: 0;
-            border-bottom: 0;
-            margin-top: -0.75rem;
-            margin-right: -2rem;
-        }
-        .side-buttons div {
-            margin-right: 3rem;
-        }
-        #citation,
-        #mail {
-            width: 4rem;
-            height: 4rem;
-        }
-        #citation-info-text,
-        #mail-info-text {
-            padding: 2rem 3rem 2rem 3rem;
-            border-radius: 1.5rem;
-            font-size: 3rem;
-        }
-        #citation-info-text.showHorizontalOpen, 
-        #citation-info-text.showHorizontalClose,
-        #mail-info-text.showHorizontalOpen, 
-        #mail-info-text.showHorizontalClose {
-            left: 2vw;
-            top: -5vh;
-        }
-        #citation-info-text.showHorizontalOpen:after, 
-        #citation-info-text.showHorizontalClose:after,
-        #mail-info-text.showHorizontalOpen:after, 
-        #mail-info-text.showHorizontalClose:after {
-            border: 4rem solid transparent;
-            border-right-color: var(--options-font-inactive);
-            border-left: 0;
-            border-bottom: 0;
-            margin-top: -3rem;
-            margin-left: -3rem;
-        }
-
-        #collapse {
-            width: 6rem;
-            height: 6rem;
-            right: -1.5rem;
-        }
-            #collapse.close {
-                transform: translateX(-1rem) rotate(0deg);
-            }
-
-
-        #price-gauge {
-            font-size: 2rem;
-        }
-
-        #search-stats {
-            bottom: -8vh;
-            font-size: 2.5em;
-        }
-
-        .info-box {
-            display: grid;
-            position: relative;
-            grid-template-columns: 1fr 1fr;
-            height: 80%;
-            width: 20vw;
-            padding-bottom: 2rem;
-            font-size: 3.5rem;
-        }
-        .info-text {
-            padding-left: 1.5rem;
-            border-bottom: 8px dashed var(--background);
-        }
-        .info-data {
-            padding-right: 1.5rem;
-        }
 }
 
 
@@ -235,227 +43,41 @@
 
 /* High DPI 2K+ display desktops ==================================== */
 /* ================================================================== */
-@media screen and (orientation:landscape) and (min-width: 1600px) and (max-width: 3800px) and 
-(-webkit-min-device-pixel-ratio: 1.5) {
+@media screen and (orientation:landscape) and 
+    (min-width: 1600px) and 
+    (max-width: 3800px) {
    
-    .nav h2 {
-        font-size: 4rem;
-    }
-    .nav-list a {
-        font-size: 3.25rem;
-    }
-    #menu.slide-toggle {
-        margin-top: 0.5vh;
-        margin-right: 5vw;
-    }
-    #menu-buttons {
-        font-size: 5rem;
-    }
-
-    
     /* Main Mapbox geocoder search box */
     .mapboxgl-ctrl-geocoder {
-        bottom: 20vh !important;
         right: 1.5vw !important;
         min-width: 100px !important;
-        width: 20vw !important;
         height: 5vh !important;
-        line-height: 4rem !important;
+        line-height: 2rem !important;
     }
     
-    /* Search icon and placeholder text */
-    .mapboxgl-ctrl-geocoder--icon {
-        width: 3.5rem !important;
-        height: 3.5rem !important;
-        left: 0.6rem !important;
-    }
+    
     /* Placeholder text */
     .mapboxgl-ctrl-geocoder--input {
-        margin-left: 4.5rem !important;
-        font-size: 2.25rem !important;
+        /* margin-left: 4.5rem !important; */
+        /* font-size: 2.25rem !important; */
     }
 
     /* Search results */
     /* Default results list */
     .mapboxgl-ctrl-geocoder .suggestions {
-        font-size: 2.25rem !important;
+        /* font-size: 2.25rem !important; */
     }
 
-   
-    #detached-icon, 
-    #condo-icon {
-        width: 5rem;
-        height: 5rem;
+    /* Popups */
+    .mapboxgl-popup {
+        font-size: 1rem !important;
     }
-
-    @keyframes filterSheath {
-        0% {
-            left: 0;
-            background-color: var(--background);
-        }
-        100% {
-            left: -21vw;
-            background-color: var(--transparent);
-        }
+    .mapboxgl-popup-content {
+        line-height: 1rem;
+        padding: 0.5rem !important;
     }
-    @keyframes filterUnsheath {
-        0% {
-            left: -21vw;
-        }
-        100% {
-            left: 0;
-        }
-    }
-    .filter-menu .filter-options-container {
-        row-gap: 3rem;
-    }
-    .filter-options {
-        font-size: 3rem;
-    }
-    .radio-list {
-        padding-top: 1.5rem;
-    }
-    .radio-item {
-        font-size: 1.5rem;
-    }
-    .radio-text {
-        padding-left: 2.25rem;
-    }
-    #sqm {
-        font-size: 2rem;
-    }
-    .radio-item input:checked ~ .radio-text:after {
-        font-size: 2rem;
-        top: -0.4rem;
-        left: -0.4rem;
-        animation-name: spriteWiggle;
-        animation-delay: 0ms;
-        animation-duration: 750ms;
-        animation-timing-function: ease-out;
-    }
-        @keyframes spriteWiggle {
-            0% {
-                transform: translateX(-10px) rotateY(180deg);
-            }
-            30% {
-                transform: translateX(10px) rotateY(180deg);
-            }
-            100% {
-                transform: translateX(0px) rotateY(180deg);
-            }
-        }
-        .radio-text:before {
-            width: 2rem;
-            opacity: 0.65;
-            border-bottom: 2px dashed var(--options-font-inactive);
-            transition: all 750ms ease;
-            -moz-transition: all 750ms ease;
-            -webkit-transition: all 750ms ease;
-        }
-        .radio-item input:focus ~ .radio-text:before {
-            border-bottom: 2px solid;
-        }
-        .fas.fa-search {
-            font-size: 6rem;
-        }
-        .submit-parameters-check {
-            font-size: 1.5rem;
-            padding: 2rem 3rem 3rem 3rem;
-        }
-        #submit-tooltip-text {
-            font-size: 1.25rem;
-            margin: 2rem;
-            border-radius: 1rem;
-            padding: 14px 20px 14px 20px;
-        }
-        #submit-tooltip-text:after {
-            border: 1.5rem solid transparent;
-            border-left-color: var(--options-font-inactive);
-            border-right: 0;
-            border-bottom: 0;
-            margin-top: -0.75rem;
-            margin-right: -1.3rem;
-        }
-        .side-buttons div {
-            margin-right: 2rem;
-        }
-        #citation,
-        #mail {
-            width: 2.5rem;
-            height: 2.5rem;
-        }
-        #citation-info-text,
-        #mail-info-text {
-            padding: 1rem 2rem 1rem 2rem;
-            border-radius: 1rem;
-            font-size: 1.75rem;
-        }
-        #citation-info-text.showHorizontalOpen, 
-        #citation-info-text.showHorizontalClose,
-        #mail-info-text.showHorizontalOpen, 
-        #mail-info-text.showHorizontalClose {
-            left: 1vw;
-            top: -3vh;
-        }
-        #citation-info-text.showHorizontalOpen:after, 
-        #citation-info-text.showHorizontalClose:after,
-        #mail-info-text.showHorizontalOpen:after, 
-        #mail-info-text.showHorizontalClose:after {
-            border: 2rem solid transparent;
-            border-right-color: var(--options-font-inactive);
-            border-left: 0;
-            border-bottom: 0;
-            margin-top: -1.5rem;
-            margin-left: -1.5rem;
-        }
-        #collapse {
-            width: 4rem;
-            height: 4rem;
-            right: -1rem;
-        }
-            #collapse.close {
-                transform: translateX(-1rem) rotate(0deg);
-            }
-
-
-        #price-gauge {
-            font-size: 1rem;
-        }
-        
-        #search-stats {
-            bottom: -8vh;
-            font-size: 1.25rem;
-        }
-       
-        .info-box {
-            display: grid;
-            position: relative;
-            grid-template-columns: 1fr 1fr;
-            height: 80%;
-            width: 20vw;
-            padding-bottom: 2rem;
-            font-size: 2rem;
-        }
-        .info-text {
-            padding-left: 1rem;
-            border-bottom: 4px dashed var(--background);
-        }
-        .info-data {
-            padding-right: 1rem;
-        }
 }
-
-
-
-
-/* 1080+ high DPI desktops base settings =========================== */
-/* ================================================================= */
-@media screen and (orientation:landscape) and (min-width: 2000px) and (max-width: 3800px) and 
-(-webkit-max-device-pixel-ratio: 1.5) {
-    
-
 }
-
 
 
 
@@ -463,8 +85,6 @@
 /* =================================================================== */
 @media screen and (orientation:landscape) and (min-height: 1400px) {
   
-
-    
 }
 
 
@@ -474,8 +94,6 @@
 /* ==================================================================== */
 @media screen and (orientation:landscape) and (min-height: 1100px) and (max-height: 1350px) {
 
-
-
 }
 
 
@@ -484,9 +102,6 @@
 /* Under 1920px width screens =========================================== */
 /* ====================================================================== */
 @media screen and (orientation:landscape) and (min-width: 900px) and (max-width: 1600px) {
-    #menu.slide-toggle {
-        margin-right: 5vw;
-    }
 
      /* Main Mapbox geocoder search box */
      .mapboxgl-ctrl-geocoder {
@@ -564,64 +179,6 @@
     /* #sqm {
         font-size: 2rem;
     } */
-    .radio-item input:checked ~ .radio-text:after {
-        font-size: 1rem;
-        top: -0.1rem;
-        left: -0.5rem;
-        animation-name: spriteWiggle;
-        animation-delay: 0ms;
-        animation-duration: 750ms;
-        animation-timing-function: ease-out;
-    }
-        @keyframes spriteWiggle {
-            0% {
-                transform: translateX(-10px) rotateY(180deg);
-            }
-            30% {
-                transform: translateX(10px) rotateY(180deg);
-            }
-            100% {
-                transform: translateX(0px) rotateY(180deg);
-            }
-        }
-        .radio-text:before {
-            left: -0.3rem;
-            width: 1rem;
-            opacity: 0.65;
-            border-bottom: 1px dashed var(--options-font-inactive);
-            transition: all 750ms ease;
-            -moz-transition: all 750ms ease;
-            -webkit-transition: all 750ms ease;
-        }
-        .radio-item input:focus ~ .radio-text:before {
-            border-bottom: 1px solid;
-        }
-        /* .fas.fa-search {
-            font-size: 6rem;
-        } */
-        #submit-tooltip {
-            pointer-events: none;
-            grid-column-start: 1;
-            grid-column-end: 4;
-            grid-row-start: 1;
-            grid-row-end: 4;
-        }
-        #submit-tooltip-text {
-            bottom: unset;
-            right: unset;
-            font-size: 0.65rem;
-            margin: 0;
-            border-radius: 1rem;
-            /* padding: 14px 20px 14px 20px; */
-        }
-        #submit-tooltip-text:after {
-            border: 0.7rem solid transparent;
-            border-left-color: var(--options-font-inactive);
-            border-right: 0;
-            border-bottom: 0;
-            margin-top: -0.5rem;
-            margin-right: -0.55rem;
-        }
 
         .submit-parameters-check {
             font-size: 0.75rem;
@@ -638,21 +195,6 @@
             font-size: 1rem;
         }
     
-        .info-box {
-            display: grid;
-            position: relative;
-            grid-template-columns: 1fr 1fr;
-            height: 80%;
-            width: 22vw;
-            padding-bottom: 1rem;
-            font-size: 1rem;
-        }
-        .info-text {
-            border-bottom: 2px dashed var(--background);
-        }
-        .info-data {
-            padding-right: 1rem;
-        }
 }
 
 
