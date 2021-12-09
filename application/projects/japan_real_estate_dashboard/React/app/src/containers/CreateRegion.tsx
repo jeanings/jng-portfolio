@@ -26,7 +26,7 @@ const CreateRegion: React.FC<CreateRegionProps> = (props: CreateRegionProps) => 
     const availability: string = checkAvailability();
     
 
-    const onLevelChange = () => {
+    const onItemNameClick = () => {
         /* --------------------------------
             Handle clicks on menu items.
         -------------------------------- */
@@ -43,20 +43,21 @@ const CreateRegion: React.FC<CreateRegionProps> = (props: CreateRegionProps) => 
             dispatch(handleMenuLevel(nextRender));
             // Switch render direction.
             dispatch(handleRenderDirection('zoom in'));
-            
+
             // Dispatch to MongoDB thunk for requests above 'districts'.
-            if (props.category != 'districts') {
-                // Send to MongoDB thunk to get menu data (if first time retrieving).
+            if (props.category !== 'districts') {
                 if (!menuApiState[props.nextCategory][props.name]) {
+                    // Send to MongoDB thunk to get menu data (if first time retrieving).
                     let mongoDbRequest: MongoDbMenuFetchProps = {
                         'lang': locale,
                         [props.category]: props.name
                     };
 
                     dispatch(mongoDbFetchRegions(mongoDbRequest));
+
                 } else {
-                    if (DEV_MODE === 'True')
-                        console.log("Reusing menu data: ", props.category, name);
+                    // if (DEV_MODE === 'True')
+                    //     console.log("Reusing menu data: ", props.category, props.name);
                 }
             }
         }
@@ -126,11 +127,10 @@ const CreateRegion: React.FC<CreateRegionProps> = (props: CreateRegionProps) => 
         } else {
             nameList = getRegionsInLevel(dataSet);
 
-            if (nameList.includes(props.name)) {
+            if (nameList.includes(props.name))
                 className = "available";
-            } else {
+            else
                 className = "unavailable";
-            }
         }
 
         return className;
@@ -192,7 +192,7 @@ const CreateRegion: React.FC<CreateRegionProps> = (props: CreateRegionProps) => 
                     name={props.name}
                     data-category={props.category}
                     data-level={props.level}
-                    onClick={onLevelChange}>
+                    onClick={onItemNameClick}>
                 {locale === 'en'
                     ? props.category === 'regions'
                         // Kanto region etc
@@ -202,13 +202,14 @@ const CreateRegion: React.FC<CreateRegionProps> = (props: CreateRegionProps) => 
                             ? props.name  === 'Tokyo'
                                 ? props.name.concat(' Metropolis') 
                                 : props.name
-                            // Funabashi 'City'
+                            // Setagaya 'City'
                             : props.category === 'cities'
                                 ? props.name.replace(',', ', ')
                                     .replace(' Village', '')
                                     .replace(' Town', '')
                                     .replace(' City', '')
                                     .replace(' County', '')
+                                    .replace(' Ward', '')
                                 : props.name
                     // locale === 'jp'
                     : props.name }

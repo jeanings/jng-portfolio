@@ -18,6 +18,7 @@
 /* Menu scrollbar */
 .Sidebar_regions::-webkit-scrollbar {
     width: 0.5rem;
+    height: 0.5rem;
 }
     /* Scroll track above thumb */
     .Sidebar_regions::-webkit-scrollbar-track-piece {
@@ -38,6 +39,9 @@
     }
     .Sidebar_regions::-webkit-scrollbar-thumb:hover {
         background-color: var(--options-font-highlight);
+    }
+    .Sidebar_regions::-webkit-scrollbar-corner {
+        background-color: var(--background);
     }
 
 /* Regions header area */
