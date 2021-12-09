@@ -144,8 +144,8 @@
     display: none;
     grid-template-columns: 100%;
     grid-template-rows: auto;
-    padding-left: 1rem;
-    padding-right: 1rem;
+    padding-left: 1.25rem;
+    padding-right: 1.25rem;
     font-size: 0.9rem;
     color: var(--options-font-inactive);
     align-items: flex-start;
