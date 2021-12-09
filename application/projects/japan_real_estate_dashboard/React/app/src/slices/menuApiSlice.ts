@@ -1,5 +1,5 @@
-import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
-import axios, { AxiosResponse, AxiosError } from 'axios';
+import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
+import axios, { AxiosResponse } from 'axios';
 import { RootState } from '../store';
 import { DEV_MODE } from '../App';
 
@@ -26,8 +26,8 @@ export const mongoDbFetchRegions = createAsyncThunk(
 
             if (response.status === 200) {
                 // Returns promise status, caught and handled by extra reducers in menuSlice. 
-                if (DEV_MODE === 'True')
-                    console.log("SUCCESS: Menu API called.", response);
+                // if (DEV_MODE === 'True')
+                //     console.log("SUCCESS: Menu API called.", response);
                 return (await response.data);
             }
         } catch (error) {
@@ -78,7 +78,7 @@ const menuApiSlice = createSlice({
                 ------------------------------------- */
                 const category = Object.keys(action.meta.arg)[1];
                 // Handle state updates depending on initial render status.
-                if (state.status != 'successful') {
+                if (state.status !== 'successful') {
                     // Push each object in payload array into menu state.
                     action.payload.map((item: any) => {
                         if (category === 'country') {
@@ -96,6 +96,7 @@ const menuApiSlice = createSlice({
 
                     // Set fetch status.
                     state.status = 'successful';
+
                 } else if (state.status === 'successful') {
                     const categoryMap = {
                         'regions': 'prefectures',

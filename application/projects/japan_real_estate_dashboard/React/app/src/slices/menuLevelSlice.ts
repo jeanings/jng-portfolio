@@ -1,4 +1,4 @@
-import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { createSlice } from '@reduxjs/toolkit';
 import { RootState } from '../store';
 
 
@@ -36,7 +36,7 @@ const menuLevelSlice = createSlice({
                     category: category,
                     name: name
                 }
-            }    
+            }
         },
         handleRenderDirection: (state, action) => {
             /* -----------------------------------------------------------------
@@ -60,7 +60,8 @@ interface MenuLevelProps {
     [index: string] : string | any, 
     active: {
         [index: string] : string | any
-    }
+    },
+    direction: 'zoom in' | 'zoom out'
 }
 
 

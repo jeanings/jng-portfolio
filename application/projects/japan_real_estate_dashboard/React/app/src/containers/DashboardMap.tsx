@@ -34,8 +34,8 @@ const DashboardMap: React.FC = () => {
                 : 'jp';     // placeholder, ignore
     // Map defaults, refs.
     mapboxgl.accessToken = DEV_MODE === 'True' ? process.env.REACT_APP_DEV_MAPBOX : process.env.REACT_APP_PROD_MAPBOX;
-    const mapContainer = useRef(null);
-    const map = useRef<mapboxgl.map | null>(null);
+    const refMapContainer = useRef(null);
+    const refMap = useRef<mapboxgl.map | null>(null);
     var mapStyle: string = locale === 'en'
             ? process.env.REACT_APP_MAPBOX_STYLE_EN!
             : process.env.REACT_APP_MAPBOX_STYLE_JP!;
@@ -45,9 +45,9 @@ const DashboardMap: React.FC = () => {
         /* ------------------------------------
             Initialize map on initial render.
         ------------------------------------ */
-        if (map.current === null) {
-            map.current = new mapboxgl.Map({
-                container: mapContainer.current,
+        if (refMap.current === null) {
+            refMap.current = new mapboxgl.Map({
+                container: refMapContainer.current,
                 style: mapStyle,
                 center: [mapState.lng, mapState.lat],
                 zoom: mapState.zoom,
@@ -71,26 +71,29 @@ const DashboardMap: React.FC = () => {
         -------------------------------------------- */
         const menuLevels = Object.entries(menuLevelState.active);
         let name: string = '';
-        let type: string = '';
+        let placeType: string = '';
         let partOf: string = '';
+        let toStripFromName = [' Village', ' Town', ' City', ' County', ' Ward'];
         let updateBounds;
+
 
         if (menuLevels.length > 1) {
             if (menuLevels.length === 4) {
                 // Current view: district type.
-                type = 'locality';
+                placeType = 'poi';
                 name = menuLevelState.active['level 4'].name;
                 partOf = menuLevelState.active['level 2'].name.concat(
                     ' ', menuLevelState.active['level 3'].name
                 );
             } else if (menuLevels.length === 3) {
                 // Current view: city type.
-                type = 'place';
+                placeType = 'place%2Clocality';
                 name = menuLevelState.active['level 3'].name;
                 partOf = menuLevelState.active['level 2'].name;
+
             } else if (menuLevels.length === 2) {
                 // Current view: prefecture type.
-                type = 'region';
+                placeType = 'region';
                 name = menuLevelState.active['level 2'].name;
                 partOf = '';
 
@@ -102,19 +105,33 @@ const DashboardMap: React.FC = () => {
                     };
 
                     dispatch(handleBoundsUpdate(updateBounds));
-                    
                     return;
                 }
             }
 
+            // Strip all region type identifiers for Mapbox querying.
+            // (Mapbox queries with 'ward', 'village' doesn't work well)
+            if (locale === 'en') {
+                toStripFromName.forEach(identifier => {
+                    if (name.includes(identifier)) {
+                        name = name.replace(identifier, '');
+                    }
+                    
+                    if (partOf.includes(identifier)) {
+                        partOf = partOf.replace(identifier, '');
+                    }
+                });
+            }
+                
             const mapboxRequest: MapboxGeocoderProps = {
                 lang: locale as 'en' | 'jp',
                 name: name,
-                types: type,
+                types: placeType,
                 partOf: partOf
             };
 
             dispatch(mapboxFetchGeo(mapboxRequest));
+
         } else if (menuLevels.length === 1) {
             // Current view: region type.
             name = menuLevelState.active['level 1'].name;
@@ -124,6 +141,7 @@ const DashboardMap: React.FC = () => {
             };
 
             dispatch(handleBoundsUpdate(updateBounds));
+
         } else {
             // Current view: initial Japan bounds.
             updateBounds = {
@@ -140,7 +158,7 @@ const DashboardMap: React.FC = () => {
         /* ----------------------------------------------------------------
             Fit map to bounds or centre to coordinates on region change.
         ---------------------------------------------------------------- */
-        if (map.current) {
+        if (refMap.current) {
             if (mapState.bounds.sw.lng !== null) {
                 // Fit to bounds if API returns them.
                 // Most likely any region other than district types.
@@ -149,7 +167,7 @@ const DashboardMap: React.FC = () => {
                     mapState.bounds.ne.lng!, mapState.bounds.ne.lat!
                 ];
 
-                map.current.fitBounds(
+                refMap.current.fitBounds(
                     bbox, {
                         linear: false,
                         speed: 0.85,
@@ -164,7 +182,7 @@ const DashboardMap: React.FC = () => {
                     mapState.lng, mapState.lat
                 ];
 
-                map.current.flyTo(
+                refMap.current.flyTo(
                     {
                         center: center,
                         speed: 0.55,
@@ -187,7 +205,7 @@ const DashboardMap: React.FC = () => {
     return (
         <div 
             id="map" 
-            ref={mapContainer} 
+            ref={refMapContainer} 
             className={getMediaQueries(classBase, locale)}>
         </div>
     );

@@ -24,8 +24,8 @@ export const mapboxFetchGeo = createAsyncThunk(
 
             if (response.status === 200) {
                 // Returns promise status, caught and handled by extra reducers in mapSlice. 
-                if (DEV_MODE === 'True')
-                    console.log("SUCCESS: mapboxFetchGeo called.", response);
+                // if (DEV_MODE === 'True')
+                //     console.log("SUCCESS: mapboxFetchGeo called.", response);
                 return (await response.data);
             } else {
                 console.log("ERROR: mapboxFetchGeo response failed.", response);
@@ -46,26 +46,26 @@ export const fetchGeo = (apiUrl: string, requestGeo: MapboxGeocoderProps) => {
         Mapbox geocode fetcher for thunk.
     ------------------------------------ */
     const accessToken = process.env.REACT_APP_DEV_MAPBOX as string;
-    const type: string = '&types=' + requestGeo.types;   // Not used in JP: including returns poor results
-    const country: string = '&country=jp';
-    const language: string = requestGeo.lang === 'en' ? '&language=en' : '&language=ja';
     const worldview: string = '&worldview=jp';
+    const language: string = requestGeo.lang === 'en' ? '&language=en' : '&language=ja';
+    const country: string = '&country=jp';
+    const type: string = '&types=' + requestGeo.types;
     const resultsLimit: string = '&limit=' + '1';
 
     const settings: string = requestGeo.lang === 'en'
         ? '.json?access_token='.concat(
-                accessToken, 
-                country,
-                type,
-                language, 
+                accessToken,
                 worldview, 
+                language, 
+                country,
+                type,                   // EN: Need type argument for better results, but still inaccurate.
                 resultsLimit
             )
-        : '.json?access_token='.concat(
+        : '.json?access_token='.concat( // JP: Doesn't need type, native language queries work fine
                 accessToken, 
-                country,
-                language, 
                 worldview, 
+                language, 
+                country,
                 resultsLimit
             );
 
@@ -76,8 +76,8 @@ export const fetchGeo = (apiUrl: string, requestGeo: MapboxGeocoderProps) => {
         settings
     );
     
-    if (DEV_MODE === 'True')
-        console.log("Mapbox API request url:", requestUrl);
+    // if (DEV_MODE === 'True')
+    //     console.log("Mapbox API request url:", requestUrl);
 
     let geocoderPromise = Promise.resolve(axios.get(requestUrl));
 

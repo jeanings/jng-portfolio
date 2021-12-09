@@ -34,6 +34,15 @@
         border-bottom: none;
         background-color: var(--background);
     }
+        #Sidebar_tab_options path {
+            stroke: var(--options-font-inactive);
+            fill: var(--options-font-inactive);
+        }
+
+        #Sidebar_tab_options circle {
+            stroke: var(--options-font-active);
+            fill: var(--options-font-inactive);
+        }
 
         #Sidebar_tab_options.hide {
             border-top-left-radius: 0.3rem;
@@ -82,11 +91,19 @@
             }
 
     #Sidebar_tab_options:hover > .ionicon,
+    #Sidebar_tab_options:hover > #Sidebar_tab_options_icon path,
     #Sidebar_tab_regions:hover > .ionicon {
         fill: var(--options-font-active);
         color: var(--options-font-active);
+        stroke: var(--options-font-active);
         opacity: 1;
     }
+
+    #Sidebar_tab_options:hover > #Sidebar_tab_options_icon circle {
+        stroke: var(--options-font-inactive);
+        opacity: 1;
+    }
+
 
 
 .Sidebar_tab.en {

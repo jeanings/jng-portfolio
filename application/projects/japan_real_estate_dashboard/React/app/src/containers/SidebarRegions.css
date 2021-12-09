@@ -18,6 +18,7 @@
 /* Menu scrollbar */
 .Sidebar_regions::-webkit-scrollbar {
     width: 0.5rem;
+    height: 0.5rem;
 }
     /* Scroll track above thumb */
     .Sidebar_regions::-webkit-scrollbar-track-piece {
@@ -38,6 +39,9 @@
     }
     .Sidebar_regions::-webkit-scrollbar-thumb:hover {
         background-color: var(--options-font-highlight);
+    }
+    .Sidebar_regions::-webkit-scrollbar-corner {
+        background-color: var(--background);
     }
 
 /* Regions header area */
@@ -140,8 +144,8 @@
     display: none;
     grid-template-columns: 100%;
     grid-template-rows: auto;
-    padding-left: 1rem;
-    padding-right: 1rem;
+    padding-left: 1.25rem;
+    padding-right: 1.25rem;
     font-size: 0.9rem;
     color: var(--options-font-inactive);
     align-items: flex-start;
@@ -158,6 +162,7 @@
         .Sidebar_regions_notify_note {
             grid-column: 1 / -1;
             grid-row: 1 / 2;
+            text-align: start;
         }
 
         .Sidebar_regions_notify_rec {
