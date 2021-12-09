@@ -26,8 +26,8 @@ export const mongoDbFetchData = createAsyncThunk(
                
             if (response.status === 200) {
                 // Returns promise status, caught and handled by extra reducers in dataSlice. 
-                if (DEV_MODE === 'True')
-                    console.log("SUCCESS: Data API called.", response);
+                // if (DEV_MODE === 'True')
+                //     console.log("SUCCESS: Data API called.", response);
                 return (await response.data);
             }
         } catch (error) {

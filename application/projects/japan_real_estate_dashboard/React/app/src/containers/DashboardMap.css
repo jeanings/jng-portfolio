@@ -12,7 +12,7 @@
 
 .mapboxgl-ctrl, 
 .mapboxgl-ctrl-bottom-right {
-    padding: 0rem 1rem 0rem 1rem;
+    padding: 0rem 0.5rem 0.5rem 0.5rem;
 }
 
 .mapboxgl-ctrl.mapboxgl-ctrl-attrib {
