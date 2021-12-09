@@ -8,7 +8,7 @@ import SidebarRegionsSelected from './SidebarRegionsSelected';
 import { SidebarRegSet } from '../imports/languageSet';
 import { DEV_MODE, getMediaQueries } from '../App';
 import './SidebarRegions.css';
-
+const mikan = require('mikanjs');
 
 
 const SidebarRegions: React.FC = () => {
@@ -169,16 +169,22 @@ const SidebarRegions: React.FC = () => {
         const collection: string = dataApiState.currentOptions.collection;
         const options: string = dataApiState.currentOptions.options;
         const notifyElem = document.getElementsByClassName("Sidebar_regions_notify")[0];
+        const notifyTextSpan = document.getElementsByClassName("Sidebar_regions_notify_note")[0];
+        const notifyText = locale === 'jp' 
+            ? mikan(SidebarRegSet[locale].noDataNotify.note)
+            : SidebarRegSet[locale].noDataNotify.note;
+        notifyTextSpan.innerHTML = notifyText;
 
         try {
             let request = dataApiState.collections[collection][options];
-            
+        
             if (request === undefined) {
                 // Notify user about unavailable data.
                 notifyElem.classList.add("show");
             } else if (request) {
                 notifyElem.classList.remove("show");
             }
+
         } catch (TypeError) {
             // if (DEV_MODE)
             //     console.log("No data from API call: initial render.");
@@ -294,11 +300,12 @@ const SidebarRegions: React.FC = () => {
 
             <div className={getMediaQueries(classBase.concat('_notify'), locale)}>
                 <span className={getMediaQueries(classBase.concat('_notify_note'), locale)}>
-                    {SidebarRegSet[locale].noDataNotify.note}
                 </span>
                 <ul className={getMediaQueries(classBase.concat('_notify_rec'), locale)}
                     id="Sidebar_regions_notify_rec_house">
+
                     {SidebarRegSet[locale].noDataNotify.houseRec.type}
+
                     <li className={getMediaQueries(classBase.concat('_notify_rec_item'), locale)}>
                         {SidebarRegSet[locale].noDataNotify.houseRec.material}
                     </li>
@@ -314,7 +321,9 @@ const SidebarRegions: React.FC = () => {
                 </ul>
                 <ul className={getMediaQueries(classBase.concat('_notify_rec'), locale)}
                     id="Sidebar_regions_notify_rec_condo">
+
                     {SidebarRegSet[locale].noDataNotify.condoRec.type}
+
                     <li className={getMediaQueries(classBase.concat('_notify_rec_item'), locale)}>
                         {SidebarRegSet[locale].noDataNotify.condoRec.material}
                     </li>

@@ -162,6 +162,7 @@
         .Sidebar_regions_notify_note {
             grid-column: 1 / -1;
             grid-row: 1 / 2;
+            text-align: start;
         }
 
         .Sidebar_regions_notify_rec {
