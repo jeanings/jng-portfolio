@@ -161,7 +161,7 @@ const SidebarOptions: React.FC = () => {
             optionsMenu.classList.add("hide");
             regionsTab?.classList.add("show");
             regionsMenu.classList.add("show");
-        }, 750);
+        }, 500);
     }
 
 

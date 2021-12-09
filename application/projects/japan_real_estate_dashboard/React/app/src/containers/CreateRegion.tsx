@@ -3,8 +3,7 @@ import { useAppDispatch, useAppSelector } from '../hooks';
 import { handleMenuLevel, handleRenderDirection } from '../slices/menuLevelSlice';
 import { handleSelection } from '../slices/selectionSlice';
 import { mongoDbFetchRegions, MongoDbMenuFetchProps } from '../slices/menuApiSlice';
-import { DEV_MODE } from '../App';
-import { getMediaQueries } from '../App';
+import { DEV_MODE, getMediaQueries } from '../App';
 import './CreateRegion.css';
 
 

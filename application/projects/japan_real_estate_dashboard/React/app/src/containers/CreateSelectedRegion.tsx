@@ -1,7 +1,6 @@
 import React from 'react';
 import { useAppDispatch, useAppSelector } from '../hooks';
 import { clearSelection } from '../slices/selectionSlice';
-import { getMediaQueries } from '../App';
 import './CreateSelectedRegion.css';
 
 

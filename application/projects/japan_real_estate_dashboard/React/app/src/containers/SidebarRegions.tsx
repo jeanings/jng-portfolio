@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect } from 'react';
 import { useAppDispatch, useAppSelector } from '../hooks';
 import { handleLevelStore, handleStoreRemoval } from '../slices/menuStoreSlice';
 import { handleRenderDirection, handleMenuLevelRemoval } from '../slices/menuLevelSlice';
@@ -96,8 +96,8 @@ const SidebarRegions: React.FC = () => {
                 }
             }
         }
-    //   data status,    back button,    menu clicks   
-    }, [menuApiState, menuStoreState, menuLevelState]);
+    // data status,   menu clicks   
+    }, [menuApiState, menuLevelState]);
 
 
     /* ------------------------------------------------------------------------
