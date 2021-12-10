@@ -5,7 +5,6 @@
 from flask import Blueprint, render_template
 from flask import current_app as app
 from flask import jsonify, request, send_from_directory
-from .assets import build_assets
 from bson.json_util import ObjectId
 from pathlib import Path
 from pymongo import MongoClient
