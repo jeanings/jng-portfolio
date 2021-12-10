@@ -12,12 +12,15 @@ from pymongo import MongoClient
 from urllib.parse import quote_plus
 import json, pymongo
 
+DEBUG_MODE = app.config['FLASK_DEBUG']
+
 
 # Folder paths.
 REACT_PATH = Path.cwd() / 'application' / 'static' / 'builds' / 'projects' / 'japan_real_estate_dashboard' / 'React'
 if REACT_PATH.exists():
-    react_templates_abs = REACT_PATH.resolve().as_posix()
+    react_abs = REACT_PATH.resolve().as_posix()
     react_static_abs = (REACT_PATH / 'static').resolve().as_posix()
+    react_favicon_abs = (REACT_PATH / 'favicon').resolve().as_posix()
     
     
 # JSON encoder for ObjectId type.
@@ -31,9 +34,8 @@ app.json_encoder = MongoEncoder
 
 # Blueprint config.
 japan_real_estate_dashboard_bp = Blueprint('japan_real_estate_dashboard_bp', __name__,
-    static_url_path='/static',
-    static_folder='builds/projects/fudousan_stats/React/static',
-    template_folder=react_templates_abs
+    static_folder=react_static_abs,
+    template_folder=react_abs
 )
 
 
@@ -56,14 +58,14 @@ except pymongo.errors.OperationFailure:
 @japan_real_estate_dashboard_bp.route('/japan-real-estate-dashboard-2010-2020', methods=['GET'])
 @japan_real_estate_dashboard_bp.route('/japan-real-estate-dashboard-2010-2020/', methods=['GET'])
 def japan_real_estate_dashboard_en():
-    return send_from_directory(react_templates_abs, 'japan_real_estate_dashboard_en.html')
+    return send_from_directory(react_abs, 'japan_real_estate_dashboard.html')
 
 
 # JP Japan real estate dashboard stats main route.
 @japan_real_estate_dashboard_bp.route('/fudousan-kakaku-hikaku-2010-2020', methods=['GET'])
 @japan_real_estate_dashboard_bp.route('/fudousan-kakaku-hikaku-2010-2020/', methods=['GET'])
 def japan_real_estate_dashboard_jp():
-    return send_from_directory(react_templates_abs, 'japan_real_estate_dashboard_jp.html')
+    return send_from_directory(react_abs, 'japan_real_estate_dashboard.html')
 
 
 # Japan real estate dashboard MongoDB get menu data route.
