@@ -72,6 +72,7 @@
             color: #ffffff;
             opacity: 0.15;
             cursor: not-allowed;
+            user-select: none;
             transition: 200ms all ease-in-out;
         }
 
@@ -119,6 +120,7 @@
                 color: var(--options-font-highlight);
                 font-size: 0.7rem;
                 opacity: 1;
+                user-select: none;
                 transition: all 300ms ease-out;
             }
             #Sidebar_regions_header_selected_button_arrow:hover {
