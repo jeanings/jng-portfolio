@@ -28,6 +28,7 @@
     font-family: "Kaisei Opti", serif;
     font-size: 1.35rem;
     color: var(--options-font-inactive);
+    user-select: none;
     padding-bottom: 1rem;
 }
 
