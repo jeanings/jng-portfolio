@@ -40,7 +40,7 @@
         </div>
 
         <span id="resume_header_location">
-            VANCOUVER BC
+            VANCOUVER CANADA
         </span>
     </div>
 
@@ -54,80 +54,50 @@
             <div class="resume_section_item">
                 <div class="resume_section_item_header">
                     <h3 class="resume_section_item_header_name">
-                        React-Redux dashboard app for visualizing housing prices of Japan
+                        {{ proj.title }}
                     </h3>
     
                     <div class="resume_section_item_header_links">
                         <a id="resume_selection_item_header_links_url" 
-                            href="https://jeanings.space/projects/japan-real-estate-dashboard-2010-2020/">
-                            https://jeanings.space/projects/japan-real-estate-dashboard-2010-2020
+                            href="{{ proj.url }}">
+                            {{ proj.url }}
                         </a>
                     </div>
 
                     <h4 class="resume_section_item_header_location">
-                        Vancouver BC
+                        {{ proj.location }}
                     </h4>
 
                     <h4 class="resume_section_item_header_date">
-                        2021 spring-autumn
+                        {{ proj.date }}
                     </h4>
 
                 </div>
 
                 <div class="resume_section_item_stack">
                     <ul class="resume_section_item_stack_backend">
-                        <li class="resume_section_item_stack_backend_item">
-                            Python
-                        </li>
-                        <li class="resume_section_item_stack_backend_item">
-                            NodeJS
-                        </li>
-                        <li class="resume_section_item_stack_backend_item">
-                            MongoDB
-                        </li>
-                        <li class="resume_section_item_stack_backend_item">
-                            Flask
-                        </li>
-                        <li class="resume_section_item_stack_backend_item">
-                            NumPy
-                        </li>
-                        <li class="resume_section_item_stack_backend_item">
-                            pandas
-                        </li>
+                        {%- for tech in proj.stack.backend -%}
+                            <li class="resume_section_item_stack_backend_item">
+                                {{ tech }}
+                            </li>
+                        {%- endfor -%}
                     </ul>
 
                     <ul class="resume_section_item_stack_frontend">
-                        <li class="resume_section_item_stack_frontend_item">
-                            React
-                        </li>
-                        <li class="resume_section_item_stack_frontend_item">
-                            Redux
-                        </li>
-                        <li class="resume_section_item_stack_frontend_item">
-                            TypeScript
-                        </li>
-                        <li class="resume_section_item_stack_frontend_item">
-                            Mapbox GL JS
-                        </li>
-                        <li class="resume_section_item_stack_frontend_item">
-                            Chart.js
-                        </li>
-                        <li class="resume_section_item_stack_frontend_item">
-                            CSS
-                        </li>
+                        {%- for tech in proj.stack.frontend -%}
+                            <li class="resume_section_item_stack_frontend_item">
+                                {{ tech }}
+                            </li>
+                        {%- endfor -%}
                     </ul>
                 </div>
                 
                 <ul class="resume_section_item_list">
-                    <li class="resume_section_item_list_item">
-                        cleaned and transformed housing transactions data for backend MongoDB API requests
-                    </li>
-                    <li class="resume_section_item_list_item">
-                        designed app in React Redux for state management and seamless UI renders
-                    </li>
-                    <li class="resume_section_item_list_item">
-                        visualized data using Mapbox for drawing locations and Chart.js for transactions by year
-                    </li>
+                    {%- for item in proj.description -%}
+                        <li class="resume_section_item_list_item">
+                            {{ item }}
+                        </li>
+                    {%- endfor -%}
                 </ul>
             </div>
 
@@ -138,61 +108,38 @@
             <h2 class="resume_section_name">
                 education
             </h2>
+            {%- for institute in edu -%}
+                {%- for id in institute -%}
 
-            <div class="resume_section_item">
-                <div class="resume_section_item_header">
-                    <h3 class="resume_section_item_header_name">
-                        Self-directed learning
-                    </h3>
+                    <div class="resume_section_item">
+                        <div class="resume_section_item_header">
+                            <h3 class="resume_section_item_header_name">
+                                {{ id }}
+                            </h3>
 
-                    <h4 class="resume_section_item_header_title">
-                        Web Development
-                    </h4>
+                            <h4 class="resume_section_item_header_title">
+                                {{ institute[id].title }}
+                            </h4>
 
-                    <h4 class="resume_section_item_header_location">
-                        online
-                    </h4>
-                    <h4 class="resume_section_item_header_date">
-                        2019 -
-                    </h4>
-                </div>
-                    
+                            <h4 class="resume_section_item_header_location">
+                                {{ institute[id].location }}
+                            </h4>
+                            <h4 class="resume_section_item_header_date">
+                                {{ institute[id].date }}
+                            </h4>
+                        </div>
 
+                        <ul class="resume_section_item_list">
+                            {%- for line in institute[id].description -%}
+                                <li class="resume_section_item_list_item">
+                                    {{ line }}
+                                </li>
+                            {%- endfor -%}
+                        </ul>
                 
-
-                <ul class="resume_section_item_list">
-                    <li class="resume_section_item_list_item">
-                        edX courses - CS50: Intro to Computer Science  //  CS161: Design and Analysis of Algorithms   
-                    </li>
-                </ul>
-            </div>
-
-            <div class="resume_section_item">
-                <div class="resume_section_item_header">
-                    <h3 class="resume_section_item_header_name">
-                        University of British Columbia
-                    </h3>
-                    <h4 class="resume_section_item_header_title">
-                        B.Asc Materials Engineering
-                    </h4>
-
-                    <h4 class="resume_section_item_header_location">
-                        Vancouver BC
-                    </h4>
-                    <h4 class="resume_section_item_header_date">
-                        2012
-                    </h4>
-                </div>
-                
-                
-
-                <ul class="resume_section_item_list">
-                    <li class="resume_section_item_list_item">
-                        specialization - manufacturing and materials performance
-                    </li>
-                </ul>
-            </div>
-
+                    </div>
+                {%- endfor -%}
+            {%- endfor -%}
         </div>
 
 
@@ -200,63 +147,37 @@
             <h2 class="resume_section_name">
                 experience
             </h2>
+            {%- for job in exp -%}
+                {%- for id in job -%}
 
-            <div class="resume_section_item">
-                <div class="resume_section_item_header">
-                    <h3 class="resume_section_item_header_name">
-                        Working Holiday Programme
-                    </h3>
-                    <h4 class="resume_section_item_header_title">
-                        Traveller, Inn Staff
-                    </h4>
+                <div class="resume_section_item">
+                    <div class="resume_section_item_header">
+                        <h3 class="resume_section_item_header_name">
+                            {{ id }}
+                        </h3>
+                        <h4 class="resume_section_item_header_title">
+                            {{ job[id].title }}
+                        </h4>
 
-                    <h4 class="resume_section_item_header_location">
-                        Japan
-                    </h4>
-                    <h4 class="resume_section_item_header_date">
-                        2017
-                    </h4>
+                        <h4 class="resume_section_item_header_location">
+                            {{ job[id].location }}
+                        </h4>
+                        <h4 class="resume_section_item_header_date">
+                            {{ job[id].date }}
+                        </h4>
+                    </div>
+
+                    <ul class="resume_section_item_list">
+                        {%- for line in job[id].description -%}
+                            <li class="resume_section_item_list_item">
+                                {{ line }}
+                            </li>
+                        {%- endfor -%}
+                    </ul>
+
                 </div>
-
-                
-                <ul class="resume_section_item_list">
-                    <li class="resume_section_item_list_item">
-                        Interpreted for English & Cantonese speakers at an inn on the Kumano Kodo pilgrimage trails
-                    </li>
-                    <li class="resume_section_item_list_item">
-                        Coordinated recruitment of international seasonal staff
-                    </li>
-                </ul>
-            </div>
-
-            <div class="resume_section_item">
-                <div class="resume_section_item_header">
-                    <h3 class="resume_section_item_header_name">
-                        Kafrit NA Ltd
-                    </h3>
-                    <h4 class="resume_section_item_header_title">
-                        Quality Control Laboratory Technician
-                    </h4>
-
-                    <h4 class="resume_section_item_header_location">
-                        Langley BC
-                    </h4>
-                    <h4 class="resume_section_item_header_date">
-                        2013 - 2016
-                    </h4>
-                </div>
-
-                
-                <ul class="resume_section_item_list">
-                    <li class="resume_section_item_list_item">
-                        Responsible for all testing of production polyethylene materials
-                    </li>
-                    <li class="resume_section_item_list_item">
-                        Optimized test procedures, explored test methods, tuned HPLC spectral libraries
-                    </li>
-                </ul>
-            </div>
-
+                {%- endfor -%}
+            {%- endfor -%}
         </div>
 
 
@@ -273,27 +194,19 @@
                 </div>
 
                 <ul class="resume_section_item_list" id="resume_section_item_list_language-name">
-                    <li class="resume_section_item_list_item">
-                        English
-                    </li>
-                    <li class="resume_section_item_list_item">
-                        Cantonese
-                    </li>
-                    <li class="resume_section_item_list_item">
-                        Japanese
-                    </li>
+                    {%- for lang in info.languages -%}
+                        <li class="resume_section_item_list_item">
+                            {{ lang }}
+                        </li>
+                    {%- endfor -%}
                 </ul>
 
                 <ul class="resume_section_item_list" id="resume_section_item_list_language-level">
-                    <li class="resume_section_item_list_item">
-                        native
-                    </li>
-                    <li class="resume_section_item_list_item">
-                        fluent
-                    </li>
-                    <li class="resume_section_item_list_item">
-                        intermediate, self-taught (JLPT N2)
-                    </li>
+                    {%- for lang, level in info.languages.items() -%}
+                        <li class="resume_section_item_list_item">
+                            {{ level }}
+                        </li>
+                    {%- endfor -%}
                 </ul>
             </div>
 
@@ -305,15 +218,11 @@
                 </div>
 
                 <ul class="resume_section_item_list">
-                    <li class="resume_section_item_list_item">
-                        sourdough bread baking
-                    </li>
-                    <li class="resume_section_item_list_item">
-                        taking not-so-good photos
-                    </li>
-                    <li class="resume_section_item_list_item">
-                        board games with good friends
-                    </li>
+                    {%- for hobby in info.hobby -%}
+                        <li class="resume_section_item_list_item">
+                            {{ hobby }}
+                        </li>
+                    {%- endfor -%}
                 </ul>
             </div>
 
