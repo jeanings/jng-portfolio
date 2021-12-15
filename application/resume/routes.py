@@ -10,8 +10,10 @@ from pathlib import Path
 from dotenv import load_dotenv
 from pymongo import MongoClient
 from urllib.parse import quote_plus
+import json
 
 DEBUG_MODE = app.config['FLASK_DEBUG']
+CV_LETTER_JSON = Path.cwd() / 'application' / 'resume' / 'tools' / 'cv_letter.json'
 
 
 # Blueprint config.
@@ -37,7 +39,7 @@ db = client.resume
 collection = db['2021']
 
 
-# Projects route.
+# Resume route.
 @resume_bp.route('/resume', methods=['GET'])
 @resume_bp.route('/resume/', methods=['GET'])
 def resume():
@@ -64,4 +66,22 @@ def resume():
         edu=edu,
         exp=exp,
         info=info
+    )
+
+
+# Cover letter template route.
+@resume_bp.route('/resume/cover-letter-template', methods=['GET'])
+@resume_bp.route('/resume/cover-letter-template/', methods=['GET'])
+def coverletter():
+    cv_letter = {}
+
+    with open(CV_LETTER_JSON, encoding='utf-8') as json_file:
+        data = json.load(json_file)
+        cv_letter = data
+         
+
+    return render_template('letter.html', 
+        title="Cover letter template ——  jeanings.space",
+        block=cv_letter["block"],
+        body=cv_letter["body"]
     )
