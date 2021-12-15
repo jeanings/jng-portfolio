@@ -44,8 +44,12 @@ h4 {
 
 @media print {
     .header {
-        visibility: hidden;
+        display: none;
     }
+}
+
+@page {
+    size: A4;
 }
 
 .container {
@@ -254,3 +258,35 @@ h4 {
                             list-style-type: none;
                         }
 
+    
+    .resume_letter_block {
+        display: flex;
+        flex-direction: column;
+        font-size: 0.75rem;
+    }
+
+    .resume_letter_body,
+    .resume_letter_footer {
+        display: grid;
+        row-gap: 1rem;
+        padding-top: 1rem;
+        line-height: 1.75;
+        font-size: 0.85rem;
+    }
+
+        .resume_letter_body a {
+            color: var(--text-accent-primary);
+        }
+
+        .resume_letter_body_date {
+            font-style: italic;
+        }
+
+        .resume_letter_body_title {
+            font-weight: 600;
+            padding-bottom: 1rem;
+        }
+
+        .resume_letter_body_proj_name {
+            font-style: italic;
+        }
