@@ -5,6 +5,7 @@ window.onload = function() {
 	loading();
 	fillGrid()
 	renderNewestProjects();
+	timelineStartFromMostRecent();
 };
 
 
@@ -26,7 +27,27 @@ function renderNewestProjects() {
 
 	// Click on elements to render.
 	newestMainElem.click();
-	newestSubElem.click();	
+	newestSubElem.click();
+}
+
+
+
+function timelineStartFromMostRecent() {
+	/* -----------------------------------------
+		Scroll to "end" of timeline at start.
+	----------------------------------------- */
+	let timelineContainer = document.getElementsByClassName("projects_timeline")[0];
+	let scrollToEnd;
+
+	scrollToEnd = setInterval(() => {
+		let scrollWidth = timelineContainer.scrollWidth;
+		timelineContainer.scrollLeft = scrollWidth;
+
+		if (timelineContainer.scrollLeft !== scrollWidth) {
+			clearInterval(scrollToEnd);
+			scrollToEnd = null;
+		}
+	}, 500);
 }
 
 

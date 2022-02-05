@@ -104,15 +104,19 @@
     .projects {
         padding-left: 2rem;
         padding-right: 2rem;
-        grid-template-rows: 30% 70%;
+        grid-template-rows: 15% 85%;
     }
+
+        .projects_timeline_grid {
+            width: 300vw;
+        }
 
         .projects_timeline_grid_year_title {
             writing-mode: vertical-lr;
         }
 
         .projects_timeline_grid_year {
-            grid-template-rows: 6.5rem;
+            grid-template-rows: 2.5rem 6.5rem;
         }
 
         .projects_content {
@@ -175,15 +179,18 @@
     .projects {
         padding-left: 2rem;
         padding-right: 2rem;
-        grid-template-rows: 30% 70%;
+        grid-template-rows: 15% 85%;
     }
+        .projects_timeline_grid {
+            width: 300vw;
+        }
 
         .projects_timeline_grid_year_title {
             writing-mode: vertical-lr;
         }
 
         .projects_timeline_grid_year {
-            grid-template-rows: 6.5rem;
+            grid-template-rows: 2.5rem 6.5rem;
         }
 
         .projects_content {
@@ -246,15 +253,18 @@
     .projects {
         padding-left: 2rem;
         padding-right: 2rem;
-        grid-template-rows: 35% 65%;
+        grid-template-rows: 15% 85%;
     }
+        .projects_timeline_grid {
+            width: 300vw;
+        }
 
         .projects_timeline_grid_year_title {
             writing-mode: vertical-lr;
         }
 
         .projects_timeline_grid_year {
-            grid-template-rows: 5rem;
+            grid-template-rows: 2.5rem 5rem;
         }
 
         .projects_content {
