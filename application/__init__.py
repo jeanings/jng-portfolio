@@ -33,6 +33,7 @@ def create_app():
         from .projects.tokaido import routes as tokaido
         from .projects.japan_real_estate_choropleth import routes as japan_real_estate_choropleth
         from .projects.japan_real_estate_dashboard import routes as japan_real_estate_dashboard
+        from .projects.photo_diary import routes as photo_diary
 
         db.create_all()
 
@@ -43,6 +44,7 @@ def create_app():
         app.register_blueprint(tokaido.tokaido_bp, url_prefix="/projects")
         app.register_blueprint(japan_real_estate_choropleth.japan_real_estate_choropleth_bp, url_prefix="/projects")
         app.register_blueprint(japan_real_estate_dashboard.japan_real_estate_dashboard_bp, url_prefix="/projects")
+        app.register_blueprint(photo_diary.photo_diary_bp, url_prefix="/projects")
         app.register_error_handler(404, error_404)
 
         return app

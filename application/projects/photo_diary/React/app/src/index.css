@@ -1,0 +1,35 @@
+:root {
+    --colour-background: #3f3f3f;
+    --colour-transparent: #00000000;
+    --colour-title: #ecec7a;
+    --colour-text-inactive: #d6d6c150;
+    --colour-text-active: #d6d6c1;
+    --colour-text-highlight: #ecec7a;
+    --colour-border: #9c9c9c;
+    --root-font-size: 16px;
+    overflow: hidden;
+    font-size: var(--root-font-size);
+  }
+  
+  /* Import fonts */
+  /* @import url(''); */
+  
+  * {
+    box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+      'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+      sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+  
+  #root {
+    height: 100vh;
+    display: grid;
+    grid-template-columns: 100%;
+    grid-template-rows: 100%;
+  }
