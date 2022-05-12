@@ -67,9 +67,9 @@ def photo_diary_data():
         db = client.photo_diary
         # collection_regions = db.photo_data
     
-    '''
-        Work in progress ------------------------------
-    '''
+        '''
+            Work in progress ------------------------------
+        '''
 
     except pymongo.errors.AutoReconnect:
         print("Reconnecting to database due to connection failure / is lost.")
