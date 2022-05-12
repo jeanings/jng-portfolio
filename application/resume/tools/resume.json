@@ -3,8 +3,8 @@
             "selectedProject": {
                 "title": "React-Redux dashboard app for visualizing housing prices of Japan",
                 "url": "https://jeanings.space/projects/japan-real-estate-dashboard-2010-2020",
-                "location": "Vancouver BC",
-                "date": "2021 spring-autumn",
+                "location": "",
+                "date": "Mar 2021 - Sep 2021",
                 "stack": {
                     "backend": [
                         "Python",
@@ -16,7 +16,7 @@
                     ],
                     "frontend": [
                         "React",
-                        "React",
+                        "Redux Toolkit",
                         "TypeScript",
                         "Mapbox GL JS",
                         "Chart.js",
@@ -24,19 +24,20 @@
                     ]
                 },
                 "description": [
-                    "cleaned and transformed housing transactions data for backend MongoDB API requests",
-                    "designed app in React Redux for state management and seamless UI renders",
-                    "visualized data using Mapbox for drawing locations and Chart.js for transactions by year"
+                    "Cleaned and transformed data on housing transactions from geographic regions down to districts",
+                    "Designed custom API requests for fetching transactions data in MongoDB and geocoding in Mapbox",
+                    "Developed frontend using React Redux for state management and seamless UI renders",
+                    "Visualized data by geocoding with Mapbox and charting price and total transactions with Chart.js"
                 ]
             }
         },
         {
             "education": [
                 {
-                    "Self-directed learning": {
+                    "Self-Directed Learning": {
                         "title": "Web Development",
-                        "location": "online",
-                        "date": "2019 -",
+                        "location": "",
+                        "date": "Jan 2019 -",
                         "description": [
                             "edX courses - CS50: Intro to Computer Science  //  CS161: Design and Analysis of Algorithms"
                         ]
@@ -48,7 +49,7 @@
                         "location": "Vancouver BC",
                         "date": "2012",
                         "description": [
-                            "specialization - manufacturing and materials performance"
+                            "Specialization - Manufacturing and materials performance"
                         ]
                     }
                 }
@@ -58,11 +59,11 @@
             "experience": [
                 {
                     "Working Holiday Programme": {
-                        "title": "Traveller, Inn Staff",
+                        "title": "Traveller, Inn Staff at Kiri no Sato Takahara",
                         "location": "Japan",
-                        "date": "2017",
+                        "date": "Sep 2016 - Sep 2017",
                         "description": [
-                            "Interpreted for English & Cantonese speakers at an inn on the Kumano Kodo pilgrimage trails",
+                            "Interpreted for English & Cantonese speakers on the Kumano Kodo UNESCO pilgrimage trails",
                             "Coordinated recruitment of international seasonal staff"
                         ]
                     }
@@ -71,7 +72,7 @@
                     "Kafrit NA Ltd": {
                         "title": "Quality Control Laboratory Technician",
                         "location": "Langley BC",
-                        "date": "2013 - 2016",
+                        "date": "Feb 2013 - Sep 2016",
                         "description": [
                             "Responsible for all testing of production polyethylene materials",
                             "Optimized test procedures, explored test methods, tuned HPLC spectral libraries"
@@ -83,14 +84,14 @@
         {
             "additionalInfo": {
                 "languages": {
-                    "English": "native",
-                    "Cantonese": "fluent",
+                    "English": "Native",
+                    "Cantonese": "Fluent",
                     "Japanese": "JLPT N2: 2015 (self-taught)"
                 },
                 "hobby": [
-                    "sourdough bread baking",
-                    "taking not-so-good photos",
-                    "board games with good friends"
+                    "Sourdough bread baking",
+                    "Tinkering on film cameras",
+                    "Taking not-so-good photos"
                 ]
             }
         }
