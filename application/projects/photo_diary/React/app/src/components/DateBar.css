@@ -1,4 +1,81 @@
 .DateBar {
+    background-color: var(--colour-background);
     grid-column: 1 / -1;
     grid-row: 1 / 2;
+    display: grid;
+    align-items: center;
+    padding: 1rem;
 }
+
+.DateBar_year_selector {
+    display: grid;
+    height: 100%;
+    width: 6rem;
+    grid-template-columns: 100%;
+    grid-template-rows: 100%;
+    color: var(--colour-text-inactive);
+    list-style: none;
+    overflow: hidden;
+}
+
+    .DateBar_year_selector:hover {
+        cursor: pointer;
+        overflow: visible;
+    }
+     
+        /* Hovering on year selector extends list */
+        .DateBar_year_selector:hover
+        > .DateBar_year_selector_item {
+            cursor: pointer;
+            overflow: visible;
+            display: inline-block;
+            grid-column: auto;
+            width: 6rem;
+            animation-name: list-drawer-fade-in;
+            animation-duration: 300ms;
+            animation-fill-mode: forwards;
+            animation-timing-function: ease-in-out;
+        }
+
+            @keyframes list-drawer-fade-in {
+                0% {
+                    opacity: 0;
+                }
+
+                100% {
+                    opacity: 100%;
+                }
+            }
+
+    /* Current selected year */
+    .DateBar_year_selector_active {
+        display: inline-block;
+        color: var(--colour-text-active);
+        grid-column: 1;
+        grid-row: 1;
+        font-size: 2rem;
+        text-align: center;
+        align-self: center;
+    }
+
+        .DateBar_year_selector_active:hover {
+            cursor: ew-resize;
+        }
+
+    
+    /* Year items in menu drawer */
+    .DateBar_year_selector_item {
+        grid-column: 1;
+        grid-row: 1;
+        font-size: 2rem;
+        text-align: center;
+        align-self: center;
+        display: none;
+    }
+
+        .DateBar_year_selector_item:hover {
+            color: var(--colour-text-highlight);
+        }
+
+    
+    

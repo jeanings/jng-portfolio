@@ -72,6 +72,9 @@ const DateBar: React.FC = () => {
 
     ==================================================================== */
 
+    const onYearSelect = (event: any) => {
+        // Dispatch event.target.innerText to reducer.
+    }
 
     /* -----------------------------------------------------
                         CSS classes
@@ -81,6 +84,27 @@ const DateBar: React.FC = () => {
     
     return (
         <div className={useMediaQueries(classBase)}>
+            <div className="DateBar_year_selector">
+                <div className="DateBar_year_selector_active">2014</div>
+                <li className="DateBar_year_selector_item"
+                    onClick={onYearSelect}>2014</li>
+                <li className="DateBar_year_selector_item"
+                    onClick={onYearSelect}>2015</li>
+                <li className="DateBar_year_selector_item"
+                    onClick={onYearSelect}>2016</li>
+                <li className="DateBar_year_selector_item"
+                    onClick={onYearSelect}>2017</li>
+                <li className="DateBar_year_selector_item"
+                    onClick={onYearSelect}>2018</li>
+                <li className="DateBar_year_selector_item"
+                    onClick={onYearSelect}>2019</li>
+                <li className="DateBar_year_selector_item"
+                    onClick={onYearSelect}>2020</li>
+                <li className="DateBar_year_selector_item"
+                    onClick={onYearSelect}>2021</li>
+                <li className="DateBar_year_selector_item"
+                    onClick={onYearSelect}>2022</li>
+            </div>
         </div>
     );
 }
