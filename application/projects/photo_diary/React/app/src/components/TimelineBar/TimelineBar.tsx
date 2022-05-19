@@ -74,10 +74,7 @@ const TimelineBar: React.FC = () => {
 
     const onYearSelect = (event: any) => {
         // Dispatch event.target.innerText to reducer.
-<<<<<<< HEAD:application/projects/photo_diary/React/app/src/components/DateBar.tsx
-=======
         
->>>>>>> develop/photo_diary:application/projects/photo_diary/React/app/src/components/TimelineBar/TimelineBar.tsx
     }
 
     /* -----------------------------------------------------
@@ -88,27 +85,6 @@ const TimelineBar: React.FC = () => {
     
     return (
         <div className={useMediaQueries(classBase)}>
-<<<<<<< HEAD:application/projects/photo_diary/React/app/src/components/DateBar.tsx
-            <div className="DateBar_year_selector">
-                <div className="DateBar_year_selector_active">2014</div>
-                <li className="DateBar_year_selector_item"
-                    onClick={onYearSelect}>2014</li>
-                <li className="DateBar_year_selector_item"
-                    onClick={onYearSelect}>2015</li>
-                <li className="DateBar_year_selector_item"
-                    onClick={onYearSelect}>2016</li>
-                <li className="DateBar_year_selector_item"
-                    onClick={onYearSelect}>2017</li>
-                <li className="DateBar_year_selector_item"
-                    onClick={onYearSelect}>2018</li>
-                <li className="DateBar_year_selector_item"
-                    onClick={onYearSelect}>2019</li>
-                <li className="DateBar_year_selector_item"
-                    onClick={onYearSelect}>2020</li>
-                <li className="DateBar_year_selector_item"
-                    onClick={onYearSelect}>2021</li>
-                <li className="DateBar_year_selector_item"
-=======
             <div className="TimelineBar_year_selector">
                 <div className="TimelineBar_year_selector_active">2014</div>
                 <li className="TimelineBar_year_selector_item"
@@ -128,7 +104,6 @@ const TimelineBar: React.FC = () => {
                 <li className="TimelineBar_year_selector_item"
                     onClick={onYearSelect}>2021</li>
                 <li className="TimelineBar_year_selector_item"
->>>>>>> develop/photo_diary:application/projects/photo_diary/React/app/src/components/TimelineBar/TimelineBar.tsx
                     onClick={onYearSelect}>2022</li>
             </div>
         </div>

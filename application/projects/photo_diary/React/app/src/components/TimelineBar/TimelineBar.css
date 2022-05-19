@@ -1,9 +1,4 @@
-<<<<<<< HEAD:application/projects/photo_diary/React/app/src/components/DateBar.css
-.DateBar {
-    background-color: var(--colour-background);
-=======
 .TimelineBar {
->>>>>>> develop/photo_diary:application/projects/photo_diary/React/app/src/components/TimelineBar/TimelineBar.css
     grid-column: 1 / -1;
     grid-row: 1 / 2;
     display: grid;
@@ -11,7 +6,7 @@
     padding: 1rem;
 }
 
-.DateBar_year_selector {
+.TimelineBar_year_selector {
     display: grid;
     height: 100%;
     width: 6rem;
@@ -22,14 +17,14 @@
     overflow: hidden;
 }
 
-    .DateBar_year_selector:hover {
+    .TimelineBar_year_selector:hover {
         cursor: pointer;
         overflow: visible;
     }
      
         /* Hovering on year selector extends list */
-        .DateBar_year_selector:hover
-        > .DateBar_year_selector_item {
+        .TimelineBar_year_selector:hover
+        > .TimelineBar_year_selector_item {
             cursor: pointer;
             overflow: visible;
             display: inline-block;
@@ -52,7 +47,7 @@
             }
 
     /* Current selected year */
-    .DateBar_year_selector_active {
+    .TimelineBar_year_selector_active {
         display: inline-block;
         color: var(--colour-text-active);
         grid-column: 1;
@@ -62,13 +57,13 @@
         align-self: center;
     }
 
-        .DateBar_year_selector_active:hover {
+        .TimelineBar_year_selector_active:hover {
             cursor: ew-resize;
         }
 
     
     /* Year items in menu drawer */
-    .DateBar_year_selector_item {
+    .TimelineBar_year_selector_item {
         grid-column: 1;
         grid-row: 1;
         font-size: 2rem;
@@ -77,7 +72,7 @@
         display: none;
     }
 
-        .DateBar_year_selector_item:hover {
+        .TimelineBar_year_selector_item:hover {
             color: var(--colour-text-highlight);
         }
 
