@@ -1,6 +1,6 @@
 import React from 'react';
-import { useAppSelector } from '../hooks';
-import { useMediaQueries } from '../App';
+import { useAppSelector } from '../../hooks';
+import { useMediaQueries } from '../../App';
 // @ts-ignore
 import mapboxgl from 'mapbox-gl'; 
 import 'mapbox-gl/dist/mapbox-gl.css';

@@ -1,11 +1,11 @@
 import React from 'react';
-import { useAppSelector } from '../hooks';
-import { useMediaQueries } from '../App';
-import './DateBar.css';
+import { useAppSelector } from '../../hooks';
+import { useMediaQueries } from '../../App';
+import './TimelineBar.css';
 
 
 
-const DateBar: React.FC = () => {
+const TimelineBar: React.FC = () => {
     /* ------------------------------------------------------------
         A main component - container for the date selector up top.
     ------------------------------------------------------------- */
@@ -72,18 +72,43 @@ const DateBar: React.FC = () => {
 
     ==================================================================== */
 
+    const onYearSelect = (event: any) => {
+        // Dispatch event.target.innerText to reducer.
+        
+    }
 
     /* -----------------------------------------------------
                         CSS classes
     ------------------------------------------------------*/
-    const classBase: string = 'DateBar';
+    const classBase: string = 'TimelineBar';
 
     
     return (
         <div className={useMediaQueries(classBase)}>
+            <div className="TimelineBar_year_selector">
+                <div className="TimelineBar_year_selector_active">2014</div>
+                <li className="TimelineBar_year_selector_item"
+                    onClick={onYearSelect}>2014</li>
+                <li className="TimelineBar_year_selector_item"
+                    onClick={onYearSelect}>2015</li>
+                <li className="TimelineBar_year_selector_item"
+                    onClick={onYearSelect}>2016</li>
+                <li className="TimelineBar_year_selector_item"
+                    onClick={onYearSelect}>2017</li>
+                <li className="TimelineBar_year_selector_item"
+                    onClick={onYearSelect}>2018</li>
+                <li className="TimelineBar_year_selector_item"
+                    onClick={onYearSelect}>2019</li>
+                <li className="TimelineBar_year_selector_item"
+                    onClick={onYearSelect}>2020</li>
+                <li className="TimelineBar_year_selector_item"
+                    onClick={onYearSelect}>2021</li>
+                <li className="TimelineBar_year_selector_item"
+                    onClick={onYearSelect}>2022</li>
+            </div>
         </div>
     );
 }
 
 
-export default DateBar;
+export default TimelineBar;
