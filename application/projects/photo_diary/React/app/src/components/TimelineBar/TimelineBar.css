@@ -1,5 +1,9 @@
+<<<<<<< HEAD:application/projects/photo_diary/React/app/src/components/DateBar.css
 .DateBar {
     background-color: var(--colour-background);
+=======
+.TimelineBar {
+>>>>>>> develop/photo_diary:application/projects/photo_diary/React/app/src/components/TimelineBar/TimelineBar.css
     grid-column: 1 / -1;
     grid-row: 1 / 2;
     display: grid;

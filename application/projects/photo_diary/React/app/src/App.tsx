@@ -1,9 +1,9 @@
 import React from 'react';
 import { useAppDispatch, useAppSelector } from './hooks';
 import { useMediaQuery } from 'react-responsive';
-import DateBar from './components/DateBar';
-import FilterMenu from './components/FilterMenu';
-import MainCanvas from './components/MainCanvas';
+import TimelineBar from './components/TimelineBar/TimelineBar';
+import FilterMenu from './components/FilterMenu/FilterMenu';
+import MainCanvas from './components/MainCanvas/MainCanvas';
 import './App.css';
 
 
@@ -18,7 +18,7 @@ const App: React.FC = () => {
 
     return (
         <div className={useMediaQueries(classBase)}>
-            <DateBar />
+            <TimelineBar />
             <FilterMenu />
             <MainCanvas />
         </div>

@@ -1,6 +1,6 @@
 import React from 'react';
-import { useAppSelector } from '../hooks';
-import { useMediaQueries } from '../App';
+import { useAppSelector } from '../../hooks';
+import { useMediaQueries } from '../../App';
 import './FilterMenu.css';
 
 
