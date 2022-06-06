@@ -73,6 +73,8 @@ const TimelineBar: React.FC = () => {
     ==================================================================== */
 
     const onYearSelect = (event: any) => {
+        // Change current selected year.
+
         // Dispatch event.target.innerText to reducer.
         
     }
@@ -85,25 +87,40 @@ const TimelineBar: React.FC = () => {
     
     return (
         <div className={useMediaQueries(classBase)}>
-            <div className="TimelineBar_year_selector">
-                <div className="TimelineBar_year_selector_active">2014</div>
+            <div className="TimelineBar_year_selector"
+                role="menubar" aria-label="year_selector">
+
+                <div className="TimelineBar_year_selector_active"
+                    role="menuitem" aria-label="year_selected">
+                    2014
+                </div>
+
                 <li className="TimelineBar_year_selector_item"
+                    role="menuitem"
                     onClick={onYearSelect}>2014</li>
                 <li className="TimelineBar_year_selector_item"
+                    role="menuitem"
                     onClick={onYearSelect}>2015</li>
                 <li className="TimelineBar_year_selector_item"
+                    role="menuitem"
                     onClick={onYearSelect}>2016</li>
                 <li className="TimelineBar_year_selector_item"
+                    role="menuitem"
                     onClick={onYearSelect}>2017</li>
                 <li className="TimelineBar_year_selector_item"
+                    role="menuitem"
                     onClick={onYearSelect}>2018</li>
                 <li className="TimelineBar_year_selector_item"
+                    role="menuitem"
                     onClick={onYearSelect}>2019</li>
                 <li className="TimelineBar_year_selector_item"
+                    role="menuitem"
                     onClick={onYearSelect}>2020</li>
                 <li className="TimelineBar_year_selector_item"
+                    role="menuitem"
                     onClick={onYearSelect}>2021</li>
                 <li className="TimelineBar_year_selector_item"
+                    role="menuitem"
                     onClick={onYearSelect}>2022</li>
             </div>
         </div>
