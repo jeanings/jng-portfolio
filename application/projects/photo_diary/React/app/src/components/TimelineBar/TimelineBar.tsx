@@ -73,9 +73,24 @@ const TimelineBar: React.FC = () => {
     ==================================================================== */
 
     const onYearSelect = (event: any) => {
-        // Change current selected year.
+        // Reset all radios to false.
+        const yearSelectorItems:  HTMLCollectionOf<Element>= document.getElementsByClassName("TimelineBar_year_selector_item");
+
+        for (let element of Array.from(yearSelectorItems)) {
+            element.ariaChecked = "false";
+        }
+
+
+        // Change to clicked year.
+        const yearSelected: string = event.target.textContent;
+        const yearSelectedStatus: boolean = event.target.ariaChecked = true;
+        const yearSelector = document.querySelector(".TimelineBar_year_selector_active") as HTMLElement;
+
+        yearSelector.textContent = yearSelected;
+
 
         // Dispatch event.target.innerText to reducer.
+        
         
     }
 
@@ -96,31 +111,40 @@ const TimelineBar: React.FC = () => {
                 </div>
 
                 <li className="TimelineBar_year_selector_item"
-                    role="menuitem"
+                    role="menuitemradio"
+                    aria-checked="false"
                     onClick={onYearSelect}>2014</li>
                 <li className="TimelineBar_year_selector_item"
-                    role="menuitem"
+                    role="menuitemradio"
+                    aria-checked="false"
                     onClick={onYearSelect}>2015</li>
                 <li className="TimelineBar_year_selector_item"
-                    role="menuitem"
+                    role="menuitemradio"
+                    aria-checked="false"
                     onClick={onYearSelect}>2016</li>
                 <li className="TimelineBar_year_selector_item"
-                    role="menuitem"
+                    role="menuitemradio"
+                    aria-checked="false"
                     onClick={onYearSelect}>2017</li>
                 <li className="TimelineBar_year_selector_item"
-                    role="menuitem"
+                    role="menuitemradio"
+                    aria-checked="false"
                     onClick={onYearSelect}>2018</li>
                 <li className="TimelineBar_year_selector_item"
-                    role="menuitem"
+                    role="menuitemradio"
+                    aria-checked="false"
                     onClick={onYearSelect}>2019</li>
                 <li className="TimelineBar_year_selector_item"
-                    role="menuitem"
+                    role="menuitemradio"
+                    aria-checked="false"
                     onClick={onYearSelect}>2020</li>
                 <li className="TimelineBar_year_selector_item"
-                    role="menuitem"
+                    role="menuitemradio"
+                    aria-checked="false"
                     onClick={onYearSelect}>2021</li>
                 <li className="TimelineBar_year_selector_item"
-                    role="menuitem"
+                    role="menuitemradio"
+                    aria-checked="false"
                     onClick={onYearSelect}>2022</li>
             </div>
         </div>
