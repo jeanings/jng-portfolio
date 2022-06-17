@@ -43,6 +43,7 @@
     "@babel/preset-env": "^7.18.2",
     "@babel/preset-react": "^7.17.12",
     "@babel/preset-typescript": "^7.17.12",
+    "@faker-js/faker": "^7.2.0",
     "@testing-library/jest-dom": "^4.2.4",
     "@testing-library/react": "^12.1.5",
     "@types/jest": "^24.9.1",
