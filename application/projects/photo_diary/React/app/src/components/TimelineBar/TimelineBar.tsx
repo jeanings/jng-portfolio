@@ -1,5 +1,6 @@
-import React from 'react';
-import { useAppSelector } from '../../hooks';
+import React, { useEffect } from 'react';
+import { useAppDispatch, useAppSelector } from '../../hooks';
+import { handleTimelineYear } from '../../slices/timelineSlice';
 import { useMediaQueries } from '../../App';
 import './TimelineBar.css';
 
@@ -71,6 +72,8 @@ const TimelineBar: React.FC = () => {
 
 
     ==================================================================== */
+    const dispatch = useAppDispatch();
+    
 
     const onYearSelect = (event: any) => {
         // Reset all radios to false.
@@ -89,9 +92,9 @@ const TimelineBar: React.FC = () => {
         yearSelector.textContent = yearSelected;
 
 
-        // Dispatch event.target.innerText to reducer.
-        
-        
+        // Dispatch selected year to reducer.
+        const payloadYear = yearSelected;
+        dispatch(handleTimelineYear(payloadYear));
     }
 
     /* -----------------------------------------------------

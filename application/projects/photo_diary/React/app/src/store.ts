@@ -1,10 +1,11 @@
 import { configureStore, ThunkAction, Action } from '@reduxjs/toolkit';
+import timelineReducer from './slices/timelineSlice';
 
 
 
 export const store = configureStore({
   reducer: {
-
+    timeline: timelineReducer
   },
 });
 
