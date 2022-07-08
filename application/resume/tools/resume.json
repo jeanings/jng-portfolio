@@ -1,35 +1,61 @@
-{"2021Q4": [
+{"2022": [
         {
-            "selectedProject": {
-                "title": "React-Redux dashboard app for visualizing housing prices of Japan",
-                "url": "https://jeanings.space/projects/japan-real-estate-dashboard-2010-2020",
-                "location": "",
-                "date": "Mar 2021 - Sep 2021",
-                "stack": {
-                    "backend": [
-                        "Python",
-                        "NodeJS",
-                        "MongoDB",
-                        "Flask",
-                        "NumPy",
-                        "pandas"
-                    ],
-                    "frontend": [
-                        "React",
-                        "Redux Toolkit",
-                        "TypeScript",
-                        "Mapbox GL JS",
-                        "Chart.js",
-                        "CSS"
-                    ]
-                },
-                "description": [
-                    "Cleaned and transformed data on housing transactions from geographic regions down to districts",
-                    "Designed custom API requests for fetching transactions data in MongoDB and geocoding in Mapbox",
-                    "Developed frontend using React Redux for state management and seamless UI renders",
-                    "Visualized data by geocoding with Mapbox and charting price and total transactions with Chart.js"
-                ]
-            }
+            "selectedProjects": [
+                {
+                    "React-Redux dashboard app for visualizing housing prices of Japan": {
+                        "url": "https://jeanings.space/projects/japan-real-estate-dashboard-2010-2020",
+                        "location": "",
+                        "date": "Mar 2021 - Sep 2021",
+                        "stack": {
+                            "backend": [
+                                "Python",
+                                "NodeJS",
+                                "MongoDB",
+                                "Flask",
+                                "NumPy",
+                                "pandas"
+                            ],
+                            "frontend": [
+                                "React",
+                                "Redux Toolkit",
+                                "TypeScript",
+                                "Mapbox GL JS",
+                                "Chart.js",
+                                "CSS"
+                            ]
+                        },
+                        "description": [
+                            "Cleaned and transformed data on housing transactions from geographic regions down to districts",
+                            "Designed custom API requests for fetching transactions data in MongoDB and geocoding in Mapbox",
+                            "Developed frontend using React Redux for state management and seamless UI renders",
+                            "Visualized data by geocoding with Mapbox and charting price and total transactions with Chart.js"
+                        ]
+                    }
+                }, 
+                {
+                    "Urban-hiking the Tokaido: an interactive travel journal": {
+                        "url": "https://jeanings.space/projects/tokaido-urban-hike",
+                        "location": "",
+                        "date": "Feb 2020 - Jun 2020",
+                        "stack": {
+                            "backend": [
+                                "Python",
+                                "PostgreSQL",
+                                "Flask"
+                            ],
+                            "frontend": [
+                                "JavaScript",
+                                "Mapbox GL JS",
+                                "CSS"
+                            ]
+                        },
+                        "description": [
+                            "Geotagged photos by matching timestamps against Google Location History's GPS-logged data",
+                            "Mapped route traveled for each day and styled transitions smoothly with Mapbox"
+                        ]
+                    }
+                }
+            ]
         },
         {
             "education": [
@@ -48,9 +74,7 @@
                         "title": "B.Asc Materials Engineering",
                         "location": "Vancouver BC",
                         "date": "2012",
-                        "description": [
-                            "Specialization - Manufacturing and materials performance"
-                        ]
+                        "description": []
                     }
                 }
             ]
@@ -62,10 +86,7 @@
                         "title": "Traveller, Inn Staff at Kiri no Sato Takahara",
                         "location": "Japan",
                         "date": "Sep 2016 - Sep 2017",
-                        "description": [
-                            "Interpreted for English & Cantonese speakers on the Kumano Kodo UNESCO pilgrimage trails",
-                            "Coordinated recruitment of international seasonal staff"
-                        ]
+                        "description": []
                     }
                 },
                 {
@@ -73,10 +94,7 @@
                         "title": "Quality Control Laboratory Technician",
                         "location": "Langley BC",
                         "date": "Feb 2013 - Sep 2016",
-                        "description": [
-                            "Responsible for all testing of production polyethylene materials",
-                            "Optimized test procedures, explored test methods, tuned HPLC spectral libraries"
-                        ]
+                        "description": []
                     }
                 }
             ]
