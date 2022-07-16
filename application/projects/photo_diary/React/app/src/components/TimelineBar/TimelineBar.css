@@ -4,6 +4,8 @@
     display: grid;
     align-items: center;
     padding: 1rem;
+    grid-template-columns: 6rem 50vw;
+    grid-template-rows: 100%;
 }
 
 .TimelineBar_year_selector {
@@ -76,5 +78,19 @@
             color: var(--colour-text-highlight);
         }
 
-    
+
+.TimelineBar_month_selector {
+    grid-column: 2 / -1;
+    grid-row: 1 / -1;
+    display: grid;
+    grid-template-columns: repeat(12, 1fr);
+    grid-template-rows: auto;
+    height: 100%;
+    width: 100%;
+    align-content: end;
+}
+
+    .TimelineBar_month_selector_item {
+        text-align: center;
+    }
     

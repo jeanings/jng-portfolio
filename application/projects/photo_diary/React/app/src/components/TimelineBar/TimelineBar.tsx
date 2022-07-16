@@ -97,6 +97,25 @@ const TimelineBar: React.FC = () => {
         dispatch(handleTimelineYear(payloadYear));
     }
 
+
+    const onMonthSelect = (event: any) => {
+        console.log("month clicked");
+    }
+
+
+    const years: Array<string> = [
+        '2014', '2015', '2016', '2017',
+        '2018', '2019', '2020', '2021',
+        '2022'
+    ];
+
+    const months: Array<string> = [
+        'JAN', 'FEB', 'MAR', 'APR',
+        'MAY', 'JUN', 'JUL', 'AUG',
+        'SEP', 'OCT', 'NOV', 'DEC'
+    ];
+
+
     /* -----------------------------------------------------
                         CSS classes
     ------------------------------------------------------*/
@@ -150,6 +169,26 @@ const TimelineBar: React.FC = () => {
                     aria-checked="false"
                     onClick={onYearSelect}>2022</li>
             </div>
+
+            <div className="TimelineBar_month_selector"
+                role="menuitem">
+
+                {months.map((month, index) => (
+                    <div className="TimelineBar_month_selector_item"
+                        role="menuitemradio"
+                        aria-checked="false"
+                        key={index}
+                        onClick={onMonthSelect}>
+                            {month}
+                    </div>
+                ))}
+
+            </div>
+
+            
+
+
+
         </div>
     );
 }
