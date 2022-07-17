@@ -110,6 +110,7 @@ const TimelineBar: React.FC = () => {
     ];
 
     const months: Array<string> = [
+        'ALL',
         'JAN', 'FEB', 'MAR', 'APR',
         'MAY', 'JUN', 'JUL', 'AUG',
         'SEP', 'OCT', 'NOV', 'DEC'
@@ -132,47 +133,22 @@ const TimelineBar: React.FC = () => {
                     2014
                 </div>
 
-                <li className="TimelineBar_year_selector_item"
+                {/* Year items shown in drop-down */}
+                {years.map((year, index) => (
+                    <li className="TimelineBar_year_selector_item"
                     role="menuitemradio"
                     aria-checked="false"
-                    onClick={onYearSelect}>2014</li>
-                <li className="TimelineBar_year_selector_item"
-                    role="menuitemradio"
-                    aria-checked="false"
-                    onClick={onYearSelect}>2015</li>
-                <li className="TimelineBar_year_selector_item"
-                    role="menuitemradio"
-                    aria-checked="false"
-                    onClick={onYearSelect}>2016</li>
-                <li className="TimelineBar_year_selector_item"
-                    role="menuitemradio"
-                    aria-checked="false"
-                    onClick={onYearSelect}>2017</li>
-                <li className="TimelineBar_year_selector_item"
-                    role="menuitemradio"
-                    aria-checked="false"
-                    onClick={onYearSelect}>2018</li>
-                <li className="TimelineBar_year_selector_item"
-                    role="menuitemradio"
-                    aria-checked="false"
-                    onClick={onYearSelect}>2019</li>
-                <li className="TimelineBar_year_selector_item"
-                    role="menuitemradio"
-                    aria-checked="false"
-                    onClick={onYearSelect}>2020</li>
-                <li className="TimelineBar_year_selector_item"
-                    role="menuitemradio"
-                    aria-checked="false"
-                    onClick={onYearSelect}>2021</li>
-                <li className="TimelineBar_year_selector_item"
-                    role="menuitemradio"
-                    aria-checked="false"
-                    onClick={onYearSelect}>2022</li>
+                    onClick={onYearSelect}>
+                        {year}
+                    </li>
+                ))}
             </div>
+
 
             <div className="TimelineBar_month_selector"
                 role="menuitem">
-
+                    
+                {/* Months selection labels: JAN, FEB, etc */}
                 {months.map((month, index) => (
                     <div className="TimelineBar_month_selector_item"
                         role="menuitemradio"
@@ -180,6 +156,12 @@ const TimelineBar: React.FC = () => {
                         key={index}
                         onClick={onMonthSelect}>
                             {month}
+
+                            {/* Counter for photos taken in each month */}
+                            <div className="TimelineBar_month_selector_item_counter"
+                                key={'counter' + index}>
+                                0
+                            </div>
                     </div>
                 ))}
 
