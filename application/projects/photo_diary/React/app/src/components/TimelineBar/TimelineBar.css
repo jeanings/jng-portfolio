@@ -5,6 +5,7 @@
     align-items: center;
     grid-template-columns: 6rem 50vw;
     grid-template-rows: 3rem auto;
+    z-index: 5;
 }
 
 .TimelineBar_year_selector {
