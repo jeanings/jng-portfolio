@@ -3,18 +3,20 @@
     grid-row: 1 / 2;
     display: grid;
     align-items: center;
-    padding: 1rem;
     grid-template-columns: 6rem 50vw;
-    grid-template-rows: 100%;
+    grid-template-rows: 3rem auto;
 }
 
 .TimelineBar_year_selector {
-    display: grid;
+    display: flex;
+    grid-column: 1 / 2;
+    grid-row: 1 / -1;
     height: 100%;
-    width: 6rem;
-    grid-template-columns: 100%;
-    grid-template-rows: 100%;
+    width: 100%;
+    flex-direction: column;
+    justify-content: start;
     color: var(--colour-text-inactive);
+    font-size: 2.5rem;
     list-style: none;
     overflow: hidden;
 }
@@ -54,13 +56,12 @@
         color: var(--colour-text-active);
         grid-column: 1;
         grid-row: 1;
-        font-size: 2rem;
         text-align: center;
         align-self: center;
     }
 
         .TimelineBar_year_selector_active:hover {
-            cursor: ew-resize;
+            cursor: ns-resize;
         }
 
     
@@ -68,7 +69,6 @@
     .TimelineBar_year_selector_item {
         grid-column: 1;
         grid-row: 1;
-        font-size: 2rem;
         text-align: center;
         align-self: center;
         display: none;
@@ -81,16 +81,17 @@
 
 .TimelineBar_month_selector {
     grid-column: 2 / -1;
-    grid-row: 1 / -1;
+    grid-row: 1 / 2;
     display: grid;
     grid-template-columns: repeat(12, 1fr);
-    grid-template-rows: auto;
+    grid-template-rows: 60% 40%;
     height: 100%;
     width: 100%;
     align-content: end;
 }
 
     .TimelineBar_month_selector_item {
+        grid-row: 2 / -1;
         text-align: center;
     }
     
