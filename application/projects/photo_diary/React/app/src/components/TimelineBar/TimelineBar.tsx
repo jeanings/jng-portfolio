@@ -130,7 +130,7 @@ const TimelineBar: React.FC = () => {
 
                 <div className="TimelineBar_year_selector_active"
                     role="menuitem" aria-label="year_selected">
-                    2014
+                    {years[years.length - 1]}
                 </div>
 
                 {/* Year items shown in drop-down */}
@@ -164,12 +164,7 @@ const TimelineBar: React.FC = () => {
                             </div>
                     </div>
                 ))}
-
             </div>
-
-            
-
-
 
         </div>
     );
