@@ -99,7 +99,7 @@ const TimelineBar: React.FC = () => {
 
 
     const onMonthSelect = (event: any) => {
-        console.log("month clicked");
+       
     }
 
 
@@ -136,8 +136,9 @@ const TimelineBar: React.FC = () => {
                 {/* Year items shown in drop-down */}
                 {years.map((year, index) => (
                     <li className="TimelineBar_year_selector_item"
-                    role="menuitemradio"
+                    role="menuitemradio" aria-label="year_selector_item"
                     aria-checked="false"
+                    key={'key_year_' + index}
                     onClick={onYearSelect}>
                         {year}
                     </li>
@@ -146,20 +147,20 @@ const TimelineBar: React.FC = () => {
 
 
             <div className="TimelineBar_month_selector"
-                role="menuitem">
+                role="menubar" aria-label="month_selector">
                     
                 {/* Months selection labels: JAN, FEB, etc */}
                 {months.map((month, index) => (
                     <div className="TimelineBar_month_selector_item"
-                        role="menuitemradio"
+                        role="menuitemradio" aria-label="month_selector_item"
                         aria-checked="false"
-                        key={index}
+                        key={'key_month_' + index}
                         onClick={onMonthSelect}>
                             {month}
 
                             {/* Counter for photos taken in each month */}
                             <div className="TimelineBar_month_selector_item_counter"
-                                key={'counter' + index}>
+                                key={'key_month_counter_' + index}>
                                 0
                             </div>
                     </div>

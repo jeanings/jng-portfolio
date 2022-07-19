@@ -9,7 +9,9 @@ import { faker } from '@faker-js/faker';
 import TimelineBar from './TimelineBar';
 
 
-
+/* ---------------------------------------------------
+    Tests for year selector
+----------------------------------------------------*/
 test("renders year selector", () => {
     render(
         <Provider store={store}>
@@ -63,7 +65,7 @@ describe("clicks on year drawer items", () => {
         });
     
         // Select a year.
-        const yearSelect = screen.getByRole('menuitemradio', { name: '2015' });
+        const yearSelect = screen.getByText('2015', { exact: true });
         fireEvent.click(yearSelect);
     
         // Check for aria-checked status.
@@ -84,10 +86,37 @@ describe("clicks on year drawer items", () => {
         );
 
         // Select a year.
-        const yearSelect = screen.getByRole('menuitemradio', { name: '2015' });
+        const yearSelect = screen.getByText('2015', { exact: true });
         fireEvent.click(yearSelect);
 
         // Check for dispatch.
         expect(store.getState().timeline.year).toBe('2015');
     });
+});
+
+
+
+/* ---------------------------------------------------
+    Tests for month selector
+----------------------------------------------------*/
+test("renders month selector", () => {
+    render(
+        <Provider store={store}>
+            <TimelineBar />
+        </Provider>
+    );
+
+    expect(screen.getByRole('menubar', { name: 'month_selector' })).toBeInTheDocument();
+});
+
+
+test("renders list of selectable months", () => {
+    render(
+        <Provider store={store}>
+            <TimelineBar />
+        </Provider>
+    );
+
+    const monthSelectorItems = screen.getAllByRole('menuitemradio', { name: 'month_selector_item' });
+    expect(monthSelectorItems.length).toBeGreaterThanOrEqual(13);
 });
