@@ -59,15 +59,16 @@ describe("clicks on year drawer items", () => {
         );
     
         // Check for all radios to be false.
-        const yearSelectorItems = screen.getAllByRole('menuitemradio');
+        const yearSelectorItems = screen.getAllByRole('menuitemradio', { name: 'year_selector_item' });
         yearSelectorItems.forEach(element => {
             expect(element).toHaveAttribute('aria-checked', 'false');
         });
     
         // Select a year.
-        const yearSelect = screen.getByText('2015', { exact: true });
+        const yearSelect = yearSelectorItems.find(element => element.textContent === '2015') as HTMLElement;
+      
         fireEvent.click(yearSelect);
-    
+        
         // Check for aria-checked status.
         expect(yearSelect.ariaChecked).toEqual(true);
     
@@ -85,8 +86,11 @@ describe("clicks on year drawer items", () => {
             </Provider>
         );
 
+        const yearSelectorItems = screen.getAllByRole('menuitemradio', { name: 'year_selector_item' });
+
         // Select a year.
-        const yearSelect = screen.getByText('2015', { exact: true });
+        const yearSelect = yearSelectorItems.find(element => element.textContent === '2015') as HTMLElement;
+      
         fireEvent.click(yearSelect);
 
         // Check for dispatch.
@@ -119,4 +123,56 @@ test("renders list of selectable months", () => {
 
     const monthSelectorItems = screen.getAllByRole('menuitemradio', { name: 'month_selector_item' });
     expect(monthSelectorItems.length).toBeGreaterThanOrEqual(13);
+});
+
+
+describe("clicks on month items", () => {
+    afterAll(() => {
+        cleanup();
+    });
+
+    test("changes and highlights month on click", async() => {
+        render(
+            <Provider store={store}>
+                <TimelineBar />
+            </Provider>
+        );
+    
+        // Check for all radios to be false.
+        const monthSelectorItems = screen.getAllByRole('menuitemradio', { name: 'month_selector_item' });
+        monthSelectorItems.forEach(element => {
+            expect(element).toHaveAttribute('aria-checked', 'false');
+        });
+    
+        // Select a month.
+        const monthSelect = monthSelectorItems.find(
+            element => element.textContent!.replace(/\d/, "") === 'JAN') as HTMLElement;
+        fireEvent.click(monthSelect);
+    
+        // Check for aria-checked status.
+        expect(monthSelect.ariaChecked).toEqual(true);
+    
+        // Check for selected month highlight.
+        await waitFor(() => 
+            expect(monthSelect).toHaveClass('active')
+        );
+    });
+
+    test("dispatches action to change state of selected month", () => {
+        render(
+            <Provider store={store}>
+                <TimelineBar />
+            </Provider>
+        );
+        
+        const monthSelectorItems = screen.getAllByRole('menuitemradio', { name: 'month_selector_item' });
+
+        // Select a year.
+        const monthSelect = monthSelectorItems.find(
+            element => element.textContent!.replace(/\d/, '') === 'JAN') as HTMLElement;
+        fireEvent.click(monthSelect);
+
+        // Check for dispatch.
+        expect(store.getState().timeline.month).toBe('jan');
+    });
 });

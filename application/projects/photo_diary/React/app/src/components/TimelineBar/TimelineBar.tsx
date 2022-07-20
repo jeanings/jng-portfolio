@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { useAppDispatch, useAppSelector } from '../../hooks';
-import { handleTimelineYear } from '../../slices/timelineSlice';
+import { handleTimelineMonth, handleTimelineYear, TimelineProps } from '../../slices/timelineSlice';
 import { useMediaQueries } from '../../App';
 import './TimelineBar.css';
 
@@ -10,6 +10,18 @@ const TimelineBar: React.FC = () => {
     /* ------------------------------------------------------------
         A main component - container for the date selector up top.
     ------------------------------------------------------------- */
+    const years: Array<string> = [
+        '2014', '2015', '2016', '2017',
+        '2018', '2019', '2020', '2021',
+        '2022'
+    ];
+
+    const months: Array<string> = [
+        'ALL',
+        'JAN', 'FEB', 'MAR', 'APR',
+        'MAY', 'JUN', 'JUL', 'AUG',
+        'SEP', 'OCT', 'NOV', 'DEC'
+    ];
     
 
     /* ==================================================================== 
@@ -75,14 +87,30 @@ const TimelineBar: React.FC = () => {
     const dispatch = useAppDispatch();
     
 
+    useEffect(() => {
+        // Set initial year and month selection parameters.
+        const payloadInitYear: string = years[years.length - 1];  // refactor for API, current/most recent year
+        const payloadInitMonth: TimelineProps["month"] = 'all';
+        const allMonthsElement: HTMLElement = document.getElementsByClassName("TimelineBar_month_selector_item")[0] as HTMLElement;
+
+        allMonthsElement.click();
+
+        dispatch(handleTimelineYear(payloadInitYear));
+        dispatch(handleTimelineMonth(payloadInitMonth));
+    }, []);
+
+
     const onYearSelect = (event: any) => {
-        // Reset all radios to false.
+        /* -------------------------------------------------------
+            Clicks on year selector items will dispatch action to
+            retrieve new set of images, handled by the reducer.
+        ------------------------------------------------------- */
         const yearSelectorItems:  HTMLCollectionOf<Element>= document.getElementsByClassName("TimelineBar_year_selector_item");
 
+        // Reset all radios to false.
         for (let element of Array.from(yearSelectorItems)) {
             element.ariaChecked = "false";
         }
-
 
         // Change to clicked year.
         const yearSelected: string = event.target.textContent;
@@ -91,30 +119,38 @@ const TimelineBar: React.FC = () => {
 
         yearSelector.textContent = yearSelected;
 
-
         // Dispatch selected year to reducer.
-        const payloadYear = yearSelected;
+        const payloadYear: TimelineProps["year"] = yearSelected;
         dispatch(handleTimelineYear(payloadYear));
     }
 
 
     const onMonthSelect = (event: any) => {
-       
+        /* ----------------------------------------------------------------
+            Clicks on month selector items will dispatch action to
+            update set of images, showing only images from selected month.
+        ---------------------------------------------------------------- */
+        const monthSelectorItems:  HTMLCollectionOf<Element>= document.getElementsByClassName("TimelineBar_month_selector_item");
+        const monthSelected: HTMLElement = event.target;
+
+        // Reset all radios to false, unhighlight styling.
+        for (let element of Array.from(monthSelectorItems)) {
+            element.ariaChecked = "false";
+            element.classList.remove("active");
+        }
+
+        // Change to clicked month.
+        const monthSelectedText: string = event.target.textContent.replace(/\d/, "");
+        const monthSelectedStatus: boolean = event.target.ariaChecked = true;
+
+        // Update styling and highlight new month.
+        monthSelected.classList.add("active");
+
+        // Dispatch selected month to reducer.
+        const payloadMonth = monthSelectedText.toLowerCase() as TimelineProps["month"];
+        dispatch(handleTimelineMonth(payloadMonth));
     }
 
-
-    const years: Array<string> = [
-        '2014', '2015', '2016', '2017',
-        '2018', '2019', '2020', '2021',
-        '2022'
-    ];
-
-    const months: Array<string> = [
-        'ALL',
-        'JAN', 'FEB', 'MAR', 'APR',
-        'MAY', 'JUN', 'JUL', 'AUG',
-        'SEP', 'OCT', 'NOV', 'DEC'
-    ];
 
 
     /* -----------------------------------------------------

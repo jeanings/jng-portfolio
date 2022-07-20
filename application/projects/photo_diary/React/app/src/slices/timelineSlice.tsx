@@ -9,7 +9,7 @@ import { RootState } from '../store';
 ------------------------------------------------------------------------------ */
 
 // State for initial render.
-const initialState: timelineProps = {
+const initialState: TimelineProps = {
     year: null,
     month: 'all'
 }
@@ -22,7 +22,7 @@ const timelineSlice = createSlice({
     name: 'timeline',
     initialState,
     reducers: {
-        handleTimelineYear: (state, action: PayloadAction<string>) => {
+        handleTimelineYear: (state, action: PayloadAction<TimelineProps["year"]>) => {
             /* --------------------------
                 Saves selection of year.
             -------------------------- */
@@ -30,7 +30,7 @@ const timelineSlice = createSlice({
             
             state.year = selectedYear;
         },
-        handleTimelineMonth: (state, action: PayloadAction<timelineProps['month']>) => {
+        handleTimelineMonth: (state, action: PayloadAction<TimelineProps["month"]>) => {
             /* -----------------------------
                 Saves selection of month(s)
             ------------------------------ */
@@ -43,15 +43,18 @@ const timelineSlice = createSlice({
 
 
 // Types setting.
-export interface timelineProps {
+export interface TimelineProps {
     [index: string]: string | any,
     year: string | null,
-    month: 'jan' | 'feb' | 'mar' |
-           'apr' | 'may' | 'jun' |
-           'jul' | 'aug' | 'sep' |
-           'oct' | 'nov' | 'dec' |
-           'all'
+    month: TimelineMonthTypes
 }
+
+export type TimelineMonthTypes = 
+    'jan' | 'feb' | 'mar' |
+    'apr' | 'may' | 'jun' |
+    'jul' | 'aug' | 'sep' |
+    'oct' | 'nov' | 'dec' |
+    'all';
 
 
 // Selector for selection state.
