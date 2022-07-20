@@ -1,5 +1,6 @@
-import React from 'react';
-import { useAppSelector } from '../../hooks';
+import React, { useEffect } from 'react';
+import { useAppDispatch, useAppSelector } from '../../hooks';
+import { handleTimelineMonth, handleTimelineYear, TimelineProps } from '../../slices/timelineSlice';
 import { useMediaQueries } from '../../App';
 import './TimelineBar.css';
 
@@ -9,6 +10,18 @@ const TimelineBar: React.FC = () => {
     /* ------------------------------------------------------------
         A main component - container for the date selector up top.
     ------------------------------------------------------------- */
+    const years: Array<string> = [
+        '2014', '2015', '2016', '2017',
+        '2018', '2019', '2020', '2021',
+        '2022'
+    ];
+
+    const months: Array<string> = [
+        'ALL',
+        'JAN', 'FEB', 'MAR', 'APR',
+        'MAY', 'JUN', 'JUL', 'AUG',
+        'SEP', 'OCT', 'NOV', 'DEC'
+    ];
     
 
     /* ==================================================================== 
@@ -71,11 +84,74 @@ const TimelineBar: React.FC = () => {
 
 
     ==================================================================== */
+    const dispatch = useAppDispatch();
+    
+
+    useEffect(() => {
+        // Set initial year and month selection parameters.
+        const payloadInitYear: string = years[years.length - 1];  // refactor for API, current/most recent year
+        const payloadInitMonth: TimelineProps["month"] = 'all';
+        const allMonthsElement: HTMLElement = document.getElementsByClassName("TimelineBar_month_selector_item")[0] as HTMLElement;
+
+        allMonthsElement.click();
+
+        dispatch(handleTimelineYear(payloadInitYear));
+        dispatch(handleTimelineMonth(payloadInitMonth));
+    }, []);
+
 
     const onYearSelect = (event: any) => {
-        // Dispatch event.target.innerText to reducer.
-        
+        /* -------------------------------------------------------
+            Clicks on year selector items will dispatch action to
+            retrieve new set of images, handled by the reducer.
+        ------------------------------------------------------- */
+        const yearSelectorItems:  HTMLCollectionOf<Element>= document.getElementsByClassName("TimelineBar_year_selector_item");
+
+        // Reset all radios to false.
+        for (let element of Array.from(yearSelectorItems)) {
+            element.ariaChecked = "false";
+        }
+
+        // Change to clicked year.
+        const yearSelected: string = event.target.textContent;
+        const yearSelectedStatus: boolean = event.target.ariaChecked = true;
+        const yearSelector = document.querySelector(".TimelineBar_year_selector_active") as HTMLElement;
+
+        yearSelector.textContent = yearSelected;
+
+        // Dispatch selected year to reducer.
+        const payloadYear: TimelineProps["year"] = yearSelected;
+        dispatch(handleTimelineYear(payloadYear));
     }
+
+
+    const onMonthSelect = (event: any) => {
+        /* ----------------------------------------------------------------
+            Clicks on month selector items will dispatch action to
+            update set of images, showing only images from selected month.
+        ---------------------------------------------------------------- */
+        const monthSelectorItems:  HTMLCollectionOf<Element>= document.getElementsByClassName("TimelineBar_month_selector_item");
+        const monthSelected: HTMLElement = event.target;
+
+        // Reset all radios to false, unhighlight styling.
+        for (let element of Array.from(monthSelectorItems)) {
+            element.ariaChecked = "false";
+            element.classList.remove("active");
+        }
+
+        // Change to clicked month.
+        const monthSelectedText: string = event.target.textContent.replace(/\d/, "");
+        const monthSelectedStatus: boolean = event.target.ariaChecked = true;
+
+        // Update styling and highlight new month.
+        monthSelected.classList.add("active");
+
+        // Dispatch selected month to reducer.
+        const payloadMonth = monthSelectedText.toLowerCase() as TimelineProps["month"];
+        dispatch(handleTimelineMonth(payloadMonth));
+    }
+
+
 
     /* -----------------------------------------------------
                         CSS classes
@@ -85,27 +161,48 @@ const TimelineBar: React.FC = () => {
     
     return (
         <div className={useMediaQueries(classBase)}>
-            <div className="TimelineBar_year_selector">
-                <div className="TimelineBar_year_selector_active">2014</div>
-                <li className="TimelineBar_year_selector_item"
-                    onClick={onYearSelect}>2014</li>
-                <li className="TimelineBar_year_selector_item"
-                    onClick={onYearSelect}>2015</li>
-                <li className="TimelineBar_year_selector_item"
-                    onClick={onYearSelect}>2016</li>
-                <li className="TimelineBar_year_selector_item"
-                    onClick={onYearSelect}>2017</li>
-                <li className="TimelineBar_year_selector_item"
-                    onClick={onYearSelect}>2018</li>
-                <li className="TimelineBar_year_selector_item"
-                    onClick={onYearSelect}>2019</li>
-                <li className="TimelineBar_year_selector_item"
-                    onClick={onYearSelect}>2020</li>
-                <li className="TimelineBar_year_selector_item"
-                    onClick={onYearSelect}>2021</li>
-                <li className="TimelineBar_year_selector_item"
-                    onClick={onYearSelect}>2022</li>
+            <div className="TimelineBar_year_selector"
+                role="menubar" aria-label="year_selector">
+
+                <div className="TimelineBar_year_selector_active"
+                    role="menuitem" aria-label="year_selected">
+                    {years[years.length - 1]}
+                </div>
+
+                {/* Year items shown in drop-down */}
+                {years.map((year, index) => (
+                    <li className="TimelineBar_year_selector_item"
+                    role="menuitemradio" aria-label="year_selector_item"
+                    aria-checked="false"
+                    key={'key_year_' + index}
+                    onClick={onYearSelect}>
+                        {year}
+                    </li>
+                ))}
             </div>
+
+
+            <div className="TimelineBar_month_selector"
+                role="menubar" aria-label="month_selector">
+                    
+                {/* Months selection labels: JAN, FEB, etc */}
+                {months.map((month, index) => (
+                    <div className="TimelineBar_month_selector_item"
+                        role="menuitemradio" aria-label="month_selector_item"
+                        aria-checked="false"
+                        key={'key_month_' + index}
+                        onClick={onMonthSelect}>
+                            {month}
+
+                            {/* Counter for photos taken in each month */}
+                            <div className="TimelineBar_month_selector_item_counter"
+                                key={'key_month_counter_' + index}>
+                                0
+                            </div>
+                    </div>
+                ))}
+            </div>
+
         </div>
     );
 }

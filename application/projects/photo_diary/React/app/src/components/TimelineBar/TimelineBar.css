@@ -1,4 +1,121 @@
 .TimelineBar {
     grid-column: 1 / -1;
     grid-row: 1 / 2;
+    display: grid;
+    align-items: center;
+    grid-template-columns: 6rem 45vw;
+    grid-template-rows: 3rem auto;
+    column-gap: 1.5rem;
+    user-select: none;
+    z-index: 5;
 }
+
+.TimelineBar_year_selector {
+    display: flex;
+    grid-column: 1 / 2;
+    grid-row: 1 / -1;
+    height: 100%;
+    width: 100%;
+    flex-direction: column;
+    justify-content: start;
+    color: var(--colour-text-inactive);
+    font-size: 2.85rem;
+    list-style: none;
+    overflow: hidden;
+}
+
+    .TimelineBar_year_selector:hover {
+        cursor: pointer;
+        overflow: visible;
+    }
+     
+        /* Hovering on year selector extends list */
+        .TimelineBar_year_selector:hover
+        > .TimelineBar_year_selector_item {
+            cursor: pointer;
+            overflow: visible;
+            display: inline-block;
+            grid-column: auto;
+            width: 6rem;
+            animation-name: list-drawer-fade-in;
+            animation-duration: 300ms;
+            animation-fill-mode: forwards;
+            animation-timing-function: ease-in-out;
+        }
+
+            @keyframes list-drawer-fade-in {
+                0% {
+                    opacity: 0;
+                }
+
+                100% {
+                    opacity: 100%;
+                }
+            }
+
+    /* Current selected year */
+    .TimelineBar_year_selector_active {
+        display: inline-block;
+        color: var(--colour-text-active);
+        grid-column: 1;
+        grid-row: 1;
+        text-align: center;
+        align-self: center;
+    }
+
+        .TimelineBar_year_selector_active:hover {
+            cursor: ns-resize;
+        }
+
+    
+    /* Year items in menu drawer */
+    .TimelineBar_year_selector_item {
+        grid-column: 1;
+        grid-row: 1;
+        text-align: center;
+        align-self: center;
+        display: none;
+        transition: 350ms all;
+    }
+
+        .TimelineBar_year_selector_item:hover {
+            color: var(--colour-text-highlight);
+            transition: 350ms all;
+        }
+
+
+.TimelineBar_month_selector {
+    grid-column: 2 / -1;
+    grid-row: 1 / 2;
+    display: grid;
+    grid-template-columns: repeat(13, 1fr);
+    grid-template-rows: 35% 65%;
+    column-gap: 0.75rem;
+    height: 100%;
+    width: 100%;
+}
+
+    .TimelineBar_month_selector_item {
+        grid-row: 1 / -1;
+        text-align: center;
+        font-size: 0.9rem;
+        cursor: pointer;
+        transition: 350ms all;
+    }
+
+        .TimelineBar_month_selector_item:hover {
+            color: var(--colour-text-highlight);
+            transition: 350ms all;
+        }
+
+        .TimelineBar_month_selector_item.active {
+            color: var(--colour-text-active);
+            transition: 350ms all;
+        }
+
+    .TimelineBar_month_selector_item_counter {
+        grid-row: 2 / -1;
+        text-align: center;
+        font-size: 1.75rem;
+        pointer-events: none;
+    }
