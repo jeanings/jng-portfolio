@@ -2,7 +2,7 @@ import React from 'react';
 import { useAppDispatch, useAppSelector } from './hooks';
 import { useMediaQuery } from 'react-responsive';
 import TimelineBar from './components/TimelineBar/TimelineBar';
-import FilterMenu from './components/FilterMenu/FilterMenu';
+import FilterDrawer from './components/FilterDrawer/FilterDrawer';
 import MainCanvas from './components/MainCanvas/MainCanvas';
 import './App.css';
 
@@ -19,7 +19,7 @@ const App: React.FC = () => {
     return (
         <div className={useMediaQueries(classBase)}>
             <TimelineBar />
-            <FilterMenu />
+            <FilterDrawer />
             <MainCanvas />
         </div>
     )

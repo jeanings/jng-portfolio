@@ -1,11 +1,11 @@
 import React from 'react';
 import { useAppSelector } from '../../hooks';
 import { useMediaQueries } from '../../App';
-import './FilterMenu.css';
+import './FilterDrawer.css';
 
 
 
-const FilterMenu: React.FC = () => {
+const FilterDrawer: React.FC = () => {
     /* ------------------------------------------------------------
         A main component - container for the filters on the left.
     ------------------------------------------------------------- */
@@ -44,7 +44,7 @@ const FilterMenu: React.FC = () => {
     /* -----------------------------------------------------
                         CSS classes
     ------------------------------------------------------*/
-    const classBase: string = 'FilterMenu';
+    const classBase: string = 'FilterDrawer';
 
 
     return (
@@ -54,4 +54,4 @@ const FilterMenu: React.FC = () => {
 }
 
 
-export default FilterMenu;
+export default FilterDrawer;
