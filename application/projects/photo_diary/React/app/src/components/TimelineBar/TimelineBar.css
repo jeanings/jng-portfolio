@@ -79,7 +79,7 @@
     }
 
         .TimelineBar_year_selector_item:hover {
-            color: var(--colour-text-highlight);
+            color: var(--colour-accent-secondary);
             transition: 350ms all;
         }
 
@@ -104,7 +104,7 @@
     }
 
         .TimelineBar_month_selector_item:hover {
-            color: var(--colour-text-highlight);
+            color: var(--colour-accent-secondary);
             transition: 350ms all;
         }
 
