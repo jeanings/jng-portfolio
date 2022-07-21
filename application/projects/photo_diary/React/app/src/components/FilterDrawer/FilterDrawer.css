@@ -3,8 +3,19 @@
     grid-row: 2 / -1;
     display: grid;
     grid-template-columns: 70% 30%;
+    font-family: 'Barlow Condensed', sans-serif;
     z-index: 1;
 }
+
+    .FilterDrawer_parameters {
+    }
+
+        .FilterDrawer_parameters_title,
+        .FilterDrawer_tags_title {
+            font-family: 'Barlow Condensed', sans-serif;
+            font-size: 1.50rem;
+            color: var(--colour-text-active);
+        }
 
     .FilterDrawer button {
         background: none;
@@ -14,12 +25,14 @@
         border-radius: 10%;
         padding: 0.15rem 0.25rem 0.15rem 0.25rem;
         color: var(--colour-text-inactive);
+        font-family: 'Barlow Condensed', sans-serif;
+        font-size: 1.20rem;
         cursor: pointer;
         transition: all 350ms;
     }
 
         .FilterDrawer button:hover {
-            background-color: var(--colour-text-highlight);
-            color: var(--colour-text-active);
+            background-color: var(--colour-accent-secondary);
+            color: var(--colour-background);
             transition: all 350ms;
         }

@@ -80,7 +80,7 @@ const FilterDrawer: React.FC = () => {
             
             <div className="FilterDrawer_parameters">
                 <div className="FilterDrawer_parameters_camera">
-                    CAMERA
+                    <span className="FilterDrawer_parameters_title">CAMERA</span>
                     {/* Pull data from backend, dynamic list */}
                     {cameras.map((camera, index) => (
                         <button className="FilterDrawer_parameters_camera_item"
@@ -95,7 +95,7 @@ const FilterDrawer: React.FC = () => {
                 </div>
 
                 <div className="FilterDrawer_parameters_focal">
-                    FOCAL LENGTH
+                    <span className="FilterDrawer_parameters_title">FOCAL LENGTH</span>
                     {/* Pull data from backend, dynamic list */}
                     {focalLengths.map((focalLength, index) => (
                         <button className="FilterDrawer_parameters_focalLength_item"
@@ -109,7 +109,7 @@ const FilterDrawer: React.FC = () => {
                 </div>
 
                 <div className="FilterDrawer_parameters_format">
-                    FORMAT
+                    <span className="FilterDrawer_parameters_title">FORMAT</span>
                     {/* Pull data from backend, dynamic list */}
                     {formats.map((format, index) => (
                         <button className="FilterDrawer_parameters_format_item"
@@ -124,7 +124,7 @@ const FilterDrawer: React.FC = () => {
             </div>
 
             <div className="FilterDrawer_tags">
-                TAGS
+                <span className="FilterDrawer_tags_title">TAGS</span>
             </div>
 
         </div>
