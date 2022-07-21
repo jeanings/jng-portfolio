@@ -6,13 +6,15 @@
     --colour-text-active: #d6d6c1;
     --colour-text-highlight: #e96c18;
     --colour-border: #9c9c9c;
+    --colour-accent-primary: rgb(187, 199, 21);
+    --colour-accent-secondary: rgb(42, 184, 124);
     --root-font-size: 16px;
     overflow: hidden;
     font-size: var(--root-font-size);
   }
   
   /* Import fonts */
-  /* @import url(''); */
+  @import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@200;400&display=swap');
   
   * {
     box-sizing: border-box;
