@@ -80,7 +80,7 @@ export function useMediaQueries(base: string) {
     } else if (mediaQueries.isPortableHdLandscape) {
         mediaQuery = base.concat(' ', classFor.isPortableHdLandscape);
     } else if (mediaQueries.isScreen1080) {
-        mediaQuery = base.concat(' ', classFor.isScreen1080);
+        mediaQuery = base.concat('', classFor.isScreen1080);
     } else if (mediaQueries.isScreen1440) {
         mediaQuery = base.concat(' ', classFor.isScreen1440);
     } else if (mediaQueries.isScreen4k) {

@@ -62,40 +62,49 @@ const FilterDrawer: React.FC = () => {
         // console.log(event.target.ariaLabel);
 
         switch(event.target.ariaLabel) {
-            case 'camera_item':
+            case 'FilterDrawer-format-item':
+                console.log('format item click');
+                break;
+        
+            case 'FilterDrawer-camera-item':
                 console.log('camera item click');
                 break;
 
-            case 'focalLength_item':
+            case 'FilterDrawer-focalLength-item':
                 console.log('focalLength item click');
                 break;
 
-            case 'format_item':
-                console.log('format item click');
+            case 'FilterDrawer-aperture-item':
+                console.log('aperture item click');
                 break;
-        }
+        }    
     };
 
     /* -----------------------------------------------------
                         CSS classes
     ------------------------------------------------------*/
-    const classBase: string = 'FilterDrawer';
+    const classBase: string = "FilterDrawer";
 
 
     return (
-        <div className={useMediaQueries(classBase)}>
+        <section className={useMediaQueries(classBase)}>
             
-            <div className="FilterDrawer_parameters">
+            <div className={useMediaQueries(classBase) + "__parameters-wrapper"}
+                role="group" aria-label="">
 
-                <div className="FilterDrawer_parameters_format">
-                    <span className="FilterDrawer_parameters_title">FORMAT</span>
+                <div className={useMediaQueries(classBase) + "__parameters"}
+                    role="group" aria-label="FilterDrawer-format">
+                    <h1 className={useMediaQueries(classBase) + "__header"}>
+                        FORMAT
+                    </h1>
 
-                    {/* Pull data from backend, dynamic list */}
-                    <div className="FilterDrawer_parameters_options">
+                    {/* REFACTOR: Pull data from backend, dynamic list */}
+                    <div className={useMediaQueries(classBase) + "__options"}
+                        role="group" aria-label="FilterDrawer-format-options">
 
                         {formats.map((format, index) => (
-                            <button className="FilterDrawer_parameters_format_item"
-                                role="menuitemradio" aria-label="format_item"
+                            <button className={"FilterDrawer" + "__format-item"}
+                                role="checkbox" aria-label="FilterDrawer-format-item"
                                 aria-checked="false"
                                 key={'key_format_' + index}
                                 onClick={onFilterClick}>
@@ -106,14 +115,19 @@ const FilterDrawer: React.FC = () => {
                     </div>
                 </div>
 
-                <div className="FilterDrawer_parameters_camera">
-                    <span className="FilterDrawer_parameters_title">CAMERA</span>
-                    {/* Pull data from backend, dynamic list */}
-                    <div className="FilterDrawer_parameters_options">
+                <div className={useMediaQueries(classBase) + "__parameters"}
+                    role="group" aria-label="FilterDrawer-camera-block">
+                    <h1 className={useMediaQueries(classBase) + "__header"}>
+                        CAMERA
+                    </h1>
+
+                    {/* REFACTOR: Pull data from backend, dynamic list */}
+                    <div className={useMediaQueries(classBase) + "__options"}
+                        role="group" aria-label="FilterDrawer-camera-options">
 
                         {cameras.map((camera, index) => (
-                            <button className="FilterDrawer_parameters_camera_item"
-                                role="menuitemradio" aria-label="camera_item"
+                            <button className={"FilterDrawer" + "__camera-item"}
+                                role="checkbox" aria-label="FilterDrawer-camera-item"
                                 aria-checked="false"
                                 key={'key_camera_' + index}
                                 onClick={onFilterClick}>
@@ -124,15 +138,19 @@ const FilterDrawer: React.FC = () => {
                     </div>
                 </div>
 
-                <div className="FilterDrawer_parameters_focalLength">
-                    <span className="FilterDrawer_parameters_title">FOCAL LENGTH</span>
+                <div className={useMediaQueries(classBase) + "__parameters"}
+                    role="group" aria-label="FilterDrawer-focalLength">
+                    <h1 className={useMediaQueries(classBase) + "__header"}>
+                        FOCAL LENGTH
+                    </h1>
 
-                    {/* Pull data from backend, dynamic list */}
-                    <div className="FilterDrawer_parameters_options">
+                    {/* REFACTOR: Pull data from backend, dynamic list */}
+                    <div className={useMediaQueries(classBase) + "__options"}
+                        role="group" aria-label="FilterDrawer-focalLength-options">
 
                         {focalLengths.map((focalLength, index) => (
-                            <button className="FilterDrawer_parameters_focalLength_item"
-                                role="menuitemradio" aria-label="focalLength_item"
+                            <button className={"FilterDrawer" + "__focalLength-item"}
+                                role="checkbox" aria-label="FilterDrawer-focalLength-item"
                                 aria-checked="false"
                                 key={'key_focalLength_' + index}
                                 onClick={onFilterClick}>
@@ -143,15 +161,17 @@ const FilterDrawer: React.FC = () => {
                     </div>
                 </div>
 
-                <div className="FilterDrawer_parameters_aperture">
-                    <span className="FilterDrawer_parameters_title">APERTURE</span>
+                <div className={useMediaQueries(classBase) + "__parameters"}
+                    role="group" aria-label="FilterDrawer-aperture">
+                    <h1 className={useMediaQueries(classBase) + "__header"}>APERTURE</h1>
 
-                    {/* Pull data from backend, dynamic list */}
-                    <div className="FilterDrawer_parameters_options">
+                    {/* REFACTOR: Pull data from backend, dynamic list */}
+                    <div className={useMediaQueries(classBase) + "__options"}
+                        role="group" aria-label="FilterDrawer-aperture-options">
 
                         {apertures.map((aperture, index) => (
-                            <button className="FilterDrawer_parameters_aperture_item"
-                                role="menuitemradio" aria-label="aperture_item"
+                            <button className={"FilterDrawer" + "__aperture-item"}
+                                role="checkbox" aria-label="FilterDrawer-aperture-item"
                                 aria-checked="false"
                                 key={'key_aperture_' + index}
                                 onClick={onFilterClick}>
@@ -162,16 +182,17 @@ const FilterDrawer: React.FC = () => {
                     </div>
                 </div>
 
-                
+                <div className={useMediaQueries(classBase) + "__parameters"}>
+                    <h1 className={useMediaQueries(classBase) + "__header"}>TAGS</h1>
 
-                <div className="FilterDrawer_parameters_tags">
-                    <span className="FilterDrawer_parameters_title">TAGS</span>
-                    <div className="FilterDrawer_parameters_options">
+                    <div className={useMediaQueries(classBase) + "__options"}
+                        role="group" aria-label="FilterDrawer-tags-options">
                         
                     </div>
                 </div>
+
             </div>
-        </div>
+        </section>
     );
 }
 

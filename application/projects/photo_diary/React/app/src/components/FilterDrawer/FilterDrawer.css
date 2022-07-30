@@ -9,7 +9,7 @@
     z-index: 1;
 }
 
-    .FilterDrawer_parameters {
+    .FilterDrawer__parameters-wrapper {
         display: grid;
         row-gap: 2rem;
         column-gap: 2rem;
@@ -17,24 +17,19 @@
         grid-template-rows: 25% 25% 50%;
     }
 
-        .FilterDrawer_parameters_format,
-        .FilterDrawer_parameters_camera,
-        .FilterDrawer_parameters_focalLength,
-        .FilterDrawer_parameters_aperture,
-        .FilterDrawer_parameters_tags {
+        .FilterDrawer__parameters {
             display: grid;
             grid-template-rows: 2.5rem auto;
         }
 
-        .FilterDrawer_parameters_title,
-        .FilterDrawer_tags_title {
+        .FilterDrawer__header {
             font-family: 'Barlow Semi Condensed', sans-serif;
             font-size: 1.50rem;
             font-weight: 400;
             color: var(--colour-text-active);
         }
 
-        .FilterDrawer_parameters_options {
+        .FilterDrawer__options {
             display: flex;
             flex-wrap: wrap;
             column-gap: 0.25rem;
