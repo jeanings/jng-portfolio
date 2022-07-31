@@ -1,7 +1,6 @@
 import React, { useEffect } from 'react';
-import { useAppDispatch, useAppSelector } from '../../hooks';
+import { useAppDispatch, useAppSelector, useMediaQueries } from '../../hooks';
 import { handleTimelineMonth, handleTimelineYear, TimelineProps } from '../../slices/timelineSlice';
-import { useMediaQueries } from '../../App';
 import './TimelineBar.css';
 
 
