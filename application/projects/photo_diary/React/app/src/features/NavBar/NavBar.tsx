@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { useAppSelector, useMediaQueries } from '../../hooks';
+import { useAppSelector, useMediaQueries } from '../../common/hooks';
 import './NavBar.css';
 
 

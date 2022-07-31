@@ -2,7 +2,7 @@ import React from 'react';
 import { useDispatch, useSelector, Provider } from 'react-redux';
 import configureStore from 'redux-mock-store';
 import thunk from 'redux-thunk';
-import { store } from '../../store';
+import { store } from '../../app/store';
 import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { faker } from '@faker-js/faker';

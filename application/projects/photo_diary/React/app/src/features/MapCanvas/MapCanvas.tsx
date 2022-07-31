@@ -1,9 +1,9 @@
 import React from 'react';
-import { useAppSelector, useMediaQueries } from '../../hooks';
+import { useAppSelector, useMediaQueries } from '../../common/hooks';
 // @ts-ignore
 import mapboxgl from 'mapbox-gl'; 
 import 'mapbox-gl/dist/mapbox-gl.css';
-import './MainCanvas.css';
+import './MapCanvas.css';
 
 
 
