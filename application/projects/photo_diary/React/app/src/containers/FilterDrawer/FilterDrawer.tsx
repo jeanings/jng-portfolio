@@ -88,17 +88,17 @@ const FilterDrawer: React.FC = () => {
     return (
         <section className={useMediaQueries(classBase)}>
             
-            <div className={useMediaQueries(classBase) + "__parameters-wrapper"}
+            <div className={useMediaQueries(classBase.concat("__", "parameters-wrapper"))}
                 role="group" aria-label="">
 
-                <div className={useMediaQueries(classBase) + "__parameters"}
+                <div className={useMediaQueries(classBase.concat("__", "parameters"))}
                     role="group" aria-label="FilterDrawer-format">
-                    <h1 className={useMediaQueries(classBase) + "__header"}>
+                    <h1 className={useMediaQueries(classBase.concat("__", "header"))}>
                         FORMAT
                     </h1>
 
                     {/* REFACTOR: Pull data from backend, dynamic list */}
-                    <div className={useMediaQueries(classBase) + "__options"}
+                    <div className={useMediaQueries(classBase.concat("__", "options"))}
                         role="group" aria-label="FilterDrawer-format-options">
 
                         {formats.map((format, index) => (
@@ -114,14 +114,14 @@ const FilterDrawer: React.FC = () => {
                     </div>
                 </div>
 
-                <div className={useMediaQueries(classBase) + "__parameters"}
+                <div className={useMediaQueries(classBase.concat("__", "parameters"))}
                     role="group" aria-label="FilterDrawer-camera-block">
-                    <h1 className={useMediaQueries(classBase) + "__header"}>
+                    <h1 className={useMediaQueries(classBase.concat("__", "header"))}>
                         CAMERA
                     </h1>
 
                     {/* REFACTOR: Pull data from backend, dynamic list */}
-                    <div className={useMediaQueries(classBase) + "__options"}
+                    <div className={useMediaQueries(classBase.concat("__", "options"))}
                         role="group" aria-label="FilterDrawer-camera-options">
 
                         {cameras.map((camera, index) => (
@@ -137,14 +137,14 @@ const FilterDrawer: React.FC = () => {
                     </div>
                 </div>
 
-                <div className={useMediaQueries(classBase) + "__parameters"}
+                <div className={useMediaQueries(classBase.concat("__", "parameters"))}
                     role="group" aria-label="FilterDrawer-focalLength">
-                    <h1 className={useMediaQueries(classBase) + "__header"}>
+                    <h1 className={useMediaQueries(classBase.concat("__", "header"))}>
                         FOCAL LENGTH
                     </h1>
 
                     {/* REFACTOR: Pull data from backend, dynamic list */}
-                    <div className={useMediaQueries(classBase) + "__options"}
+                    <div className={useMediaQueries(classBase.concat("__", "options"))}
                         role="group" aria-label="FilterDrawer-focalLength-options">
 
                         {focalLengths.map((focalLength, index) => (
@@ -160,12 +160,14 @@ const FilterDrawer: React.FC = () => {
                     </div>
                 </div>
 
-                <div className={useMediaQueries(classBase) + "__parameters"}
+                <div className={useMediaQueries(classBase.concat("__", "parameters"))}
                     role="group" aria-label="FilterDrawer-aperture">
-                    <h1 className={useMediaQueries(classBase) + "__header"}>APERTURE</h1>
+                    <h1 className={useMediaQueries(classBase.concat("__", "header"))}>
+                        APERTURE
+                    </h1>
 
                     {/* REFACTOR: Pull data from backend, dynamic list */}
-                    <div className={useMediaQueries(classBase) + "__options"}
+                    <div className={useMediaQueries(classBase.concat("__", "options"))}
                         role="group" aria-label="FilterDrawer-aperture-options">
 
                         {apertures.map((aperture, index) => (
@@ -181,10 +183,12 @@ const FilterDrawer: React.FC = () => {
                     </div>
                 </div>
 
-                <div className={useMediaQueries(classBase) + "__parameters"}>
-                    <h1 className={useMediaQueries(classBase) + "__header"}>TAGS</h1>
+                <div className={useMediaQueries(classBase.concat("__", "parameters"))}>
+                    <h1 className={useMediaQueries(classBase.concat("__", "header"))}>
+                        TAGS
+                    </h1>
 
-                    <div className={useMediaQueries(classBase) + "__options"}
+                    <div className={useMediaQueries(classBase.concat("__", "options"))}
                         role="group" aria-label="FilterDrawer-tags-options">
                         
                     </div>
