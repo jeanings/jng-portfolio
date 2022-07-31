@@ -10,7 +10,7 @@ import { RootState } from '../store';
 
 // State for initial render.
 const initialState: TimelineProps = {
-    year: null,
+    year: '',
     month: 'all'
 }
 
@@ -45,7 +45,7 @@ const timelineSlice = createSlice({
 // Types setting.
 export interface TimelineProps {
     [index: string]: string | any,
-    year: string | null,
+    year: string,
     month: TimelineMonthTypes
 }
 
