@@ -10,7 +10,7 @@
     z-index: 5;
 }
 
-.TimelineBar_year_selector {
+.TimelineBar__year-selector {
     display: flex;
     grid-column: 1 / 2;
     grid-row: 1 / -1;
@@ -24,14 +24,14 @@
     overflow: hidden;
 }
 
-    .TimelineBar_year_selector:hover {
+    .TimelineBar__year-selector:hover {
         cursor: pointer;
         overflow: visible;
     }
      
         /* Hovering on year selector extends list */
-        .TimelineBar_year_selector:hover
-        > .TimelineBar_year_selector_item {
+        .TimelineBar__year-selector:hover
+        > .TimelineBar__year-item {
             cursor: pointer;
             overflow: visible;
             display: inline-block;
@@ -54,7 +54,7 @@
             }
 
     /* Current selected year */
-    .TimelineBar_year_selector_active {
+    .TimelineBar__year-selected {
         display: inline-block;
         color: var(--colour-text-active);
         grid-column: 1;
@@ -63,13 +63,13 @@
         align-self: center;
     }
 
-        .TimelineBar_year_selector_active:hover {
+        .TimelineBar__year-selected:hover {
             cursor: ns-resize;
         }
 
     
     /* Year items in menu drawer */
-    .TimelineBar_year_selector_item {
+    .TimelineBar__year-item {
         grid-column: 1;
         grid-row: 1;
         text-align: center;
@@ -78,13 +78,13 @@
         transition: 350ms all;
     }
 
-        .TimelineBar_year_selector_item:hover {
+        .TimelineBar__year-item:hover {
             color: var(--colour-accent-secondary);
             transition: 350ms all;
         }
 
 
-.TimelineBar_month_selector {
+.TimelineBar__month-selector {
     grid-column: 2 / -1;
     grid-row: 1 / 2;
     display: grid;
@@ -95,7 +95,7 @@
     width: 100%;
 }
 
-    .TimelineBar_month_selector_item {
+    .TimelineBar__month-item {
         grid-row: 1 / -1;
         text-align: center;
         font-size: 0.9rem;
@@ -103,17 +103,17 @@
         transition: 350ms all;
     }
 
-        .TimelineBar_month_selector_item:hover {
+        .TimelineBar__month-item:hover {
             color: var(--colour-accent-secondary);
             transition: 350ms all;
         }
 
-        .TimelineBar_month_selector_item.active {
+        .TimelineBar__month-item.active {
             color: var(--colour-text-active);
             transition: 350ms all;
         }
 
-    .TimelineBar_month_selector_item_counter {
+    .TimelineBar__month-counter {
         grid-row: 2 / -1;
         text-align: center;
         font-size: 1.75rem;
