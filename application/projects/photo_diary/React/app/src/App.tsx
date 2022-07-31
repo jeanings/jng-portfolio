@@ -1,9 +1,9 @@
 import React from 'react';
 import { useAppDispatch, useAppSelector } from './hooks';
 import { useMediaQuery } from 'react-responsive';
-import TimelineBar from './components/TimelineBar/TimelineBar';
-import FilterDrawer from './components/FilterDrawer/FilterDrawer';
-import MainCanvas from './components/MainCanvas/MainCanvas';
+import TimelineBar from './containers/TimelineBar/TimelineBar';
+import FilterDrawer from './containers/FilterDrawer/FilterDrawer';
+import MainCanvas from './containers/MainCanvas/MainCanvas';
 import './App.css';
 
 
