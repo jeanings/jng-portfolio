@@ -1,5 +1,5 @@
 import React from 'react';
-import { useAppSelector, useMediaQueries } from '../../hooks';
+import { useAppSelector, useMediaQueries } from '../../common/hooks';
 import './FilterDrawer.css';
 
 

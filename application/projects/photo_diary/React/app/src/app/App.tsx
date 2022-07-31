@@ -1,18 +1,14 @@
 import React from 'react';
-import { useAppDispatch, useAppSelector, useMediaQueries } from './hooks';
+import { useAppDispatch, useAppSelector, useMediaQueries } from '../common/hooks';
 import { useMediaQuery } from 'react-responsive';
-import TimelineBar from './containers/TimelineBar/TimelineBar';
-import FilterDrawer from './containers/FilterDrawer/FilterDrawer';
-import MainCanvas from './containers/MainCanvas/MainCanvas';
+import TimelineBar from '../features/TimelineBar/TimelineBar';
+import FilterDrawer from '../features/FilterDrawer/FilterDrawer';
+import MapCanvas from '../features/MapCanvas/MapCanvas';
 import './App.css';
 
 
 
 const App: React.FC = () => {
-
-
-
-
     // CSS Classes
     const classBase: string = 'App';
 
@@ -20,7 +16,7 @@ const App: React.FC = () => {
         <div className={useMediaQueries(classBase)}>
             <TimelineBar />
             <FilterDrawer />
-            <MainCanvas />
+            <MapCanvas />
         </div>
     )
 }

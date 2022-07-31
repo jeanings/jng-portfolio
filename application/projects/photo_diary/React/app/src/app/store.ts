@@ -1,5 +1,5 @@
 import { configureStore, ThunkAction, Action } from '@reduxjs/toolkit';
-import timelineReducer from './slices/timelineSlice';
+import timelineReducer from '../features/TimelineBar/timelineSlice';
 
 
 
