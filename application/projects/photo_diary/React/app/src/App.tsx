@@ -2,7 +2,7 @@ import React from 'react';
 import { useAppDispatch, useAppSelector } from './hooks';
 import { useMediaQuery } from 'react-responsive';
 import TimelineBar from './components/TimelineBar/TimelineBar';
-import FilterMenu from './components/FilterMenu/FilterMenu';
+import FilterDrawer from './components/FilterDrawer/FilterDrawer';
 import MainCanvas from './components/MainCanvas/MainCanvas';
 import './App.css';
 
@@ -19,7 +19,7 @@ const App: React.FC = () => {
     return (
         <div className={useMediaQueries(classBase)}>
             <TimelineBar />
-            <FilterMenu />
+            <FilterDrawer />
             <MainCanvas />
         </div>
     )
@@ -80,7 +80,7 @@ export function useMediaQueries(base: string) {
     } else if (mediaQueries.isPortableHdLandscape) {
         mediaQuery = base.concat(' ', classFor.isPortableHdLandscape);
     } else if (mediaQueries.isScreen1080) {
-        mediaQuery = base.concat(' ', classFor.isScreen1080);
+        mediaQuery = base.concat('', classFor.isScreen1080);
     } else if (mediaQueries.isScreen1440) {
         mediaQuery = base.concat(' ', classFor.isScreen1440);
     } else if (mediaQueries.isScreen4k) {
