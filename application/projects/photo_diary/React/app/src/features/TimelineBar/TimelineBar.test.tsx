@@ -75,25 +75,25 @@ describe("clicks on year drawer items", () => {
         await expect(store.getState().timeline.year).toBe('2015');
     });
 
-    // test("changes selected year text", async() => {
-    //     render(
-    //         <Provider store={store}>
-    //             <TimelineBar />
-    //         </Provider>
-    //     );
+    test("changes selected year text", async() => {
+        render(
+            <Provider store={store}>
+                <TimelineBar />
+            </Provider>
+        );
             
-    //     const yearItems = screen.getAllByRole('menuitemradio', { name: 'year-item' });
+        const yearItems = screen.getAllByRole('menuitemradio', { name: 'year-item' });
         
-    //     // Select a year.
-    //     const yearSelection = yearItems.find(element => element.textContent === '2015') as HTMLElement;
-    //     fireEvent.click(yearSelection);
+        // Select a year.
+        const yearSelection = yearItems.find(element => element.textContent === '2015') as HTMLElement;
+        fireEvent.click(yearSelection);
     
-    //     // Check for actual change in selected year.
-    //     const yearSelected = screen.getByRole('menuitem', { name: 'year-selected' });
-    //     await waitFor(() => 
-    //         expect(yearSelected).toHaveTextContent('2015')
-    //     );
-    // });
+        // Check for actual change in selected year.
+        const yearSelected = screen.getByRole('menuitem', { name: 'year-selected' });
+        await waitFor(() => 
+            expect(yearSelected).toHaveTextContent('2015')
+        );
+    });
 });
 
 

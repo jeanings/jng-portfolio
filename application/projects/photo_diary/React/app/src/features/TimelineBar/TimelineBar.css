@@ -67,23 +67,6 @@
             cursor: ns-resize;
         }
 
-    
-    /* Year items in menu drawer */
-    .TimelineBar__year-item {
-        grid-column: 1;
-        grid-row: 1;
-        text-align: center;
-        align-self: center;
-        display: none;
-        transition: 350ms all;
-    }
-
-        .TimelineBar__year-item:hover {
-            color: var(--colour-accent-secondary);
-            transition: 350ms all;
-        }
-
-
 .TimelineBar__month-selector {
     grid-column: 2 / -1;
     grid-row: 1 / 2;
