@@ -1,7 +1,8 @@
 import React, { useEffect } from 'react';
 import { useAppDispatch, useAppSelector, useMediaQueries } from '../../common/hooks';
 import { handleTimelineMonth, handleTimelineYear, TimelineProps } from '../../features/TimelineBar/timelineSlice';
-import YearButtons from './YearButtons';
+import YearButton from './YearButton';
+import MonthButton from './MonthButton';
 import './TimelineBar.css';
 
 
@@ -12,7 +13,6 @@ const TimelineBar: React.FunctionComponent = () => {
     ------------------------------------------------------------- */
 
     /* ==================================================================== 
-
     To-do / pseudo code
         
         1) get list of all available years from MongoDB
@@ -68,20 +68,20 @@ const TimelineBar: React.FunctionComponent = () => {
                     popupPhotoInOutdoor
                     popupSubject (?)
                     popupTags (?)
-
-
     ==================================================================== */
+
+
     const dispatch = useAppDispatch();
     const yearState = useAppSelector(state => state.timeline.year);
     const classBase: string = 'TimelineBar';
 
-    /* REFACTOR: years array pulled from API */
+    /* TODO: years array pulled from API */
     const years: Array<string> = [
         '2014', '2015', '2016', '2017',
         '2018', '2019', '2020', '2021',
         '2022'
     ];
-    /* REFACTOR: months array pulled from API */
+    /* TODO: months array pulled from API */
     const months: Array<string> = [
         'ALL',
         'JAN', 'FEB', 'MAR', 'APR',
@@ -93,17 +93,18 @@ const TimelineBar: React.FunctionComponent = () => {
     //     /* -------------------------------------------------------
     //         Set initial year and month selection parameters.
     //     ------------------------------------------------------- */
-    //     const payloadInitYear: string = years[years.length - 1];  // refactor for API, current/most recent year
+    //     const payloadInitYear: string = yearState;  // refactor for API, current/most recent year
     //     // const payloadInitMonth: TimelineProps["month"] = 'all';
     //     const yearItems = Array.from(document.getElementsByClassName(
-    //         "TimelineBar__year-item") as HTMLCollectionOf<Element>);
+    //         classBase.concat("__", "year-item")) as HTMLCollectionOf<Element>);
     //     const initYear = yearItems.find(
     //         element => element.textContent === payloadInitYear) as HTMLElement;
-    //     const initMonthAll: HTMLElement = document.getElementsByClassName(
-    //         "TimelineBar".concat("__", "month-item"))[0] as HTMLElement;
+    //     const initMonth: HTMLElement = document.getElementsByClassName(
+    //         classBase.concat("__", "month-item"))[0] as HTMLElement;
 
-    //     initYear.click();
-    //     initMonthAll.click();
+    //     console.log(initYear, initMonth)
+    //     // initYear.click();
+    //     // initMonthAll.click();
 
     //     // dispatch(handleTimelineYear(payloadInitYear));
     //     // dispatch(handleTimelineMonth(payloadInitMonth));
@@ -115,40 +116,12 @@ const TimelineBar: React.FunctionComponent = () => {
             Update selected year text on state change.
         ------------------------------------------------------- */
         const yearSelectedElement: HTMLElement = document.querySelector(
-            ".TimelineBar".concat("__", "year-selected")) as HTMLElement;
+            ".".concat(classBase, "__", "year-selected")) as HTMLElement;
         
         if (yearSelectedElement) {
             yearSelectedElement.textContent = yearState;
         }
     }, [yearState]);
-
-
-    const onMonthSelect = (event: any) => {
-        /* ----------------------------------------------------------------
-            Clicks on month selector items will dispatch action to
-            update selected month, showing only images from selected month.
-        ---------------------------------------------------------------- */
-        const monthSelectorItems: HTMLCollectionOf<Element> = document.getElementsByClassName(
-            "TimelineBar".concat("__", "month-item"));
-        const monthSelection: HTMLElement = event.target;
-
-        // Reset all radios to false, unhighlight styling.
-        for (let element of Array.from(monthSelectorItems)) {
-            element.ariaChecked = "false";
-            element.classList.remove("active");
-        }
-
-        // Change to clicked month.
-        const monthSelectionText: string = event.target.textContent.replace(/\d/, "");
-        const monthSelectionStatus: boolean = event.target.ariaChecked = true;
-
-        // Update styling and highlight new month.
-        monthSelection.classList.add("active");
-
-        // Dispatch selected month to reducer.
-        const payloadMonth = monthSelectionText.toLowerCase() as TimelineProps["month"];
-        dispatch(handleTimelineMonth(payloadMonth));
-    }
 
 
     return (
@@ -161,10 +134,10 @@ const TimelineBar: React.FunctionComponent = () => {
                     {yearState}
                 </div>
 
-                {/* REFACTOR: years array pulled from API */}
+    {/* TODO: years array pulled from API */}
                 {/* Year items shown in drop-down */}
                 {years.map((year, index) => (
-                    <YearButtons
+                    <YearButton
                         name={year}
                         baseClassName={classBase}
                         className='year-item'
@@ -176,22 +149,16 @@ const TimelineBar: React.FunctionComponent = () => {
 
             <div className={useMediaQueries(classBase.concat("__", "month-selector"))}
                 role="menubar" aria-label="month-selector">
-                    
+                
                 {/* Months selection labels: JAN, FEB, etc */}
                 {months.map((month, index) => (
-                    <div className={"TimelineBar".concat("__", "month-item")}
-                        role="menuitemradio" aria-label="month-item"
-                        aria-checked="false"
-                        key={'key-month_' + index}
-                        onClick={onMonthSelect}>
-                            {month}
-
-                            {/* Counter for photos taken in each month */}
-                            <div className={"TimelineBar".concat("__", "month-counter")}
-                                key={'key-month-counter_' + index}>
-                                0
-                            </div>
-                    </div>
+                    <MonthButton 
+                        name={month}
+                        baseClassName={classBase}
+                        className='month-item'
+                        keyIndex={index}
+                        key={'key-month_'.concat(index.toString())}
+                    />
                 ))}
             </div>
 

@@ -1,10 +1,10 @@
 import React, { useEffect } from 'react';
-import { useAppDispatch, useAppSelector, useMediaQueries } from '../../common/hooks';
+import { useAppDispatch, useMediaQueries } from '../../common/hooks';
 import { handleTimelineYear, TimelineProps } from './timelineSlice';
-import './YearButtons.css';
+import './YearButton.css';
 
 
-const YearButtons: React.FunctionComponent<YearButtonProps> = (props: YearButtonProps) => {
+const YearButton: React.FunctionComponent<YearButtonProps> = (props: YearButtonProps) => {
     const dispatch = useAppDispatch();
 
     const onYearSelect = (event: any) => {
@@ -35,7 +35,6 @@ const YearButtons: React.FunctionComponent<YearButtonProps> = (props: YearButton
             className={useMediaQueries(props.baseClassName.concat("__", props.className))}
             role="menuitemradio" aria-label={props.className}
             aria-checked="false"
-            // key={props.keyName}
             onClick={onYearSelect}>
                 {props.name}
         </li>
@@ -47,7 +46,6 @@ export interface YearButtonProps {
     name: string,
     baseClassName: string,
     className: string,
-    // keyName: string
 };
 
-export default YearButtons;
+export default YearButton;
