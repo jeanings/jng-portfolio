@@ -2,7 +2,7 @@
 #   Script to read and rebuild data from Google timeline into separate jsons by year.
 #-------------------------------------------------------------------------------------
 
-import json, jsonpickle
+import json, jsonpickle, pytz
 from datetime import datetime
 from pathlib import Path
 
@@ -67,6 +67,7 @@ def build_year_jsons():
 
         # Parse ISO date format, Z identifyier code equals UTC.
         location.timestamp = datetime.fromisoformat(location.timestamp.strip('Z'))
+        location.timestamp = location.timestamp.replace(tzinfo=pytz.UTC)
         
         year_json = LOC_JSON_YEARS_FOLDER / (str(location.timestamp.year) + '.json')
         if year_json.is_file() and location.timestamp.year != current_year:
