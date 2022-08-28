@@ -24,6 +24,7 @@ class Metadata(object):
         self.tags = None
         self.url = None
 
+
     def get_format(self, cameras_dict):
         """
         Takes in dict of cameras used and auto-generate format value with camera make and model.
@@ -38,3 +39,31 @@ class Metadata(object):
                     return None
                 
                 self.format = format_type
+    
+    
+    def as_dict(self):
+        """
+        Returns class as dict.
+        """
+
+        return {
+            'filename': self.filename,
+            'local_path': self.local_path,
+            'date_taken': self.date_taken,
+            'date_year': self.date_year,
+            'date_month': self.date_month,
+            'date_day': self.date_day,
+            'date_time': self.date_time,
+            'make': self.make,
+            'model': self.model,
+            'focal_length_35mm': self.focal_Length_35mm,
+            'format': self.format,
+            'format_sub': self.format_sub,
+            'iso': self.iso,
+            'aperture': self.aperture,
+            'shutter_speed': self.shutter_speed,
+            'gps_lat': self.gps_lat,
+            'gps_lng': self.gps_lng,
+            'tags': self.tags,
+            'url': self.url 
+        }
