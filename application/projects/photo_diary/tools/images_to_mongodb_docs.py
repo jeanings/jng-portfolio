@@ -5,12 +5,16 @@
 from os import environ
 from dotenv import load_dotenv
 from pathlib import Path
+from datetime import datetime
 from urllib.parse import quote_plus
+from PIL import Image, ExifTags
+from gps_unit_conversion import dms_to_deci_deg
+from image_metadata import Metadata
 from bson.json_util import ObjectId
 from pymongo import MongoClient
 from google.oauth2 import service_account
 from google.cloud import storage
-import json, pymongo
+import json, pymongo, re
 
 PROJ_FOLDER = Path.cwd() / 'application' / 'projects' / 'photo_diary'
 IMG_FOLDER =  PROJ_FOLDER / 'images'
@@ -31,13 +35,13 @@ storage_client = storage.Client(credentials=credentials)
 try:
     client = MongoClient(f'mongodb+srv://{MONGODB_ID}:{MDB_PASS}@portfolio.8frim.mongodb.net/')    
 except pymongo.errors.AutoReconnect:
-    print("Reconnecting to database due to connection failure / is lost.")
+    print("Reconnecting to database due to connection failure.")
 except pymongo.errors.OperationFailure:
     print("Database operation error.")
 db = client.photo_diary # or client['database_name']
 
 
-
+            
 def list_blobs_with_prefix(bucket_name, prefix, delimiter=None):
     """
     Gets list of blobs in a bucket.
@@ -60,16 +64,121 @@ def list_blobs_with_prefix(bucket_name, prefix, delimiter=None):
     return request
 
 
+def get_metadata(image, cameras_dict, image_url):
+    """
+    Extract and build dict of image metadata of interest.
+    """
+
+    pil_image = Image.open(image)
+    exif_data = {ExifTags.TAGS[key]: val for key, val in pil_image._getexif().items() if key in ExifTags.TAGS}
+    metadata = Metadata()
+
+    # Base file info.
+    metadata.filename = image.name
+    metadata.local_path = str(image)
+    metadata.date_taken = exif_data['DateTimeOriginal']
+
+    dt = datetime.strptime(metadata.date_taken, "%Y:%m:%d %H:%M:%S")
+    metadata.date_year = dt.year
+    metadata.date_month = dt.month
+    metadata.date_day = dt.day
+    metadata.date_time = ':'.join([str(dt.hour), str(dt.minute), str(dt.second)])
+
+    # Camera/lens data.
+    metadata.make = exif_data['Make']
+    metadata.model = exif_data['Model']
+    metadata.focal_Length_35mm = exif_data['FocalLengthIn35mmFilm']
+    metadata.get_format(cameras_dict)
+
+    # Exposure settings.
+    metadata.iso = exif_data['ISOSpeedRatings']
+    metadata.aperture = exif_data['FNumber']
+    metadata.shutter_speed = exif_data['ExposureTime']
+
+    # GPS coordinates.
+    metadata.gps_lat = dms_to_deci_deg(exif_data['GPSInfo'][2])
+    metadata.gps_lng = dms_to_deci_deg(exif_data['GPSInfo'][4])
+
+    # Tags.
+    xmp_string = pil_image.app['APP1'].decode('utf-8')
+    xmp_raw_string = repr(xmp_string)
+    # Narrow regex to portion of xmp where tags are.
+    pattern_filter = re.compile(r"<rdf:Bag>(.{0,}?)</rdf:Bag>") #<rdf:Bag>(.*?)</rdf:Bag>
+    regex_filter = re.findall(pattern_filter, xmp_raw_string)
+    # Isolate for tags.
+    pattern_refine = re.compile(r"<rdf:li>(.{0,}?)</rdf:li>")
+    tags = re.findall(pattern_refine, regex_filter[0])
+    metadata.tags = tags
+
+    # URL for uploaded image.
+    metadata.url = image_url
+
+    return metadata
+
+
+def build_mongodb_doc(metadata):
+    """
+    Prepare object in MongoDB document schema. 
+    """
+    # Initiate MongoDB doc with id.
+    mongodb_doc = {}
+    mongodb_doc['_id'] = ObjectId()
+    
+    mongodb_doc.update(metadata.as_dict())
+    
+    return mongodb_doc
+
+
 def create_mongodb_docs():
     """
     Gets list of image blobs and compares to MongoDB docs.
     Creates and updates docs when needed.
     """
 
+    # Get images blob from Google Cloud Storage.
     bucket_name = environ.get('GCS_BUCKET')
     images_folder_prefix = environ.get('GCS_BUCKET_IMG_PREFIX')
-
     images_blob = list_blobs_with_prefix(bucket_name, images_folder_prefix)
+
+    # Create dict of all images in local folder.
+    image_extensions = ['.jpg', '.jpeg', '.png', '.tiff']
+    images = {}
+
+    for year_folder in IMG_FOLDER.iterdir():
+        for image_set in year_folder.iterdir():
+            for item in image_set.iterdir():
+                if item.suffix in image_extensions:
+                    # Build images_blob dict key from path.
+                    parts_index = [4, 5, 6, 7, 8, 9]
+                    blob_key = '/'.join([part for index, part in enumerate(item.parts) if index in parts_index])
+
+                    try:
+                        image_url = images_blob[blob_key]
+                    except KeyError:
+                        print(">>> {0} not in GCS images blob.  Check files for errors.  Skipping.".format(blob_key))
+                        continue
+
+                    images.update({item: image_url})
+    
+    # Create MongoDB doc for each image.
+    cameras_json = PROJ_FOLDER / 'tools' / 'cameras.json'
+    with open(cameras_json) as file:
+        cameras_dict = json.load(file)
+
+    for image in images:
+        image_url = images[image]
+        metadata = get_metadata(image, cameras_dict, image_url)
+        mongodb_doc = build_mongodb_doc(metadata)
+
+
+       
+        
+
+        
+
+       
+
+    print('')
    
 
 if __name__ == '__main__':
