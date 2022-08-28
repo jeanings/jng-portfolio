@@ -8,12 +8,12 @@ def dms_to_deci_deg(dms_coord):
     Helper function to convert degrees/minutes/seconds to decimal degree coordinates.
     https://docs.microsoft.com/en-us/office/troubleshoot/excel/convert-degrees-minutes-seconds-angles
     """
-    degrees = dms_coord[0][0]
-    minutes = dms_coord[1][0]
-    seconds = dms_coord[2][0]
+    degrees = dms_coord[0]
+    minutes = dms_coord[1]
+    seconds = dms_coord[2]
 
     deci_coord = degrees + (minutes / 60) + (seconds / 100 / 3600)
-    return deci_coord
+    return float(deci_coord)
 
 
 def deci_deg_to_dms(deci_deg_coord):
