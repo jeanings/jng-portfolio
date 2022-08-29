@@ -32,13 +32,13 @@ credentials = service_account.Credentials.from_service_account_file(GOOGLE_APPLI
 storage_client = storage.Client(credentials=credentials)
 
 # Connection to mongo server.
-# try:
-#     client = MongoClient(f'mongodb+srv://{MONGODB_ID}:{MDB_PASS}@portfolio.8frim.mongodb.net/')    
-# except pymongo.errors.AutoReconnect:
-#     print("Reconnecting to database due to connection failure.")
-# except pymongo.errors.OperationFailure:
-#     print("Database operation error.")
-# db = client.photo_diary # or client['database_name']
+try:
+    client = MongoClient(f'mongodb+srv://{MONGODB_ID}:{MDB_PASS}@portfolio.8frim.mongodb.net/')    
+except pymongo.errors.AutoReconnect:
+    print("Reconnecting to database due to connection failure.")
+except pymongo.errors.OperationFailure:
+    print("Database operation error.")
+db = client.photo_diary # or client['database_name']
 
 
             
@@ -98,21 +98,21 @@ def get_metadata(image, cameras_dict, image_url):
     metadata.date_taken = exif_data['DateTimeOriginal']
 
     dt = datetime.strptime(metadata.date_taken, "%Y:%m:%d %H:%M:%S")
-    metadata.date_year = dt.year
-    metadata.date_month = dt.month
-    metadata.date_day = dt.day
+    metadata.date_year = int(dt.year)
+    metadata.date_month = int(dt.month)
+    metadata.date_day = int(dt.day)
     metadata.date_time = ':'.join([str(dt.hour), str(dt.minute), str(dt.second)])
 
     # Camera/lens data.
     metadata.make = exif_data['Make']
     metadata.model = exif_data['Model']
-    metadata.focal_Length_35mm = exif_data['FocalLengthIn35mmFilm']
+    metadata.focal_Length_35mm = int(exif_data['FocalLengthIn35mmFilm'])
     metadata.get_format(cameras_dict)
 
     # Exposure settings.
-    metadata.iso = exif_data['ISOSpeedRatings']
-    metadata.aperture = exif_data['FNumber']
-    metadata.shutter_speed = exif_data['ExposureTime']
+    metadata.iso = int(exif_data['ISOSpeedRatings'])
+    metadata.aperture = float(exif_data['FNumber'])
+    metadata.shutter_speed = float(exif_data['ExposureTime'])
 
     # GPS coordinates.
     metadata.gps_lat = dms_to_deci_deg(exif_data['GPSInfo'][2])
@@ -159,6 +159,9 @@ def create_mongodb_docs():
     images_folder_prefix = environ.get('GCS_BUCKET_IMG_PREFIX')
     images_blob = list_blobs_with_prefix(bucket_name, images_folder_prefix)
 
+    # Get collections of MongoDB docs.
+    
+
     # Create dict of all images in local folder.
     image_extensions = ['.jpg', '.jpeg', '.png', '.tiff']
     images = {}
@@ -196,9 +199,10 @@ def create_mongodb_docs():
         mongodb_collections[str(mongodb_doc['date_year'])].append(mongodb_doc)
 
     # Insert collections to MongoDB database.
-    # for year in mongodb_collections:
-    #     collection = db[year]
-    #     collection.insert_many(mongodb_collections[year])
+    for year in mongodb_collections:
+        collection = db[year]
+        collection.insert_many(mongodb_collections[year])
+        print(">>> {0} documents inserted into {1} collection.".format(len(mongodb_collections[year]), year))
 
 
         
