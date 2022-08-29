@@ -32,36 +32,55 @@ credentials = service_account.Credentials.from_service_account_file(GOOGLE_APPLI
 storage_client = storage.Client(credentials=credentials)
 
 # Connection to mongo server.
-try:
-    client = MongoClient(f'mongodb+srv://{MONGODB_ID}:{MDB_PASS}@portfolio.8frim.mongodb.net/')    
-except pymongo.errors.AutoReconnect:
-    print("Reconnecting to database due to connection failure.")
-except pymongo.errors.OperationFailure:
-    print("Database operation error.")
-db = client.photo_diary # or client['database_name']
+# try:
+#     client = MongoClient(f'mongodb+srv://{MONGODB_ID}:{MDB_PASS}@portfolio.8frim.mongodb.net/')    
+# except pymongo.errors.AutoReconnect:
+#     print("Reconnecting to database due to connection failure.")
+# except pymongo.errors.OperationFailure:
+#     print("Database operation error.")
+# db = client.photo_diary # or client['database_name']
 
 
             
-def list_blobs_with_prefix(bucket_name, prefix, delimiter=None):
+def list_blobs_with_prefix(bucket_name, prefix):
     """
     Gets list of blobs in a bucket.
     https://cloud.google.com/storage/docs/listing-objects#storage-list-objects-python
     """
 
-    blobs = storage_client.list_blobs(bucket_name, prefix=prefix, delimiter=delimiter)
-    request = {}
+    # Organize prefixes by folder year.
+    folders_request = storage_client.list_blobs(bucket_name, prefix=prefix, delimiter='/')
+    folders = {}
 
-    for blob in blobs:
-        request.update({
-            blob.name: blob.public_url
-        })
+    # Consume iterator to get prefixes.
+    for _ in folders_request:
+        pass
+    
+    folder_prefixes = folders_request.prefixes
+    for item in folder_prefixes:
+        year = item.strip(prefix)
+        folders[year] = item
 
-    if delimiter:
-        request["prefixes"] = []
-        for prefix in blobs.prefixes:
-            request["prefixes"].append(prefix)
+    # Get image blobs.
+    blobs= {}
+    for year in folders:
+        blobs[year] = {}
+        prefix = folders[year]
+        blobs_request = storage_client.list_blobs(bucket_name, prefix=prefix, delimiter=None)
 
-    return request
+        for blob in blobs_request:
+            blobs[year][blob.name] = blob.public_url
+
+    return blobs
+
+
+def check_blobs_and_docs():
+    """
+    Check MongoDB docs count against GCS blobs to get list of files to update.
+    """
+
+    # db.collection.find().count()
+
 
 
 def get_metadata(image, cameras_dict, image_url):
@@ -123,7 +142,7 @@ def build_mongodb_doc(metadata):
     # Initiate MongoDB doc with id.
     mongodb_doc = {}
     mongodb_doc['_id'] = ObjectId()
-    
+
     mongodb_doc.update(metadata.as_dict())
     
     return mongodb_doc
@@ -143,8 +162,12 @@ def create_mongodb_docs():
     # Create dict of all images in local folder.
     image_extensions = ['.jpg', '.jpeg', '.png', '.tiff']
     images = {}
+    mongodb_collections = {}
 
     for year_folder in IMG_FOLDER.iterdir():
+        # Initialize dict entry for the year.
+        mongodb_collections[year_folder.name] = []
+        
         for image_set in year_folder.iterdir():
             for item in image_set.iterdir():
                 if item.suffix in image_extensions:
@@ -153,32 +176,35 @@ def create_mongodb_docs():
                     blob_key = '/'.join([part for index, part in enumerate(item.parts) if index in parts_index])
 
                     try:
-                        image_url = images_blob[blob_key]
+                        image_url = images_blob[year_folder.name][blob_key]
                     except KeyError:
                         print(">>> {0} not in GCS images blob.  Check files for errors.  Skipping.".format(blob_key))
                         continue
 
                     images.update({item: image_url})
     
-    # Create MongoDB doc for each image.
+    # Create MongoDB doc for each image and add to its year collection.
     cameras_json = PROJ_FOLDER / 'tools' / 'cameras.json'
     with open(cameras_json) as file:
         cameras_dict = json.load(file)
-
+    
     for image in images:
         image_url = images[image]
         metadata = get_metadata(image, cameras_dict, image_url)
         mongodb_doc = build_mongodb_doc(metadata)
+        # Add to its corresponding year in collections dict.
+        mongodb_collections[str(mongodb_doc['date_year'])].append(mongodb_doc)
+
+    # Insert collections to MongoDB database.
+    # for year in mongodb_collections:
+    #     collection = db[year]
+    #     collection.insert_many(mongodb_collections[year])
 
 
-       
         
 
-        
 
-       
-
-    print('')
+    print(">>> MongoDB database of uploaded images updated.")
    
 
 if __name__ == '__main__':
