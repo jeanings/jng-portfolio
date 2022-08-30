@@ -74,15 +74,39 @@ def list_blobs_with_prefix(bucket_name, prefix):
     return blobs
 
 
-def check_blobs_and_docs():
+def check_blobs_and_docs(images_blob):
     """
     Check MongoDB docs count against GCS blobs to get list of files to update.
     """
 
-    # db.collection.find().count()
+    image_blobs_to_update = {}
 
+    print(">>> Comparing images on cloud to database entries...")
+    for item in images_blob.items():
+        year = item[0]
+        collection = db[year]
+        blobs = item[1]
 
+        # Get image counts. 
+        blob_count = len(blobs)
+        collection_count = collection.count_documents({})   # queries all docs
+        
+        collection_images = list(collection.find({}, {'url': 1, '_id': 0}))
+        collection_url_list = [doc['url'] for doc in collection_images]
+        
+        if blob_count != collection_count:
+            # Get blobs that are missing in collection.
+            for blob in images_blob[year].items():
+                image_url = blob[1]
+                    
+                if image_url not in collection_url_list:
+                    # Add to update dict.
+                    image_blobs_to_update.setdefault(year, {})
+                    image_blobs_to_update[year].update({blob[0]: blob[1]})
 
+    return image_blobs_to_update
+
+       
 def get_metadata(image, cameras_dict, image_url):
     """
     Extract and build dict of image metadata of interest.
@@ -157,10 +181,10 @@ def create_mongodb_docs():
     # Get images blob from Google Cloud Storage.
     bucket_name = environ.get('GCS_BUCKET')
     images_folder_prefix = environ.get('GCS_BUCKET_IMG_PREFIX')
-    images_blob = list_blobs_with_prefix(bucket_name, images_folder_prefix)
+    storage_images_blob = list_blobs_with_prefix(bucket_name, images_folder_prefix)
 
     # Get collections of MongoDB docs.
-    
+    image_blobs_to_update = check_blobs_and_docs(storage_images_blob)
 
     # Create dict of all images in local folder.
     image_extensions = ['.jpg', '.jpeg', '.png', '.tiff']
@@ -179,7 +203,7 @@ def create_mongodb_docs():
                     blob_key = '/'.join([part for index, part in enumerate(item.parts) if index in parts_index])
 
                     try:
-                        image_url = images_blob[year_folder.name][blob_key]
+                        image_url = image_blobs_to_update[year_folder.name][blob_key]
                     except KeyError:
                         print(">>> {0} not in GCS images blob.  Check files for errors.  Skipping.".format(blob_key))
                         continue
