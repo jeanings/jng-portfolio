@@ -119,13 +119,13 @@ def get_metadata(image, cameras_dict, image_url):
     # Base file info.
     metadata.filename = image.name
     metadata.local_path = str(image)
-    metadata.date_taken = exif_data['DateTimeOriginal']
+    metadata.date['taken'] = exif_data['DateTimeOriginal']
 
-    dt = datetime.strptime(metadata.date_taken, "%Y:%m:%d %H:%M:%S")
-    metadata.date_year = int(dt.year)
-    metadata.date_month = int(dt.month)
-    metadata.date_day = int(dt.day)
-    metadata.date_time = ':'.join([str(dt.hour), str(dt.minute), str(dt.second)])
+    dt = datetime.strptime(metadata.date['taken'], "%Y:%m:%d %H:%M:%S")
+    metadata.date['year'] = int(dt.year)
+    metadata.date['month'] = int(dt.month)
+    metadata.date['day'] = int(dt.day)
+    metadata.date['time'] = ':'.join([str(dt.hour), str(dt.minute), str(dt.second)])
 
     # Camera/lens data.
     metadata.make = exif_data['Make']
@@ -136,11 +136,11 @@ def get_metadata(image, cameras_dict, image_url):
     # Exposure settings.
     metadata.iso = int(exif_data['ISOSpeedRatings'])
     metadata.aperture = float(exif_data['FNumber'])
-    metadata.shutter_speed = float(exif_data['ExposureTime'])
+    metadata.shutter_speed = [exif_data['ExposureTime'].numerator, exif_data['ExposureTime'].denominator]
 
     # GPS coordinates.
-    metadata.gps_lat = dms_to_deci_deg(exif_data['GPSInfo'][2])
-    metadata.gps_lng = dms_to_deci_deg(exif_data['GPSInfo'][4])
+    metadata.gps['lat'] = dms_to_deci_deg(exif_data['GPSInfo'][2])
+    metadata.gps['lng'] = dms_to_deci_deg(exif_data['GPSInfo'][4])
 
     # Tags.
     xmp_string = pil_image.app['APP1'].decode('utf-8')
@@ -220,7 +220,7 @@ def create_mongodb_docs():
         metadata = get_metadata(image, cameras_dict, image_url)
         mongodb_doc = build_mongodb_doc(metadata)
         # Add to its corresponding year in collections dict.
-        mongodb_collections[str(mongodb_doc['date_year'])].append(mongodb_doc)
+        mongodb_collections[str(mongodb_doc['date']['year'])].append(mongodb_doc)
 
     # Insert collections to MongoDB database.
     for year in mongodb_collections:
@@ -228,52 +228,8 @@ def create_mongodb_docs():
         collection.insert_many(mongodb_collections[year])
         print(">>> {0} documents inserted into {1} collection.".format(len(mongodb_collections[year]), year))
 
-
-        
-
-
     print(">>> MongoDB database of uploaded images updated.")
    
 
 if __name__ == '__main__':
     create_mongodb_docs()
-
-    
-"""
-pseudo
-
-0)  upload images to GCS
-
-1)  get list of uploaded folders/images
-        create dict of {image name: url}
-
-2)  get Mongo docs of images
-    if len(docs) != len(uploaded)
-        create new docs
-        update
-
-3)  for all images in image_folder
-        append to images list
-
-4)  for image in images list
-        read EXIF data
-        get url from dict in 1)
-
-        Mongo doc obj {
-            name
-            url
-            year
-            month
-            day
-            time
-            gps
-            camera
-            lens
-            aperture
-            shutter
-            tags
-        }
-
-        insert Mongo doc
-
-"""
