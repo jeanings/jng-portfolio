@@ -22,12 +22,6 @@ def create_facet(facet_name, query, target_field):
         comparand_a = "$" + target_field        # subset
         comparand_b = query                     # set
 
-
-    # Both requires to be lists.
-    subset = query
-    in_set = "$" + target_field
-    operator = '$setIsSubset'
-
     facet = { facet_name: [
         { '$project': {
             '_id': 1,
@@ -53,5 +47,6 @@ def create_facet(facet_name, query, target_field):
             }
         }}
     ]}
+
 
     return facet
