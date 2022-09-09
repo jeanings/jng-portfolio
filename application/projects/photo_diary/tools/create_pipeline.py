@@ -1,25 +1,26 @@
-#---------------------------------------------------------------
-#   Script to create pipelines for MongoDB aggregate method. 
-#---------------------------------------------------------------
+#---------------------------------------
+#   Helper scripts for MongoDB queries. 
+#---------------------------------------
 
-def create_pipeline(request, target_field):
+def create_pipeline(query, target_field):
     """
+    Script to create pipelines for aggregate method.
     Takes request from front-end and document field to search in.
     """
 
     # Sets and subsets will be different depending on target data field.
     if target_field == 'date.month':
         operator = '$eq'
-        comparand_a = request
+        comparand_a = query
         comparand_b = "$" + target_field
     elif target_field == 'tags':
         operator = '$setIsSubset'
-        comparand_a = request                   # subset
+        comparand_a = query                   # subset
         comparand_b = "$" + target_field        # set
     else:
         operator = '$setIsSubset'
         comparand_a = "$" + target_field        # subset
-        comparand_b = request                   # set
+        comparand_b = query                   # set
 
     pipeline = [
         { 
