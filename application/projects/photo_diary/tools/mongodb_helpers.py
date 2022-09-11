@@ -15,12 +15,12 @@ def create_pipeline(query, target_field):
         comparand_b = "$" + target_field
     elif target_field == 'tags':
         operator = '$setIsSubset'
-        comparand_a = query                   # subset
+        comparand_a = query                     # subset
         comparand_b = "$" + target_field        # set
     else:
         operator = '$setIsSubset'
-        comparand_a = "$" + target_field        # subset
-        comparand_b = query                   # set
+        comparand_a = ["$" + target_field]      # subset
+        comparand_b = query                     # set
 
     pipeline = [
         { 
@@ -42,10 +42,12 @@ def create_pipeline(query, target_field):
                         comparand_a,
                         comparand_b 
                     ]
-                },
-                '$match': {
-                    'isSubset': True
                 }
+            }
+        },
+        {
+            '$match': {
+                'isSubset': True
             }
         }
     ]
