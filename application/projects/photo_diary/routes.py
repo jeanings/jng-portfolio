@@ -9,7 +9,7 @@ from bson.json_util import ObjectId
 from pathlib import Path
 from pymongo import MongoClient
 from urllib.parse import quote_plus
-from .tools.create_pipeline import create_pipeline
+from .tools.mongodb_helpers import create_pipeline
 import json, pymongo
 
 DEBUG_MODE = app.config['FLASK_DEBUG']
@@ -66,19 +66,17 @@ def photo_diary():
 @photo_diary_bp.route('/photo-diary/get-data', methods=['GET'])
 def photo_diary_data():
     try:
-        year = request.args.get('year', None)
-        month = request.args.get('month', None)
-        format_medium = request.args.get('format-medium', None)     # digital, film
-        format_type = request.args.get('format-type', None)         # 35mm, APS-C
-        camera = request.args.get('camera', None)
-        focal_length = request.args.get('focal-length', None)       # wide, standard, long
-        aperture = request.args.get('aperture', None)
-        tags = request.args.get('tags', None)
+        year = request.args.get('year')
+        month = request.args.get('month')
+        format_medium = request.args.get('format-medium')     # digital, film
+        format_type = request.args.get('format-type')         # 35mm, APS-C
+        camera = request.args.get('camera')
+        lenses = request.args.get('lenses')
+        focal_length = request.args.get('focal-length')       # wide, standard, long
+        tags = request.args.get('tags')
 
-        
-        '''
-            Work in progress ------------------------------
-        '''
+        if year:
+            collection = db[str(year)]
 
     except pymongo.errors.AutoReconnect:
         print("Reconnecting to database due to connection failure / is lost.")
@@ -86,27 +84,31 @@ def photo_diary_data():
         print("Database operation error.")
 
     
-    if year:
-        collection = db[str(year)]
-        year_count = collection.find({}).count_documents
-
-
-    # todo parse argument strings into list (except for year and month)
-
-        
     raw_queries = {
         'month': month, 'format_medium': format_medium, 'format_type': format_type, 
-        'camera': camera, 'focal_length': focal_length, 'aperture': aperture, 'tags': tags
+        'camera': camera, 'lenses': lenses, 'focal_length': focal_length, 'tags': tags
     }
 
-    queries = {key: val for key, val in raw_queries.items() if val}
+    # Parse queries: month as is, the rest into lists.  
+    queries = {}
+    for key, val in raw_queries.items():
+        if val:
+            if key == 'month':
+                queries.update({key: int(val)})
+            elif key == 'focal_length':
+                query = [int(foc_len) for foc_len in val.split(' ')]
+                queries.update({key: query})
+            else:
+                queries.update({key: val.split(' ')})
+
+
     query_field = {
         'month': 'date.month',
         'format_medium': 'format.medium',
         'format_type': 'format.type',
         'camera': 'model',
+        'lenses': 'lens',
         'focal_length': 'focal_length_35mm',
-        'aperture': 'aperture',
         'tags': 'tags'
     }
 
@@ -116,18 +118,18 @@ def photo_diary_data():
         '$facet': {}
     }
 
-    for keyword, request in queries.items():
-        key = 'get_' + query_field[keyword]
+    for keyword, query in queries.items():
+        key = 'get_' + query_field[keyword].replace('.', '_')
         facet_stage['$facet'].update({
-            key: create_pipeline(request, query_field[keyword])
+            key: create_pipeline(query, query_field[keyword])
         })
 
 
     # Build projection stage.
     projection_stage = {
-        "$project": {
-            "intersect": {
-                "$setIntersection": []
+        '$project': {
+            'intersect': {
+                '$setIntersection': []
             }
         }
     }
@@ -139,10 +141,9 @@ def photo_diary_data():
     
     
     # Query for the group of filters requested.
-    collection.aggregate([facet_stage, projection_stage])
+    filtered_query = collection.aggregate([facet_stage, projection_stage])
+    response = jsonify(list(filtered_query))
+    # response = [facet_stage, projection_stage]
 
-   
-    results = 'WIP'
-    response = jsonify(list(results))
 
     return response
