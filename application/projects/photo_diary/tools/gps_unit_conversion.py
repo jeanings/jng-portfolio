@@ -25,6 +25,6 @@ def deci_deg_to_dms(deci_deg_coord):
     degrees = int(deci_deg_coord)
     minutes = (deci_deg_coord - degrees) * 60.0
     seconds = (minutes - int(minutes)) * 60.0
-    dms_coord = ((degrees, 1), (int(minutes), 1), (int(seconds*100), 100))
+    dms_coord = ((abs(degrees), 1), (abs(int(minutes)), 1), (abs(int(seconds*100)), 100))
 
     return dms_coord
