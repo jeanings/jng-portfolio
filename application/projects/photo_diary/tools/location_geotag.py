@@ -107,10 +107,22 @@ def process_images(location_json, images_folder, image_set):
         lat_dms = deci_deg_to_dms(locate_image.latitude)
         lng_dms = deci_deg_to_dms(locate_image.longitude)
 
+        if locate_image.latitude > 0:
+            lat_ref = 'N'
+        else:
+            lat_ref = 'S'
+
+        if locate_image.longitude > 0:
+            lng_ref = 'E'
+        else:
+            lng_ref = 'W'
+
         # Add gps data into image.
         gps_ifd = {
-            piexif.GPSIFD.GPSLatitude: (lat_dms[0], lat_dms[1], lat_dms[2]),              
-            piexif.GPSIFD.GPSLongitude: (lng_dms[0], lng_dms[1], lng_dms[2])             
+            piexif.GPSIFD.GPSLatitudeRef: lat_ref,
+            piexif.GPSIFD.GPSLatitude: (lat_dms[0], lat_dms[1], lat_dms[2]),
+            piexif.GPSIFD.GPSLongitudeRef: lng_ref,              
+            piexif.GPSIFD.GPSLongitude: (lng_dms[0], lng_dms[1], lng_dms[2])  
         }
 
         exif_gps = {"GPS": gps_ifd} 
