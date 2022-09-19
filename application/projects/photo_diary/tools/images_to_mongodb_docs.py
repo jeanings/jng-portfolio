@@ -106,55 +106,151 @@ def check_blobs_and_docs(images_blob):
 
     return image_blobs_to_update
 
-       
+
+def find_metadata_in_tags(raw_tags):
+    """
+    Search in tags for embedded metadata (manually added to film scans).
+    """
+
+    keywords = ['date', 'camera', 'lens', 'iso', 'film']
+
+    metadata_from_tags = {keyword: tag.strip(keyword).strip() for tag in raw_tags for keyword in keywords if keyword in tag}
+
+    return metadata_from_tags
+
+
+def strip_metadata_in_tags(raw_tags):
+    """
+    Search in tags for embedded metadata (manually added to film scans)
+    and return array excluding it.  For film scans.
+    """
+
+    keywords = ['date', 'camera', 'lens', 'iso', 'film', 'roll']
+    cleaned_tags = []
+
+    for tag in raw_tags:
+        if any([keyword in tag for keyword in keywords]):
+            continue
+        else:
+            cleaned_tags.append(tag)
+
+    return cleaned_tags
+
+
 def get_metadata(image, cameras_dict, image_url):
     """
     Extract and build dict of image metadata of interest.
     """
 
+    # Get metadata.
     pil_image = Image.open(image)
     exif_data = {ExifTags.TAGS[key]: val for key, val in pil_image._getexif().items() if key in ExifTags.TAGS}
+    xmp_string = pil_image.app['APP1'].decode('utf-8')
+    xmp_raw_string = repr(xmp_string)
     metadata = Metadata()
+
+    # Narrow regex to portion of xmp where tags are.
+    pattern_filter_tags = re.compile(r"<rdf:Bag>(.{0,}?)</rdf:Bag>") #<rdf:Bag>(.*?)</rdf:Bag>
+    regex_filter_tags = re.findall(pattern_filter_tags, xmp_raw_string)
+    # Isolate for tags.
+    pattern_refine = re.compile(r"<rdf:li>(.{0,}?)</rdf:li>")
+    raw_tags = re.findall(pattern_refine, regex_filter_tags[0])
+
+    # Get metadata for film scans.
+    film_metadata = find_metadata_in_tags(raw_tags)
 
     # Base file info.
     metadata.filename = image.name
     metadata.local_path = str(image)
-    metadata.date['taken'] = exif_data['DateTimeOriginal']
 
-    dt = datetime.strptime(metadata.date['taken'], "%Y:%m:%d %H:%M:%S")
-    metadata.date['year'] = int(dt.year)
-    metadata.date['month'] = int(dt.month)
-    metadata.date['day'] = int(dt.day)
-    metadata.date['time'] = ':'.join([str(dt.hour), str(dt.minute), str(dt.second)])
+    # ---------------------------------------- 
+    # ---------- For digital images ----------
+    # ----------------------------------------
+    if len(film_metadata) == 0:
+        # Date data.
+        metadata.date['taken'] = exif_data['DateTimeOriginal']
+        dt = datetime.strptime(metadata.date['taken'], "%Y:%m:%d %H:%M:%S")
+        metadata.date['year'] = int(dt.year)
+        metadata.date['month'] = int(dt.month)
+        metadata.date['day'] = int(dt.day)
+        metadata.date['time'] = ':'.join([str(dt.hour), str(dt.minute), str(dt.second)])
 
-    # Camera/lens data.
-    metadata.make = exif_data['Make']
-    metadata.model = exif_data['Model']
-    metadata.focal_Length_35mm = int(exif_data['FocalLengthIn35mmFilm'])
-    metadata.get_format(cameras_dict)
+        # Camera/lens data.
+        metadata.make = exif_data['Make']
+        metadata.model = exif_data['Model']
+        
+        if metadata.model == 'DMC-LX7':
+            metadata.get_lens()
+            metadata.model = 'Lumix DMC-LX7'
+        
+        metadata.focal_Length_35mm = int(exif_data['FocalLengthIn35mmFilm'])
+        metadata.get_format(cameras_dict)
 
-    # Exposure settings.
-    metadata.iso = int(exif_data['ISOSpeedRatings'])
-    metadata.aperture = float(exif_data['FNumber'])
-    metadata.shutter_speed = [exif_data['ExposureTime'].numerator, exif_data['ExposureTime'].denominator]
+        # Exposure settings.
+        metadata.iso = int(exif_data['ISOSpeedRatings'])
+        metadata.aperture = float(exif_data['FNumber'])
+        metadata.shutter_speed = [exif_data['ExposureTime'].numerator, exif_data['ExposureTime'].denominator]
 
-    # GPS coordinates.
-    metadata.gps['lat'] = dms_to_deci_deg(exif_data['GPSInfo'][2])
-    metadata.gps['lng'] = dms_to_deci_deg(exif_data['GPSInfo'][4])
+        # GPS coordinates.
+        metadata.gps['lat_ref'] = exif_data['GPSInfo'][1]
+        if metadata.gps['lat_ref'] == 'N':
+            metadata.gps['lat'] = dms_to_deci_deg(exif_data['GPSInfo'][2])
+        else:
+            metadata.gps['lat'] = dms_to_deci_deg(exif_data['GPSInfo'][2]) * -1
 
-    # Tags.
-    xmp_string = pil_image.app['APP1'].decode('utf-8')
-    xmp_raw_string = repr(xmp_string)
-    # Narrow regex to portion of xmp where tags are.
-    pattern_filter = re.compile(r"<rdf:Bag>(.{0,}?)</rdf:Bag>") #<rdf:Bag>(.*?)</rdf:Bag>
-    regex_filter = re.findall(pattern_filter, xmp_raw_string)
-    # Isolate for tags.
-    pattern_refine = re.compile(r"<rdf:li>(.{0,}?)</rdf:li>")
-    tags = re.findall(pattern_refine, regex_filter[0])
-    metadata.tags = tags
+        metadata.gps['lng_ref'] = exif_data['GPSInfo'][3]
+        if metadata.gps['lng_ref'] == 'E':
+            metadata.gps['lng'] = dms_to_deci_deg(exif_data['GPSInfo'][4])
+        else:
+            metadata.gps['lng'] = dms_to_deci_deg(exif_data['GPSInfo'][4]) * -1
+        
+        # URL for uploaded image.
+        metadata.url = image_url
 
-    # URL for uploaded image.
-    metadata.url = image_url
+        # Tags.
+        metadata.tags = raw_tags
+
+    # ------------------------------------
+    # ---------- For film scans ----------
+    # ------------------------------------
+    else:
+        # Date data.
+        date_year_month = film_metadata['date'].split('-')
+        metadata.date['year'] = int(date_year_month[0])
+        metadata.date['month'] = int(date_year_month[1])
+
+        # Camera/lens data.
+        camera = film_metadata['camera'].split(' ')
+        metadata.make = camera[0]
+        metadata.model = ' '.join(camera[1:])
+        metadata.lens = film_metadata['lens']
+        pattern_focal_length = re.compile(r"[\d]+(?=mm)")
+        regex_focal_length = re.search(pattern_focal_length, metadata.lens)
+        metadata.focal_Length_35mm = int(regex_focal_length.group(0))
+        metadata.get_format(cameras_dict)
+
+        # Exposure settings.
+        metadata.film = film_metadata['film']
+        metadata.iso = int(film_metadata['iso'])
+        
+        # GPS coordinates.
+        metadata.gps['lat_ref'] = exif_data['GPSInfo'][1]
+        if metadata.gps['lat_ref'] == 'N':
+            metadata.gps['lat'] = dms_to_deci_deg(exif_data['GPSInfo'][2])
+        else:
+            metadata.gps['lat'] = dms_to_deci_deg(exif_data['GPSInfo'][2]) * -1
+
+        metadata.gps['lng_ref'] = exif_data['GPSInfo'][3]
+        if metadata.gps['lng_ref'] == 'E':
+            metadata.gps['lng'] = dms_to_deci_deg(exif_data['GPSInfo'][4])
+        else:
+            metadata.gps['lng'] = dms_to_deci_deg(exif_data['GPSInfo'][4]) * -1
+
+        # URL for uploaded image.
+        metadata.url = image_url
+
+        # Tags.
+        metadata.tags = strip_metadata_in_tags(raw_tags)
 
     return metadata
 
