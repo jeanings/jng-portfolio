@@ -63,13 +63,17 @@ def list_blobs_with_prefix(bucket_name, prefix):
 
     # Get image blobs.
     blobs= {}
+    image_extensions = ['.jpg', '.jpeg', '.png', '.tiff']
     for year in folders:
         blobs[year] = {}
         prefix = folders[year]
         blobs_request = storage_client.list_blobs(bucket_name, prefix=prefix, delimiter=None)
 
         for blob in blobs_request:
-            blobs[year][blob.name] = blob.public_url
+            if any(ext in blob.public_url[-5:] for ext in image_extensions):
+                blobs[year][blob.name] = blob.public_url
+            else:
+                continue
 
     return blobs
 
@@ -301,7 +305,7 @@ def create_mongodb_docs():
                     try:
                         image_url = image_blobs_to_update[year_folder.name][blob_key]
                     except KeyError:
-                        print(">>> {0} not in GCS images blob.  Check files for errors.  Skipping.".format(blob_key))
+                        print(">>> {0} not in GCS images to update.  Skipping.".format(blob_key))
                         continue
 
                     images.update({item: image_url})
@@ -320,6 +324,9 @@ def create_mongodb_docs():
 
     # Insert collections to MongoDB database.
     for year in mongodb_collections:
+        if len(mongodb_collections[year]) == 0:
+            continue
+
         collection = db[year]
         collection.insert_many(mongodb_collections[year])
         print(">>> {0} documents inserted into {1} collection.".format(len(mongodb_collections[year]), year))
