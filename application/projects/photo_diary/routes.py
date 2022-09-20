@@ -9,6 +9,7 @@ from bson.json_util import ObjectId
 from pathlib import Path
 from pymongo import MongoClient
 from urllib.parse import quote_plus
+from .tools.mongodb_helpers import create_pipeline
 import json, pymongo
 
 DEBUG_MODE = app.config['FLASK_DEBUG']
@@ -46,7 +47,8 @@ MDB_PASS = quote_plus(MONGODB_KEY)
 
 # MongoDB connection.
 try:
-    client = MongoClient(f'mongodb+srv://{MONGODB_ID}:{MDB_PASS}@portfolio.8frim.mongodb.net/fudousan?retryWrites=true&w=majority')    
+    client = MongoClient(f'mongodb+srv://{MONGODB_ID}:{MDB_PASS}@portfolio.8frim.mongodb.net/')
+    db = client.photo_diary
 except pymongo.errors.AutoReconnect:
     print("Reconnecting to database due to connection failure / is lost.")
 except pymongo.errors.OperationFailure:
@@ -64,20 +66,86 @@ def photo_diary():
 @photo_diary_bp.route('/photo-diary/get-data', methods=['GET'])
 def photo_diary_data():
     try:
-        db = client.photo_diary
-        # collection_regions = db.photo_data
-    
-        '''
-            Work in progress ------------------------------
-        '''
+        year = request.args.get('year')
+        month = request.args.get('month')
+        format_medium = request.args.get('format-medium')     # digital, film
+        format_type = request.args.get('format-type')         # 35mm, APS-C
+        film = request.args.get('film')
+        camera = request.args.get('camera')
+        lenses = request.args.get('lenses')
+        focal_length = request.args.get('focal-length')
+        tags = request.args.get('tags')
+
+        if year:
+            collection = db[str(year)]
 
     except pymongo.errors.AutoReconnect:
         print("Reconnecting to database due to connection failure / is lost.")
     except pymongo.errors.OperationFailure:
         print("Database operation error.")
 
-    # results = 0
+    raw_queries = {
+        'month': month, 'format_medium': format_medium, 'format_type': format_type, 'film': film,
+        'camera': camera, 'lenses': lenses, 'focal_length': focal_length, 'tags': tags
+    }
 
-    response = jsonify(list(results))
+    # Parse queries: month as is, the rest into lists.  
+    queries = {}
+    whitespaced_keywords = ['camera', 'film', 'lenses', 'tags']
+
+    for key, val in raw_queries.items():
+        if val:
+            if key == 'month':
+                queries.update({key: int(val)})
+            elif key == 'focal_length':
+                query = [int(foc_len) for foc_len in val.split(' ')]
+                queries.update({key: query})
+            elif key in whitespaced_keywords:
+                query = [item.replace('_', ' ') for item in val.split(' ')]
+                queries.update({key: query})
+            else:
+                queries.update({key: val.split(' ')})
+
+    query_field = {
+        'month': 'date.month',
+        'format_medium': 'format.medium',
+        'format_type': 'format.type',
+        'film': 'film',
+        'camera': 'model',
+        'lenses': 'lens',
+        'focal_length': 'focal_length_35mm',
+        'tags': 'tags'
+    }
+
+    # Build facet stage.
+    facet_stage = {
+        '$facet': {}
+    }
+
+    for keyword, query in queries.items():
+        key = 'get_' + query_field[keyword].replace('.', '_')
+        facet_stage['$facet'].update({
+            key: create_pipeline(query, query_field[keyword])
+        })
+
+    # Build projection stage.
+    projection_stage = {
+        '$project': {
+            'intersect': {
+                '$setIntersection': []
+            }
+        }
+    }
+
+    for facet in facet_stage['$facet'].keys():
+        projection_stage['$project']['intersect']['$setIntersection'].append(
+            '$' + facet
+        )
+    
+    # Query for the group of filters requested.
+    filtered_query = collection.aggregate([facet_stage, projection_stage])
+    response = jsonify(list(filtered_query))
+    # response = [queries, facet_stage, projection_stage]
+
 
     return response
