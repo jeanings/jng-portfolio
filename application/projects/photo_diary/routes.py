@@ -70,9 +70,10 @@ def photo_diary_data():
         month = request.args.get('month')
         format_medium = request.args.get('format-medium')     # digital, film
         format_type = request.args.get('format-type')         # 35mm, APS-C
+        film = request.args.get('film')
         camera = request.args.get('camera')
         lenses = request.args.get('lenses')
-        focal_length = request.args.get('focal-length')       # wide, standard, long
+        focal_length = request.args.get('focal-length')
         tags = request.args.get('tags')
 
         if year:
@@ -83,14 +84,15 @@ def photo_diary_data():
     except pymongo.errors.OperationFailure:
         print("Database operation error.")
 
-    
     raw_queries = {
-        'month': month, 'format_medium': format_medium, 'format_type': format_type, 
+        'month': month, 'format_medium': format_medium, 'format_type': format_type, 'film': film,
         'camera': camera, 'lenses': lenses, 'focal_length': focal_length, 'tags': tags
     }
 
     # Parse queries: month as is, the rest into lists.  
     queries = {}
+    whitespaced_keywords = ['camera', 'film', 'lenses', 'tags']
+
     for key, val in raw_queries.items():
         if val:
             if key == 'month':
@@ -98,21 +100,23 @@ def photo_diary_data():
             elif key == 'focal_length':
                 query = [int(foc_len) for foc_len in val.split(' ')]
                 queries.update({key: query})
+            elif key in whitespaced_keywords:
+                query = [item.replace('_', ' ') for item in val.split(' ')]
+                queries.update({key: query})
             else:
                 queries.update({key: val.split(' ')})
-
 
     query_field = {
         'month': 'date.month',
         'format_medium': 'format.medium',
         'format_type': 'format.type',
+        'film': 'film',
         'camera': 'model',
         'lenses': 'lens',
         'focal_length': 'focal_length_35mm',
         'tags': 'tags'
     }
 
-    
     # Build facet stage.
     facet_stage = {
         '$facet': {}
@@ -123,7 +127,6 @@ def photo_diary_data():
         facet_stage['$facet'].update({
             key: create_pipeline(query, query_field[keyword])
         })
-
 
     # Build projection stage.
     projection_stage = {
@@ -139,11 +142,10 @@ def photo_diary_data():
             '$' + facet
         )
     
-    
     # Query for the group of filters requested.
     filtered_query = collection.aggregate([facet_stage, projection_stage])
     response = jsonify(list(filtered_query))
-    # response = [facet_stage, projection_stage]
+    # response = [queries, facet_stage, projection_stage]
 
 
     return response
