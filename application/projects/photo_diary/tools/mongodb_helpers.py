@@ -2,7 +2,60 @@
 #   Helper scripts for MongoDB queries. 
 #---------------------------------------
 
-def create_pipeline(query, target_field):
+def create_selectables_pipeline():
+    """
+    Script to create pipeline to get all unique selectables for filter component.
+    """
+
+    pipeline = [
+        {
+            '$group': {
+                '_id': 0,
+                'format_medium': { '$addToSet': '$format.medium' }, 
+                'format_type': { '$addToSet': '$format.type' },
+                'film': { '$addToSet': '$film' },
+                'camera': { 
+                    '$addToSet': {
+                        '$concat': [
+                            '$make', ' ', '$model' 
+                        ]
+                    }
+                },
+                'lenses': { '$addToSet': '$lens' },
+                'focal_length': { '$addToSet': '$focal_length_35mm' },
+                'tags': { '$push': '$tags' }
+            }
+        },
+        {
+            '$project': {
+                '_id': 0,
+                'formatMedium': '$format_medium', 
+                'formatType': '$format_type',
+                'film': '$film',
+                'camera': '$camera',
+                'lenses': '$lenses',
+                'focalLength': '$focal_length',
+                'tags': { 
+                    '$setIntersection': [{
+                        '$reduce': {
+                            'input': '$tags',
+                            'initialValue': [],
+                            'in': { 
+                                '$concatArrays': [ 
+                                    '$$value', '$$this' 
+                                ] 
+                            }
+                        }
+                    }]
+                }
+            }
+        }
+    ]
+
+    return pipeline
+
+
+def create_facet_pipeline(query, target_field):
     """
     Script to create pipelines for aggregate method.
     Takes request from front-end and document field to search in.
@@ -55,6 +108,5 @@ def create_pipeline(query, target_field):
             }
         }
     ]
-
 
     return pipeline
