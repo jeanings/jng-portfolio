@@ -9,7 +9,7 @@ from bson.json_util import ObjectId
 from pathlib import Path
 from pymongo import MongoClient
 from urllib.parse import quote_plus
-from .tools.mongodb_helpers import create_facet_pipeline, create_selectables_pipeline
+from .tools.mongodb_helpers import create_facet_stage, create_projection_stage, get_selectables_pipeline
 import json, pymongo
 
 DEBUG_MODE = app.config['FLASK_DEBUG']
@@ -121,38 +121,18 @@ def photo_diary_data():
         'tags': 'tags'
     }
 
+    # Query MongoDB.
     if len(queries) == 0:
         # For query with just 'year'.
         docs = {
             'docs': list(collection.find({}))
         }
-
+        
     else:
-        # For other queries, build facet stage.
-        facet_stage = {
-            '$facet': {}
-        }
+        # For other queries.
+        facet_stage = create_facet_stage(queries, query_field)
+        projection_stage = create_projection_stage(facet_stage)
 
-        for keyword, query in queries.items():
-            key = 'get_' + query_field[keyword].replace('.', '_')
-            facet_stage['$facet'].update({
-                key: create_facet_pipeline(query, query_field[keyword])
-            })
-
-        # Build projection stage.
-        projection_stage = {
-            '$project': {
-                'intersect': {
-                    '$setIntersection': []
-                }
-            }
-        }
-
-        for facet in facet_stage['$facet'].keys():
-            projection_stage['$project']['intersect']['$setIntersection'].append(
-                '$' + facet
-            )
-    
         # Query for the group of filters requested.
         filtered_query = collection.aggregate([facet_stage, projection_stage])
 
@@ -160,9 +140,9 @@ def photo_diary_data():
             'docs': list(filtered_query)
         }
 
-    # response = [collections, raw_queries, queries, facet_stage, projection_stage]
+    # Get unique values from fields for selectables to display in filter component.
     filter_selectables = {
-        'filterSelectables': list(collection.aggregate(create_selectables_pipeline()))
+        'filterSelectables': list(collection.aggregate(get_selectables_pipeline()))
     }
 
     response = jsonify(filter_selectables, docs)
