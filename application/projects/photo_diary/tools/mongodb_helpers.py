@@ -57,6 +57,34 @@ def get_selectables_pipeline():
     return pipeline
 
 
+def get_image_counts(docs):
+    """
+    Iterates through docs and counts occurances of each month,
+    returning an object with image counts through the entire year.    
+    """
+
+    counter = {'all': 0}
+    month_num_map = {
+        '1': 'jan', '2': 'feb', '3': 'mar', '4': 'apr',
+        '5': 'may', '6': 'jun', '7': 'jul', '8': 'aug',
+        '9': 'sep', '10': 'oct', '11': 'nov', '12': 'dec'
+    }
+
+    for doc in docs:
+        month_num = doc['date']['month']
+        month_str = month_num_map[str(month_num)]
+
+        try:
+            count = counter[month_str]
+            counter[month_str] = count + 1
+        except (KeyError): 
+            counter[month_str] = 1
+
+        counter['all'] = counter['all'] + 1
+        
+    return counter
+
+
 def get_facet_pipeline(query, target_field):
     """
     Set up pipelines for aggregate method.

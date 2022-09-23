@@ -9,7 +9,7 @@ from bson.json_util import ObjectId
 from pathlib import Path
 from pymongo import MongoClient
 from urllib.parse import quote_plus
-from .tools.mongodb_helpers import create_facet_stage, create_projection_stage, get_selectables_pipeline
+from .tools.mongodb_helpers import create_facet_stage, create_projection_stage, get_selectables_pipeline, get_image_counts
 import json, pymongo
 
 DEBUG_MODE = app.config['FLASK_DEBUG']
@@ -68,8 +68,8 @@ def photo_diary_data():
     try:
         year = request.args.get('year')
         month = request.args.get('month')
-        format_medium = request.args.get('format-medium')     # digital, film
-        format_type = request.args.get('format-type')         # 35mm, APS-C
+        format_medium = request.args.get('format-medium')
+        format_type = request.args.get('format-type')
         film = request.args.get('film')
         camera = request.args.get('camera')
         lenses = request.args.get('lenses')
@@ -121,13 +121,14 @@ def photo_diary_data():
         'tags': 'tags'
     }
 
+    # Get unique values from fields for selectables to display in filter component.
+    # Uses values from images in the whole year.
+    filter_selectables = list(collection.aggregate(get_selectables_pipeline()))
+    
     # Query MongoDB.
     if len(queries) == 0:
         # For query with just 'year'.
-        docs = {
-            'docs': list(collection.find({}))
-        }
-        
+        docs = list(collection.find({}))
     else:
         # For other queries.
         facet_stage = create_facet_stage(queries, query_field)
@@ -135,16 +136,17 @@ def photo_diary_data():
 
         # Query for the group of filters requested.
         filtered_query = collection.aggregate([facet_stage, projection_stage])
+        docs = list(filtered_query)[0]['intersect']
 
-        docs = {
-            'docs': list(filtered_query)
-        }
+    # Get image counts for each month.
+    counter = get_image_counts(docs)
 
-    # Get unique values from fields for selectables to display in filter component.
-    filter_selectables = {
-        'filterSelectables': list(collection.aggregate(get_selectables_pipeline()))
+    results = {
+        'filterSelectables': filter_selectables,
+        'docs': docs,
+        'counter': counter
     }
-
-    response = jsonify(filter_selectables, docs)
+    
+    response = jsonify(results)
 
     return response
