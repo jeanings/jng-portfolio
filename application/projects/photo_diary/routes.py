@@ -76,9 +76,9 @@ def photo_diary_data():
         focal_length = request.args.get('focal-length')
         tags = request.args.get('tags')
 
+        collections = sorted(db.list_collection_names())
         if year == 'default':
             # Set collection to current year on initial renders.
-            collections = sorted(db.list_collection_names())
             collection = db[collections[-1]]
         elif year:
             collection = db[str(year)]
@@ -142,11 +142,12 @@ def photo_diary_data():
     counter = get_image_counts(docs)
 
     results = {
+        'years': collections,
+        'counter': counter,
         'filterSelectables': filter_selectables,
-        'docs': docs,
-        'counter': counter
+        'docs': docs
     }
-    
+        
     response = jsonify(results)
 
     return response
