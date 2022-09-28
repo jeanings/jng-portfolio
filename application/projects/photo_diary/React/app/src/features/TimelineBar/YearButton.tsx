@@ -4,14 +4,20 @@ import { handleTimelineYear, TimelineProps } from './timelineSlice';
 import './YearButton.css';
 
 
+/* =============================================================
+    Button constructor for dropdown menu of year items.
+    Clicks will dispatch to change <timeline.year> state,
+    triggering a hook in TimelineBar. 
+============================================================= */
 const YearButton: React.FunctionComponent<YearButtonProps> = (props: YearButtonProps) => {
     const dispatch = useAppDispatch();
 
+    /* -------------------------------------------------------
+        Clicks on year selector items will dispatch action to
+        update selected year, handled by the reducer.
+    ------------------------------------------------------- */
     const onYearSelect = (event: any) => {
-        /* -------------------------------------------------------
-            Clicks on year selector items will dispatch action to
-            update selected year, handled by the reducer.
-        ------------------------------------------------------- */
+        
         const yearItems: HTMLCollectionOf<Element> = document.getElementsByClassName(
             props.baseClassName.concat("__", props.className));
 
@@ -21,13 +27,13 @@ const YearButton: React.FunctionComponent<YearButtonProps> = (props: YearButtonP
         }
 
         // Change to clicked year.
-        const yearSelectionText: string = event.target.textContent;
+        const yearSelectionText: number = event.target.textContent;
         const yearSelectionStatus: boolean = event.target.ariaChecked = true;
 
         // Dispatch selected year to reducer.
         const payloadYear: TimelineProps["year"] = yearSelectionText;
         dispatch(handleTimelineYear(payloadYear));
-    }
+    };
     
 
     return (
