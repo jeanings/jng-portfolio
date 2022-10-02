@@ -3,7 +3,8 @@ import {
     createAsyncThunk,
     Action,
     AnyAction,
-    PayloadAction } from '@reduxjs/toolkit';
+    PayloadAction, 
+    isRejectedWithValue } from '@reduxjs/toolkit';
 import axios, { AxiosError, AxiosResponse } from 'axios';
 import { RootState } from '../../app/store';
 import { DEV_MODE, apiUrl } from '../../app/App';
@@ -13,36 +14,42 @@ import { DEV_MODE, apiUrl } from '../../app/App';
     Slice for handling current selection of timeline; year and month.
     Handles updates to {dateSelection} state.
 ============================================================================== */
+
+/* -------------------------------------------------
+    Async thunk for fetching initial MongoDB data.
+------------------------------------------------- */
 export const fetchImagesData = createAsyncThunk(
-    /* -------------------------------------------------
-        Async thunk for fetching initial MongoDB data.
-    ------------------------------------------------- */
     'timeline/fetchImagesData',
-    async (request: ImageDocsRequestProps) => {
+    async (request: ImageDocsRequestProps, { rejectWithValue }) => {
         // Async fetch requested data, calling backend API to MongoDB.
         try {
             const response: AxiosResponse = await fetchDocs(apiUrl, request);
             if (response.status === 200) {
-                // Returns promise status, handling done by extra reducers in timelineSlice.
+                // Returns promise status, handling done by extra reducer.
                 return (await response.data);
             }
         } 
-        catch (error) {
-            if (axios.isAxiosError(error)) {
-                console.log("ERROR: AxiosError - async thunk in fetchImages.", error.response?.data)
-            } else {
-                console.log("ERROR: API call failed in fetchImages.");
+        catch (err) {
+            // Errors handled by extra reducer.
+            if (axios.isAxiosError(err)) {
+                const error = err as AxiosError;
+                return rejectWithValue(error.response!.data);
+            }
+            else {
+                const error = err;
+                return rejectWithValue(error);
             }
         }
     }
 );
 
 
+/* --------------------------------
+    Image docs fetcher for thunk.
+-------------------------------- */
 export const fetchDocs = (apiUrl: string, request: ImageDocsRequestProps) => {
-    /* --------------------------------
-        Image docs fetcher for thunk.
-    -------------------------------- */
-    const mongoDbPromise = Promise.resolve(
+    
+   const mongoDbPromise = Promise.resolve(
         axios.get(
             apiUrl, { params: request }
         )
@@ -52,10 +59,14 @@ export const fetchDocs = (apiUrl: string, request: ImageDocsRequestProps) => {
 }
 
 
+/* ------------------------------------------
+    Handles updates to timeline selection.
+------------------------------------------ */
 // State for initial render.
 const initialState: TimelineProps = {
     request: 'idle',
-    year: null,
+    yearInit: null,
+    yearSelected: null,
     years: null,
     month: 'all',
     counter: null,
@@ -63,68 +74,64 @@ const initialState: TimelineProps = {
     filterSelectables: null
 };
 
-
 const timelineSlice = createSlice({
-    /* ---------------------------------------------
-        Handles updates to timeline selection.
-    --------------------------------------------- */
     name: 'timeline',
     initialState,
     reducers: {
-        handleTimelineYear: (state, action: PayloadAction<TimelineProps['year']>) => {
-            /* --------------------------
-                Saves selection of year.
-            -------------------------- */
-            const selectedYear = action.payload;
-            
-            state.year = selectedYear;
-        },
+        /* ---------------------------
+            Saves selection of year.
+        --------------------------- */
+        // handleTimelineYear: (state, action: PayloadAction<TimelineProps['year']>) => {
+        //     const selectedYear: number = action.payload;
+        //     state.yearSelected = selectedYear;
+        //     state.request = 'pending';
+        // },
+        /* ------------------------------
+            Saves selection of month(s)
+        ------------------------------ */
         handleTimelineMonth: (state, action: PayloadAction<TimelineProps['month']>) => {
-            /* -----------------------------
-                Saves selection of month(s)
-            ------------------------------ */
             const selectedMonth = action.payload;
-
             state.month = selectedMonth;
         }
     },
+    /* ----------------------------------------------------
+        Reducers for async thunk MongoDB menu API calls.
+    ---------------------------------------------------- */
     extraReducers: (builder) => {
-        /* ----------------------------------------------------
-            Reducers for async thunk MongoDB menu API calls.
-        ---------------------------------------------------- */
         builder
+            /* ------------------------------------- 
+                Updates state on successful fetch.
+            ------------------------------------- */
             .addCase(fetchImagesData.fulfilled, (state, action) => {
-                /* ------------------------------------- 
-                    Updates state on successful fetch.
-                ------------------------------------- */
-                const data = action.payload
+                const data = action.payload;
                 const counter: object = data.counter;
                 const filterSelectables: FilterableTypes = data.filterSelectables[0];
                 const imageDocs: Array<ImageDocTypes> = data.docs;
                 const years: Array<string> = data.years
-                const year: number = action.meta.arg.year != 'default'
-                    ? action.meta.arg.year
-                    : imageDocs[0].date.year
                 
                 // Set states.
-                state.request = 'complete';
-                state.year = year;
+                if (state.yearInit === null) {
+                    const yearInit: number = action.meta.arg.year !== 'default'
+                        ? action.meta.arg.year          // sets to year of fetch request
+                        : imageDocs[0].date.year        // sets to year of image docs if default
+                    state.yearInit = yearInit;
+                    state.yearSelected = yearInit;
+                }
+                else {
+                    state.yearSelected = action.meta.arg.year as number;
+                }
                 state.years = years;
                 state.counter = counter;
                 state.imageDocs = imageDocs;
                 state.filterSelectables = filterSelectables;
+                state.request = 'complete';
             })
-
-            .addCase(fetchImagesData.rejected, (state, action) => {
-                /* ------------------------ 
-                    Catches fetch errors.
-                ------------------------ */
-                state.request = 'error';
-                console.error("MongoDB image data fetch unsuccessful.", action);
-            })
-
+            /* --------------------------------------- 
+                Catches errors on fetching from API.
+            --------------------------------------- */
             .addMatcher(isRejectedAction, (state, action) => {
-                console.error("MongoDB image data action rejected.", action);
+                // console.log("MongoDB image data action rejected.");
+                state.request = 'error';
             })
     },
 });
@@ -134,7 +141,8 @@ const timelineSlice = createSlice({
 export interface TimelineProps {
     [index: string]: string | any,
     'request': 'idle' | 'pending' | 'complete' | 'error',
-    'year': number | null,
+    'yearInit': number | null,
+    'yearSelected': number | null,
     'years': Array<string> | null,
     'month': TimelineMonthTypes,
     'counter': object | null,
@@ -225,5 +233,5 @@ export const timelineSelection = (state: RootState) => state.timeline;
 
 // Export actions, reducers.
 const { actions, reducer } = timelineSlice;
-export const { handleTimelineYear, handleTimelineMonth } = actions;
+export const { handleTimelineMonth } = actions;
 export default reducer;

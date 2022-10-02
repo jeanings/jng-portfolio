@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
-import { useAppDispatch, useMediaQueries } from '../../common/hooks';
-import { handleTimelineYear, TimelineProps } from './timelineSlice';
+import { useAppDispatch, useAppSelector, useMediaQueries } from '../../common/hooks';
+import { fetchImagesData, ImageDocsRequestProps, TimelineProps } from './timelineSlice';
 import './YearButton.css';
 
 
@@ -11,10 +11,11 @@ import './YearButton.css';
 ============================================================= */
 const YearButton: React.FunctionComponent<YearButtonProps> = (props: YearButtonProps) => {
     const dispatch = useAppDispatch();
+    const timelineState = useAppSelector(state => state.timeline);
 
     /* -------------------------------------------------------
         Clicks on year selector items will dispatch action to
-        update selected year, handled by the reducer.
+        fetch data and update state, handled by the reducer.
     ------------------------------------------------------- */
     const onYearSelect = (event: any) => {
         
@@ -26,13 +27,23 @@ const YearButton: React.FunctionComponent<YearButtonProps> = (props: YearButtonP
             element.ariaChecked = "false";
         }
 
-        // Change to clicked year.
+        // Get clicked year text and set to checked.
         const yearSelectionText: number = event.target.textContent;
         const yearSelectionStatus: boolean = event.target.ariaChecked = true;
 
-        // Dispatch selected year to reducer.
-        const payloadYear: TimelineProps["year"] = yearSelectionText;
-        dispatch(handleTimelineYear(payloadYear));
+        // Change selected year to clicked year.
+        const yearSelectedElement: HTMLElement = document.querySelector(
+            ".".concat(props.baseClassName, "__", "year-selected")) as HTMLElement;
+        
+        if (yearSelectedElement) {
+            yearSelectedElement.textContent = yearSelectionText.toString();
+        }
+
+        // Dispatch fetch request.
+        const payloadForYear: ImageDocsRequestProps = {
+            'year': yearSelectionText as number
+        };
+        dispatch(fetchImagesData(payloadForYear));
     };
     
 

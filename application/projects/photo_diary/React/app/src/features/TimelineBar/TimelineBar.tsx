@@ -6,7 +6,7 @@ import {
 import { 
     fetchImagesData, 
     handleTimelineMonth, 
-    handleTimelineYear, 
+    // handleTimelineYear, 
     ImageDocsRequestProps, 
     TimelineProps } from '../../features/TimelineBar/timelineSlice';
 import YearButton from './YearButton';
@@ -37,36 +37,14 @@ const TimelineBar: React.FunctionComponent = () => {
         Get default data set on initial render.
     ------------------------------------------ */
     useEffect(() => {
-        const initArg: ImageDocsRequestProps = {
+        const payloadInit: ImageDocsRequestProps = {
             'year': 'default'
         };
-
-        if (timelineState.year === null) {
-            dispatch(fetchImagesData(initArg))
+        
+        if (timelineState.yearInit === null) {
+            dispatch(fetchImagesData(payloadInit));
         }
     }, []);
-
-
-    /* -------------------------------------------------------
-        Update selected year text on state change.
-    ------------------------------------------------------- */
-    useEffect(() => {
-        const yearSelectedElement: HTMLElement = document.querySelector(
-            ".".concat(classBase, "__", "year-selected")) as HTMLElement;
-
-        if (timelineState.year !== null) {
-            if (yearSelectedElement) {
-                yearSelectedElement.textContent = timelineState.year.toString() as string;
-            }
-
-            const imageDataByYear: ImageDocsRequestProps = {
-                'year': timelineState.year
-            }
-
-            dispatch(fetchImagesData(imageDataByYear))
-        }
-    }, [timelineState.year]);
-
 
     // Build list of selectable years, based on collections in db.
     let years: Array<string> = [];
@@ -86,7 +64,7 @@ const TimelineBar: React.FunctionComponent = () => {
 
                 <div className={useMediaQueries(classBase.concat("__", "year-selected"))}
                     role="menuitem" aria-label="year-selected">
-                    {timelineState.year}
+                    {timelineState.yearSelected}
                 </div>
 
                 {/* Dropdown menu of selectable years based on db collections. */}
@@ -108,7 +86,6 @@ const TimelineBar: React.FunctionComponent = () => {
                     />
                 ))}
             </div>
-
         </div>
     );
 }
