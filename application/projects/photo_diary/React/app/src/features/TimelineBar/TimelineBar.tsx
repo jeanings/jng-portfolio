@@ -58,7 +58,8 @@ const TimelineBar: React.FunctionComponent = () => {
 
 
     return (
-        <div className={useMediaQueries(classBase)}>
+        <div className={useMediaQueries(classBase)}
+            role="region" aria-label="timeline">
             <div className={useMediaQueries(classBase.concat("__", "year-selector"))}
                 role="menubar" aria-label="year-selector">
 
