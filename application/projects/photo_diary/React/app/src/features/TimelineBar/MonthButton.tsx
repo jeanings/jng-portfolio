@@ -5,14 +5,20 @@ import MonthCounter from './MonthCounter';
 import './MonthButton.css';
 
 
+/* =============================================================
+    Button constructor for row of month items.
+    Clicks will dispatch to change ... state
+============================================================= */
 const MonthButton: React.FunctionComponent<MonthButtonProps> = (props: MonthButtonProps) => {
     const dispatch = useAppDispatch();
 
+
+    /* ----------------------------------------------------------------
+        Clicks on month selector items will dispatch action to
+        update selected month, showing only images from selected month.
+    ---------------------------------------------------------------- */
     const onMonthSelect = (event: any) => {
-        /* ----------------------------------------------------------------
-            Clicks on month selector items will dispatch action to
-            update selected month, showing only images from selected month.
-        ---------------------------------------------------------------- */
+        
         const monthSelectorItems: HTMLCollectionOf<Element> = document.getElementsByClassName(
             "TimelineBar".concat("__", "month-item"));
         const monthSelection: HTMLElement = event.target;
@@ -43,18 +49,39 @@ const MonthButton: React.FunctionComponent<MonthButtonProps> = (props: MonthButt
             onClick={onMonthSelect}>
                 {props.name}
 
-                {/* Counter for photos taken in each month */}
-                <MonthCounter
-                    name={props.name}
-                    baseClassName={props.baseClassName}
-                    className='month-counter'
-                    key={'key-month-counter_'.concat(props.keyIndex.toString())}
-                />
+                {/* Counter for images taken in the month */}
+                {createMonthCounter(props.name, props.baseClassName, props.keyIndex)}
         </div>
     );
 }
 
 
+/* =====================================================================
+    Helper functions.
+===================================================================== */
+
+/* -----------------------------------------------------
+    Wrapper for creating image counters for the month.
+----------------------------------------------------- */
+function createMonthCounter(name: string, classBase: string, index: number) {
+    let monthCounter : JSX.Element;
+
+    monthCounter = (
+        <MonthCounter
+            name={name}
+            baseClassName={classBase}
+            className='month-counter'
+            key={'key-month-counter_'.concat(index.toString())}
+        />
+    );
+
+    return monthCounter;
+}
+
+
+/* =====================================================================
+    Types.
+===================================================================== */
 export interface MonthButtonProps {
     name: string,
     baseClassName: string,
