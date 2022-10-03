@@ -51,10 +51,10 @@ const TimelineBar: React.FunctionComponent = () => {
     
     // Build month items.
     const months: Array<string> = [
-        'ALL',
-        'JAN', 'FEB', 'MAR', 'APR',
-        'MAY', 'JUN', 'JUL', 'AUG',
-        'SEP', 'OCT', 'NOV', 'DEC'
+        'all',
+        'jan', 'feb', 'mar', 'apr',
+        'may', 'jun', 'jul', 'aug',
+        'sep', 'oct', 'nov', 'dec'
     ];
     let monthItems: Array<JSX.Element> = [];
 

@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { useAppDispatch, useMediaQueries } from '../../common/hooks';
 import { handleTimelineMonth, TimelineProps } from './timelineSlice';
 import MonthCounter from './MonthCounter';
@@ -13,12 +13,11 @@ const MonthButton: React.FunctionComponent<MonthButtonProps> = (props: MonthButt
     const dispatch = useAppDispatch();
 
 
-    /* ----------------------------------------------------------------
+    /* ------------------------------------------------------------------
         Clicks on month selector items will dispatch action to
         update selected month, showing only images from selected month.
-    ---------------------------------------------------------------- */
+    ------------------------------------------------------------------ */
     const onMonthSelect = (event: any) => {
-        
         const monthSelectorItems: HTMLCollectionOf<Element> = document.getElementsByClassName(
             "TimelineBar".concat("__", "month-item"));
         const monthSelection: HTMLElement = event.target;
@@ -47,7 +46,7 @@ const MonthButton: React.FunctionComponent<MonthButtonProps> = (props: MonthButt
             role="menuitemradio" aria-label={props.className}
             aria-checked="false"
             onClick={onMonthSelect}>
-                {props.name}
+                {props.name.toUpperCase()}
 
                 {/* Counter for images taken in the month */}
                 {createMonthCounter(props.name, props.baseClassName, props.keyIndex)}

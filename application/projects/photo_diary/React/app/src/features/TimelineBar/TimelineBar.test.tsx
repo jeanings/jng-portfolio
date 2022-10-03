@@ -55,7 +55,7 @@ describe("on initial renders", () => {
             </Provider>
         );
         
-        // Confirm initial [request] state.
+        // Confirm initial << timeline.request >> state.
         expect(newStore.getState().timeline.request).toBe('idle');
         
         // Wait for async thunk to handle response.
@@ -160,9 +160,9 @@ test("catches fetch request errors", async() => {
     );
 
     await waitFor(() => {
-        // yearInit remains null if fetch unsuccessful.
+        // << timeline.yearInit >> state remains null if fetch unsuccessful.
         expect(newStore.getState().timeline.yearInit).toBeFalsy;
-        // [request] state changed to 'error' instead of 'idle' or 'complete'.
+        // << timeline.request >> state changed to 'error' instead of 'idle' or 'complete'.
         expect(newStore.getState().timeline.request).toBe('error');
     });
 });
@@ -170,7 +170,7 @@ test("catches fetch request errors", async() => {
 
     
 /* =====================================================================
-    Tests for clicks on menu drawer items.
+    Tests for clicks on menu timeline selection items.
 ===================================================================== */
 describe("clicks on year drawer items", () => {
     beforeEach(() => {
@@ -196,7 +196,7 @@ describe("clicks on year drawer items", () => {
             </Provider>
         );
         
-        // Confirm initial [request] state.
+        // Confirm initial << timeline.request >> state.
         expect(newStore.getState().timeline.request).toBe('idle');
 
         await waitFor(() => {
@@ -228,51 +228,60 @@ describe("clicks on year drawer items", () => {
 });
 
 
+describe("clicks on month selector items", () => {
+    beforeEach(() => {
+         // Intercept get requests to live API, returning default local data.
+        mockAxios = new MockAdapter(axios);
+        mockAxios
+            .onGet(apiUrl, { params: { 'year': 'default' } })
+            .replyOnce(200, mockDefaultData)
+            .onGet(apiUrl, { params: { 'year': '2015' } })
+            .reply(200, mock2015Data)
+    });
 
-
-
-// xdescribe("clicks on month items", () => {
-//     afterAll(() => {
-//         cleanup();
-//     });
-
-//     test("changes and highlights month on click", async() => {
-//         renderWithProviders(<TimelineBar />);
+    afterEach(() => {
+        mockAxios.reset();
+        cleanup;
+    });
     
-//         // Check for all radios to be false.
-//         const monthItems = screen.getAllByRole('menuitemradio', { name: 'month-item' });
-//         monthItems.forEach(element => {
-//             expect(element).toHaveAttribute('aria-checked', 'false');
-//         });
-    
-//         // Select a month.
-//         const monthSelection = monthItems.find(
-//             element => element.textContent!.replace(/\d/, "") === 'JAN') as HTMLElement;
-//         fireEvent.click(monthSelection);
-    
-//         // Check for aria-checked status.
-//         expect(monthSelection.ariaChecked).toEqual(true);
-    
-//         // Check for selected month highlight.
-//         await waitFor(() => 
-//             expect(monthSelection).toHaveClass('active')
-//         );
-//     });
-
-//     test("dispatches action to change state of selected month", () => {
-//         renderWithProviders(<TimelineBar />);
+    test("dispatches to change selected month, updates element style", async() => {
+        const newStore = setupStore();
+        render(
+            <Provider store={newStore}>
+                <TimelineBar />
+            </Provider>
+        );
         
-//         const monthItems = screen.getAllByRole('menuitemradio', { name: 'month-item' });
+        // Confirm initial << timeline.request >> state.
+        expect(newStore.getState().timeline.request).toBe('idle');
 
-//         // Select a year.
-//         const monthSelection = monthItems.find(
-//             element => element.textContent!.replace(/\d/, '') === 'JAN') as HTMLElement;
-//         fireEvent.click(monthSelection);
+        // Check for all radios to be false.
+        const monthItemElems = screen.getAllByRole('menuitemradio', { name: 'month-item' });
+        monthItemElems.forEach(element => {
+            expect(element).toHaveAttribute('aria-checked', 'false');
+        });
 
-//         // Check for dispatch.
-//         expect(store.getState().timeline.month).toBe('jan');
-//     });
-// });
+        // Select a month.
+        const monthToSelect: string = 'feb';
+        const monthElemToSelect = monthItemElems.find(element => 
+            element.textContent!.replace(/\d/, "") === monthToSelect.toUpperCase()) as HTMLElement;
+        fireEvent.click(monthElemToSelect);
+    
+        // Check for checked and style updates to counter.
+        expect(monthElemToSelect.ariaChecked).toEqual(true);
+        expect(monthElemToSelect).toHaveClass('active')
+    
+        await waitFor(() => {
+            // Updates << timeline.month >> state correctly.
+            expect(newStore.getState().timeline.month).toBe(monthToSelect);
+            
+            // Verify count in element matches count in state.
+            const countFromElem: number = parseInt(monthElemToSelect.lastChild!.textContent as string);
+            const countFromState: number = newStore.getState().timeline.counter![monthToSelect];
+            expect(countFromElem).toEqual(countFromState);
+        });
+    });
+});
 
 
 

@@ -104,7 +104,7 @@ const timelineSlice = createSlice({
             ------------------------------------- */
             .addCase(fetchImagesData.fulfilled, (state, action) => {
                 const data = action.payload;
-                const counter: object = data.counter;
+                const counter: CounterTypes = data.counter;
                 const filterSelectables: FilterableTypes = data.filterSelectables[0];
                 const imageDocs: Array<ImageDocTypes> = data.docs;
                 const years: Array<string> = data.years
@@ -145,7 +145,7 @@ export interface TimelineProps {
     'yearSelected': number | null,
     'years': Array<string> | null,
     'month': TimelineMonthTypes,
-    'counter': object | null,
+    'counter': CounterTypes | null,
     'imageDocs': Array<ImageDocTypes> | null,
     'filterSelectables': FilterableTypes | null
 };

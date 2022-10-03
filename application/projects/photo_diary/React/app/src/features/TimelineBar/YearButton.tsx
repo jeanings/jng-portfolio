@@ -1,13 +1,13 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { useAppDispatch, useAppSelector, useMediaQueries } from '../../common/hooks';
-import { fetchImagesData, ImageDocsRequestProps, TimelineProps } from './timelineSlice';
+import { fetchImagesData, ImageDocsRequestProps } from './timelineSlice';
 import './YearButton.css';
 
 
 /* =============================================================
     Button constructor for dropdown menu of year items.
-    Clicks will dispatch to change <timeline.year> state,
-    triggering a hook in TimelineBar. 
+    Clicks will dispatch fetch request to async thunk,
+    getting new image data for the clicked year. 
 ============================================================= */
 const YearButton: React.FunctionComponent<YearButtonProps> = (props: YearButtonProps) => {
     const dispatch = useAppDispatch();
@@ -18,7 +18,6 @@ const YearButton: React.FunctionComponent<YearButtonProps> = (props: YearButtonP
         fetch data and update state, handled by the reducer.
     ------------------------------------------------------- */
     const onYearSelect = (event: any) => {
-        
         const yearItems: HTMLCollectionOf<Element> = document.getElementsByClassName(
             props.baseClassName.concat("__", props.className));
 
@@ -59,6 +58,9 @@ const YearButton: React.FunctionComponent<YearButtonProps> = (props: YearButtonP
 }
 
 
+/* =====================================================================
+    Types.
+===================================================================== */
 export interface YearButtonProps {
     name: string,
     baseClassName: string,
