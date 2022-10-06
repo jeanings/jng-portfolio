@@ -1,5 +1,10 @@
-import React from 'react';
-import { useAppSelector, useMediaQueries } from '../../common/hooks';
+import React, { useEffect } from 'react';
+import { 
+    useAppDispatch,
+    useAppSelector,
+    useMediaQueries } from '../../common/hooks';
+import Countup from 'react-countup';
+import { handleMonthCounter } from '../../features/TimelineBar/timelineSlice';
 import './MonthCounter.css';
 
 
@@ -8,21 +13,52 @@ import './MonthCounter.css';
     Subscribes to image counts in << timeline.counter >> state.
 ============================================================== */
 const MonthCounter: React.FunctionComponent<MonthCounterProps> = (props: MonthCounterProps) => {
-    const timelineState = useAppSelector(state => state.timeline);
-    let counter: number = 0;
+    const dispatch = useAppDispatch();
+    const countState = useAppSelector(state => state.timeline.counter[props.name]);
+    const countPrevState = useAppSelector(state => state.timeline.counter.previous[props.name]);
+    const countStart = countPrevState !== undefined
+        ? countPrevState
+        : 0;
+    
+    /* ------------------------------------------------------
+        Update state corresponding to this counter's month.
+    ------------------------------------------------------ */
+    useEffect(() => {
+        // Wait out the rolling counter's duration.
+        setTimeout(() => {
+            const endCount = countState !== undefined
+                ? countState as number
+                : 0;
 
-    // Updates counter with << timeline.counter >> state.
-    if (timelineState.counter) {
-        if (props.name in timelineState.counter) {
-            counter = timelineState.counter[props.name];
-        }
-    }
+            const payloadUpdatePrevCounter = {
+                month: props.name,
+                count: endCount
+            };
+
+            // Only dispatch action if previous and new counts are different.
+            if (endCount !== countStart) {
+                dispatch(handleMonthCounter(payloadUpdatePrevCounter));
+            }
+        }, 2000)
+    }, [countState])
+
+
+    // Create rolling counter component.
+    const updateCount: JSX.Element = (
+        <Countup
+            start={countStart as number} 
+            end={countState === undefined ? 0 : countState as number}   // Avoids passing in undefined
+            duration={1.5}                                              // when fetches result in 
+            decimals={0}                                                // non-existent keys.
+        />
+    );
     
-    
+
     return (
         <div className={useMediaQueries(props.baseClassName.concat("__", props.className))}
             role='none' aria-label='month-counter'>
-            {counter}
+
+            {updateCount}
         </div>
     );
 }

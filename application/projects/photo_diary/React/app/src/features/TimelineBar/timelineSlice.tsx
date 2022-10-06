@@ -3,11 +3,10 @@ import {
     createAsyncThunk,
     Action,
     AnyAction,
-    PayloadAction, 
-    isRejectedWithValue } from '@reduxjs/toolkit';
+    PayloadAction } from '@reduxjs/toolkit';
 import axios, { AxiosError, AxiosResponse } from 'axios';
 import { RootState } from '../../app/store';
-import { DEV_MODE, apiUrl } from '../../app/App';
+import { apiUrl } from '../../app/App';
 
 
 /* ==============================================================================
@@ -69,7 +68,20 @@ const initialState: TimelineProps = {
     yearSelected: null,
     years: null,
     month: 'all',
-    counter: null,
+    counter: {
+        'all': 0,
+        'jan': 0, 'feb': 0, 'mar': 0,
+        'apr': 0, 'may': 0, 'jun': 0,
+        'jul': 0, 'aug': 0, 'sep': 0,
+        'oct': 0, 'nov': 0, 'dec': 0,
+        'previous': {
+            'all': 0,
+            'jan': 0, 'feb': 0, 'mar': 0,
+            'apr': 0, 'may': 0, 'jun': 0,
+            'jul': 0, 'aug': 0, 'sep': 0,
+            'oct': 0, 'nov': 0, 'dec': 0,
+        }
+    },
     imageDocs: null,
     filterSelectables: null
 };
@@ -78,20 +90,15 @@ const timelineSlice = createSlice({
     name: 'timeline',
     initialState,
     reducers: {
-        /* ---------------------------
-            Saves selection of year.
-        --------------------------- */
-        // handleTimelineYear: (state, action: PayloadAction<TimelineProps['year']>) => {
-        //     const selectedYear: number = action.payload;
-        //     state.yearSelected = selectedYear;
-        //     state.request = 'pending';
-        // },
-        /* ------------------------------
-            Saves selection of month(s)
-        ------------------------------ */
         handleTimelineMonth: (state, action: PayloadAction<TimelineProps['month']>) => {
             const selectedMonth = action.payload;
             state.month = selectedMonth;
+        },
+        handleMonthCounter: (state, action) => {
+            const month = action.payload.month;
+            const count = action.payload.count;
+
+            state.counter.previous[month] = count;
         }
     },
     /* ----------------------------------------------------
@@ -121,7 +128,7 @@ const timelineSlice = createSlice({
                     state.yearSelected = action.meta.arg.year as number;
                 }
                 state.years = years;
-                state.counter = counter;
+                state.counter = {...counter, 'previous': state.counter.previous};
                 state.imageDocs = imageDocs;
                 state.filterSelectables = filterSelectables;
                 state.request = 'complete';
@@ -145,7 +152,7 @@ export interface TimelineProps {
     'yearSelected': number | null,
     'years': Array<string> | null,
     'month': TimelineMonthTypes,
-    'counter': CounterTypes | null,
+    'counter': CounterTypes,
     'imageDocs': Array<ImageDocTypes> | null,
     'filterSelectables': FilterableTypes | null
 };
@@ -171,7 +178,10 @@ export type TimelineMonthTypes =
     'all';
 
 export type CounterTypes = {
-    [index: string]: number
+    [index: string]: number | object,
+    'previous': {
+        [index: string]: number | null
+    }
 };
 
 export type ImageDocTypes = {
@@ -233,5 +243,5 @@ export const timelineSelection = (state: RootState) => state.timeline;
 
 // Export actions, reducers.
 const { actions, reducer } = timelineSlice;
-export const { handleTimelineMonth } = actions;
+export const { handleTimelineMonth, handleMonthCounter } = actions;
 export default reducer;

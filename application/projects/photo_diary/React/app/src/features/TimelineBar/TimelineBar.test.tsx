@@ -4,6 +4,7 @@ import { setupStore } from '../../app/store';
 // import { renderWithProviders } from '../../utils/test-utils';
 // import thunk, { ThunkMiddleware } from 'redux-thunk';
 import { 
+    act,
     cleanup, 
     fireEvent, 
     render, 
@@ -237,10 +238,14 @@ describe("clicks on month selector items", () => {
             .replyOnce(200, mockDefaultData)
             .onGet(apiUrl, { params: { 'year': '2015' } })
             .reply(200, mock2015Data)
+        jest.useFakeTimers();
+
     });
 
     afterEach(() => {
         mockAxios.reset();
+        jest.runOnlyPendingTimers()
+        jest.useRealTimers()
         cleanup;
     });
     
@@ -256,30 +261,44 @@ describe("clicks on month selector items", () => {
         expect(newStore.getState().timeline.request).toBe('idle');
 
         // Check for all radios to be false.
-        const monthItemElems = screen.getAllByRole('menuitemradio', { name: 'month-item' });
-        monthItemElems.forEach(element => {
-            expect(element).toHaveAttribute('aria-checked', 'false');
-        });
+        const monthSelectorElems = screen.getAllByRole('menuitemradio', { name: 'month-item' });
 
         // Select a month.
-        const monthToSelect: string = 'feb';
-        const monthElemToSelect = monthItemElems.find(element => 
+        const monthToSelect: string = 'all';
+        const monthElemToSelect = monthSelectorElems.find(element => 
             element.textContent!.replace(/\d/, "") === monthToSelect.toUpperCase()) as HTMLElement;
         fireEvent.click(monthElemToSelect);
-    
+            
+        monthSelectorElems.forEach(element => {
+            // Check for radios and aria-checked to be reset. 
+            if (element !== monthElemToSelect) {
+                expect(element).toHaveAttribute('aria-checked', 'false');
+                expect(element).not.toHaveClass("active");
+            }
+        });
+
         // Check for checked and style updates to counter.
-        expect(monthElemToSelect.ariaChecked).toEqual(true);
-        expect(monthElemToSelect).toHaveClass('active')
-    
+        expect(monthElemToSelect.ariaChecked).toEqual('true');
+        expect(monthElemToSelect).toHaveClass("active");
+
         await waitFor(() => {
             // Updates << timeline.month >> state correctly.
             expect(newStore.getState().timeline.month).toBe(monthToSelect);
-            
-            // Verify count in element matches count in state.
-            const countFromElem: number = parseInt(monthElemToSelect.lastChild!.textContent as string);
-            const countFromState: number = newStore.getState().timeline.counter![monthToSelect];
-            expect(countFromElem).toEqual(countFromState);
+            expect(newStore.getState().timeline.request).toBe('complete');
         });
+
+        // Let rolling counts finish, plus dispatch updates to previous counter state.
+        act(() => {
+            jest.advanceTimersByTime(2500);
+        });
+
+        const countFromState = newStore.getState().timeline.counter![monthToSelect] as number;
+        const countFromPrevState = newStore.getState().timeline.counter.previous![monthToSelect] as number;
+        const countFromElem: number = parseInt(monthElemToSelect.lastChild!.textContent as string);
+        // Verify final count on screen equals to << timeline.counter >> and updates 
+        // << timeline.counter.previous >> so the next fetch  will roll the count from those numbers.
+        expect(countFromElem).toEqual(countFromState);
+        expect(countFromPrevState).toEqual(countFromState);
     });
 });
 
