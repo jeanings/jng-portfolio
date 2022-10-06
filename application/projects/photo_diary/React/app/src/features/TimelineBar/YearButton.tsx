@@ -11,37 +11,38 @@ import './YearButton.css';
 ============================================================= */
 const YearButton: React.FunctionComponent<YearButtonProps> = (props: YearButtonProps) => {
     const dispatch = useAppDispatch();
-    const timelineState = useAppSelector(state => state.timeline);
 
     /* -------------------------------------------------------
         Clicks on year selector items will dispatch action to
         fetch data and update state, handled by the reducer.
     ------------------------------------------------------- */
-    const onYearSelect = (event: any) => {
-        const yearItems: HTMLCollectionOf<Element> = document.getElementsByClassName(
+    const onYearSelect = (event: React.SyntheticEvent) => {
+        const yearSelectElem = event.target as HTMLButtonElement;
+        const yearElems: HTMLCollectionOf<Element> = document.getElementsByClassName(
             props.baseClassName.concat("__", props.className));
 
         // Reset all radios to false.
-        for (let element of Array.from(yearItems)) {
-            element.ariaChecked = "false";
+        for (let element of Array.from(yearElems)) {
+            element.ariaChecked = 'false';
         }
 
         // Get clicked year text and set to checked.
-        const yearSelectionText: number = event.target.textContent;
-        const yearSelectionStatus: boolean = event.target.ariaChecked = true;
+        const yearSelectElemText: string = yearSelectElem.textContent as string;
+        yearSelectElem.ariaChecked = 'true';
 
         // Change selected year to clicked year.
-        const yearSelectedElement: HTMLElement = document.querySelector(
+        const yearSelectedElem: HTMLElement = document.querySelector(
             ".".concat(props.baseClassName, "__", "year-selected")) as HTMLElement;
         
-        if (yearSelectedElement) {
-            yearSelectedElement.textContent = yearSelectionText.toString();
+        if (yearSelectedElem) {
+            yearSelectedElem.textContent = yearSelectElemText;
         }
 
         // Dispatch fetch request.
         const payloadForYear: ImageDocsRequestProps = {
-            'year': yearSelectionText as number
+            'year': parseInt(yearSelectElemText)
         };
+
         dispatch(fetchImagesData(payloadForYear));
     };
     
@@ -52,6 +53,7 @@ const YearButton: React.FunctionComponent<YearButtonProps> = (props: YearButtonP
             role="menuitemradio" aria-label={props.className}
             aria-checked="false"
             onClick={onYearSelect}>
+
                 {props.name}
         </li>
     );

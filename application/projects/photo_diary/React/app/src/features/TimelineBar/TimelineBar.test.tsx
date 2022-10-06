@@ -1,8 +1,6 @@
 import React from 'react';
 import { Provider } from 'react-redux';
 import { setupStore } from '../../app/store';
-// import { renderWithProviders } from '../../utils/test-utils';
-// import thunk, { ThunkMiddleware } from 'redux-thunk';
 import { 
     act,
     cleanup, 
@@ -17,7 +15,6 @@ import { apiUrl } from '../../app/App';
 import mockDefaultData from '../../utils/mockDefaultData.json';
 import mock2015Data from '../../utils/mock2015Data.json';
 import TimelineBar from './TimelineBar';
-// import timelineReducer, { handleTimelineMonth } from '../../features/TimelineBar/timelineSlice';
 
 
 var mockAxios = new MockAdapter(axios);
@@ -101,7 +98,7 @@ describe("on initial renders", () => {
     });
 
 
-    test("renders list of selectable years", () => {
+    test("renders list of selectable years", async() => {
         const newStore = setupStore();
         render(
             <Provider store={newStore}>
@@ -110,8 +107,12 @@ describe("on initial renders", () => {
         );
 
         // API succesfully called and populated list of selectable years.
-        const yearSelectorItems = screen.getAllByRole('menuitemradio');
-        expect(yearSelectorItems.length).toBeGreaterThanOrEqual(1);
+        await waitFor(() => {
+            expect(newStore.getState().timeline.request).toBe('complete');
+            const yearElems = screen.getAllByRole('menuitemradio', { name: 'year-item'});
+            expect(yearElems.length).toBeGreaterThanOrEqual(1);
+        });
+        
     });
 
     
@@ -180,7 +181,7 @@ describe("clicks on year drawer items", () => {
         mockAxios
             .onGet(apiUrl, { params: { 'year': 'default' } })
             .replyOnce(200, mockDefaultData)
-            .onGet(apiUrl, { params: { 'year': '2015' } })
+            .onGet(apiUrl, { params: { 'year': 2015 } })
             .reply(200, mock2015Data)
     });
 
@@ -203,28 +204,29 @@ describe("clicks on year drawer items", () => {
         await waitFor(() => {
             // Wait for initial fetch to render year selector items.
             screen.findAllByRole('menuitemradio', { name: 'year-item' });
-            const yearItemElems = screen.getAllByRole('menuitemradio', { name: 'year-item' });
+            const yearElems = screen.getAllByRole('menuitemradio', { name: 'year-item' });
 
             // Confirm nothing is selected.
-            yearItemElems.forEach(element => {
+            yearElems.forEach(element => {
                 expect(element).toHaveAttribute('aria-checked', 'false');
             });
 
             // Click on a year.
-            const selectedYearElem = yearItemElems.find(element => element.textContent === '2015') as HTMLElement;
-            fireEvent.click(selectedYearElem);
+            const yearSelectElem = yearElems.find(element => element.textContent === '2015') as HTMLElement;
+            fireEvent.click(yearSelectElem)
 
             // Clicked element gets checked value and state is updated.
-            expect(selectedYearElem.ariaChecked).toEqual(true);
-            expect(newStore.getState().timeline.yearSelected).toBe('2015');
+            expect(yearSelectElem.ariaChecked).toEqual('true');
+            expect(newStore.getState().timeline.request).toBe('complete');
+            expect(newStore.getState().timeline.yearSelected).toBe(2015);
 
             // Verify that new image doc has same date year metadata as clicked year.
             expect(newStore.getState().timeline.imageDocs![0].date.year).toBe(2015);
 
             // Check screen's year selected element updates to 2015.
-            const yearSelected = screen.getByRole('menuitem', { name: 'year-selected' });
-            expect(yearSelected).toHaveTextContent('2015');
-        })
+            const yearSelectedElem = screen.getByRole('menuitem', { name: 'year-selected' });
+            expect(yearSelectedElem).toHaveTextContent('2015');
+        });
     });
 });
 
@@ -236,8 +238,6 @@ describe("clicks on month selector items", () => {
         mockAxios
             .onGet(apiUrl, { params: { 'year': 'default' } })
             .replyOnce(200, mockDefaultData)
-            .onGet(apiUrl, { params: { 'year': '2015' } })
-            .reply(200, mock2015Data)
         jest.useFakeTimers();
 
     });
