@@ -9,7 +9,7 @@
     z-index: 1;
 }
 
-    .FilterDrawer__parameters-wrapper {
+    .FilterDrawer__parameters-container {
         display: grid;
         row-gap: 2rem;
         column-gap: 2rem;
