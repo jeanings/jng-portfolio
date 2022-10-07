@@ -1,23 +1,39 @@
-import { configureStore, ThunkAction, Action } from '@reduxjs/toolkit';
+import {
+    combineReducers, 
+    configureStore,
+    PreloadedState,
+    ThunkAction, 
+    Action } from '@reduxjs/toolkit';
 import timelineReducer from '../features/TimelineBar/timelineSlice';
 
 
-
-export const store = configureStore({
-  reducer: {
+// Create the root reducer independently to obtain the RootState type.
+const rootReducer = combineReducers({
     timeline: timelineReducer
-  },
 });
 
+export function setupStore(preloadedState?: PreloadedState<RootState>) {
+    return configureStore({
+        reducer: rootReducer,
+        preloadedState
+    });
+};
 
-export type AppDispatch = typeof store.dispatch;
-export type RootState = ReturnType<typeof store.getState>;
+export const store = configureStore({
+    reducer: {
+        timeline: timelineReducer
+    },
+});
+
+export type RootState = ReturnType<typeof rootReducer>
+export type AppStore = ReturnType<typeof setupStore>
+export type AppDispatch = AppStore['dispatch']
+
 export type AppThunk<ReturnType = void> = ThunkAction<
-  ReturnType,
-  RootState,
-  unknown,
-  Action<string>
+    ReturnType,
+    RootState,
+    unknown,
+    Action<string>
 >;
-
 
 export default store;
