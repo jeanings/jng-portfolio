@@ -9,7 +9,7 @@ from bson.json_util import ObjectId
 from pathlib import Path
 from pymongo import MongoClient
 from urllib.parse import quote_plus
-from .tools.mongodb_helpers import create_pipeline
+from .tools.mongodb_helpers import create_facet_stage, create_projection_stage, get_selectables_pipeline, get_image_counts
 import json, pymongo
 
 DEBUG_MODE = app.config['FLASK_DEBUG']
@@ -68,15 +68,19 @@ def photo_diary_data():
     try:
         year = request.args.get('year')
         month = request.args.get('month')
-        format_medium = request.args.get('format-medium')     # digital, film
-        format_type = request.args.get('format-type')         # 35mm, APS-C
+        format_medium = request.args.get('format-medium')
+        format_type = request.args.get('format-type')
         film = request.args.get('film')
         camera = request.args.get('camera')
         lenses = request.args.get('lenses')
         focal_length = request.args.get('focal-length')
         tags = request.args.get('tags')
 
-        if year:
+        collections = sorted(db.list_collection_names())
+        if year == 'default':
+            # Set collection to current year on initial renders.
+            collection = db[collections[-1]]
+        elif year:
             collection = db[str(year)]
 
     except pymongo.errors.AutoReconnect:
@@ -117,35 +121,33 @@ def photo_diary_data():
         'tags': 'tags'
     }
 
-    # Build facet stage.
-    facet_stage = {
-        '$facet': {}
-    }
-
-    for keyword, query in queries.items():
-        key = 'get_' + query_field[keyword].replace('.', '_')
-        facet_stage['$facet'].update({
-            key: create_pipeline(query, query_field[keyword])
-        })
-
-    # Build projection stage.
-    projection_stage = {
-        '$project': {
-            'intersect': {
-                '$setIntersection': []
-            }
-        }
-    }
-
-    for facet in facet_stage['$facet'].keys():
-        projection_stage['$project']['intersect']['$setIntersection'].append(
-            '$' + facet
-        )
+    # Get unique values from fields for selectables to display in filter component.
+    # Uses values from images in the whole year.
+    filter_selectables = list(collection.aggregate(get_selectables_pipeline()))
     
-    # Query for the group of filters requested.
-    filtered_query = collection.aggregate([facet_stage, projection_stage])
-    response = jsonify(list(filtered_query))
-    # response = [queries, facet_stage, projection_stage]
+    # Query MongoDB.
+    if len(queries) == 0:
+        # For query with just 'year'.
+        docs = list(collection.find({}))
+    else:
+        # For other queries.
+        facet_stage = create_facet_stage(queries, query_field)
+        projection_stage = create_projection_stage(facet_stage)
 
+        # Query for the group of filters requested.
+        filtered_query = collection.aggregate([facet_stage, projection_stage])
+        docs = list(filtered_query)[0]['intersect']
+
+    # Get image counts for each month.
+    counter = get_image_counts(docs)
+
+    results = {
+        'years': collections,
+        'counter': counter,
+        'filterSelectables': filter_selectables,
+        'docs': docs
+    }
+        
+    response = jsonify(results)
 
     return response
