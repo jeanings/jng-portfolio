@@ -3,21 +3,17 @@ import {
     useAppDispatch, 
     useAppSelector, 
     useMediaQueries } from '../../common/hooks';
-import { 
-    fetchImagesData, 
-    handleTimelineMonth, 
-    ImageDocsRequestProps, 
-    TimelineProps } from '../../features/TimelineBar/timelineSlice';
+import { fetchImagesData, ImageDocsRequestProps } from '../../features/TimelineBar/timelineSlice';
 import YearButton from './YearButton';
 import MonthButton from './MonthButton';
 import './TimelineBar.css';
 
 
-/* =============================================================
+/* ================================================================
     A main component - container for the date selector up top.
     Entry point for requesting initial images data from API,
-    and subsequent requests on year/month elements.
-============================================================= */
+    and subsequent requests on year/month elements plus filtering.
+================================================================ */
 const TimelineBar: React.FunctionComponent = () => {
     const dispatch = useAppDispatch();
     const timelineState = useAppSelector(state => state.timeline);
@@ -39,12 +35,12 @@ const TimelineBar: React.FunctionComponent = () => {
 
     // Build list of selectable years, based on collections in db.
     let years: Array<string> = [];
-    let yearsList: Array<JSX.Element> = [];
+    let yearElems: Array<JSX.Element> = [];
     years = timelineState.years as Array<string>
 
     if (years) {
         years.map((year, index) => (
-            yearsList.push(createYearButton(year, index, classBase))
+            yearElems.push(createYearButton(year, index, classBase))
         ));
     }
 
@@ -56,10 +52,10 @@ const TimelineBar: React.FunctionComponent = () => {
         'may', 'jun', 'jul', 'aug',
         'sep', 'oct', 'nov', 'dec'
     ];
-    let monthItems: Array<JSX.Element> = [];
+    let monthElems: Array<JSX.Element> = [];
 
     months.map((month, index) => (
-        monthItems.push(createMonthButton(month, index, classBase))
+        monthElems.push(createMonthButton(month, index, classBase))
     ));
 
 
@@ -76,7 +72,7 @@ const TimelineBar: React.FunctionComponent = () => {
                 </div>
 
                 {/* Dropdown menu of selectable years based on db collections. */}
-                {yearsList}
+                {yearElems}
             </div>
 
 
@@ -84,7 +80,7 @@ const TimelineBar: React.FunctionComponent = () => {
                 role="menubar" aria-label="month-selector">
                 
                 {/* Months selection labels: JAN, FEB, etc. */}
-                {monthItems}
+                {monthElems}
             </div>
         </div>
     );
