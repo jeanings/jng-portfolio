@@ -14,7 +14,7 @@
         row-gap: 2rem;
         column-gap: 2rem;
         grid-template-columns: 50% 50%;
-        grid-template-rows: 15% 20% 10% auto;
+        grid-template-rows: repeat(5, 1fr);
     }
 
         .FilterDrawer__parameters {
@@ -32,23 +32,23 @@
             }
 
             #camera {
-                grid-column: 2 / -1;
-                grid-row: 1 / 2;
-            }
-
-            #lens {
-                grid-column: 2 / -1;
-                grid-row: 2 / 3;
-            }
-
-            #focalLength {
                 grid-column: 1 / 2;
                 grid-row: 3 / 4;
             }
 
+            #lens {
+                grid-column: 1 / 2;
+                grid-row: 4 / 5;
+            }
+
+            #focalLength {
+                grid-column: 1 / 2;
+                grid-row: 5 / 6;
+            }
+
             #tags {
-                grid-column: 1 / -1;
-                grid-row: 4 / -1;
+                grid-column: 2 / -1;
+                grid-row: 1 / -1;
             }
 
         .FilterDrawer__header {

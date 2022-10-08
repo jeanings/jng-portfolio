@@ -30,12 +30,12 @@ const FilterButton: React.FunctionComponent<FilterButtonProps> = (props: FilterB
         }    
     };
 
-    
+   
+
     return (
         <button className={"FilterDrawer".concat("__", props.categoryName, "-item")}
             role="checkbox" aria-label={"FilterDrawer".concat("-", props.categoryName, "-item")}
             aria-checked="false"
-            key={"key".concat("_", props.categoryName, "_", props.index.toString())}
             onClick={onFilterClick}>
 
                 {props.categoryName === 'focalLength'
@@ -52,7 +52,6 @@ const FilterButton: React.FunctionComponent<FilterButtonProps> = (props: FilterB
 export interface FilterButtonProps {
     categoryName: string
     selectable: string | number
-    index: number
 };
 
 

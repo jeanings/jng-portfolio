@@ -224,7 +224,7 @@ export type ImageDocFormatTypes = {
 
 export type FilterableTypes = {
     'camera': Array<string>,
-    'film'?: Array<string>,
+    'film'?: Array<string | null>,
     'focalLength': Array<number>,
     'formatMedium': Array<string>,
     'formatType': Array<string>,

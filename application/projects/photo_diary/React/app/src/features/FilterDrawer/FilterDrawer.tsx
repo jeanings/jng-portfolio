@@ -1,4 +1,4 @@
-import React, { MouseEventHandler, useEffect } from 'react';
+import React from 'react';
 import { useAppSelector, useMediaQueries } from '../../common/hooks';
 import FilterButton from './FilterButton';
 import './FilterDrawer.css';
@@ -10,11 +10,12 @@ import './FilterDrawer.css';
 ==================================================================== */
 const FilterDrawer: React.FunctionComponent = () => {
     const filterablesState = useAppSelector(state => state.timeline.filterSelectables); 
-        
+
     const cameras: Array<string> = filterablesState?.camera === undefined 
         ? [] : filterablesState?.camera;
-    const films: Array<string> = filterablesState?.film === undefined
-        ? [] : filterablesState?.film;
+    const films: Array<string | null> = (filterablesState?.film === undefined
+        || filterablesState?.film.includes(null) === true)
+            ? [] : filterablesState?.film;
     const lenses: Array<string> = filterablesState?.lenses === undefined
         ? [] : filterablesState?.lenses;
     const tags: Array<string> = filterablesState?.tags === undefined
@@ -45,7 +46,7 @@ const FilterDrawer: React.FunctionComponent = () => {
                 role="group" aria-label="FilterDrawer-container">
 
                 {createCategory(classNames, "format", formats)}
-                {createCategory(classNames, "film", films)}
+                {createCategory(classNames, "film", films as Array<string>)}
                 {createCategory(classNames, "camera", cameras)}
                 {createCategory(classNames, "lens", lenses)}
                 {createCategory(classNames, "focalLength", focalLengths)}
@@ -78,14 +79,12 @@ function createCategory(classNames: ClassNameTypes, categoryName: string, select
             <div className={classNames['options']}
                 role="group" aria-label={"FilterDrawer".concat("-", categoryName, "-options")}>
                 
-                {selectables.length !== 0
-                    ? selectables.map((selectable, index) => (
-                        <FilterButton 
-                            categoryName={categoryName}
-                            selectable={selectable}
-                            index={index} 
-                        />))
-                    : <></>
+                {selectables.map((selectable, index) => (
+                    <FilterButton 
+                        categoryName={categoryName}
+                        selectable={selectable}
+                        key={"key".concat("_", categoryName, "_", index.toString())}
+                    />))
                 }
             </div>
         </div>
