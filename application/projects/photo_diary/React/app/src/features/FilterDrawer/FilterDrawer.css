@@ -14,13 +14,42 @@
         row-gap: 2rem;
         column-gap: 2rem;
         grid-template-columns: 50% 50%;
-        grid-template-rows: 25% 25% 50%;
+        grid-template-rows: 15% 20% 10% auto;
     }
 
         .FilterDrawer__parameters {
             display: grid;
             grid-template-rows: 2.5rem auto;
         }
+            #format {
+                grid-column: 1 / 2;
+                grid-row: 1 / 2;
+            }
+
+            #film {
+                grid-column: 1 / 2;
+                grid-row: 2 / 3;
+            }
+
+            #camera {
+                grid-column: 2 / -1;
+                grid-row: 1 / 2;
+            }
+
+            #lens {
+                grid-column: 2 / -1;
+                grid-row: 2 / 3;
+            }
+
+            #focalLength {
+                grid-column: 1 / 2;
+                grid-row: 3 / 4;
+            }
+
+            #tags {
+                grid-column: 1 / -1;
+                grid-row: 4 / -1;
+            }
 
         .FilterDrawer__header {
             font-family: 'Barlow Semi Condensed', sans-serif;
@@ -36,25 +65,4 @@
             row-gap: 0.25rem;
             align-content: start;
             justify-content: start;
-        }
-
-    .FilterDrawer button {
-        background: none;
-        border-color: var(--colour-border);
-        border-style: solid;
-        border-width: 1px;
-        border-radius: 0.20rem;
-        padding: 0.25rem 0.5rem 0.25rem 0.5rem;
-        color: var(--colour-text-inactive);
-        font-family: 'Barlow Semi Condensed', sans-serif;
-        font-size: 1.20rem;
-        font-weight: 200;
-        cursor: pointer;
-        transition: all 350ms;
-    }
-
-        .FilterDrawer button:hover {
-            background-color: var(--colour-accent-secondary);
-            color: var(--colour-background);
-            transition: all 350ms;
         }

@@ -1,45 +1,32 @@
-import React, { MouseEventHandler } from 'react';
+import React, { MouseEventHandler, useEffect } from 'react';
 import { useAppSelector, useMediaQueries } from '../../common/hooks';
+import FilterButton from './FilterButton';
 import './FilterDrawer.css';
 
 
-
+/* ====================================================================
+    A main component - container for filtering options.
+    Renders all the filter options available in the set of image data.
+==================================================================== */
 const FilterDrawer: React.FunctionComponent = () => {
-    /* ------------------------------------------------------------
-        A main component - container for the filters on the left.
-    ------------------------------------------------------------- */
     const filterablesState = useAppSelector(state => state.timeline.filterSelectables); 
-
-    let formats: Array<string> = [];
-    let cameras: Array<string> = [];
-    let films: Array<string> = [];
-    let lenses: Array<string> = [];
-    let tags: Array<string> = [];
-    let focalLengths: Array<string> = [];
-    
-    
-    const onFilterClick = (event: React.SyntheticEvent) => {
-        const filterElem = event.target as HTMLButtonElement;
-
-        switch(filterElem.ariaLabel) {
-            case 'FilterDrawer-format-item':
-                console.log('format item click');
-                break;
         
-            case 'FilterDrawer-camera-item':
-                console.log('camera item click');
-                break;
-
-            case 'FilterDrawer-focalLength-item':
-                console.log('focalLength item click');
-                break;
-
-            case 'FilterDrawer-aperture-item':
-                console.log('aperture item click');
-                break;
-        }    
-    };
-
+    const cameras: Array<string> = filterablesState?.camera === undefined 
+        ? [] : filterablesState?.camera;
+    const films: Array<string> = filterablesState?.film === undefined
+        ? [] : filterablesState?.film;
+    const lenses: Array<string> = filterablesState?.lenses === undefined
+        ? [] : filterablesState?.lenses;
+    const tags: Array<string> = filterablesState?.tags === undefined
+        ? [] : filterablesState?.tags;
+    const focalLengths: Array<number> = filterablesState?.focalLength === undefined
+        ? [] : filterablesState?.focalLength;
+    const formats: Array<string> = filterablesState?.formatMedium === undefined
+        ? []
+        : filterablesState!.formatType === undefined
+            ? filterablesState?.formatMedium
+            : filterablesState?.formatMedium.concat(filterablesState?.formatType);  
+    
     /* -----------------------------------------------------
                         CSS classes
     ------------------------------------------------------*/
@@ -57,12 +44,12 @@ const FilterDrawer: React.FunctionComponent = () => {
             <div className={useMediaQueries(classBase.concat("__", "parameters-container"))}
                 role="group" aria-label="FilterDrawer-container">
 
-                {createCategory(classNames, "format", formats, onFilterClick)}
-                {createCategory(classNames, "camera", cameras, onFilterClick)}
-                {createCategory(classNames, "film", films, onFilterClick)}
-                {createCategory(classNames, "lens", lenses, onFilterClick)}
-                {createCategory(classNames, "tags", tags, onFilterClick)}
-                {createCategory(classNames, "focalLength", focalLengths, onFilterClick)}
+                {createCategory(classNames, "format", formats)}
+                {createCategory(classNames, "film", films)}
+                {createCategory(classNames, "camera", cameras)}
+                {createCategory(classNames, "lens", lenses)}
+                {createCategory(classNames, "focalLength", focalLengths)}
+                {createCategory(classNames, "tags", tags)}
 
             </div>
         </section>
@@ -77,52 +64,32 @@ const FilterDrawer: React.FunctionComponent = () => {
 /* --------------------------------------------
     Constructor for filter drawer categories.
 -------------------------------------------- */
-function createCategory(classNames: ClassNameTypes, categoryName: string, selectables: Array<string>, 
-    onFilterClick: MouseEventHandler) {
+function createCategory(classNames: ClassNameTypes, categoryName: string, selectables: Array<string | number>) {
+    return (
+        <div className={classNames['parent']} id={categoryName}
+            role="group" aria-label={"FilterDrawer".concat("-", categoryName)}>
 
-    let categoryElem;
-    if (categoryName !== "tags") {
-        categoryElem = (
-            <div className={classNames['parent']}
-                role="group" aria-label={"FilterDrawer".concat("-", categoryName)}>
-    
-                <h1 className={classNames['title']}>
-                    {categoryName !== "focalLength"
-                        ? categoryName.toUpperCase()
-                        : "FOCAL LENGTH"}
-                </h1>
-    
-                <div className={classNames['options']}
-                    role="group" aria-label={"FilterDrawer".concat("-", categoryName, "-options")}>
-    
-                    {selectables.map((selectable, index) => (
-                        <button className={"FilterDrawer".concat("__", categoryName, "-item")}
-                            role="checkbox" aria-label={"FilterDrawer".concat("-", categoryName, "-item")}
-                            aria-checked="false"
-                            key={"key".concat("_", categoryName, "_", index.toString())}
-                            onClick={onFilterClick}>
-                                {selectable}
-                        </button>
-                    ))}
-                </div>
-            </div>
-        );
-    } 
-    else {
-        categoryElem = (
-            <div className={classNames['parent']}>
-                <h1 className={classNames['title']}>
-                    {categoryName.toUpperCase()}
-                </h1>
+            <h1 className={classNames['title']}>
+                {categoryName !== "focalLength"
+                    ? categoryName.toUpperCase()
+                    : "FOCAL LENGTH"}
+            </h1>
 
-                <div className={classNames['options']}
-                    role="group" aria-label={"FilterDrawer".concat("-", categoryName, "-options")}>
-                </div>
+            <div className={classNames['options']}
+                role="group" aria-label={"FilterDrawer".concat("-", categoryName, "-options")}>
+                
+                {selectables.length !== 0
+                    ? selectables.map((selectable, index) => (
+                        <FilterButton 
+                            categoryName={categoryName}
+                            selectable={selectable}
+                            index={index} 
+                        />))
+                    : <></>
+                }
             </div>
-        );
-    }
-    
-    return categoryElem;
+        </div>
+    )
 }
 
 

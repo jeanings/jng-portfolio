@@ -119,8 +119,8 @@ const timelineSlice = createSlice({
                 // Set states.
                 if (state.yearInit === null) {
                     const yearInit: number = action.meta.arg.year !== 'default'
-                        ? action.meta.arg.year          // sets to year of fetch request
-                        : imageDocs[0].date.year        // sets to year of image docs if default
+                        ? action.meta.arg.year          // Sets to year of fetch request
+                        : imageDocs[0].date.year        // Sets to year of image docs if default
                     state.yearInit = yearInit;
                     state.yearSelected = yearInit;
                 }
@@ -130,7 +130,9 @@ const timelineSlice = createSlice({
                 state.years = years;
                 state.counter = {...counter, 'previous': state.counter.previous};
                 state.imageDocs = imageDocs;
-                state.filterSelectables = filterSelectables;
+                if (Object.keys(action.meta.arg).length === 1) {    // Only set filter selectables
+                    state.filterSelectables = filterSelectables;    // if only 1 arg - ie only 'year'
+                }
                 state.request = 'complete';
             })
             /* --------------------------------------- 
