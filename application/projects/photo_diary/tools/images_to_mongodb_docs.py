@@ -180,8 +180,8 @@ def get_metadata(image, cameras_dict, image_url):
         metadata.date['time'] = ':'.join([str(dt.hour), str(dt.minute), str(dt.second)])
 
         # Camera/lens data.
-        metadata.make = exif_data['Make']
-        metadata.model = exif_data['Model']
+        metadata.make = exif_data['Make'].strip()
+        metadata.model = exif_data['Model'].strip()
         
         if metadata.model == 'DMC-LX7':
             metadata.get_lens()
