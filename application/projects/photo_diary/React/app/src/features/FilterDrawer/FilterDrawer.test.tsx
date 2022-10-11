@@ -1,11 +1,8 @@
 import React from 'react';
 import { Provider } from 'react-redux';
-import store, { setupStore, RootState } from '../../app/store';
+import { setupStore, RootState } from '../../app/store';
 import { 
-    act,
     cleanup, 
-    fireEvent, 
-    prettyDOM, 
     render, 
     screen, 
     waitFor } from '@testing-library/react';
@@ -16,7 +13,7 @@ import '@testing-library/jest-dom';
 import mockDefaultData from '../../utils/mockDefaultData.json';
 import mock2015Data from '../../utils/mock2015Data.json';
 import FilterDrawer from './FilterDrawer';
-import { addFilter, removeFilter } from './filterDrawerSlice';
+import { addFilter } from './filterDrawerSlice';
 
 
 var mockAxios = new MockAdapter(axios);
@@ -107,7 +104,7 @@ describe("on initial renders", () => {
 
 
 /* =====================================================================
-    Tests for initial rendering - async thunk, state-reliant elements.
+    Tests for simulating clicks, dispatches and state updates.
 ===================================================================== */
 describe("on filter button clicks", () => {
     afterEach(() => {
@@ -204,9 +201,9 @@ describe("on filter button clicks", () => {
             const filterButtonToClick: HTMLElement = filterButton[0];
             let filterButtonText: string | number;
             let stateKey: string;
-            // expect(newStore.getState().filter.lens).not.toContain(lensSelected);
 
-            // Parse key/val pairs to prepare them for correct dispatching.
+            // Parse key/val pairs to prepare them for correct dispatching,
+            // as done in switch cases.
             if (group.category === 'format') {
                 filterButtonText = filterButtonToClick.textContent as string;
                 if (filterButtonText === 'film' || filterButtonText === 'digital') {
@@ -237,12 +234,10 @@ describe("on filter button clicks", () => {
             // Simulate click on "pressed" filter button.
             user.click(filterButtonToClick);
 
-
             // Verify filter is removed from state.
             await waitFor(() => {
                 expect(newStore.getState().filter[stateKey]).not.toContain(filterButtonText);
             });
-            
         });
     })
 });

@@ -1,5 +1,5 @@
-import React, { useEffect } from 'react';
-import { useAppSelector, useAppDispatch } from '../../common/hooks';
+import React from 'react';
+import { useAppDispatch } from '../../common/hooks';
 import { addFilter, removeFilter, FilterProps } from './filterDrawerSlice';
 import './FilterButton.css';
 
@@ -11,51 +11,60 @@ import './FilterButton.css';
 const FilterButton: React.FunctionComponent<FilterButtonProps> = (props: FilterButtonProps) => {
     const dispatch = useAppDispatch();
     
+    /* ------------------------------------------------------------
+        Handle clicks on buttons.
+        Dispatches addFilter or removeFilter actions depending if 
+        filter exists or not in << filter >> state.
+    ------------------------------------------------------------ */
     const onFilterClick = (event: React.SyntheticEvent) => {
         const filterElem = event.target as HTMLButtonElement;
-        const filterKeyword = filterElem.textContent as string;
+        const buttonText = filterElem.textContent as string;
         // Sets aria-checked, determines addFilter/removeFilter dispatches below.
         const setAriaPressed = filterElem.getAttribute('aria-pressed') === 'false'
             ? 'true' : 'false';
-        filterElem.setAttribute('aria-pressed', setAriaPressed)
+        filterElem.setAttribute('aria-pressed', setAriaPressed);
 
         let payloadFilter: FilterProps;
         const ariaPressed = filterElem.getAttribute('aria-pressed');
         // Assign payload its corresponding key:val pairs based on category.
         switch(filterElem.getAttribute('aria-label')) {
             case 'FilterDrawer-format-item':
+                // "Format" includes both medium (film, digital) and type (35mm, mirrorless)
+                // but fetch API handles both as separate for querying. This handles separation
+                // of each for querying MongoDB.
                 payloadFilter = (filterElem.textContent === 'film'
                     || filterElem.textContent === 'digital')
-                        ? { 'formatMedium': filterKeyword }
-                        : { 'formatType': filterKeyword };
+                        ? { 'formatMedium': buttonText }
+                        : { 'formatType': buttonText };
                 ariaPressed === 'true'
                     ? dispatch(addFilter(payloadFilter))
                     : dispatch(removeFilter(payloadFilter));
                 break;
 
             case 'FilterDrawer-film-item':
-                payloadFilter = { 'film': filterKeyword };
+                payloadFilter = { 'film': buttonText };
                 ariaPressed === 'true'
                     ? dispatch(addFilter(payloadFilter))
                     : dispatch(removeFilter(payloadFilter));
                 break;
         
             case 'FilterDrawer-camera-item':
-                payloadFilter = { 'camera': filterKeyword };
+                payloadFilter = { 'camera': buttonText };
                 ariaPressed === 'true'
                     ? dispatch(addFilter(payloadFilter))
                     : dispatch(removeFilter(payloadFilter));
                 break;
 
             case 'FilterDrawer-lens-item':
-                payloadFilter = { 'lens': filterKeyword };
+                payloadFilter = { 'lens': buttonText };
                 ariaPressed === 'true'
                     ? dispatch(addFilter(payloadFilter))
                     : dispatch(removeFilter(payloadFilter));
                 break;
 
             case 'FilterDrawer-focalLength-item':
-                const focalLength: number = parseInt(filterKeyword.replace('mm', ''));
+                // Metadata have focal lengths in int, cleaning string is necessary.
+                const focalLength: number = parseInt(buttonText.replace('mm', ''));
                 payloadFilter = { 'focalLength': focalLength };
                 ariaPressed === 'true'
                     ? dispatch(addFilter(payloadFilter))
@@ -63,7 +72,7 @@ const FilterButton: React.FunctionComponent<FilterButtonProps> = (props: FilterB
                 break;
 
             case 'FilterDrawer-tags-item':
-                payloadFilter = { 'tags': filterKeyword };
+                payloadFilter = { 'tags': buttonText };
                 ariaPressed === 'true'
                     ? dispatch(addFilter(payloadFilter))
                     : dispatch(removeFilter(payloadFilter));

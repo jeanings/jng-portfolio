@@ -11,22 +11,29 @@ import './FilterDrawer.css';
 const FilterDrawer: React.FunctionComponent = () => {
     const filterablesState = useAppSelector(state => state.timeline.filterSelectables); 
 
+    // Prep fetched data for the filter groups.
     const cameras: Array<string> = filterablesState?.camera === undefined 
-        ? [] : filterablesState?.camera;
+        ? []
+        : filterablesState!.camera;
     const films: Array<string | null> = (filterablesState?.film === undefined
-        || filterablesState?.film.includes(null) === true)
-            ? [] : filterablesState?.film;
+        || filterablesState?.film.includes(null) === true)      // for digital images, arrays have null value
+            ? []
+            : filterablesState!.film;
     const lenses: Array<string> = filterablesState?.lens === undefined
-        ? [] : filterablesState?.lens;
+        ? []
+        : filterablesState!.lens;
     const tags: Array<string> = filterablesState?.tags === undefined
-        ? [] : filterablesState?.tags;
+        ? []
+        : filterablesState!.tags;
     const focalLengths: Array<number> = filterablesState?.focalLength === undefined
-        ? [] : filterablesState?.focalLength;
+        ? []
+        : filterablesState!.focalLength;
     const formats: Array<string> = filterablesState?.formatMedium === undefined
         ? []
-        : filterablesState!.formatType === undefined
-            ? filterablesState?.formatMedium
-            : filterablesState?.formatMedium.concat(filterablesState?.formatType);  
+        : filterablesState?.formatType === undefined
+            ? filterablesState!.formatMedium
+            // Combines format medium and type values into the same 'format' category.
+            : filterablesState!.formatMedium.concat(filterablesState!.formatType);
     
     /* -----------------------------------------------------
                         CSS classes
@@ -79,6 +86,7 @@ function createCategory(classNames: ClassNameTypes, categoryName: string, select
             <div className={classNames['options']}
                 role="group" aria-label={"FilterDrawer".concat("-", categoryName, "-options")}>
                 
+                {/* Generate buttons for all the values in each filter category. */}
                 {selectables.map((selectable, index) => (
                     <FilterButton 
                         categoryName={categoryName}
