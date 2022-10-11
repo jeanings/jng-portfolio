@@ -18,3 +18,10 @@
         color: var(--colour-background);
         transition: all 350ms;
     }
+
+    .FilterDrawer button.active {
+        background-color: var(--colour-text-active);
+        color: var(--colour-background);
+        transition: all 350ms;
+
+    }

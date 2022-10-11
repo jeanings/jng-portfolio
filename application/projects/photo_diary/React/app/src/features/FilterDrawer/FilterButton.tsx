@@ -23,9 +23,13 @@ const FilterButton: React.FunctionComponent<FilterButtonProps> = (props: FilterB
         const setAriaPressed = filterElem.getAttribute('aria-pressed') === 'false'
             ? 'true' : 'false';
         filterElem.setAttribute('aria-pressed', setAriaPressed);
+        const ariaPressed = filterElem.getAttribute('aria-pressed');
+        // Add class active for styling.
+        ariaPressed === 'true'
+            ? filterElem.classList.add("active")
+            : filterElem.classList.remove("active");
 
         let payloadFilter: FilterProps;
-        const ariaPressed = filterElem.getAttribute('aria-pressed');
         // Assign payload its corresponding key:val pairs based on category.
         switch(filterElem.getAttribute('aria-label')) {
             case 'FilterDrawer-format-item':
