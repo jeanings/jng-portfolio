@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react';
-import { useAppSelector, useMediaQueries } from '../../common/hooks';
+import { useAppSelector, useAppDispatch } from '../../common/hooks';
+import { addFilter, removeFilter, FilterProps } from './filterDrawerSlice';
 import './FilterButton.css';
 
 
@@ -8,26 +9,66 @@ import './FilterButton.css';
     buttons under each filter category.
 ==================================================================== */
 const FilterButton: React.FunctionComponent<FilterButtonProps> = (props: FilterButtonProps) => {
+    const dispatch = useAppDispatch();
+    
     const onFilterClick = (event: React.SyntheticEvent) => {
         const filterElem = event.target as HTMLButtonElement;
+        const filterKeyword = filterElem.textContent as string;
+        // Sets aria-checked, determines addFilter/removeFilter dispatches below.
+        const setAriaPressed = filterElem.getAttribute('aria-pressed') === 'false'
+            ? 'true' : 'false';
+        filterElem.setAttribute('aria-pressed', setAriaPressed)
 
-        switch(filterElem.ariaLabel) {
+        let payloadFilter: FilterProps;
+        const ariaPressed = filterElem.getAttribute('aria-pressed');
+        // Assign payload its corresponding key:val pairs based on category.
+        switch(filterElem.getAttribute('aria-label')) {
             case 'FilterDrawer-format-item':
-                console.log('format item click');
+                payloadFilter = (filterElem.textContent === 'film'
+                    || filterElem.textContent === 'digital')
+                        ? { 'formatMedium': filterKeyword }
+                        : { 'formatType': filterKeyword };
+                ariaPressed === 'true'
+                    ? dispatch(addFilter(payloadFilter))
+                    : dispatch(removeFilter(payloadFilter));
+                break;
+
+            case 'FilterDrawer-film-item':
+                payloadFilter = { 'film': filterKeyword };
+                ariaPressed === 'true'
+                    ? dispatch(addFilter(payloadFilter))
+                    : dispatch(removeFilter(payloadFilter));
                 break;
         
             case 'FilterDrawer-camera-item':
-                console.log('camera item click');
+                payloadFilter = { 'camera': filterKeyword };
+                ariaPressed === 'true'
+                    ? dispatch(addFilter(payloadFilter))
+                    : dispatch(removeFilter(payloadFilter));
+                break;
+
+            case 'FilterDrawer-lens-item':
+                payloadFilter = { 'lens': filterKeyword };
+                ariaPressed === 'true'
+                    ? dispatch(addFilter(payloadFilter))
+                    : dispatch(removeFilter(payloadFilter));
                 break;
 
             case 'FilterDrawer-focalLength-item':
-                console.log('focalLength item click');
+                const focalLength: number = parseInt(filterKeyword.replace('mm', ''));
+                payloadFilter = { 'focalLength': focalLength };
+                ariaPressed === 'true'
+                    ? dispatch(addFilter(payloadFilter))
+                    : dispatch(removeFilter(payloadFilter));
                 break;
 
-            case 'FilterDrawer-aperture-item':
-                console.log('aperture item click');
+            case 'FilterDrawer-tags-item':
+                payloadFilter = { 'tags': filterKeyword };
+                ariaPressed === 'true'
+                    ? dispatch(addFilter(payloadFilter))
+                    : dispatch(removeFilter(payloadFilter));
                 break;
-        }    
+        }
     };
 
    
@@ -35,7 +76,7 @@ const FilterButton: React.FunctionComponent<FilterButtonProps> = (props: FilterB
     return (
         <button className={"FilterDrawer".concat("__", props.categoryName, "-item")}
             role="checkbox" aria-label={"FilterDrawer".concat("-", props.categoryName, "-item")}
-            aria-checked="false"
+            aria-pressed="false"
             onClick={onFilterClick}>
 
                 {props.categoryName === 'focalLength'

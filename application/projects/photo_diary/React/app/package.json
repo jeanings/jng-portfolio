@@ -4,7 +4,6 @@
   "private": true,
   "dependencies": {
     "@reduxjs/toolkit": "^1.8.2",
-    "@testing-library/user-event": "^7.2.1",
     "@types/node": "^12.20.52",
     "@types/react": "^16.14.26",
     "@types/react-dom": "^16.9.16",
@@ -47,6 +46,7 @@
     "@babel/preset-typescript": "^7.17.12",
     "@testing-library/jest-dom": "^4.2.4",
     "@testing-library/react": "^12.1.5",
+    "@testing-library/user-event": "^14.4.3",
     "@types/jest": "^24.9.1",
     "axios-mock-adapter": "^1.21.2",
     "babel-jest": "^28.1.0",

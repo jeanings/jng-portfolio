@@ -16,8 +16,8 @@ const FilterDrawer: React.FunctionComponent = () => {
     const films: Array<string | null> = (filterablesState?.film === undefined
         || filterablesState?.film.includes(null) === true)
             ? [] : filterablesState?.film;
-    const lenses: Array<string> = filterablesState?.lenses === undefined
-        ? [] : filterablesState?.lenses;
+    const lenses: Array<string> = filterablesState?.lens === undefined
+        ? [] : filterablesState?.lens;
     const tags: Array<string> = filterablesState?.tags === undefined
         ? [] : filterablesState?.tags;
     const focalLengths: Array<number> = filterablesState?.focalLength === undefined

@@ -11,7 +11,7 @@ import { apiUrl } from '../../app/App';
 
 /* ==============================================================================
     Slice for handling current selection of timeline; year and month.
-    Handles updates to {dateSelection} state.
+    Handles updates to << timeline >> state.
 ============================================================================== */
 
 /* -------------------------------------------------
@@ -146,7 +146,9 @@ const timelineSlice = createSlice({
 });
 
 
-// Types setting.
+/* =====================================================================
+    Types.
+===================================================================== */
 export interface TimelineProps {
     [index: string]: string | any,
     'request': 'idle' | 'pending' | 'complete' | 'error',
@@ -223,13 +225,16 @@ export type ImageDocFormatTypes = {
 };
 
 export type FilterableTypes = {
-    'camera': Array<string>,
+    [index: string]: Array<string | number | null> | undefined,
+    'make'?: Array<string>,
+    'model'?: Array<string>,
+    'camera'?: Array<string>,
     'film'?: Array<string | null>,
-    'focalLength': Array<number>,
-    'formatMedium': Array<string>,
-    'formatType': Array<string>,
-    'lenses': Array<string>,
-    'tags': Array<string>
+    'focalLength'?: Array<number>,
+    'formatMedium'?: Array<string>,
+    'formatType'?: Array<string>,
+    'lens'?: Array<string>,
+    'tags'?: Array<string>
 };
 
 interface RejectedAction extends Action {
