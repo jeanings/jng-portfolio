@@ -53,7 +53,18 @@ const FilterButton: React.FunctionComponent<FilterButtonProps> = (props: FilterB
                 break;
         
             case 'FilterDrawer-camera-item':
-                payloadFilter = { 'camera': buttonText };
+                // Only dispatch camera model as 'camera'.
+                const make: string = buttonText.split(' ', 1)[0];
+                const modelStrings: Array<string> = buttonText.split(' ')
+                    .filter(model => !model.includes(make));
+                let camera: string = '';
+                
+                // Reconstruct camera model if it contains multiple parts of text.
+                modelStrings.forEach(modelString =>
+                    camera = camera.concat(' ', modelString).trim()
+                );
+
+                payloadFilter = { 'camera': camera };
                 ariaPressed === 'true'
                     ? dispatch(addFilter(payloadFilter))
                     : dispatch(removeFilter(payloadFilter));

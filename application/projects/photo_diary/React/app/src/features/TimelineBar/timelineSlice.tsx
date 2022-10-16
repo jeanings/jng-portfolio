@@ -47,13 +47,40 @@ export const fetchImagesData = createAsyncThunk(
     Image docs fetcher for thunk.
 -------------------------------- */
 export const fetchDocs = (apiUrl: string, request: ImageDocsRequestProps) => {
-    
-   const mongoDbPromise = Promise.resolve(
+    let parsedRequest: ParsedParametersType = {};
+
+    // Convert arrays of parameters into joined query string. 
+    for (let parameter in request) {
+        if (typeof request[parameter] !== 'object') {
+            parsedRequest[parameter] = request[parameter]
+        }
+        else {
+            let parsedArrayToString: string = '';
+            // Join all parameters in each array into one query string.
+            // Whitespace converts to '_' and all values in array concatenated with '+'.
+            request[parameter].forEach((item: string | number) => {
+                let parsed: string;
+                if (typeof item === 'string') {
+                    parsed = item.replace(/\s/g, '_');
+                }
+                else {
+                    parsed = item.toString();
+                }
+                parsedArrayToString = parsedArrayToString === ''
+                    ? parsed
+                    : parsedArrayToString.concat('+', parsed);
+            })
+
+            parsedRequest[parameter] = parsedArrayToString;
+        }
+    }
+
+    const mongoDbPromise = Promise.resolve(
         axios.get(
-            apiUrl, { params: request }
+            apiUrl, { params: parsedRequest }
         )
     );
-
+    
     return mongoDbPromise;
 }
 
@@ -115,7 +142,7 @@ const timelineSlice = createSlice({
                 const filterSelectables: FilterableTypes = data.filterSelectables[0];
                 const imageDocs: Array<ImageDocTypes> = data.docs;
                 const years: Array<string> = data.years
-                
+
                 // Set states.
                 if (state.yearInit === null) {
                     const yearInit: number = action.meta.arg.year !== 'default'
@@ -125,7 +152,7 @@ const timelineSlice = createSlice({
                     state.yearSelected = yearInit;
                 }
                 else {
-                    state.yearSelected = action.meta.arg.year as number;
+                    state.yearSelected = imageDocs[0].date.year as number;
                 }
                 state.years = years;
                 state.counter = {...counter, 'previous': state.counter.previous};
@@ -169,9 +196,13 @@ export interface ImageDocsRequestProps {
     'format-type'?: Array<ImageDocFormatTypes['type']> | null,
     'film'?: Array<string> | null,
     'camera'?: Array<string> | null,
-    'lenses'?: Array<string> | null,
+    'lens'?: Array<string> | null,
     'focal-length'?: Array<number> | null,
     'tags'?: Array<string> | null
+};
+
+export type ParsedParametersType = {
+    [index: string]: string | number | Array<string>
 };
 
 export type TimelineMonthTypes = 

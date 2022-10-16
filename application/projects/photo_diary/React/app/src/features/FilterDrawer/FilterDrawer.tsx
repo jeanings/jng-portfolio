@@ -1,6 +1,8 @@
-import React from 'react';
-import { useAppSelector, useMediaQueries } from '../../common/hooks';
+import React, { useEffect } from 'react';
+import { useAppSelector, useAppDispatch, useMediaQueries } from '../../common/hooks';
 import FilterButton from './FilterButton';
+import { clearFilters } from './filterDrawerSlice';
+import { fetchImagesData, ImageDocsRequestProps, ImageDocFormatTypes } from '../TimelineBar/timelineSlice';
 import './FilterDrawer.css';
 
 
@@ -9,7 +11,68 @@ import './FilterDrawer.css';
     Renders all the filter options available in the set of image data.
 ==================================================================== */
 const FilterDrawer: React.FunctionComponent = () => {
-    const filterablesState = useAppSelector(state => state.timeline.filterSelectables); 
+    const dispatch = useAppDispatch();
+    const filterablesState = useAppSelector(state => state.timeline.filterSelectables);
+    const yearSelected = useAppSelector(state => state.timeline.yearSelected);
+    const filterState = useAppSelector(state => state.filter);
+
+    /* -------------------------------------------------------------
+        Changes to << filter >> state will dispatch fetch request.
+        Image counters will update but filterable items will not change,
+        as those are fixed to the selected year.
+    ------------------------------------------------------------- */
+    useEffect(() => {
+        if (yearSelected !== null) {
+            let filterQueries: ImageDocsRequestProps= {
+                'year': yearSelected as number
+            }
+            
+            // Assign correct string for keys.
+            for (let category in filterState) {
+                if (filterState[category]!.length > 0) {
+                    switch(category) {
+                        case 'formatMedium':
+                            filterQueries['format-medium'] = filterState[category] as Array<ImageDocFormatTypes['medium']>
+                            break;
+                        case 'formatType': 
+                            filterQueries['format-type'] = filterState[category] as Array<ImageDocFormatTypes['type']>
+                            break;
+                        case 'film':
+                            filterQueries['film'] = filterState[category] as Array<string>
+                            break;
+                        case 'camera':
+                            filterQueries['camera'] = filterState[category]
+                            break;
+                        case 'lens':
+                            filterQueries['lens'] = filterState[category]
+                            break;
+                        case 'focalLength':
+                            filterQueries['focal-length'] = filterState[category] as Array<number>
+                            break;
+                        case 'tags':
+                            filterQueries['tags'] = filterState[category]
+                            break;
+                    }
+                }
+            }
+           
+            dispatch(fetchImagesData(filterQueries))
+        }
+    }, [filterState]);
+
+
+    /* ---------------------------------------------
+        Clear << filter >> state on changing year. 
+    --------------------------------------------- */
+    useEffect(() => {
+        // Clear all "active" styling on pressed buttons.
+        document.querySelectorAll('[role="checkbox"]').forEach(button =>
+            button.classList.remove("active"));
+        
+        dispatch(clearFilters("RESET TO INIT STATE"));
+    }, [yearSelected])
+
+
 
     // Prep fetched data for the filter groups.
     const cameras: Array<string> = filterablesState?.camera === undefined 
@@ -52,6 +115,7 @@ const FilterDrawer: React.FunctionComponent = () => {
             <div className={useMediaQueries(classBase.concat("__", "parameters-container"))}
                 role="group" aria-label="FilterDrawer-container">
 
+                {/* Generates each filter category and its buttons. */}
                 {createCategory(classNames, "format", formats)}
                 {createCategory(classNames, "film", films as Array<string>)}
                 {createCategory(classNames, "camera", cameras)}

@@ -48,6 +48,15 @@ const filterSlice = createSlice({
                     state[key] = updatedArray;
                 }
             }
+        },
+        /* -------------------------------------------------------
+            Handles clearing of entire filter state.
+        ------------------------------------------------------- */
+        clearFilters: (state, action: PayloadAction<string>) => {
+            const clearRequest: string = action.payload;
+            if (clearRequest === "RESET TO INIT STATE") {
+                Object.assign(state, initialState);
+            }
         }
     }
 });
@@ -74,5 +83,5 @@ export const filterSelection = (state: RootState) => state.filter;
 
 // Export actions, reducers.
 const { actions, reducer } = filterSlice;
-export const { addFilter, removeFilter } = actions;
+export const { addFilter, removeFilter, clearFilters } = actions;
 export default reducer;
