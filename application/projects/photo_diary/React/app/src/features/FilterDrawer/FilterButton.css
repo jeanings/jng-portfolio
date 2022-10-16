@@ -1,0 +1,27 @@
+.FilterDrawer button {
+    background: none;
+    border-color: var(--colour-border);
+    border-style: solid;
+    border-width: 1px;
+    border-radius: 0.20rem;
+    padding: 0.25rem 0.5rem 0.25rem 0.5rem;
+    color: var(--colour-text-inactive);
+    font-family: 'Barlow Semi Condensed', sans-serif;
+    font-size: 1.05rem;
+    font-weight: 200;
+    cursor: pointer;
+    transition: all 350ms;
+}
+
+    .FilterDrawer button:hover {
+        background-color: var(--colour-accent-secondary);
+        color: var(--colour-background);
+        transition: all 350ms;
+    }
+
+    .FilterDrawer button.active {
+        background-color: var(--colour-text-active);
+        color: var(--colour-background);
+        transition: all 350ms;
+
+    }

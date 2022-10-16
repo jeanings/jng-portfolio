@@ -11,7 +11,7 @@ import { apiUrl } from '../../app/App';
 
 /* ==============================================================================
     Slice for handling current selection of timeline; year and month.
-    Handles updates to {dateSelection} state.
+    Handles updates to << timeline >> state.
 ============================================================================== */
 
 /* -------------------------------------------------
@@ -47,13 +47,40 @@ export const fetchImagesData = createAsyncThunk(
     Image docs fetcher for thunk.
 -------------------------------- */
 export const fetchDocs = (apiUrl: string, request: ImageDocsRequestProps) => {
-    
-   const mongoDbPromise = Promise.resolve(
+    let parsedRequest: ParsedParametersType = {};
+
+    // Convert arrays of parameters into joined query string. 
+    for (let parameter in request) {
+        if (typeof request[parameter] !== 'object') {
+            parsedRequest[parameter] = request[parameter]
+        }
+        else {
+            let parsedArrayToString: string = '';
+            // Join all parameters in each array into one query string.
+            // Whitespace converts to '_' and all values in array concatenated with '+'.
+            request[parameter].forEach((item: string | number) => {
+                let parsed: string;
+                if (typeof item === 'string') {
+                    parsed = item.replace(/\s/g, '_');
+                }
+                else {
+                    parsed = item.toString();
+                }
+                parsedArrayToString = parsedArrayToString === ''
+                    ? parsed
+                    : parsedArrayToString.concat('+', parsed);
+            })
+
+            parsedRequest[parameter] = parsedArrayToString;
+        }
+    }
+
+    const mongoDbPromise = Promise.resolve(
         axios.get(
-            apiUrl, { params: request }
+            apiUrl, { params: parsedRequest }
         )
     );
-
+    
     return mongoDbPromise;
 }
 
@@ -115,22 +142,24 @@ const timelineSlice = createSlice({
                 const filterSelectables: FilterableTypes = data.filterSelectables[0];
                 const imageDocs: Array<ImageDocTypes> = data.docs;
                 const years: Array<string> = data.years
-                
+
                 // Set states.
                 if (state.yearInit === null) {
                     const yearInit: number = action.meta.arg.year !== 'default'
-                        ? action.meta.arg.year          // sets to year of fetch request
-                        : imageDocs[0].date.year        // sets to year of image docs if default
+                        ? action.meta.arg.year          // Sets to year of fetch request
+                        : imageDocs[0].date.year        // Sets to year of image docs if default
                     state.yearInit = yearInit;
                     state.yearSelected = yearInit;
                 }
                 else {
-                    state.yearSelected = action.meta.arg.year as number;
+                    state.yearSelected = imageDocs[0].date.year as number;
                 }
                 state.years = years;
                 state.counter = {...counter, 'previous': state.counter.previous};
                 state.imageDocs = imageDocs;
-                state.filterSelectables = filterSelectables;
+                if (Object.keys(action.meta.arg).length === 1) {    // Only set filter selectables
+                    state.filterSelectables = filterSelectables;    // if only 1 arg - ie only 'year'
+                }
                 state.request = 'complete';
             })
             /* --------------------------------------- 
@@ -144,7 +173,9 @@ const timelineSlice = createSlice({
 });
 
 
-// Types setting.
+/* =====================================================================
+    Types.
+===================================================================== */
 export interface TimelineProps {
     [index: string]: string | any,
     'request': 'idle' | 'pending' | 'complete' | 'error',
@@ -165,9 +196,13 @@ export interface ImageDocsRequestProps {
     'format-type'?: Array<ImageDocFormatTypes['type']> | null,
     'film'?: Array<string> | null,
     'camera'?: Array<string> | null,
-    'lenses'?: Array<string> | null,
+    'lens'?: Array<string> | null,
     'focal-length'?: Array<number> | null,
     'tags'?: Array<string> | null
+};
+
+export type ParsedParametersType = {
+    [index: string]: string | number | Array<string>
 };
 
 export type TimelineMonthTypes = 
@@ -221,13 +256,16 @@ export type ImageDocFormatTypes = {
 };
 
 export type FilterableTypes = {
-    'camera': Array<string>,
-    'film'?: Array<string>,
-    'focalLength': Array<number>,
-    'formatMedium': Array<string>,
-    'formatType': Array<string>,
-    'lenses': Array<string>,
-    'tags': Array<string>
+    [index: string]: Array<string | number | null> | undefined,
+    'make'?: Array<string>,
+    'model'?: Array<string>,
+    'camera'?: Array<string>,
+    'film'?: Array<string | null>,
+    'focalLength'?: Array<number>,
+    'formatMedium'?: Array<string>,
+    'formatType'?: Array<string>,
+    'lens'?: Array<string>,
+    'tags'?: Array<string>
 };
 
 interface RejectedAction extends Action {
