@@ -23,7 +23,7 @@ def get_selectables_pipeline():
                         ]
                     }
                 },
-                'lenses': { '$addToSet': '$lens' },
+                'lens': { '$addToSet': '$lens' },
                 'focal_length': { '$addToSet': '$focal_length_35mm' },
                 'tags': { '$push': '$tags' }
             }
@@ -35,7 +35,7 @@ def get_selectables_pipeline():
                 'formatType': '$format_type',
                 'film': '$film',
                 'camera': '$camera',
-                'lenses': '$lenses',
+                'lens': '$lens',
                 'focalLength': '$focal_length',
                 'tags': { 
                     '$setIntersection': [{

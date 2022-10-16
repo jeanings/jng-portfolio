@@ -92,23 +92,24 @@ def photo_diary_data():
         'month': month, 'format_medium': format_medium, 'format_type': format_type, 'film': film,
         'camera': camera, 'lenses': lenses, 'focal_length': focal_length, 'tags': tags
     }
-
+    print(raw_queries)
     # Parse queries: month as is, the rest into lists.  
     queries = {}
     whitespaced_keywords = ['camera', 'film', 'lenses', 'tags']
 
     for key, val in raw_queries.items():
+        
         if val:
             if key == 'month':
                 queries.update({key: int(val)})
             elif key == 'focal_length':
-                query = [int(foc_len) for foc_len in val.split(' ')]
+                query = [int(foc_len) for foc_len in val.split('+')]
                 queries.update({key: query})
             elif key in whitespaced_keywords:
-                query = [item.replace('_', ' ') for item in val.split(' ')]
+                query = [item.replace('_', ' ') for item in val.split('+')]
                 queries.update({key: query})
             else:
-                queries.update({key: val.split(' ')})
+                queries.update({key: val.split('+')})
 
     query_field = {
         'month': 'date.month',
