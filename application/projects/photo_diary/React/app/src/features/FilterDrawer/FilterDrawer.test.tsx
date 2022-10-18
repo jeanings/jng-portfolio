@@ -12,6 +12,7 @@ import MockAdapter from 'axios-mock-adapter';
 import { apiUrl } from '../../app/App';
 import '@testing-library/jest-dom';
 import mockDefaultData from '../../utils/mockDefaultData.json';
+import mock2022Data from '../../utils/mock2022Data.json';
 import mock2015Data from '../../utils/mock2015Data.json';
 import TimelineBar from '../TimelineBar/TimelineBar';
 import FilterDrawer from './FilterDrawer';
@@ -19,7 +20,8 @@ import { addFilter } from './filterDrawerSlice';
 
 
 var mockAxios = new MockAdapter(axios);
-const user = userEvent.setup();
+var user = userEvent.setup();
+
 const preloadedState: RootState = {
     timeline: {
         request: 'complete',
@@ -63,7 +65,7 @@ const preloadedStateWithFilter: RootState = {
         years: mockDefaultData.years,
         month: 'jan',
         counter: preloadedState.timeline.counter,
-        imageDocs: null,
+        imageDocs: preloadedState.timeline.imageDocs,
         filterSelectables: mockDefaultData.filterSelectables[0]
     },
     filter: {
@@ -77,11 +79,11 @@ const preloadedStateWithFilter: RootState = {
     }
 }
 
-beforeAll(() => {
+beforeEach(() => {
     mockAxios = new MockAdapter(axios);
 });
 
-afterAll(() => {
+afterEach(() => {
     mockAxios.reset();
     cleanup;
 });
@@ -90,11 +92,7 @@ afterAll(() => {
 /* =====================================================================
     Tests for initial rendering - async thunk, state-reliant elements.
 ===================================================================== */
-describe("on initial renders", () => {
-    afterEach(() => {
-        cleanup;
-    });
-
+describe("on initial load", () => {
     test("renders groups of filter options", async() => {
         const newStore = setupStore(preloadedState);
         render(
@@ -189,9 +187,8 @@ describe("on filter button clicks", () => {
                 expect(newStore.getState().filter[group.category]).not.toContain(filterButtonText);
             }
 
-            user.click(filterButtonToClick);
-    
             // Wait for onClick.
+            await waitFor(() => user.click(filterButtonToClick));
             await waitFor(() => expect(filterButtonToClick.getAttribute('aria-pressed')).toEqual('true'));
             
             // ----------------- Same logic as in switch cases of FilterButton START -----------------
@@ -285,7 +282,7 @@ describe("on filter button clicks", () => {
             });
 
             // Simulate click on "pressed" filter button.
-            user.click(filterButtonToClick);
+            await waitFor(() => user.click(filterButtonToClick));
 
             // Verify filter is removed from state.
             await waitFor(() => {
@@ -303,26 +300,40 @@ describe("on filter button clicks", () => {
 test("<< filter >> state resets to initial state when year is changed", async() => {
     mockAxios = new MockAdapter(axios);
     mockAxios
+        .onGet(apiUrl, { params: { 'year': 2022, 'format-medium': 'film' } })
+        .replyOnce(200, mock2015Data)
         .onGet(apiUrl, { params: { 'year': 2015 } })
         .replyOnce(200, mock2015Data)
 
     const newStore = setupStore(preloadedStateWithFilter);
-        render(
-            <Provider store={newStore}>
-                <TimelineBar />
-                <FilterDrawer />
-            </Provider>
-        );
+    render(
+        <Provider store={newStore}>
+            <TimelineBar />
+            <FilterDrawer />
+        </Provider>
+    );
 
-    // Verify filter state isn't blank.
-    await waitFor(() => expect(newStore.getState().filter.film!.length).toBeGreaterThan(0));
-
+    expect(newStore.getState().timeline.request).toEqual('complete');
+    // Verify filter to click's state is blank.
+    expect(newStore.getState().filter.film!.length).toEqual(0);
+    
+    // Wait for elements to render.
     await waitFor(() => screen.findAllByRole('menuitemradio', { name: 'year-item'}));
     const yearElems = screen.getAllByRole('menuitemradio', { name: 'year-item' });
 
+    screen.findAllByRole('checkbox', { name: "FilterDrawer-film-item" });
+    const filterButtons = screen.getAllByRole('checkbox', { name: "FilterDrawer-film-item" });
+
+    // Get filter button element to click: FILM -> Kodak Gold 200.
+    let filterButtonToClick = filterButtons.filter(button => button.textContent === 'Kodak Gold 200')[0];
+    await waitFor(() => user.click(filterButtonToClick));
+
+    // Verify filter state isn't blank.
+    await waitFor(() => expect(newStore.getState().filter.film).toContain(filterButtonToClick.textContent));
+
     // Click on a year.
     const yearSelectElem = yearElems.find(element => element.textContent === '2015') as HTMLElement;
-    user.click(yearSelectElem);
+    await waitFor(() => user.click(yearSelectElem));
 
     // Wait for fetch to resolve.
     await waitFor(() => expect(newStore.getState().timeline.yearSelected).toEqual(2015));
@@ -338,7 +349,7 @@ test("dispatches fetch request on << filter >> state changes", async() => {
         .onGet(apiUrl, { params: { 'year': 'default' } })
         .replyOnce(200, mockDefaultData)
         .onGet(apiUrl, { params: { 'year': 2022, 'format-medium': 'film' } })
-        .reply(200, mock2015Data)
+        .replyOnce(200, mock2022Data)
 
     const newStore = setupStore();
         render(
@@ -356,29 +367,13 @@ test("dispatches fetch request on << filter >> state changes", async() => {
 
     screen.findAllByRole('checkbox', { name: "FilterDrawer-format-item" });
     const filterButtons = screen.getAllByRole('checkbox', { name: "FilterDrawer-format-item" });
-    let filterButtonToClick: HTMLElement;
 
-    // Get button element to click.
-    filterButtons.forEach(element => {
-        if (element.textContent === 'film') {
-            filterButtonToClick = element;
-            user.click(filterButtonToClick);
-        }
-    });
+    // Get filter button element to click: FORMAT -> film.
+    let filterButtonToClick = filterButtons.filter(button => button.textContent === 'film')[0];
+    await waitFor(() => user.click(filterButtonToClick));
 
-    await waitFor(() => {
-        expect(newStore.getState().filter.formatMedium).toContain('film');
-        expect(newStore.getState().timeline.request).toEqual('complete');
-        expect(newStore.getState().timeline.yearSelected).toEqual(2015);
-    });
+    expect(newStore.getState().filter.formatMedium).toContain('film');
 
     // Verify fetch returning different set of data.
     expect(newStore.getState().timeline.counter.all).not.toEqual(40);
 });
-
-
-
-
-
-
-
