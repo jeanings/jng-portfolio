@@ -117,7 +117,7 @@ def photo_diary_data():
         'format_type': 'format.type',
         'film': 'film',
         'camera': 'model',
-        'lenses': 'lens',
+        'lens': 'lens',
         'focal_length': 'focal_length_35mm',
         'tags': 'tags'
     }
