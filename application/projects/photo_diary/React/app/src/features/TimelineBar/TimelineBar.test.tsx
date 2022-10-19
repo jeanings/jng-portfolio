@@ -257,7 +257,7 @@ describe("clicks on dropdown year selector elements", () => {
 
         await waitFor(() => {
             // Clicked element gets checked value and state is updated.
-            expect(yearSelectElem.ariaChecked).toEqual('true');
+            expect(yearSelectElem.getAttribute('aria-checked')).toEqual('true');
             expect(newStore.getState().timeline.request).toEqual('complete');
         });
 
