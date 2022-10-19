@@ -49,8 +49,8 @@ const MonthButton: React.FunctionComponent<MonthButtonProps> = (props: MonthButt
         // Reset all other radios to false, unhighlight styling.
         for (let element of Array.from(monthSelectorElems)) {
             if (element !== monthElemToSelect) {
-                if (element.ariaChecked === 'true') {
-                    element.ariaChecked = 'false';
+                if (element.getAttribute('aria-checked') === 'true') {
+                    element.setAttribute('aria-checked', 'false');
                     element.classList.remove("active");
                 }
             }
@@ -58,7 +58,7 @@ const MonthButton: React.FunctionComponent<MonthButtonProps> = (props: MonthButt
 
         // Change to clicked month.
         const monthElemToSelectName: string = monthElemToSelect.textContent!.replace(/\d/, "");
-        monthElemToSelect.ariaChecked = 'true';
+        monthElemToSelect.setAttribute('aria-checked', 'true');
 
         // Update styling and highlight new month.
         monthElemToSelect.classList.add("active");
