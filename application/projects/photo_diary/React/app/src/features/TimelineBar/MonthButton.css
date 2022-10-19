@@ -20,11 +20,11 @@
     }
 
         .TimelineBar__month-item:hover {
-            color: var(--colour-accent-secondary);
+            color: var(--colour-accent-primary);
             transition: 350ms all;
         }
 
         .TimelineBar__month-item.active {
-            color: var(--colour-text-active);
+            color: var(--colour-accent-primary);
             transition: 350ms all;
         }

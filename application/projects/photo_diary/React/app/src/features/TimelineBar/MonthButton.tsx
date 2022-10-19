@@ -1,5 +1,8 @@
-import React from 'react';
-import { useAppDispatch, useMediaQueries } from '../../common/hooks';
+import React, { useEffect } from 'react';
+import { 
+    useAppDispatch, 
+    useAppSelector,
+    useMediaQueries } from '../../common/hooks';
 import { handleTimelineMonth, TimelineProps } from './timelineSlice';
 import MonthCounter from './MonthCounter';
 import './MonthButton.css';
@@ -11,6 +14,28 @@ import './MonthButton.css';
 ============================================================= */
 const MonthButton: React.FunctionComponent<MonthButtonProps> = (props: MonthButtonProps) => {
     const dispatch = useAppDispatch();
+    const yearSelected = useAppSelector(state => state.timeline.yearSelected);
+
+    /* ------------------------------------------------------------------
+        On year selected changes, set 'ALL' months selector to 
+            - aria-checked true
+            - active class styling
+        and remove the same for the rest of the month selector elements.
+    ------------------------------------------------------------------ */
+    useEffect(() => {
+        switch(props.name) {
+            case 'all':
+                const defaultActiveMonthSelectorElem = document.getElementById("month-item-all") as HTMLElement;
+                defaultActiveMonthSelectorElem.setAttribute('aria-checked', 'true');
+                defaultActiveMonthSelectorElem.classList.add("active");
+                break;
+            default: 
+                const monthSelectorElem = document.getElementById("month-item-".concat(props.name)) as HTMLElement;
+                monthSelectorElem.setAttribute('aria-checked', 'false');
+                monthSelectorElem.classList.remove("active");
+        }
+    }, [yearSelected]);
+
 
     /* ------------------------------------------------------------------
         Clicks on month selector items will dispatch action to
@@ -41,11 +66,12 @@ const MonthButton: React.FunctionComponent<MonthButtonProps> = (props: MonthButt
         // Dispatch selected month to reducer.
         const payloadMonth = monthElemToSelectName.toLowerCase() as TimelineProps["month"];
         dispatch(handleTimelineMonth(payloadMonth));
-    }
+    };
     
 
     return (
         <div className={useMediaQueries(props.baseClassName.concat("__", props.className))}
+            id={props.className.concat('-', props.name)}
             role="menuitemradio" aria-label={props.className}
             aria-checked="false"
             onClick={onMonthSelect}>
