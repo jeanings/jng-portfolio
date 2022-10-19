@@ -1,4 +1,4 @@
-import React from 'react';
+import React , { useEffect, useRef } from 'react';
 import { useAppSelector, useMediaQueries } from '../../common/hooks';
 // @ts-ignore
 import mapboxgl from 'mapbox-gl'; 
@@ -6,62 +6,49 @@ import 'mapbox-gl/dist/mapbox-gl.css';
 import './MapCanvas.css';
 
 
+/* ================================================================
+    A main component - container for the main portion of the app.
+    Draws map pins on updates to image docs.
+================================================================ */
+const MapCanvas: React.FunctionComponent = () => {
+    const classBase: string = 'MapCanvas';
+    const MAPBOX_ACCESS_TOKEN = process.env.REACT_APP_MAPBOX;
+    const mapContainer = useRef(null);
+    const map = useRef<mapboxgl.map | null>(null);
+    const mapStyle: string = process.env.REACT_APP_MAPBOX_STYLE as string;
 
-const MainCanvas: React.FC = () => {
-    /* ------------------------------------------------------------
-        A main component - container for the main map canvas area.
-    ------------------------------------------------------------- */
+    /* ------------------------------------
+        Initialize map on initial render.
+    ------------------------------------ */
+    useEffect(() => {
+        if (map.current === null) {
+            map.current = new mapboxgl.Map({
+                accessToken: MAPBOX_ACCESS_TOKEN,
+                container: mapContainer.current,
+                style: mapStyle,
+                center: [-122.420679, 37.772537],
+                zoom: 12,
+                // bounds: [
+                    // [mapState.bounds.sw.lng, mapState.bounds.sw.lat],
+                    // [mapState.bounds.ne.lng, mapState.bounds.ne.lat]
+                // ],
+                // interactive: false
+                boxZoom: false,
+                doubleClickZoom: true,
+                dragPan: true,
+                dragRotate: false
+            });
+        }
+    }, []);
 
-    
-    /* ===============================================================
-    
-    To-do / pseudo code
-
-    1) (carry-over from DateBar) initial render for default year's markers
-    
-    2) if selectedYear: state
-        draw all markers for that year
-
-        if selectedMonth: state
-            draw all markers for that month in that selectedYear
-    
-        if selectedMonth: state is 'all
-            draw all markers for selectedYear: state
-    
-    3) group nearby markers based on zoom (see Tokaido map features)
-
-    4) spiderify grouped markers on click, exploding all markers radially
-
-    5) pop-ups and enlarge photo styling etc
-    
-    
-
-    State interaction:
-    
-        1) subscribe to list of photos according to DateBar selection --> photosList: state
-
-        2) markers get rendered based on above states
-
-        3) clicks on markers uses metadata saved in state
-            --> async thunk, popup states, get img url
-
-                
-    
-    ==================================================================== */
-
-
-
-    /* -----------------------------------------------------
-                        CSS classes
-    ------------------------------------------------------*/
-    const classBase: string = 'MainCanvas';
 
     
     return (
-        <main className={useMediaQueries(classBase)}>
+        <main className={useMediaQueries(classBase)} 
+            id="map" ref={mapContainer}>
         </main>
     );
 }
 
 
-export default MainCanvas;
+export default MapCanvas;
