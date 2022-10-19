@@ -16,13 +16,13 @@
 }
 
     .FilterDrawer button:hover {
-        background-color: var(--colour-accent-primary);
-        color: var(--colour-text-active);
+        background-color: var(--colour-accent-secondary);
+        color: #000;
         transition: all 350ms;
     }
 
     .FilterDrawer button.active {
-        background-color: var(--colour-text-active);
+        background-color: var(--colour-accent-primary);
         color: var(--colour-text-active);
         transition: all 350ms;
 
