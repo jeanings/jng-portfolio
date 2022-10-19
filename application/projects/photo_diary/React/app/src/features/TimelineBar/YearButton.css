@@ -9,6 +9,6 @@
 }
 
     .TimelineBar__year-item:hover {
-        color: var(--colour-accent-secondary);
+        color: var(--colour-accent-primary);
         transition: 350ms all;
     }
