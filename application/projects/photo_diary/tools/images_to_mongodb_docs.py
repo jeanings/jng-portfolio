@@ -7,6 +7,7 @@ from dotenv import load_dotenv
 from pathlib import Path
 from datetime import datetime
 from urllib.parse import quote_plus
+from decimal import *
 from PIL import Image, ExifTags
 from gps_unit_conversion import dms_to_deci_deg
 from image_metadata import Metadata
@@ -145,6 +146,8 @@ def get_metadata(image, cameras_dict, image_url):
     """
     Extract and build dict of image metadata of interest.
     """
+    # Decimal precision.
+    getcontext().prec = 15
 
     # Get metadata.
     pil_image = Image.open(image)
@@ -198,15 +201,15 @@ def get_metadata(image, cameras_dict, image_url):
         # GPS coordinates.
         metadata.gps['lat_ref'] = exif_data['GPSInfo'][1]
         if metadata.gps['lat_ref'] == 'N':
-            metadata.gps['lat'] = dms_to_deci_deg(exif_data['GPSInfo'][2])
+            metadata.gps['lat'] = str(dms_to_deci_deg(exif_data['GPSInfo'][2]))
         else:
-            metadata.gps['lat'] = dms_to_deci_deg(exif_data['GPSInfo'][2]) * -1
+            metadata.gps['lat'] = str(dms_to_deci_deg(exif_data['GPSInfo'][2]) * Decimal(-1.0))
 
         metadata.gps['lng_ref'] = exif_data['GPSInfo'][3]
         if metadata.gps['lng_ref'] == 'E':
-            metadata.gps['lng'] = dms_to_deci_deg(exif_data['GPSInfo'][4])
+            metadata.gps['lng'] = str(dms_to_deci_deg(exif_data['GPSInfo'][4]))
         else:
-            metadata.gps['lng'] = dms_to_deci_deg(exif_data['GPSInfo'][4]) * -1
+            metadata.gps['lng'] = str(dms_to_deci_deg(exif_data['GPSInfo'][4]) * Decimal(-1.0))
         
         # URL for uploaded image.
         metadata.url = image_url
@@ -240,15 +243,15 @@ def get_metadata(image, cameras_dict, image_url):
         # GPS coordinates.
         metadata.gps['lat_ref'] = exif_data['GPSInfo'][1]
         if metadata.gps['lat_ref'] == 'N':
-            metadata.gps['lat'] = dms_to_deci_deg(exif_data['GPSInfo'][2])
+            metadata.gps['lat'] = str(dms_to_deci_deg(exif_data['GPSInfo'][2]))
         else:
-            metadata.gps['lat'] = dms_to_deci_deg(exif_data['GPSInfo'][2]) * -1
+            metadata.gps['lat'] = str(dms_to_deci_deg(exif_data['GPSInfo'][2]) * Decimal(-1.0))
 
         metadata.gps['lng_ref'] = exif_data['GPSInfo'][3]
         if metadata.gps['lng_ref'] == 'E':
-            metadata.gps['lng'] = dms_to_deci_deg(exif_data['GPSInfo'][4])
+            metadata.gps['lng'] = str(dms_to_deci_deg(exif_data['GPSInfo'][4]))
         else:
-            metadata.gps['lng'] = dms_to_deci_deg(exif_data['GPSInfo'][4]) * -1
+            metadata.gps['lng'] = str(dms_to_deci_deg(exif_data['GPSInfo'][4]) * Decimal(-1.0))
 
         # URL for uploaded image.
         metadata.url = image_url
