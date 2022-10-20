@@ -20,7 +20,7 @@
     }
 
         .TimelineBar__month-item:hover {
-            color: var(--colour-accent-primary);
+            color: var(--colour-accent-secondary);
             transition: 350ms all;
         }
 

@@ -6,8 +6,8 @@
     --colour-text-inactive: hsl(0, 0%, 25%);
     --colour-text-highlight: hsl(24, 83%, 50%);
     --colour-border: hsl(0, 0%, 25%);
-    --colour-accent-primary: hsla(12, 83%, 50%, 0.75);
-    --colour-accent-secondary: rgba(0, 255, 153, 0.575);
+    --colour-accent-primary: hsl(24, 83%, 50%);
+    --colour-accent-secondary: hsl(49, 98%, 67%);
     --root-font-size: 16px;
     overflow: hidden;
     font-size: var(--root-font-size);
