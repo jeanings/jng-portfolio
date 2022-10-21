@@ -44,7 +44,8 @@ const preloadedState: RootState = {
             }
         },
         imageDocs: null,
-        filterSelectables: mockDefaultData.filterSelectables[0]
+        filterSelectables: mockDefaultData.filterSelectables[0],
+        geojson: null
     },
     filter: {
         formatMedium: [],
@@ -71,7 +72,8 @@ const preloadedStateWithFilter: RootState = {
         month: 'jan',
         counter: preloadedState.timeline.counter,
         imageDocs: preloadedState.timeline.imageDocs,
-        filterSelectables: mockDefaultData.filterSelectables[0]
+        filterSelectables: mockDefaultData.filterSelectables[0],
+        geojson: null
     },
     filter: {
         formatMedium: [],

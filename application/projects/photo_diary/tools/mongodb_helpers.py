@@ -183,3 +183,38 @@ def create_projection_stage(facet_stage):
         )
 
     return projection_stage
+
+
+def build_geojson_collection(docs):
+    """
+    Build geojson collection for source in Mapbox.
+    """
+
+    feature_collection = {
+        "type": "FeatureCollection",
+        "features": []
+    }
+
+    # Build each doc into geojson schema.
+    for doc in docs:
+        feature = {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    float(doc['gps']['lng']),
+                    float(doc['gps']['lat'])
+                ]
+            },
+            "properties": {
+                "id": doc['_id'],
+                "name": doc['filename'],
+                "date": {
+                    "year": doc['date']['year'],
+                    "month": doc['date']['month']
+                }
+            }
+        }
+        feature_collection["features"].append(feature)
+
+    return feature_collection;

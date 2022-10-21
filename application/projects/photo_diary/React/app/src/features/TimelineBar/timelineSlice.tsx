@@ -7,6 +7,7 @@ import {
 import axios, { AxiosError, AxiosResponse } from 'axios';
 import { RootState } from '../../app/store';
 import { apiUrl } from '../../app/App';
+import { GeojsonFeatureCollectionProps, GeojsonFeatureType } from '../MapCanvas/MapCanvas';
 
 
 /* ==============================================================================
@@ -110,7 +111,8 @@ const initialState: TimelineProps = {
         }
     },
     imageDocs: null,
-    filterSelectables: null
+    filterSelectables: null,
+    geojson: null
 };
 
 const timelineSlice = createSlice({
@@ -141,7 +143,8 @@ const timelineSlice = createSlice({
                 const counter: CounterTypes = data.counter;
                 const filterSelectables: FilterableTypes = data.filterSelectables[0];
                 const imageDocs: Array<ImageDocTypes> = data.docs;
-                const years: Array<string> = data.years
+                const years: Array<string> = data.years;
+                const geojsonFeatures: GeojsonFeatureCollectionProps = data.featureCollection;
 
                 // Set states.
                 if (state.yearInit === null) {
@@ -160,6 +163,7 @@ const timelineSlice = createSlice({
                 if (Object.keys(action.meta.arg).length === 1) {    // Only set filter selectables
                     state.filterSelectables = filterSelectables;    // if only 1 arg - ie only 'year'
                 }
+                state.geojson = geojsonFeatures;
                 state.request = 'complete';
             })
             /* --------------------------------------- 
@@ -185,7 +189,8 @@ export interface TimelineProps {
     'month': TimelineMonthTypes,
     'counter': CounterTypes,
     'imageDocs': Array<ImageDocTypes> | null,
-    'filterSelectables': FilterableTypes | null
+    'filterSelectables': FilterableTypes | null,
+    'geojson': GeojsonFeatureCollectionProps | null
 };
 
 export interface ImageDocsRequestProps {

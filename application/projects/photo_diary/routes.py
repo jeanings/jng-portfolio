@@ -9,7 +9,13 @@ from bson.json_util import ObjectId
 from pathlib import Path
 from pymongo import MongoClient
 from urllib.parse import quote_plus
-from .tools.mongodb_helpers import create_facet_stage, create_projection_stage, get_selectables_pipeline, get_image_counts
+from .tools.mongodb_helpers import (
+    create_facet_stage,
+    create_projection_stage,
+    get_image_counts,
+    get_selectables_pipeline,
+    build_geojson_collection
+)
 import json, pymongo
 
 DEBUG_MODE = app.config['FLASK_DEBUG']
@@ -142,11 +148,15 @@ def photo_diary_data():
     # Get image counts for each month.
     counter = get_image_counts(docs)
 
+    # Build geojson collection.
+    feature_collection = build_geojson_collection(docs)
+
     results = {
         'years': collections,
         'counter': counter,
         'filterSelectables': filter_selectables,
-        'docs': docs
+        'docs': docs,
+        'featureCollection': feature_collection
     }
         
     response = jsonify(results)
