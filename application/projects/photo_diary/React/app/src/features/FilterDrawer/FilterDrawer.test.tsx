@@ -54,6 +54,11 @@ const preloadedState: RootState = {
         lens: [],
         focalLength: [],
         tags: []
+    },
+    map: {
+        styleLoaded: false,
+        sourceStatus: 'idle',
+        markersStatus: 'idle'
     }
 };
 
@@ -76,6 +81,11 @@ const preloadedStateWithFilter: RootState = {
         lens: [],
         focalLength: [],
         tags: []
+    },
+    map: {
+        styleLoaded: false,
+        sourceStatus: 'idle',
+        markersStatus: 'idle'
     }
 }
 
