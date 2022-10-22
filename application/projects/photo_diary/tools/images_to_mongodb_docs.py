@@ -378,7 +378,7 @@ def create_mongodb_docs():
     # Insert bounding boxes.
     for year in map_bounds:
         bbox = calculate_map_bounds(map_bounds[year])
-        collection = db['bbox']
+        collection = db['bounds']
         bbox_doc = {
             'year': year, 
             'bbox': bbox
