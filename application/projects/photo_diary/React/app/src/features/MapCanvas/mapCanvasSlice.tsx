@@ -11,7 +11,7 @@ import { RootState } from '../../app/store';
     Handles updates to map loading status.
 ------------------------------------------ */
 // State for initial render.
-const initialState = {
+const initialState: MapStatusProps = {
     styleLoaded: false,
     sourceStatus: 'idle',
     markersStatus: 'idle'

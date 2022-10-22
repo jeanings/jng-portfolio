@@ -45,7 +45,8 @@ const preloadedState: RootState = {
         },
         imageDocs: null,
         filterSelectables: mockDefaultData.filterSelectables[0],
-        geojson: null
+        geojson: null,
+        bounds: null
     },
     filter: {
         formatMedium: [],
@@ -73,7 +74,8 @@ const preloadedStateWithFilter: RootState = {
         counter: preloadedState.timeline.counter,
         imageDocs: preloadedState.timeline.imageDocs,
         filterSelectables: mockDefaultData.filterSelectables[0],
-        geojson: null
+        geojson: null,
+        bounds: null
     },
     filter: {
         formatMedium: [],

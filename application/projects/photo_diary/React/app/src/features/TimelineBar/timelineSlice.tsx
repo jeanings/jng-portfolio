@@ -112,7 +112,8 @@ const initialState: TimelineProps = {
     },
     imageDocs: null,
     filterSelectables: null,
-    geojson: null
+    geojson: null,
+    bounds: null
 };
 
 const timelineSlice = createSlice({
@@ -145,6 +146,7 @@ const timelineSlice = createSlice({
                 const imageDocs: Array<ImageDocTypes> = data.docs;
                 const years: Array<string> = data.years;
                 const geojsonFeatures: GeojsonFeatureCollectionProps = data.featureCollection;
+                const bbox: BboxType = data.bounds;
 
                 // Set states.
                 if (state.yearInit === null) {
@@ -164,6 +166,7 @@ const timelineSlice = createSlice({
                     state.filterSelectables = filterSelectables;    // if only 1 arg - ie only 'year'
                 }
                 state.geojson = geojsonFeatures;
+                state.bounds = bbox;
                 state.request = 'complete';
             })
             /* --------------------------------------- 
@@ -191,6 +194,7 @@ export interface TimelineProps {
     'imageDocs': Array<ImageDocTypes> | null,
     'filterSelectables': FilterableTypes | null,
     'geojson': GeojsonFeatureCollectionProps | null
+    'bounds': BboxType | null
 };
 
 export interface ImageDocsRequestProps {
@@ -271,6 +275,12 @@ export type FilterableTypes = {
     'formatType'?: Array<string>,
     'lens'?: Array<string>,
     'tags'?: Array<string>
+};
+
+export type BboxType = {
+    [index: string]: Array<number>,
+    'lat': Array<number>,
+    'lng': Array<number>
 };
 
 interface RejectedAction extends Action {

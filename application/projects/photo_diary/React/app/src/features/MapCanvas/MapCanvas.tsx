@@ -16,6 +16,7 @@ import 'mapbox-gl/dist/mapbox-gl.css';
 const MapCanvas: React.FunctionComponent = () => {
     const dispatch = useAppDispatch();
     const geojson = useAppSelector(state => state.timeline.geojson);
+    const bounds = useAppSelector(state => state.timeline.bounds);
     const mapState = useAppSelector(state => state.map);
     const classBase: string = 'MapCanvas';
     const MAPBOX_ACCESS_TOKEN = process.env.REACT_APP_MAPBOX;
@@ -34,12 +35,14 @@ const MapCanvas: React.FunctionComponent = () => {
                 accessToken: MAPBOX_ACCESS_TOKEN,
                 container: mapContainer.current,
                 style: mapStyle,
-                center: [-122.90625772853042, 49.206604889479166],  // TODO: bounds
+                // center: [-122.90625772853042, 49.206604889479166],  // TODO: bounds
                 zoom: 12,
-                // bounds: [
+                bounds: [
+                    [bounds?.lng[0], bounds?.lat[0]],     // min
+                    [bounds?.lng[1], bounds?.lat[1]]      // max
                     // [mapState.bounds.sw.lng, mapState.bounds.sw.lat],
                     // [mapState.bounds.ne.lng, mapState.bounds.ne.lat]
-                // ],
+                ],
                 // interactive: false
                 boxZoom: false,
                 doubleClickZoom: true,

@@ -82,13 +82,17 @@ def photo_diary_data():
         focal_length = request.args.get('focal-length')
         tags = request.args.get('tags')
 
-        collections = sorted(db.list_collection_names())
+        collections_list = db.list_collection_names()
+        collections = sorted(collections_list)
+        collections.remove('bounds')
         if year == 'default':
-            # Set collection to current year on initial renders.
-            collection = db[collections[-1]]
-        elif year:
-            collection = db[str(year)]
-
+            # Set default year to current year on initial renders.
+            year = collections[-1]
+        
+        # Assign collection based on year. 
+        collection = db[str(year)]
+        bounds = db['bounds'].find_one({ 'year': str(year) })
+            
     except pymongo.errors.AutoReconnect:
         print("Reconnecting to database due to connection failure / is lost.")
     except pymongo.errors.OperationFailure:
@@ -156,7 +160,8 @@ def photo_diary_data():
         'counter': counter,
         'filterSelectables': filter_selectables,
         'docs': docs,
-        'featureCollection': feature_collection
+        'featureCollection': feature_collection,
+        'bounds': bounds['bbox']
     }
         
     response = jsonify(results)
