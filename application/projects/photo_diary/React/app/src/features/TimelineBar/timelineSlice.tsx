@@ -7,7 +7,6 @@ import {
 import axios, { AxiosError, AxiosResponse } from 'axios';
 import { RootState } from '../../app/store';
 import { apiUrl } from '../../app/App';
-import { GeojsonFeatureCollectionProps, GeojsonFeatureType } from '../MapCanvas/MapCanvas';
 
 
 /* ==============================================================================
@@ -275,6 +274,28 @@ export type FilterableTypes = {
     'formatType'?: Array<string>,
     'lens'?: Array<string>,
     'tags'?: Array<string>
+};
+
+export interface GeojsonFeatureCollectionProps {
+    [index: string]: string | object,
+    'type': 'FeatureCollection',
+    'features': Array<GeojsonFeatureType>
+};
+
+export type GeojsonFeatureType = {
+    [index: string]: string | object,
+    'type': string,
+    'geometry': {
+        'type': string,
+        'coordinates': Array<number>
+    },
+    'properties': {
+        'name': string,
+        'date': {
+            'year': number,
+            'month': number
+        }
+    }
 };
 
 export type BboxType = {

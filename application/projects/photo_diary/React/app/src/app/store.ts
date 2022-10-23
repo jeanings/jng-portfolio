@@ -13,7 +13,7 @@ import mapReducer from '../features/MapCanvas/mapCanvasSlice';
 const rootReducer = combineReducers({
     timeline: timelineReducer,
     filter: filterReducer,
-    map: mapReducer
+    mapCanvas: mapReducer
 });
 
 export function setupStore(preloadedState?: PreloadedState<RootState>) {
@@ -27,7 +27,7 @@ export const store = configureStore({
     reducer: {
         timeline: timelineReducer,
         filter: filterReducer,
-        map: mapReducer
+        mapCanvas: mapReducer
     },
 });
 

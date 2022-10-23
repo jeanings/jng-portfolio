@@ -1,7 +1,13 @@
 import React , { useEffect, useRef } from 'react';
-import { useAppDispatch, useAppSelector, useMediaQueries } from '../../common/hooks';
-import { setStyleLoadStatus, setSourceStatus, setMarkersStatus, cleanupMarkerSource } from './mapCanvasSlice';
-import { ImageDocTypes } from '../TimelineBar/timelineSlice';
+import {
+    useAppDispatch, 
+    useAppSelector, 
+    useMediaQueries } from '../../common/hooks';
+import { 
+    setStyleLoadStatus, 
+    setSourceStatus, 
+    setMarkersStatus, 
+    cleanupMarkerSource } from './mapCanvasSlice';
 import './MapCanvas.css';
 // @ts-ignore
 import mapboxgl from 'mapbox-gl'; 
@@ -17,90 +23,78 @@ const MapCanvas: React.FunctionComponent = () => {
     const dispatch = useAppDispatch();
     const geojson = useAppSelector(state => state.timeline.geojson);
     const bounds = useAppSelector(state => state.timeline.bounds);
-    const mapState = useAppSelector(state => state.map);
+    const mapState = useAppSelector(state => state.mapCanvas);
     const classBase: string = 'MapCanvas';
+    // Mapbox variables.
     const MAPBOX_ACCESS_TOKEN = process.env.REACT_APP_MAPBOX;
     const mapContainer = useRef(null);
     const map = useRef<mapboxgl.map | null>(null);
     const mapStyle: string = process.env.REACT_APP_MAPBOX_STYLE as string;
-    // const photoPinUrl: string = process.env.REACT_APP_MAPBOX_MARKER_ICON as string;
-    // const themeColour = "hsl(24, 83%, 50%)";
+    const bbox: Array<Array<number>> = bounds !== null
+        ? [ [ bounds!.lng[0], bounds!.lat[0] ],     // min bound coords
+            [ bounds!.lng[1], bounds!.lat[1] ] ]    // max bound coords
+        : []
 
-    /* ---------------------------------------
-        Initialize map on fetching new data.
-    --------------------------------------- */
+    /* -------------------------------------------------
+        Initialize map and add data source for markers 
+        once data is loaded into state.
+    ------------------------------------------------- */
     useEffect(() => {
-        if (map.current === null) {
-            map.current = new mapboxgl.Map({
-                accessToken: MAPBOX_ACCESS_TOKEN,
-                container: mapContainer.current,
-                style: mapStyle,
-                // center: [-122.90625772853042, 49.206604889479166],  // TODO: bounds
-                zoom: 12,
-                bounds: [
-                    [bounds?.lng[0], bounds?.lat[0]],     // min
-                    [bounds?.lng[1], bounds?.lat[1]]      // max
-                    // [mapState.bounds.sw.lng, mapState.bounds.sw.lat],
-                    // [mapState.bounds.ne.lng, mapState.bounds.ne.lat]
-                ],
-                // interactive: false
-                boxZoom: false,
-                doubleClickZoom: true,
-                dragPan: true,
-                dragRotate: false
-            });
-
-            // Set map status.
-            map.current.on('load', () => {
-                dispatch(setStyleLoadStatus(true));
-            });
+        if (bounds !== null) {
+            // Initialize map.
+            if (map.current === null) {
+                map.current = new mapboxgl.Map({
+                    accessToken: MAPBOX_ACCESS_TOKEN,
+                    container: mapContainer.current,
+                    style: mapStyle,
+                    zoom: 12,
+                    bounds: bbox,
+                    boxZoom: false,
+                    doubleClickZoom: true,
+                    dragPan: true,
+                    dragRotate: false
+                });
+    
+                // Set map loading status.
+                map.current.on('load', () => {
+                    dispatch(setStyleLoadStatus(true));
+                });
+            }
+            // Add or refresh marker source.
+            else if (mapState.styleLoaded === true) {
+                // Remove previous marker layer.
+                if (map.current.getLayer('imageMarkers') !== undefined) {
+                    map.current.removeLayer('imageMarkers');
+                }
+    
+                // Remove previous source data.
+                if (map.current.getSource('imageSource') !== undefined) {
+                    map.current.removeSource('imageSource');
+                }
+    
+                // Update map state so layer-adding effect triggers later.
+                dispatch(cleanupMarkerSource('idle'));
+                
+                // Add new set of data.
+                map.current.addSource('imageSource', {
+                    'type': 'geojson',
+                    'data': geojson,
+                    'cluster': true,
+                    'clusterRadius': 45,
+                    'clusterMaxZoom': 15
+                });
+    
+                // Update map state.
+                dispatch(setSourceStatus('loaded'));
+            }
         }
-    }, []);
+    }, [bounds, mapState.styleLoaded]);
 
     
-    /* ------------------------------------------------
-        Refresh souce and layers on new fetched data.
-    ------------------------------------------------ */
-    useEffect(() => {
-        if (mapState.styleLoaded === true) {
-            // Remove previous marker layer.
-            if (map.current.getLayer('imageMarkers') !== undefined) {
-                map.current.removeLayer('imageMarkers');
-            }
-
-            // Remove previous source data.
-            if (map.current.getSource('imageSource') !== undefined) {
-                map.current.removeSource('imageSource');
-            }
-
-            // Update map state so layer-adding effect triggers later.
-            dispatch(cleanupMarkerSource('idle'));
-            
-            // checkForIconImage(map, photoPinUrl);
-
-            // Add new set of data.
-            map.current.addSource('imageSource', {
-                'type': 'geojson',
-                'data': geojson,
-                'cluster': true,
-                'clusterRadius': 45,
-                'clusterMaxZoom': 15
-            });
-
-            // Update map state.
-            dispatch(setSourceStatus('loaded'));
-        }
-    }, [geojson]);
-
-
-    /* ----------------------------
-        Add marker layer for map.
-    ---------------------------- */
-    
+    // Add marker layer if map is set up.
     if (mapState.sourceStatus === 'loaded'
-        && mapState.markersStatus === 'idle') {
-
-        // checkForIconImage(map, photoPinUrl);
+        && mapState.markersStatus === 'idle'
+        && bounds !== null) {
 
         // Create new photo marker layer.
         map.current.addLayer({
@@ -108,7 +102,6 @@ const MapCanvas: React.FunctionComponent = () => {
             'type': 'symbol',
             'source': 'imageSource',
             'layout': {
-                // 'icon-image': 'photo-pin',
                 'icon-image': 'bxs-pin',
                 'icon-allow-overlap': true,
                 // 'icon-anchor': 'top-right',
@@ -118,6 +111,23 @@ const MapCanvas: React.FunctionComponent = () => {
             },
         });
 
+        // Adjust and zoom map to fit all markers. 
+        map.current.fitBounds(
+            bbox,
+            {
+                padding: {
+                    top: 150,
+                    bottom: 150,
+                    left: 250, 
+                    right: 250
+                },
+                linear: false,
+                animate: true,
+                duration: 3500,
+                curve: 1.2
+            }
+        );
+        
         dispatch(setMarkersStatus('loaded'));
     }   
 
@@ -125,56 +135,11 @@ const MapCanvas: React.FunctionComponent = () => {
     
     return (
         <main className={useMediaQueries(classBase)} 
-            id="map" ref={mapContainer}>
+            id="map" ref={mapContainer}
+            role="main" aria-label="map-canvas">
         </main>
     );
 }
 
-
-/* =====================================================================
-    Helper functions.
-===================================================================== */
-
-/* -------------------------------------------------------
-    Wrapper for creating selectable year dropdown items.
-------------------------------------------------------- */
-function checkForIconImage(map: React.MutableRefObject<any>, photoPinUrl: string) {
-    if (map.current.hasImage('photo-pin') === false) {
-        // Load in external image.
-        map.current.loadImage(photoPinUrl, (error: Error, image: object) => {
-            if (error)
-                throw error;
-            // Add to map style.
-            map.current.addImage('photo-pin', image, { sdf: true });
-        });
-    }
-};
-
-
-
-/* =====================================================================
-    Types.
-===================================================================== */
-export interface GeojsonFeatureCollectionProps {
-    [index: string]: string | object,
-    'type': 'FeatureCollection',
-    'features': Array<GeojsonFeatureType>
-};
-
-export type GeojsonFeatureType = {
-    [index: string]: string | object,
-    'type': string,
-    'geometry': {
-        'type': string,
-        'coordinates': Array<number>
-    },
-    'properties': {
-        'name': string,
-        'date': {
-            'year': number,
-            'month': number
-        }
-    }
-};
 
 export default MapCanvas;

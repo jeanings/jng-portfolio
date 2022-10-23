@@ -17,8 +17,8 @@ const initialState: MapStatusProps = {
     markersStatus: 'idle'
 };
 
-const mapSlice = createSlice({
-    name: 'map',
+const mapCanvasSlice = createSlice({
+    name: 'mapCanvas',
     initialState,
     reducers: {
         /* ---------------------------------------------------------------------
@@ -68,10 +68,12 @@ export interface MapStatusProps {
     markersStatus: 'idle' | 'loaded'
 };
 
+
+
 // Selector for selection state.
-export const map = (state: RootState) => state.map;
+export const mapCanvas = (state: RootState) => state.mapCanvas;
 
 // Export actions, reducers.
-const { actions, reducer } = mapSlice;
+const { actions, reducer } = mapCanvasSlice;
 export const { setStyleLoadStatus, setSourceStatus, setMarkersStatus, cleanupMarkerSource } = actions;
 export default reducer;

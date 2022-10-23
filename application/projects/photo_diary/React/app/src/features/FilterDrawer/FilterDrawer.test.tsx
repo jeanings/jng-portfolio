@@ -57,7 +57,7 @@ const preloadedState: RootState = {
         focalLength: [],
         tags: []
     },
-    map: {
+    mapCanvas: {
         styleLoaded: false,
         sourceStatus: 'idle',
         markersStatus: 'idle'
@@ -86,7 +86,7 @@ const preloadedStateWithFilter: RootState = {
         focalLength: [],
         tags: []
     },
-    map: {
+    mapCanvas: {
         styleLoaded: false,
         sourceStatus: 'idle',
         markersStatus: 'idle'
