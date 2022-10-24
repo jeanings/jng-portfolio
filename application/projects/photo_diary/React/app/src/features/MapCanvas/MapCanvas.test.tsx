@@ -296,3 +296,52 @@ test("adds marker layer and fits map to bounds", async() => {
     expect(mockMapFitBounds).toHaveBeenCalled();
 });
     
+
+/* =====================================================
+    Tests on fetch errors affecting map functionality.
+===================================================== */
+test("does not initialize map on unsuccessful fetch", async() => {
+    /* --------------------------------------------------------
+        Mocks                                          start
+    -------------------------------------------------------- */
+    // Mocked Axios calls.
+    mockAxios = new MockAdapter(axios);
+    mockAxios
+        .onGet(apiUrl, { params: { 'year': 'default' } })
+        .replyOnce(404, [])
+    
+    // Mocked Mapbox methods.
+    const mockMapOn = jest.fn();
+
+    jest.spyOn(mapboxgl, "Map")
+        .mockImplementation(() => {
+            return {
+                on: mockMapOn
+            }
+        })
+
+    // Mocked React functions.
+    const useDispatchSpy = jest.spyOn(reactRedux, 'useDispatch');
+    const mockDispatch = jest.fn();
+    useDispatchSpy.mockReturnValue(mockDispatch);
+    /* --------------------------------------------------------
+        Mocks                                            end
+    -------------------------------------------------------- */
+
+    const newStore = setupStore();
+        render(
+            <Provider store={newStore}>
+                <TimelineBar />
+                <MapCanvas />
+            </Provider>
+        );
+    
+    // Wait for fetch.
+    await waitFor(() => {
+        screen.findByRole('main', { name: 'map-canvas' });
+        expect(newStore.getState().timeline.bounds).toBeNull();
+    });
+    
+    // Failed initial map.on('load') call.
+    expect(mockMapOn).not.toHaveBeenCalled();
+});
