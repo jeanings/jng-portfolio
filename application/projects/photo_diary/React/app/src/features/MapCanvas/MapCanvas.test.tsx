@@ -16,7 +16,7 @@ import mockDefaultData from '../../utils/mockDefaultData.json';
 import mock2022Data from '../../utils/mock2022Data.json';
 import mock2015Data from '../../utils/mock2015Data.json';
 import TimelineBar from '../TimelineBar/TimelineBar';
-import { GeojsonFeatureCollectionProps, BboxType } from '../TimelineBar/timelineSlice';
+import { fetchImagesData, GeojsonFeatureCollectionProps, BboxType } from '../TimelineBar/timelineSlice';
 import MapCanvas from './MapCanvas';
 import { setStyleLoadStatus, cleanupMarkerSource, setSourceStatus } from './mapCanvasSlice';
 // @ts-ignore
@@ -237,10 +237,8 @@ test("adds marker layer and fits map to bounds", async() => {
     const mockMapOn = jest.fn();
     const mockMapAddSource = jest.fn();
     const mockMapGetSource = jest.fn();
-    const mockMapRemoveSource = jest.fn();
     const mockMapAddLayer = jest.fn();
     const mockMapGetLayer = jest.fn();
-    const mockMapRemoveLayer = jest.fn();
     const mockMapFitBounds = jest.fn();
 
     jest.spyOn(mapboxgl, "Map")
@@ -249,10 +247,8 @@ test("adds marker layer and fits map to bounds", async() => {
                 on: mockMapOn,
                 addSource: mockMapAddSource,
                 getSource: mockMapGetSource,
-                removeSource: mockMapRemoveSource,
                 addLayer: mockMapAddLayer,
                 getLayer: mockMapGetLayer,
-                removeLayer: mockMapRemoveLayer,
                 fitBounds: mockMapFitBounds
             }
         })
@@ -294,6 +290,111 @@ test("adds marker layer and fits map to bounds", async() => {
     // Map layer added and bounds fitted.
     expect(mockMapAddLayer).toHaveBeenCalled();
     expect(mockMapFitBounds).toHaveBeenCalled();
+    // Action dispatched to set markerStatus.
+    expect(mockDispatch).toHaveBeenCalled();
+});
+
+
+test("replaces previous layer and source on new data fetches", async() => {
+    /* --------------------------------------------------------
+        Mocks                                          start
+    -------------------------------------------------------- */
+    // Mocked Axios calls.
+    mockAxios = new MockAdapter(axios);
+    mockAxios
+        .onGet(apiUrl, { params: { 'year': 'default' } })
+        .replyOnce(200, mockDefaultData)
+        .onGet(apiUrl, { params: { 'year': 2015 } })
+        .replyOnce(200, mock2015Data)
+
+    // Mocked Mapbox methods.
+    const mockMapOn = jest.fn();
+    const mockMapAddSource = jest.fn();
+    const mockMapGetSource = jest.fn();
+    const mockMapRemoveSource = jest.fn();
+    const mockMapAddLayer = jest.fn();
+    const mockMapGetLayer = jest.fn();
+    const mockMapRemoveLayer = jest.fn();
+    const mockMapFitBounds = jest.fn();
+
+    jest.spyOn(mapboxgl, "Map")
+        .mockImplementation(() => {
+            return {
+                on: mockMapOn,
+                addSource: mockMapAddSource,
+                getSource: mockMapGetSource,
+                removeSource: mockMapRemoveSource,
+                addLayer: mockMapAddLayer,
+                getLayer: mockMapGetLayer,
+                removeLayer: mockMapRemoveLayer,
+                fitBounds: mockMapFitBounds
+            }
+        })
+
+    mockMapGetLayer.mockReturnValue('some-layer');
+    mockMapGetSource.mockReturnValue('some-source');
+
+    // Mocked React functions.
+    const useDispatchSpy = jest.spyOn(reactRedux, 'useDispatch');
+    const mockDispatch = jest.fn();
+    useDispatchSpy.mockReturnValue(mockDispatch);
+    /* --------------------------------------------------------
+        Mocks                                            end
+    -------------------------------------------------------- */
+
+    const newStore = setupStore(preloadedState);
+        render(
+            <Provider store={newStore}>
+                <TimelineBar />
+                <MapCanvas />
+            </Provider>
+        );
+    
+    // Wait for fetch.
+    await waitFor(() => {
+        screen.findByRole('main', { name: 'map-canvas' });
+        expect(newStore.getState().timeline.bounds).not.toBeNull();
+    });
+
+    const bounds2022 = newStore.getState().timeline.bounds;
+
+    // Mock dispatches for layer-adding conditions.
+    newStore.dispatch(setStyleLoadStatus(true));
+    newStore.dispatch(cleanupMarkerSource('idle'));
+    newStore.dispatch(setSourceStatus('loaded'));
+    
+    // Verify states are updated.
+    expect(newStore.getState().mapCanvas).toEqual({
+        'styleLoaded': true,
+        'markersStatus': 'idle', 
+        'sourceStatus': 'loaded'
+    });
+
+    // Map layer added and bounds fitted.
+    expect(mockMapAddLayer).toHaveBeenCalled();
+    expect(mockMapFitBounds).toHaveBeenCalled();
+
+    // Mock year selection dispatch.
+    newStore.dispatch(fetchImagesData({ 'year': 2015 }));
+
+    await waitFor(() => {
+        expect(newStore.getState().timeline.request).toEqual('complete');
+        expect(newStore.getState().timeline.yearSelected).toEqual(2015);
+        // Verify updated bounds.
+        expect(newStore.getState().timeline.bounds).not.toEqual(bounds2022);
+    });
+
+
+    // Verify removal of previous layer.
+    expect(mockMapGetLayer).toHaveBeenCalled();         // not undefined,
+    expect(mockMapRemoveLayer).toHaveBeenCalled();      // removeSource called.
+
+    // And data source.
+    expect(mockMapGetSource).toHaveBeenCalled();        // not undefined,
+    expect(mockMapRemoveSource).toHaveBeenCalled();     // removeLayer called.
+
+    // Verify new source added.
+    expect(mockMapAddSource).toHaveBeenCalled();
 });
     
 
@@ -341,7 +442,7 @@ test("does not initialize map on unsuccessful fetch", async() => {
         screen.findByRole('main', { name: 'map-canvas' });
         expect(newStore.getState().timeline.bounds).toBeNull();
     });
-    
+
     // Failed initial map.on('load') call.
     expect(mockMapOn).not.toHaveBeenCalled();
 });
