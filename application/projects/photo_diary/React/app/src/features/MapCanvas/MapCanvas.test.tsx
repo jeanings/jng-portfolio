@@ -1,7 +1,7 @@
 import React from 'react';
+import * as reactRedux from 'react-redux';
 import { Provider, useDispatch } from 'react-redux';
 import { setupStore, RootState } from '../../app/store';
-import { useAppDispatch } from '../../common/hooks';
 import { 
     cleanup, 
     render, 
@@ -81,10 +81,11 @@ const preloadedState: RootState = {
     }
 };
 
+
 /* -------------------------------------------------
     Mocked Mapbox.
 ------------------------------------------------- */
-jest.mock("mapbox-gl", () => ({
+jest.mock('mapbox-gl', () => ({
     Map: jest.fn(),
     Popup: jest.fn(),
 }));
@@ -107,15 +108,20 @@ mapboxgl.Popup.prototype = {
 };
 
 
-/* -------------------------------------------------
+/* ================================================
     Tests on map methods being called on renders.
-------------------------------------------------- */
-test.only("initializes map on rendering", async() => {
+================================================ */
+test("initializes map on rendering", async() => {
+    /* --------------------------------------------------------
+        Mocks                                          start
+    -------------------------------------------------------- */
+    // Mocked Axios calls.
     mockAxios = new MockAdapter(axios);
     mockAxios
         .onGet(apiUrl, { params: { 'year': 'default' } })
         .replyOnce(200, mockDefaultData)
     
+    // Mocked Mapbox methods.
     const mockMapOn = jest.fn();
 
     jest.spyOn(mapboxgl, "Map")
@@ -124,7 +130,9 @@ test.only("initializes map on rendering", async() => {
                 on: mockMapOn
             }
         })
-
+    /* --------------------------------------------------------
+        Mocks                                            end
+    -------------------------------------------------------- */
 
     const newStore = setupStore(preloadedState);
         render(
@@ -139,16 +147,22 @@ test.only("initializes map on rendering", async() => {
         expect(newStore.getState().timeline.bounds).not.toBeNull();
     });
 
+    // Initial map.on('load') call.
     expect(mockMapOn).toHaveBeenCalled();
 });
 
 
-test.only("gets new data source on new fetches", async() => {
+test("adds new data source on new fetches", async() => {
+    /* --------------------------------------------------------
+        Mocks                                          start
+    -------------------------------------------------------- */
+    // Mocked Axios calls.
     mockAxios = new MockAdapter(axios);
     mockAxios
         .onGet(apiUrl, { params: { 'year': 'default' } })
         .replyOnce(200, mockDefaultData)
 
+    // Mocked Mapbox methods.
     const mockMapOn = jest.fn();
     const mockMapAddSource = jest.fn();
     const mockMapGetSource = jest.fn();
@@ -170,6 +184,13 @@ test.only("gets new data source on new fetches", async() => {
             }
         })
 
+    // Mocked React functions.
+    const useDispatchSpy = jest.spyOn(reactRedux, 'useDispatch');
+    const mockDispatch = jest.fn();
+    useDispatchSpy.mockReturnValue(mockDispatch);
+    /* --------------------------------------------------------
+        Mocks                                            end
+    -------------------------------------------------------- */
 
     const newStore = setupStore(preloadedState);
         render(
@@ -184,8 +205,18 @@ test.only("gets new data source on new fetches", async() => {
         expect(newStore.getState().timeline.bounds).not.toBeNull();
     });
 
+    // Initial map.on('load') call.
     expect(mockMapOn).toHaveBeenCalled();
     // Manually set styleLoaded to true once map.on has been called.
-    // TODO
+    newStore.dispatch(setStyleLoadStatus(true))
+    
+    await waitFor(() => {
+        // useEffect << styleLoaded >> else block.
+        // cleanupMarkerSource and setSourceStatus dispatches.
+        expect(mockDispatch).toHaveBeenCalledTimes(2);
+    });
+
+    // Verify map.addsource() call, new data added.
+    expect(mockMapAddSource).toHaveBeenCalled();
 });
     
