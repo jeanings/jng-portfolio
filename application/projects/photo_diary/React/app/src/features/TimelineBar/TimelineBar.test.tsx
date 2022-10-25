@@ -152,9 +152,16 @@ describe("on initial renders", () => {
     Tests for fetch error cases.
 ===================================================================== */
 test("catches fetch request errors", async() => {
+    /* --------------------------------------------------------
+        Mocks                                          start
+    -------------------------------------------------------- */
+    // Mocked Axios calls.
     mockAxios = new MockAdapter(axios);
     mockAxios.onGet(apiUrl, { params: { 'year': 'default' } })
         .reply(404, [])
+    /* --------------------------------------------------------
+        Mocks                                            end
+    -------------------------------------------------------- */
 
     const newStore = setupStore();
     render(
@@ -177,6 +184,10 @@ test("catches fetch request errors", async() => {
     Tests for fetch helper function query string parsing.
 ===================================================================== */
 test("fetcher thunk parses queries into single string", async() => {
+    /* --------------------------------------------------------
+        Mocks                                          start
+    -------------------------------------------------------- */
+    // Mocked Axios calls.
     const request: ImageDocsRequestProps = {
         'year': 2022,
         'film': [
@@ -190,10 +201,12 @@ test("fetcher thunk parses queries into single string", async() => {
         'film': "Kodak_Gold_200+Fujifilm_Superia_X-TRA_400" 
     }
 
-
     mockAxios = new MockAdapter(axios);
     mockAxios.onGet(apiUrl, { params: fetchRequest })
         .reply(200, mockDefaultData)
+    /* --------------------------------------------------------
+        Mocks                                            end
+    -------------------------------------------------------- */
 
     const newStore = setupStore();
     render(
@@ -257,7 +270,7 @@ describe("clicks on dropdown year selector elements", () => {
 
         await waitFor(() => {
             // Clicked element gets checked value and state is updated.
-            expect(yearSelectElem.ariaChecked).toEqual('true');
+            expect(yearSelectElem.getAttribute('aria-checked')).toEqual('true');
             expect(newStore.getState().timeline.request).toEqual('complete');
         });
 
@@ -272,8 +285,10 @@ describe("clicks on dropdown year selector elements", () => {
 
 
     test("fetching new data updates image counts via rolling counter", async() => {
-        // Intercept get requests to live API, returning default local data.
-        jest.useFakeTimers();
+        /* --------------------------------------------------------
+            Mocks                                          start
+        -------------------------------------------------------- */
+        // Mocked Axios calls.
         mockAxios = new MockAdapter(axios);
         mockAxios
             .onGet(apiUrl, { params: { 'year': 'default' } })
@@ -281,6 +296,12 @@ describe("clicks on dropdown year selector elements", () => {
             .onGet(apiUrl, { params: { 'year': 2015 } })
             .replyOnce(200, mock2015Data);
 
+        // Faked timers.
+        jest.useFakeTimers();
+        /* --------------------------------------------------------
+            Mocks                                            end
+        -------------------------------------------------------- */
+        
         const newStore = setupStore();
         act(() => {
             render(
@@ -381,7 +402,7 @@ describe("clicks on dropdown year selector elements", () => {
 
 describe("clicks on month selector elements", () => {
     beforeEach(() => {
-         // Intercept get requests to live API, returning default local data.
+        // Intercept get requests to live API, returning default local data.
         mockAxios = new MockAdapter(axios);
         mockAxios
             .onGet(apiUrl, { params: { 'year': 'default' } })

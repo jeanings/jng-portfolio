@@ -28,10 +28,10 @@ afterAll(() => {
 /* =====================================================================
     Test for all features to be rendered.
 ===================================================================== */
-test("renders all features on initial load", () => {
+xtest("renders all features on initial load", () => {
     mockAxios = new MockAdapter(axios);
     mockAxios.onGet(apiUrl).reply(200, []);
-    
+
     const newStore = setupStore();
     render(
         <Provider store={newStore}>
@@ -40,4 +40,5 @@ test("renders all features on initial load", () => {
     );
 
     expect(screen.getByRole('region', { name: 'timeline' })).toBeInTheDocument();
+    
 });

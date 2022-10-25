@@ -105,7 +105,8 @@ const FilterButton: React.FunctionComponent<FilterButtonProps> = (props: FilterB
 
                 {props.categoryName === 'focalLength'
                     ? props.selectable.toString().concat('mm')      // Add focal length unit.
-                    : props.selectable}                             
+                    : props.selectable}
+                
         </button>
     );
 }

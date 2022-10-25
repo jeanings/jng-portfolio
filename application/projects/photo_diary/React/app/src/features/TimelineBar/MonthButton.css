@@ -25,6 +25,6 @@
         }
 
         .TimelineBar__month-item.active {
-            color: var(--colour-text-active);
+            color: var(--colour-accent-primary);
             transition: 350ms all;
         }
