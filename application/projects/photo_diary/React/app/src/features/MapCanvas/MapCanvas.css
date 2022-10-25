@@ -6,3 +6,7 @@
     min-width: 100%;
     z-index: 1;
 }
+
+.mapboxgl-ctrl-bottom-right {
+    display: none !important;
+}
