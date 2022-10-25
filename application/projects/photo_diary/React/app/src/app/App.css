@@ -10,7 +10,7 @@
     min-height: 100%;
     display: grid;
     grid-template-columns: 6.5rem var(--month-column) auto;
-    grid-template-rows: 3.5rem auto;
+    grid-template-rows: 3.5rem auto 3.5rem;
     column-gap: 1.5rem;
     row-gap: 2rem;
     background-color: var(--colour-background);
