@@ -16,9 +16,15 @@ import mockDefaultData from '../../utils/mockDefaultData.json';
 import mock2022Data from '../../utils/mock2022Data.json';
 import mock2015Data from '../../utils/mock2015Data.json';
 import TimelineBar from '../TimelineBar/TimelineBar';
-import { fetchImagesData, GeojsonFeatureCollectionProps, BboxType } from '../TimelineBar/timelineSlice';
+import {
+    fetchImagesData,
+    GeojsonFeatureCollectionProps,
+    BboxType } from '../TimelineBar/timelineSlice';
 import MapCanvas from './MapCanvas';
-import { setStyleLoadStatus, cleanupMarkerSource, setSourceStatus } from './mapCanvasSlice';
+import { 
+    setStyleLoadStatus, 
+    cleanupMarkerSource, 
+    setSourceStatus } from './mapCanvasSlice';
 // @ts-ignore
 import mapboxgl from 'mapbox-gl'; 
 import 'mapbox-gl/dist/mapbox-gl.css';

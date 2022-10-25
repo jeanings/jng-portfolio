@@ -217,4 +217,34 @@ def build_geojson_collection(docs):
         }
         feature_collection["features"].append(feature)
 
-    return feature_collection;
+    return feature_collection
+
+
+def get_bounding_box(docs):
+    """
+    Calculate bounding box for set of docs.
+    """
+    
+    coordinates = {
+        'lng': [],
+        'lat': []
+    }
+
+    # Group all coordinates.
+    for doc in docs:
+        coordinates['lng'].append(doc['gps']['lng'])
+        coordinates['lat'].append(doc['gps']['lat'])
+        
+    # Get bounding box coordinates.
+    bounding_box = {
+        'lng': [
+            float(min(coordinates['lng'])), 
+            float(max(coordinates['lng']))
+        ], 
+        'lat': [
+            float(min(coordinates['lat'])),
+            float(max(coordinates['lat']))
+        ]
+    }
+
+    return bounding_box

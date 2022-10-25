@@ -14,7 +14,8 @@ from .tools.mongodb_helpers import (
     create_projection_stage,
     get_image_counts,
     get_selectables_pipeline,
-    build_geojson_collection
+    build_geojson_collection,
+    get_bounding_box
 )
 import json, pymongo
 
@@ -91,7 +92,6 @@ def photo_diary_data():
         
         # Assign collection based on year. 
         collection = db[str(year)]
-        bounds = db['bounds'].find_one({ 'year': str(year) })
             
     except pymongo.errors.AutoReconnect:
         print("Reconnecting to database due to connection failure / is lost.")
@@ -155,13 +155,16 @@ def photo_diary_data():
     # Build geojson collection.
     feature_collection = build_geojson_collection(docs)
 
+    # Calculate bounding box.
+    bounding_box = get_bounding_box(docs)
+
     results = {
         'years': collections,
         'counter': counter,
         'filterSelectables': filter_selectables,
         'docs': docs,
         'featureCollection': feature_collection,
-        'bounds': bounds['bbox']
+        'bounds': bounding_box
     }
         
     response = jsonify(results)

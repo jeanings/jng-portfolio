@@ -1,4 +1,4 @@
-import React , { useEffect, useRef } from 'react';
+import React, { useEffect, useRef } from 'react';
 import {
     useAppDispatch, 
     useAppSelector, 
@@ -124,10 +124,11 @@ const MapCanvas: React.FunctionComponent = () => {
                 linear: false,
                 animate: true,
                 duration: 3500,
-                curve: 1.2
-            }
+                curve: 1.2,
+                maxZoom: 13
+            },
         );
-        
+
         dispatch(setMarkersStatus('loaded'));
     }   
 
