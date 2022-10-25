@@ -110,7 +110,9 @@ const initialState: TimelineProps = {
         }
     },
     imageDocs: null,
-    filterSelectables: null
+    filterSelectables: null,
+    geojson: null,
+    bounds: null
 };
 
 const timelineSlice = createSlice({
@@ -141,7 +143,9 @@ const timelineSlice = createSlice({
                 const counter: CounterTypes = data.counter;
                 const filterSelectables: FilterableTypes = data.filterSelectables[0];
                 const imageDocs: Array<ImageDocTypes> = data.docs;
-                const years: Array<string> = data.years
+                const years: Array<string> = data.years;
+                const geojsonFeatures: GeojsonFeatureCollectionProps = data.featureCollection;
+                const bbox: BboxType = data.bounds;
 
                 // Set states.
                 if (state.yearInit === null) {
@@ -160,6 +164,8 @@ const timelineSlice = createSlice({
                 if (Object.keys(action.meta.arg).length === 1) {    // Only set filter selectables
                     state.filterSelectables = filterSelectables;    // if only 1 arg - ie only 'year'
                 }
+                state.geojson = geojsonFeatures;
+                state.bounds = bbox;
                 state.request = 'complete';
             })
             /* --------------------------------------- 
@@ -185,7 +191,9 @@ export interface TimelineProps {
     'month': TimelineMonthTypes,
     'counter': CounterTypes,
     'imageDocs': Array<ImageDocTypes> | null,
-    'filterSelectables': FilterableTypes | null
+    'filterSelectables': FilterableTypes | null,
+    'geojson': GeojsonFeatureCollectionProps | null
+    'bounds': BboxType | null
 };
 
 export interface ImageDocsRequestProps {
@@ -266,6 +274,34 @@ export type FilterableTypes = {
     'formatType'?: Array<string>,
     'lens'?: Array<string>,
     'tags'?: Array<string>
+};
+
+export interface GeojsonFeatureCollectionProps {
+    [index: string]: string | object,
+    'type': 'FeatureCollection',
+    'features': Array<GeojsonFeatureType>
+};
+
+export type GeojsonFeatureType = {
+    [index: string]: string | object,
+    'type': string,
+    'geometry': {
+        'type': string,
+        'coordinates': Array<number>
+    },
+    'properties': {
+        'name': string,
+        'date': {
+            'year': number,
+            'month': number
+        }
+    }
+};
+
+export type BboxType = {
+    [index: string]: Array<number>,
+    'lat': Array<number>,
+    'lng': Array<number>
 };
 
 interface RejectedAction extends Action {

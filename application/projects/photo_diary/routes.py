@@ -9,7 +9,14 @@ from bson.json_util import ObjectId
 from pathlib import Path
 from pymongo import MongoClient
 from urllib.parse import quote_plus
-from .tools.mongodb_helpers import create_facet_stage, create_projection_stage, get_selectables_pipeline, get_image_counts
+from .tools.mongodb_helpers import (
+    create_facet_stage,
+    create_projection_stage,
+    get_image_counts,
+    get_selectables_pipeline,
+    build_geojson_collection,
+    get_bounding_box
+)
 import json, pymongo
 
 DEBUG_MODE = app.config['FLASK_DEBUG']
@@ -76,13 +83,16 @@ def photo_diary_data():
         focal_length = request.args.get('focal-length')
         tags = request.args.get('tags')
 
-        collections = sorted(db.list_collection_names())
+        collections_list = db.list_collection_names()
+        collections = sorted(collections_list)
+        collections.remove('bounds')
         if year == 'default':
-            # Set collection to current year on initial renders.
-            collection = db[collections[-1]]
-        elif year:
-            collection = db[str(year)]
-
+            # Set default year to current year on initial renders.
+            year = collections[-1]
+        
+        # Assign collection based on year. 
+        collection = db[str(year)]
+            
     except pymongo.errors.AutoReconnect:
         print("Reconnecting to database due to connection failure / is lost.")
     except pymongo.errors.OperationFailure:
@@ -142,11 +152,19 @@ def photo_diary_data():
     # Get image counts for each month.
     counter = get_image_counts(docs)
 
+    # Build geojson collection.
+    feature_collection = build_geojson_collection(docs)
+
+    # Calculate bounding box.
+    bounding_box = get_bounding_box(docs)
+
     results = {
         'years': collections,
         'counter': counter,
         'filterSelectables': filter_selectables,
-        'docs': docs
+        'docs': docs,
+        'featureCollection': feature_collection,
+        'bounds': bounding_box
     }
         
     response = jsonify(results)

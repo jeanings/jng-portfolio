@@ -1,9 +1,18 @@
-import React , { useEffect, useRef } from 'react';
-import { useAppSelector, useMediaQueries } from '../../common/hooks';
+import React, { useEffect, useRef } from 'react';
+import {
+    useAppDispatch, 
+    useAppSelector, 
+    useMediaQueries } from '../../common/hooks';
+import { 
+    setStyleLoadStatus, 
+    setSourceStatus, 
+    setMarkersStatus, 
+    cleanupMarkerSource } from './mapCanvasSlice';
+import './MapCanvas.css';
 // @ts-ignore
 import mapboxgl from 'mapbox-gl'; 
 import 'mapbox-gl/dist/mapbox-gl.css';
-import './MapCanvas.css';
+
 
 
 /* ================================================================
@@ -11,41 +20,124 @@ import './MapCanvas.css';
     Draws map pins on updates to image docs.
 ================================================================ */
 const MapCanvas: React.FunctionComponent = () => {
+    const dispatch = useAppDispatch();
+    const geojson = useAppSelector(state => state.timeline.geojson);
+    const bounds = useAppSelector(state => state.timeline.bounds);
+    const mapState = useAppSelector(state => state.mapCanvas);
     const classBase: string = 'MapCanvas';
+    // Mapbox variables.
     const MAPBOX_ACCESS_TOKEN = process.env.REACT_APP_MAPBOX;
     const mapContainer = useRef(null);
     const map = useRef<mapboxgl.map | null>(null);
     const mapStyle: string = process.env.REACT_APP_MAPBOX_STYLE as string;
+    const bbox: Array<Array<number>> = bounds !== null
+        ? [ [ bounds!.lng[0], bounds!.lat[0] ],     // min bound coords
+            [ bounds!.lng[1], bounds!.lat[1] ] ]    // max bound coords
+        : []
 
-    /* ------------------------------------
-        Initialize map on initial render.
-    ------------------------------------ */
+    /* -------------------------------------------------
+        Initialize map and add data source for markers 
+        once data is loaded into state.
+    ------------------------------------------------- */
     useEffect(() => {
-        if (map.current === null) {
-            map.current = new mapboxgl.Map({
-                accessToken: MAPBOX_ACCESS_TOKEN,
-                container: mapContainer.current,
-                style: mapStyle,
-                center: [-122.420679, 37.772537],
-                zoom: 12,
-                // bounds: [
-                    // [mapState.bounds.sw.lng, mapState.bounds.sw.lat],
-                    // [mapState.bounds.ne.lng, mapState.bounds.ne.lat]
-                // ],
-                // interactive: false
-                boxZoom: false,
-                doubleClickZoom: true,
-                dragPan: true,
-                dragRotate: false
-            });
+        if (bounds !== null) {
+            // Initialize map.
+            if (map.current === null) {
+                map.current = new mapboxgl.Map({
+                    accessToken: MAPBOX_ACCESS_TOKEN,
+                    container: mapContainer.current,
+                    style: mapStyle,
+                    zoom: 12,
+                    bounds: bbox,
+                    boxZoom: false,
+                    doubleClickZoom: true,
+                    dragPan: true,
+                    dragRotate: false
+                });
+    
+                // Set map loading status.
+                map.current.on('load', () => {
+                    dispatch(setStyleLoadStatus(true));
+                });
+            }
+            // Add or refresh marker source.
+            else if (mapState.styleLoaded === true) {
+                // Remove previous marker layer.
+                if (map.current.getLayer('imageMarkers') !== undefined) {
+                    map.current.removeLayer('imageMarkers');
+                }
+    
+                // Remove previous source data.
+                if (map.current.getSource('imageSource') !== undefined) {
+                    map.current.removeSource('imageSource');
+                }
+    
+                // Update map state so layer-adding effect triggers later.
+                dispatch(cleanupMarkerSource('idle'));
+                
+                // Add new set of data.
+                map.current.addSource('imageSource', {
+                    'type': 'geojson',
+                    'data': geojson,
+                    'cluster': true,
+                    'clusterRadius': 45,
+                    'clusterMaxZoom': 15
+                });
+    
+                // Update map state.
+                dispatch(setSourceStatus('loaded'));
+            }
         }
-    }, []);
+    }, [bounds, mapState.styleLoaded]);
+
+    
+    // Add marker layer if map is set up.
+    if (mapState.sourceStatus === 'loaded'
+        && mapState.markersStatus === 'idle'
+        && bounds !== null) {
+
+        // Create new photo marker layer.
+        map.current.addLayer({
+            'id': 'imageMarkers',
+            'type': 'symbol',
+            'source': 'imageSource',
+            'layout': {
+                'icon-image': 'bxs-pin',
+                'icon-allow-overlap': true,
+                // 'icon-anchor': 'top-right',
+                'icon-size': 1,
+                // 'icon-padding': 15,
+                // 'symbol-z-order': 'source'
+            },
+        });
+
+        // Adjust and zoom map to fit all markers. 
+        map.current.fitBounds(
+            bbox,
+            {
+                padding: {
+                    top: 150,
+                    bottom: 150,
+                    left: 250, 
+                    right: 250
+                },
+                linear: false,
+                animate: true,
+                duration: 3500,
+                curve: 1.2,
+                maxZoom: 13
+            },
+        );
+
+        dispatch(setMarkersStatus('loaded'));
+    }   
 
 
     
     return (
         <main className={useMediaQueries(classBase)} 
-            id="map" ref={mapContainer}>
+            id="map" ref={mapContainer}
+            role="main" aria-label="map-canvas">
         </main>
     );
 }

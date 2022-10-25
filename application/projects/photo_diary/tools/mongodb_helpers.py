@@ -183,3 +183,68 @@ def create_projection_stage(facet_stage):
         )
 
     return projection_stage
+
+
+def build_geojson_collection(docs):
+    """
+    Build geojson collection for source in Mapbox.
+    """
+
+    feature_collection = {
+        "type": "FeatureCollection",
+        "features": []
+    }
+
+    # Build each doc into geojson schema.
+    for doc in docs:
+        feature = {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    float(doc['gps']['lng']),
+                    float(doc['gps']['lat'])
+                ]
+            },
+            "properties": {
+                "id": doc['_id'],
+                "name": doc['filename'],
+                "date": {
+                    "year": doc['date']['year'],
+                    "month": doc['date']['month']
+                }
+            }
+        }
+        feature_collection["features"].append(feature)
+
+    return feature_collection
+
+
+def get_bounding_box(docs):
+    """
+    Calculate bounding box for set of docs.
+    """
+    
+    coordinates = {
+        'lng': [],
+        'lat': []
+    }
+
+    # Group all coordinates.
+    for doc in docs:
+        coordinates['lng'].append(doc['gps']['lng'])
+        coordinates['lat'].append(doc['gps']['lat'])
+        
+    # Get bounding box coordinates.
+    bounding_box = {
+        'lng': [
+            float(min(coordinates['lng'])), 
+            float(max(coordinates['lng']))
+        ], 
+        'lat': [
+            float(min(coordinates['lat'])),
+            float(max(coordinates['lat']))
+        ]
+    }
+
+    return bounding_box
