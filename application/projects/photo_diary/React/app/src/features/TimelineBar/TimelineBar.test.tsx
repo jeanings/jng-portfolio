@@ -4,29 +4,28 @@ import { setupStore } from '../../app/store';
 import { 
     act,
     cleanup, 
-    fireEvent, 
     render, 
     screen, 
     waitFor } from '@testing-library/react';
+import '@testing-library/jest-dom';
 import userEvent from '@testing-library/user-event';
 import axios, { AxiosResponse } from 'axios';
 import MockAdapter from 'axios-mock-adapter';
-import '@testing-library/jest-dom';
-import { apiUrl } from '../../app/App';
 import mockDefaultData from '../../utils/mockDefaultData.json';
 import mock2015Data from '../../utils/mock2015Data.json';
 import TimelineBar from './TimelineBar';
-import { fetchDocs, fetchImagesData, ImageDocsRequestProps } from './timelineSlice';
+import { fetchDocs, ImageDocsRequestProps } from './timelineSlice';
+import { apiUrl } from '../../app/App';
 
 
 var mockAxios = new MockAdapter(axios);
 const user = userEvent.setup();
 
-beforeAll(() => {
+beforeEach(() => {
     mockAxios = new MockAdapter(axios);
 });
 
-afterAll(() => {
+afterEach(() => {
     mockAxios.reset();
     cleanup;
 });
@@ -66,11 +65,11 @@ describe("on initial renders", () => {
             screen.getByRole('menuitem', { name: 'year-selected' });
             const yearSelectedElem = screen.getByRole('menuitem', { name: 'year-selected' });
             expect(yearSelectedElem).toHaveTextContent('2022');
-
-            // States should update to default fetch values.
-            expect(newStore.getState().timeline.yearSelected).toEqual(2022);
-            expect(newStore.getState().timeline.request).toEqual('complete');
         });
+
+        // States should update to default fetch values.
+        expect(newStore.getState().timeline.yearSelected).toEqual(2022);
+        expect(newStore.getState().timeline.request).toEqual('complete');
     });
 
 
@@ -153,9 +152,16 @@ describe("on initial renders", () => {
     Tests for fetch error cases.
 ===================================================================== */
 test("catches fetch request errors", async() => {
+    /* --------------------------------------------------------
+        Mocks                                          start
+    -------------------------------------------------------- */
+    // Mocked Axios calls.
     mockAxios = new MockAdapter(axios);
     mockAxios.onGet(apiUrl, { params: { 'year': 'default' } })
         .reply(404, [])
+    /* --------------------------------------------------------
+        Mocks                                            end
+    -------------------------------------------------------- */
 
     const newStore = setupStore();
     render(
@@ -178,6 +184,10 @@ test("catches fetch request errors", async() => {
     Tests for fetch helper function query string parsing.
 ===================================================================== */
 test("fetcher thunk parses queries into single string", async() => {
+    /* --------------------------------------------------------
+        Mocks                                          start
+    -------------------------------------------------------- */
+    // Mocked Axios calls.
     const request: ImageDocsRequestProps = {
         'year': 2022,
         'film': [
@@ -191,10 +201,12 @@ test("fetcher thunk parses queries into single string", async() => {
         'film': "Kodak_Gold_200+Fujifilm_Superia_X-TRA_400" 
     }
 
-
     mockAxios = new MockAdapter(axios);
     mockAxios.onGet(apiUrl, { params: fetchRequest })
         .reply(200, mockDefaultData)
+    /* --------------------------------------------------------
+        Mocks                                            end
+    -------------------------------------------------------- */
 
     const newStore = setupStore();
     render(
@@ -215,7 +227,7 @@ test("fetcher thunk parses queries into single string", async() => {
 /* =====================================================================
     Tests for clicks on menu timeline selection items.
 ===================================================================== */
-describe("clicks on year drawer items", () => {
+describe("clicks on dropdown year selector elements", () => {
     beforeEach(() => {
         // Intercept get requests to live API, returning default local data.
         mockAxios = new MockAdapter(axios);
@@ -223,14 +235,15 @@ describe("clicks on year drawer items", () => {
             .onGet(apiUrl, { params: { 'year': 'default' } })
             .replyOnce(200, mockDefaultData)
             .onGet(apiUrl, { params: { 'year': 2015 } })
-            .reply(200, mock2015Data)
+            .replyOnce(200, mock2015Data);
     });
 
     afterEach(() => {
         mockAxios.reset();
         cleanup;
     });
-    
+
+
     test("dispatches action, changes state of selected year and gets new data", async() => {
         const newStore = setupStore();
         render(
@@ -242,51 +255,162 @@ describe("clicks on year drawer items", () => {
         // Confirm initial << timeline.request >> state.
         expect(newStore.getState().timeline.request).toEqual('idle');
 
-        await waitFor(() => {
-            // Wait for initial fetch to render year selector items.
-            screen.findAllByRole('menuitemradio', { name: 'year-item' });
-            const yearElems = screen.getAllByRole('menuitemradio', { name: 'year-item' });
+        // Wait for initial fetch to render year selector items.
+        await waitFor(() => screen.findAllByRole('menuitemradio', { name: 'year-item' }));
+        const yearElems = screen.getAllByRole('menuitemradio', { name: 'year-item' });
 
-            // Confirm nothing is selected.
-            yearElems.forEach(element => {
-                expect(element).toHaveAttribute('aria-checked', 'false');
-            });
-
-            // Click on a year.
-            const yearSelectElem = yearElems.find(element => element.textContent === '2015') as HTMLElement;
-            user.click(yearSelectElem)
-
-            // Clicked element gets checked value and state is updated.
-            expect(yearSelectElem.ariaChecked).toEqual('true');
-            expect(newStore.getState().timeline.request).toEqual('complete');
-            expect(newStore.getState().timeline.yearSelected).toEqual(2015);
-
-            // Verify that new image doc has same date year metadata as clicked year.
-            expect(newStore.getState().timeline.imageDocs![0].date.year).toEqual(2015);
-
-            // Check screen's year selected element updates to 2015.
-            const yearSelectedElem = screen.getByRole('menuitem', { name: 'year-selected' });
-            expect(yearSelectedElem).toHaveTextContent('2015');
+        // Confirm nothing is selected.
+        yearElems.forEach(element => {
+            expect(element).toHaveAttribute('aria-checked', 'false');
         });
+
+        // Click on a year.
+        const yearSelectElem = yearElems.find(element => element.textContent === '2015') as HTMLElement;
+        await waitFor(() => user.click(yearSelectElem));
+
+        await waitFor(() => {
+            // Clicked element gets checked value and state is updated.
+            expect(yearSelectElem.getAttribute('aria-checked')).toEqual('true');
+            expect(newStore.getState().timeline.request).toEqual('complete');
+        });
+
+        // Verify that new image doc has same date year metadata as clicked year.
+        expect(newStore.getState().timeline.yearSelected).toEqual(2015);
+        expect(newStore.getState().timeline.imageDocs![0].date.year).toEqual(2015);
+
+        // Check screen's year selected element updates to 2015.
+        const yearSelectedElem = screen.getByRole('menuitem', { name: 'year-selected' });
+        expect(yearSelectedElem).toHaveTextContent('2015');
     });
-});
 
 
-xdescribe("clicks on month selector items", () => {
-    beforeEach(() => {
-         // Intercept get requests to live API, returning default local data.
+    test("fetching new data updates image counts via rolling counter", async() => {
+        /* --------------------------------------------------------
+            Mocks                                          start
+        -------------------------------------------------------- */
+        // Mocked Axios calls.
         mockAxios = new MockAdapter(axios);
         mockAxios
             .onGet(apiUrl, { params: { 'year': 'default' } })
             .replyOnce(200, mockDefaultData)
-        jest.useFakeTimers();
+            .onGet(apiUrl, { params: { 'year': 2015 } })
+            .replyOnce(200, mock2015Data);
 
+        // Faked timers.
+        jest.useFakeTimers();
+        /* --------------------------------------------------------
+            Mocks                                            end
+        -------------------------------------------------------- */
+        
+        const newStore = setupStore();
+        act(() => {
+            render(
+                <Provider store={newStore}>
+                    <TimelineBar />
+                </Provider>
+            );
+        });
+
+        expect(newStore.getState().timeline.request).toEqual('idle');
+
+        // Confirm initial << timeline.request >> state.
+        act(() => {
+            jest.advanceTimersByTime(50);
+        });
+        await waitFor(() => {
+            expect(newStore.getState().timeline.yearInit).toEqual(2022);
+            screen.findAllByRole('menuitem', { name: 'year-selected' });
+            const yearSelectedElem = screen.getByRole('menuitem', { name: 'year-selected' });
+            expect(yearSelectedElem).toHaveTextContent('2022');
+        });
+
+        expect(newStore.getState().timeline.yearSelected).toEqual(2022);
+        expect(newStore.getState().timeline.request).toEqual('complete')
+
+        // Wait for initial fetch to render year selector items.
+        act(() => {
+            jest.advanceTimersByTime(100);
+        });
+        await waitFor(() => screen.findAllByRole('menuitemradio', { name: 'year-item' }));
+        const yearElems = screen.getAllByRole('menuitemradio', { name: 'year-item' });
+
+        // // Get total image count on screen.
+        act(() => {
+            jest.advanceTimersByTime(50);
+        });
+        await waitFor(() => screen.findAllByRole('menuitemradio', { name: 'month-item' }));
+        const monthElems = screen.getAllByRole('menuitemradio', { name: 'month-item' });
+
+        let allMonthsElem: HTMLElement;
+        monthElems.forEach(element => {
+            if (element.firstChild!.textContent!.toUpperCase() === 'ALL') {
+                allMonthsElem = element;
+            }
+        });
+        const allMonthsElemKey = allMonthsElem!.firstChild!.textContent!.toLowerCase();
+
+        // Confirm total image count of default data set.
+        expect(newStore.getState().timeline.counter[allMonthsElemKey]).toEqual(40);
+
+        // Let rolling counts and dispatch actions to finish.
+        act(() => {
+            jest.advanceTimersByTime(3000);
+        });
+        await waitFor(() => expect(newStore.getState().timeline.yearSelected).toEqual(2022));
+
+        // Verify default counts to be equal after rolling counters end.
+        await waitFor(() => {
+            let countFromState = newStore.getState().timeline.counter[allMonthsElemKey];
+            expect(countFromState).toEqual(40);     // Image count for default data.
+            expect(parseInt(allMonthsElem!.lastChild!.textContent as string)).toEqual(countFromState);
+            expect(newStore.getState().timeline.counter.previous[allMonthsElemKey]).toEqual(countFromState);
+        });
+
+        // Click on a year.
+        const yearSelectElem = yearElems.find(element => element.textContent === '2015') as HTMLElement;
+        await waitFor(() => user.click(yearSelectElem));
+        
+        // Wait for fetch.
+        act(() => {
+            jest.advanceTimersByTime(100);
+        });
+        
+        // Verify << timeline >> state update.
+        expect(newStore.getState().timeline.yearSelected).toEqual(2015);
+        expect(newStore.getState().timeline.counter[allMonthsElemKey]).toEqual(59);
+
+        // Let rolling counts and dispatch actions to finish.
+        act(() => {
+            jest.advanceTimersByTime(3000);
+        });
+
+        // Verify final count on screen equals to << timeline.counter >> and updates 
+        // << timeline.counter.previous >> so the next fetch will roll the count from those numbers.
+        await waitFor(() => {
+            let countFromState = newStore.getState().timeline.counter[allMonthsElemKey];
+            expect(countFromState).toEqual(59);     // Image count for 2015 data.
+        });
+
+        let countFromState = newStore.getState().timeline.counter[allMonthsElemKey];
+        expect(parseInt(allMonthsElem!.lastChild!.textContent as string)).toEqual(countFromState);
+        expect(newStore.getState().timeline.counter.previous[allMonthsElemKey]).toEqual(countFromState);
+
+        jest.useRealTimers();
+    });
+});
+
+
+describe("clicks on month selector elements", () => {
+    beforeEach(() => {
+        // Intercept get requests to live API, returning default local data.
+        mockAxios = new MockAdapter(axios);
+        mockAxios
+            .onGet(apiUrl, { params: { 'year': 'default' } })
+            .replyOnce(200, mockDefaultData)
     });
 
     afterEach(() => {
         mockAxios.reset();
-        jest.runOnlyPendingTimers()
-        jest.useRealTimers()
         cleanup;
     });
     
@@ -302,16 +426,16 @@ xdescribe("clicks on month selector items", () => {
         expect(newStore.getState().timeline.request).toEqual('idle');
 
         // Check for all radios to be false.
-        const monthSelectorElems = screen.getAllByRole('menuitemradio', { name: 'month-item' });
+        const monthElems = screen.getAllByRole('menuitemradio', { name: 'month-item' });
 
         // Select a month.
         const monthToSelect: string = 'all';
-        const monthElemToSelect = monthSelectorElems.find(element => 
+        const monthElemToSelect = monthElems.find(element => 
             element.textContent!.replace(/\d/, "") === monthToSelect.toUpperCase()) as HTMLElement;
 
-        fireEvent.click(monthElemToSelect);
+        user.click(monthElemToSelect);
             
-        monthSelectorElems.forEach(element => {
+        monthElems.forEach(element => {
             // Check for radios and aria-checked to be reset. 
             if (element !== monthElemToSelect) {
                 expect(element).toHaveAttribute('aria-checked', 'false');
@@ -320,28 +444,10 @@ xdescribe("clicks on month selector items", () => {
         });
 
         // Check for checked and style updates to counter.
-        expect(monthElemToSelect.ariaChecked).toEqual('true');
-        expect(monthElemToSelect).toHaveClass("active");
-        expect(newStore.getState().timeline.month).toEqual(monthToSelect);
-
-        // Let rolling counts finish, plus dispatch updates to previous counter state.
-        act(() => {
-            jest.advanceTimersByTime(2500);
+        await waitFor(() => {
+            expect(newStore.getState().timeline.month).toEqual(monthToSelect)
+            // expect(monthElemToSelect).toHaveAttribute('aria-checked', 'true');
+            expect(monthElemToSelect).toHaveClass("active");
         });
-
-        const countFromState = newStore.getState().timeline.counter![monthToSelect] as number;
-        const countFromPrevState = newStore.getState().timeline.counter.previous![monthToSelect] as number;
-        const countFromElem: number = parseInt(monthElemToSelect.lastChild!.textContent as string);
-        // Verify final count on screen equals to << timeline.counter >> and updates 
-        // << timeline.counter.previous >> so the next fetch  will roll the count from those numbers.
-        expect(countFromElem).toEqual(countFromState);
-        expect(countFromPrevState).toEqual(countFromState);
     });
 });
-
-
-
-
-
-
-    

@@ -1,14 +1,14 @@
 /* TimelineBar container */
 .TimelineBar {
-    grid-column: 1 / -1;
+    grid-column: 1 / 2;
     grid-row: 1 / 2;
     display: grid;
     align-items: center;
-    grid-template-columns: 6rem 45vw;
-    grid-template-rows: 3rem auto;
+    grid-template-columns: 6.5rem var(--month-column);
+    grid-template-rows: 3.5rem auto;
     column-gap: 1.5rem;
     user-select: none;
-    z-index: 5;
+    z-index: 2;
 }
 
 /* Year selector container */
@@ -58,7 +58,7 @@
     /* Selected year: main element that's always visible */
     .TimelineBar__year-selected {
         display: inline-block;
-        color: var(--colour-text-active);
+        color: var(--colour-text-inactive);
         grid-column: 1;
         grid-row: 1;
         text-align: center;

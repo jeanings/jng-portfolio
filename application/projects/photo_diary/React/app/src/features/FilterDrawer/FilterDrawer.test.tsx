@@ -22,6 +22,18 @@ import { addFilter } from './filterDrawerSlice';
 var mockAxios = new MockAdapter(axios);
 var user = userEvent.setup();
 
+beforeEach(() => {
+    mockAxios = new MockAdapter(axios);
+});
+
+afterEach(() => {
+    mockAxios.reset();
+    cleanup;
+});
+
+/* -------------------------------------------------
+    Mocked state.
+------------------------------------------------- */
 const preloadedState: RootState = {
     timeline: {
         request: 'complete',
@@ -44,7 +56,9 @@ const preloadedState: RootState = {
             }
         },
         imageDocs: null,
-        filterSelectables: mockDefaultData.filterSelectables[0]
+        filterSelectables: mockDefaultData.filterSelectables[0],
+        geojson: null,
+        bounds: null
     },
     filter: {
         formatMedium: [],
@@ -54,6 +68,11 @@ const preloadedState: RootState = {
         lens: [],
         focalLength: [],
         tags: []
+    },
+    mapCanvas: {
+        styleLoaded: false,
+        sourceStatus: 'idle',
+        markersStatus: 'idle'
     }
 };
 
@@ -66,7 +85,9 @@ const preloadedStateWithFilter: RootState = {
         month: 'jan',
         counter: preloadedState.timeline.counter,
         imageDocs: preloadedState.timeline.imageDocs,
-        filterSelectables: mockDefaultData.filterSelectables[0]
+        filterSelectables: mockDefaultData.filterSelectables[0],
+        geojson: null,
+        bounds: null
     },
     filter: {
         formatMedium: [],
@@ -76,17 +97,15 @@ const preloadedStateWithFilter: RootState = {
         lens: [],
         focalLength: [],
         tags: []
+    },
+    mapCanvas: {
+        styleLoaded: false,
+        sourceStatus: 'idle',
+        markersStatus: 'idle'
     }
 }
 
-beforeEach(() => {
-    mockAxios = new MockAdapter(axios);
-});
 
-afterEach(() => {
-    mockAxios.reset();
-    cleanup;
-});
 
 
 /* =====================================================================
@@ -298,13 +317,20 @@ describe("on filter button clicks", () => {
     Tests that interact with other components.
 ===================================================================== */
 test("<< filter >> state resets to initial state when year is changed", async() => {
+    /* --------------------------------------------------------
+        Mocks                                          start
+    -------------------------------------------------------- */
+    // Mocked Axios calls.
     mockAxios = new MockAdapter(axios);
     mockAxios
         .onGet(apiUrl, { params: { 'year': 2022, 'format-medium': 'film' } })
         .replyOnce(200, mock2015Data)
         .onGet(apiUrl, { params: { 'year': 2015 } })
         .replyOnce(200, mock2015Data)
-
+    /* --------------------------------------------------------
+        Mocks                                            end
+    -------------------------------------------------------- */
+    
     const newStore = setupStore(preloadedStateWithFilter);
     render(
         <Provider store={newStore}>
@@ -344,12 +370,19 @@ test("<< filter >> state resets to initial state when year is changed", async() 
 
 
 test("dispatches fetch request on << filter >> state changes", async() => {
+    /* --------------------------------------------------------
+        Mocks                                          start
+    -------------------------------------------------------- */
+    // Mocked Axios calls.
     mockAxios = new MockAdapter(axios);
     mockAxios
         .onGet(apiUrl, { params: { 'year': 'default' } })
         .replyOnce(200, mockDefaultData)
         .onGet(apiUrl, { params: { 'year': 2022, 'format-medium': 'film' } })
         .replyOnce(200, mock2022Data)
+    /* --------------------------------------------------------
+        Mocks                                            end
+    -------------------------------------------------------- */
 
     const newStore = setupStore();
         render(

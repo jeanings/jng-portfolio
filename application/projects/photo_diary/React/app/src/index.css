@@ -1,13 +1,13 @@
 :root {
-    --colour-background: #3f3f3f;
+    --colour-background: hsl(0, 0%, 61%);
     --colour-transparent: #00000000;
-    --colour-title: #ecec7a;
-    --colour-text-inactive: #d6d6c150;
-    --colour-text-active: #d6d6c1;
-    --colour-text-highlight: #e96c18;
-    --colour-border: #9c9c9c;
-    --colour-accent-primary: rgb(187, 199, 21);
-    --colour-accent-secondary: rgb(42, 184, 124);
+    --colour-title: hsl(60, 75%, 70%);
+    --colour-text-active: hsl(60, 60%, 95%);
+    --colour-text-inactive: hsl(0, 0%, 25%);
+    --colour-text-highlight: hsl(24, 83%, 50%);
+    --colour-border: hsl(0, 0%, 25%);
+    --colour-accent-primary: hsl(24, 83%, 50%);
+    --colour-accent-secondary: hsl(49, 98%, 67%);
     --root-font-size: 16px;
     overflow: hidden;
     font-size: var(--root-font-size);

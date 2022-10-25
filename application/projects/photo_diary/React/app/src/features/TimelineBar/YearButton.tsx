@@ -23,12 +23,12 @@ const YearButton: React.FunctionComponent<YearButtonProps> = (props: YearButtonP
 
         // Reset all radios to false.
         for (let element of Array.from(yearElems)) {
-            element.ariaChecked = 'false';
+            element.setAttribute('aria-checked', 'false');
         }
 
         // Get clicked year text and set to checked.
         const yearSelectElemText: string = yearSelectElem.textContent as string;
-        yearSelectElem.ariaChecked = 'true';
+        yearSelectElem.setAttribute('aria-checked', 'true');
 
         // Change selected year to clicked year.
         const yearSelectedElem: HTMLElement = document.querySelector(
