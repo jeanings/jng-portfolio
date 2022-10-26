@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react';
 import { useAppSelector, useAppDispatch, useMediaQueries } from '../../common/hooks';
+import ToolbarButton, { ToolbarButtonProps } from './ToolbarButton';
 import './Toolbar.css';
 
 
@@ -8,20 +9,17 @@ import './Toolbar.css';
 ==================================================================== */
 const Toolbar: React.FunctionComponent = () => {
     const classBase: string = "Toolbar";
-    const dispatch = useAppDispatch();
 
-
-    /* -------------------------------------------------------------
-
-    ------------------------------------------------------------- */
 
 
     return (
         <menu className={useMediaQueries(classBase)}
-            role="menu" aria-label="toolbar">
+            role="menu" aria-label={classBase}>
             
+            {createToolbarButton(classBase, 'filter')}
+            {createToolbarButton(classBase, 'bounds')}
+            {createToolbarButton(classBase, 'sidePanel')}
 
-            
         </menu>
     );
 }
@@ -31,21 +29,18 @@ const Toolbar: React.FunctionComponent = () => {
     Helper functions.
 ===================================================================== */
 
-/* --------------------------------------------
-    Constructor for filter drawer categories.
--------------------------------------------- */
-
-
-
-/* =====================================================================
-    Types.
-===================================================================== */
-export type ClassNameTypes = {
-    [index: string]: string,
-    'parent': string,
-    'title': string,
-    'options': string,
-};
+/* ----------------------------------
+    Constructor for toolbar button.
+---------------------------------- */
+function createToolbarButton(classBase: string, buttonName: ToolbarButtonProps['name']) {
+    return (
+        <ToolbarButton 
+            name={buttonName}
+            baseClassName={classBase}
+            key={"key".concat("_", classBase, "-", buttonName)}
+        />
+    )
+}
 
 
 export default Toolbar;

@@ -66,10 +66,18 @@ test("renders bottom UI buttons", async() => {
         </Provider>
     );
 
-    await waitFor(() => screen.findByRole('menu', { name: 'toolbar' }));
-    const toolbar = screen.getByRole('menu', { name: 'toolbar'});
+    await waitFor(() => {
+        screen.findByRole('menu', { name: 'Toolbar' })
+        screen.findAllByRole('button', { name: 'Toolbar-button' })
+    });
+
+    // Verify toolbar is rendered.
+    const toolbar = screen.getByRole('menu', { name: 'Toolbar' });
     expect(toolbar).toBeInTheDocument();
 
+    // Verify individual toolbar buttons are rendered.
+    const toolbarButtons = screen.getAllByRole('button', { name: 'Toolbar-button' });
+    expect(toolbarButtons.length).toEqual(3);
 });
 
 xtest("drawer button clicks reveal, hide filter elements", () => {

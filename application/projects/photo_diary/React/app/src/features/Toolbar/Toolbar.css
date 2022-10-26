@@ -4,4 +4,7 @@
     display: grid;
     grid-template-columns: repeat(5, 1fr);
     grid-template-rows: 100%;
+    z-index: 2;
+    user-select: none;
+    pointer-events: none;
 }
