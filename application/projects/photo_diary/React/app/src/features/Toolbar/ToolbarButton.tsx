@@ -15,6 +15,29 @@ const ToolbarButton: React.FunctionComponent<ToolbarButtonProps> = (props: Toolb
     const onToolbarButtonClick = (event: React.SyntheticEvent) => {
         const toolbarButtonElem = event.target as HTMLButtonElement;
 
+        // Sets aria-checked, determines addFilter/removeFilter dispatches below.
+        const setAriaPressed = toolbarButtonElem.getAttribute('aria-pressed') === 'false'
+            ? 'true' : 'false';
+        toolbarButtonElem.setAttribute('aria-pressed', setAriaPressed);
+        const ariaPressed = toolbarButtonElem.getAttribute('aria-pressed');
+
+        // Add class active for styling.
+        ariaPressed === 'true'
+            ? toolbarButtonElem.classList.add("active")
+            : toolbarButtonElem.classList.remove("active");
+
+        // Assign payload its corresponding key:val pairs based on category.
+        switch(toolbarButtonElem.getAttribute('id')) {
+            case 'Toolbar-filter':
+                                        
+                break;
+            case 'Toolbar-bounds':
+
+                break;
+            case 'Toolbar-sidePanel':
+                
+                break;
+        }
     };
 
    

@@ -80,6 +80,40 @@ test("renders bottom UI buttons", async() => {
     expect(toolbarButtons.length).toEqual(3);
 });
 
+
+test("clicks on toolbar buttons register changes to pressed status, style update", async() => {
+    const newStore = setupStore();
+    render(
+        <Provider store={newStore}>
+            <Toolbar />
+        </Provider>
+    );
+
+    await waitFor(() => {
+        screen.findByRole('menu', { name: 'Toolbar' })
+        screen.findAllByRole('button', { name: 'Toolbar-button' })
+    });
+
+    // Verify toolbar is rendered.
+    const toolbar = screen.getByRole('menu', { name: 'Toolbar' });
+    expect(toolbar).toBeInTheDocument();
+
+    // Verify individual toolbar buttons are rendered.
+    const toolbarButtons = screen.getAllByRole('button', { name: 'Toolbar-button' });
+    expect(toolbarButtons.length).toEqual(3);
+
+    // Verify button is not clicked.
+    const buttonToClick = toolbarButtons[0];
+    expect(buttonToClick.getAttribute('aria-pressed')).toEqual('false');
+    expect(buttonToClick.classList).not.toContain("active");
+
+    await waitFor(() => user.click(buttonToClick));
+
+    // Verify button clicked.
+    expect(buttonToClick.getAttribute('aria-pressed')).toEqual('true');
+    expect(buttonToClick.classList).toContain("active");
+});
+
 xtest("drawer button clicks reveal, hide filter elements", () => {
 
 });
