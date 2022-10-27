@@ -1,4 +1,4 @@
-.FilterDrawer button {
+.FilterDrawer__buttons {
     background: rgba(178, 182, 182, 0.075);
     border-color: var(--colour-border);
     border-style: solid;
@@ -15,15 +15,19 @@
     transition: all 350ms;
 }
 
-    .FilterDrawer button:hover {
+    .FilterDrawer__buttons:hover {
         background-color: var(--colour-accent-secondary);
         color: #000;
         transition: all 350ms;
     }
 
-    .FilterDrawer button.active {
+    .FilterDrawer__buttons.active {
         background-color: var(--colour-accent-primary);
         color: var(--colour-text-active);
         transition: all 350ms;
 
+    }
+
+    .FilterDrawer__buttons.hide {
+        pointer-events: none;
     }

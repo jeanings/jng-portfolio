@@ -8,3 +8,13 @@
     user-select: none;
     pointer-events: none;
 }
+
+    .Toolbar__button-container {
+        grid-column: 3 / 4;
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        align-self: center;
+        justify-self: center;
+        min-width: 50%;
+        column-gap: 1.5rem;
+    }
