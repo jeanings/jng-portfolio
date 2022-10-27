@@ -1,5 +1,9 @@
-import React from 'react';
-import './ToolbarButton.css';
+import React, { useEffect } from 'react';
+import { 
+    useAppSelector, 
+    useAppDispatch, 
+    useMediaQueries } from '../../common/hooks';
+import { setBoundsButton } from '../MapCanvas/mapCanvasSlice';
 import './ToolbarButton.css';
 
 
@@ -8,6 +12,9 @@ import './ToolbarButton.css';
     buttons under each filter category.
 ==================================================================== */
 const ToolbarButton: React.FunctionComponent<ToolbarButtonProps> = (props: ToolbarButtonProps) => {    
+    const dispatch = useAppDispatch();
+    const mapStyleLoaded = useAppSelector(state => state.mapCanvas.styleLoaded);
+
     /* -----------------------------------
         Handle clicks on toolbar buttons.
     ----------------------------------- */
@@ -20,13 +27,15 @@ const ToolbarButton: React.FunctionComponent<ToolbarButtonProps> = (props: Toolb
         toolbarButtonElem.setAttribute('aria-pressed', setAriaPressed);
         const ariaPressed = toolbarButtonElem.getAttribute('aria-pressed');
 
-        // Add class active for styling.
-        ariaPressed === 'true'
-            ? toolbarButtonElem.classList.add("active")
-            : toolbarButtonElem.classList.remove("active");
+        // Add active class for styling.
+        if (toolbarButtonElem.id !== "Toolbar-bounds") {
+            ariaPressed === 'true'
+                ? toolbarButtonElem.classList.add("active")
+                : toolbarButtonElem.classList.remove("active");
+        }
 
         // Assign payload its corresponding key:val pairs based on category.
-        switch(toolbarButtonElem.getAttribute('id')) {
+        switch(toolbarButtonElem.id) {
             case 'Toolbar-filter':
                 const filterDrawerElem = document.getElementById("FilterDrawer");
                    
@@ -44,11 +53,14 @@ const ToolbarButton: React.FunctionComponent<ToolbarButtonProps> = (props: Toolb
                         filterDrawerElem.classList.add("hide");
                     }
                 }
-                
                 break;
-            case 'Toolbar-bounds':
 
+            case 'Toolbar-bounds':
+                if (mapStyleLoaded === true) {
+                    dispatch(setBoundsButton('clicked'));
+                }
                 break;
+
             case 'Toolbar-sidePanel':
                 
                 break;

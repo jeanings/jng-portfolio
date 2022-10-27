@@ -1,4 +1,5 @@
 import React from 'react';
+import * as reactRedux from 'react-redux';
 import { Provider } from 'react-redux';
 import { setupStore, RootState } from '../../app/store';
 import {
@@ -11,8 +12,13 @@ import axios from 'axios';
 import MockAdapter from 'axios-mock-adapter';
 import '@testing-library/jest-dom';
 import mockDefaultData from '../../utils/mockDefaultData.json';
-import TimelineBar from '../../features/TimelineBar/TimelineBar';
-import FilterDrawer from '../../features/FilterDrawer/FilterDrawer';
+import MapCanvas from '../MapCanvas/MapCanvas';
+import { GeojsonFeatureCollectionProps } from '../TimelineBar/timelineSlice';
+import { 
+    setStyleLoadStatus, 
+    cleanupMarkerSource, 
+    setSourceStatus, 
+    setBoundsButton } from '../MapCanvas/mapCanvasSlice';
 import { apiUrl } from '../../app/App';
 import Toolbar from './Toolbar';
 // @ts-ignore
@@ -58,8 +64,8 @@ const preloadedState: RootState = {
         },
         imageDocs: null,
         filterSelectables: mockDefaultData.filterSelectables[0],
-        geojson: null,
-        bounds: null
+        geojson: mockDefaultData.featureCollection as GeojsonFeatureCollectionProps,
+        bounds: mockDefaultData.bounds
     },
     filter: {
         formatMedium: [],
@@ -73,7 +79,8 @@ const preloadedState: RootState = {
     mapCanvas: {
         styleLoaded: false,
         sourceStatus: 'idle',
-        markersStatus: 'idle'
+        markersStatus: 'idle',
+        fitBoundsButton: 'idle'
     }
 };
 
@@ -172,7 +179,7 @@ test("drawer button clicks reveal, hide filter elements", async() => {
 
     // Get target button.
     const toolbarFilterButton: HTMLElement = toolbarButtons.filter(
-        button => button.getAttribute('id') === "Toolbar-filter")[0];
+        button => button.id === "Toolbar-filter")[0];
    
     // Test opening of filter drawer.
     await waitFor(() => user.click(toolbarFilterButton));
@@ -190,4 +197,87 @@ test("drawer button clicks reveal, hide filter elements", async() => {
 
     // Verify filter drawer is hidden.
     expect(mockFilterDrawerElem).toHaveClass("hide");
+});
+
+
+test("bounds button calls mapbox's fitBounds method", async() => {
+    /* --------------------------------------------------------
+        Mocks                                          start
+    -------------------------------------------------------- */
+    // Mocked Axios calls.
+    mockAxios = new MockAdapter(axios);
+    mockAxios
+        .onGet(apiUrl, { params: { 'year': 'default' } })
+        .replyOnce(200, mockDefaultData)
+
+    // Mocked Mapbox methods.
+    const mockMapOn = jest.fn();
+    const mockMapAddSource = jest.fn();
+    const mockMapGetSource = jest.fn();
+    const mockMapAddLayer = jest.fn();
+    const mockMapGetLayer = jest.fn();
+    const mockMapFitBounds = jest.fn();
+
+    jest.spyOn(mapboxgl, "Map")
+        .mockImplementation(() => {
+            return {
+                on: mockMapOn,
+                addSource: mockMapAddSource,
+                getSource: mockMapGetSource,
+                addLayer: mockMapAddLayer,
+                getLayer: mockMapGetLayer,
+                fitBounds: mockMapFitBounds
+            }
+        })
+
+    // Mocked React functions.
+    const useDispatchSpy = jest.spyOn(reactRedux, 'useDispatch');
+    const mockDispatch = jest.fn();
+    useDispatchSpy.mockReturnValue(mockDispatch);
+    /* --------------------------------------------------------
+        Mocks                                            end
+    -------------------------------------------------------- */
+
+    const newStore = setupStore(preloadedState);
+        render(
+            <Provider store={newStore}>
+                <MapCanvas />
+                <Toolbar />
+            </Provider>
+        );
+    
+    // Wait for fetch.
+    await waitFor(() => {
+        screen.findByRole('main', { name: 'map-canvas' });
+        expect(newStore.getState().timeline.bounds).not.toBeNull();
+    });
+
+    // Mock dispatches for layer-adding conditions.
+    newStore.dispatch(setStyleLoadStatus(true));
+    newStore.dispatch(cleanupMarkerSource('idle'));
+    newStore.dispatch(setSourceStatus('loaded'));
+    
+    // Verify states are updated.
+    expect(newStore.getState().mapCanvas).toEqual({
+        'styleLoaded': true,
+        'markersStatus': 'idle', 
+        'sourceStatus': 'loaded',
+        'fitBoundsButton': 'idle'
+    });
+
+    // Verify individual toolbar buttons are rendered.
+    const toolbarButtons = screen.getAllByRole('button', { name: 'Toolbar-button' });
+    expect(toolbarButtons.length).toEqual(3);
+
+    // Get target button.
+    const toolbarBoundsButton: HTMLElement = toolbarButtons.filter(
+        button => button.getAttribute('id') === "Toolbar-bounds")[0];
+
+    // Mock dispatch request to fitBounds.
+    await waitFor (() => user.click(toolbarBoundsButton));
+    newStore.dispatch(setBoundsButton('clicked'));
+
+    // Verify fitBounds method called, one called on init and
+    // the other on button click.
+    expect(mockMapFitBounds).toHaveBeenCalledTimes(2);
 });
