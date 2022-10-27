@@ -1,12 +1,11 @@
-.FilterDrawer button {
-    background: rgba(178, 182, 182, 0.075);
+.FilterDrawer__buttons  {
+    background: rgba(206, 206, 206, 0.6);
     border-color: var(--colour-border);
     border-style: solid;
     border-width: 1px;
     border-radius: 0.20rem;
-    backdrop-filter: blur(5px);
     padding: 0.25rem 0.5rem 0.25rem 0.5rem;
-    color: var(--colour-text-inactive);
+    color: #000;
     font-family: 'Barlow Semi Condensed', sans-serif;
     font-size: 1.05rem;
     font-weight: 200;
@@ -15,15 +14,19 @@
     transition: all 350ms;
 }
 
-    .FilterDrawer button:hover {
+    .FilterDrawer__buttons:hover {
         background-color: var(--colour-accent-secondary);
         color: #000;
         transition: all 350ms;
     }
 
-    .FilterDrawer button.active {
+    .FilterDrawer__buttons.active {
         background-color: var(--colour-accent-primary);
         color: var(--colour-text-active);
         transition: all 350ms;
 
+    }
+
+    .FilterDrawer__buttons.hide {
+        pointer-events: none;
     }

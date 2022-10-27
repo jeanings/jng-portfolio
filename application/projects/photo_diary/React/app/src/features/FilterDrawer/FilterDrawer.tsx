@@ -111,9 +111,10 @@ const FilterDrawer: React.FunctionComponent = () => {
     
 
     return (
-        <section className={useMediaQueries(classBase)}>
+        <section className={useMediaQueries(classBase)} id={classBase}
+            role="form" aria-label={classBase}>
             <div className={useMediaQueries(classBase.concat("__", "parameters-container"))}
-                role="group" aria-label="FilterDrawer-container">
+                role="group" aria-label={classBase.concat("-", "container")}>
 
                 {/* Generates each filter category and its buttons. */}
                 {createCategory(classNames, "format", formats)}

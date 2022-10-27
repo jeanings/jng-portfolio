@@ -72,7 +72,8 @@ const preloadedState: RootState = {
     mapCanvas: {
         styleLoaded: false,
         sourceStatus: 'idle',
-        markersStatus: 'idle'
+        markersStatus: 'idle',
+        fitBoundsButton: 'idle'
     }
 };
 
@@ -101,7 +102,8 @@ const preloadedStateWithFilter: RootState = {
     mapCanvas: {
         styleLoaded: false,
         sourceStatus: 'idle',
-        markersStatus: 'idle'
+        markersStatus: 'idle',
+        fitBoundsButton: 'idle'
     }
 }
 

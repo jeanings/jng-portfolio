@@ -98,7 +98,7 @@ const FilterButton: React.FunctionComponent<FilterButtonProps> = (props: FilterB
    
 
     return (
-        <button className={"FilterDrawer".concat("__", props.categoryName, "-item")}
+        <button className={"FilterDrawer".concat("__", "buttons")}
             role="checkbox" aria-label={"FilterDrawer".concat("-", props.categoryName, "-item")}
             aria-pressed="false"
             onClick={onFilterClick}>
