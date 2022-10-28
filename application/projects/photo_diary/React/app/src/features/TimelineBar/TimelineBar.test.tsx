@@ -111,10 +111,12 @@ describe("on initial renders", () => {
         // API succesfully called and populated list of selectable years.
         await waitFor(() => {
             expect(newStore.getState().timeline.request).toEqual('complete');
-            const yearElems = screen.getAllByRole('menuitemradio', { name: 'year-item'});
-            expect(yearElems.length).toBeGreaterThanOrEqual(1);
         });
-        
+
+        // Verify correct number of year items to render.
+        const yearElems = screen.getAllByRole('menuitemradio', { name: 'year-item'});
+        const yearItems = newStore.getState().timeline.years;
+        expect(yearElems.length).toEqual(yearItems!.length);
     });
 
     
@@ -142,7 +144,7 @@ describe("on initial renders", () => {
         );
 
         const monthItems = screen.getAllByRole('menuitemradio', { name: 'month-item' });
-        expect(monthItems.length).toBeGreaterThanOrEqual(12);
+        expect(monthItems.length).toBeGreaterThanOrEqual(13);
     });
 });
 
@@ -270,7 +272,7 @@ describe("clicks on dropdown year selector elements", () => {
 
         await waitFor(() => {
             // Clicked element gets checked value and state is updated.
-            expect(yearSelectElem.getAttribute('aria-checked')).toEqual('true');
+            expect(yearSelectElem).toHaveAttribute('aria-checked', 'true');
             expect(newStore.getState().timeline.request).toEqual('complete');
         });
 
@@ -320,10 +322,11 @@ describe("clicks on dropdown year selector elements", () => {
         await waitFor(() => {
             expect(newStore.getState().timeline.yearInit).toEqual(2022);
             screen.findAllByRole('menuitem', { name: 'year-selected' });
-            const yearSelectedElem = screen.getByRole('menuitem', { name: 'year-selected' });
-            expect(yearSelectedElem).toHaveTextContent('2022');
         });
 
+        // Confirm changes.
+        const yearSelectedElem = screen.getByRole('menuitem', { name: 'year-selected' });
+        expect(yearSelectedElem).toHaveTextContent('2022');
         expect(newStore.getState().timeline.yearSelected).toEqual(2022);
         expect(newStore.getState().timeline.request).toEqual('complete')
 
@@ -433,7 +436,7 @@ describe("clicks on month selector elements", () => {
         const monthElemToSelect = monthElems.find(element => 
             element.textContent!.replace(/\d/, "") === monthToSelect.toUpperCase()) as HTMLElement;
 
-        user.click(monthElemToSelect);
+        await waitFor(() => user.click(monthElemToSelect));
             
         monthElems.forEach(element => {
             // Check for radios and aria-checked to be reset. 
@@ -446,8 +449,11 @@ describe("clicks on month selector elements", () => {
         // Check for checked and style updates to counter.
         await waitFor(() => {
             expect(newStore.getState().timeline.month).toEqual(monthToSelect)
-            // expect(monthElemToSelect).toHaveAttribute('aria-checked', 'true');
+            expect(monthElemToSelect).toHaveAttribute('aria-checked', 'true');
             expect(monthElemToSelect).toHaveClass("active");
         });
     });
+
+    // TODO 
+    // test("dispatches fetch request for data from selected month only")
 });

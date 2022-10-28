@@ -54,7 +54,7 @@ const YearButton: React.FunctionComponent<YearButtonProps> = (props: YearButtonP
             aria-checked="false"
             onClick={onYearSelect}>
 
-                {props.name}
+                {props.year}
         </li>
     );
 }
@@ -64,7 +64,7 @@ const YearButton: React.FunctionComponent<YearButtonProps> = (props: YearButtonP
     Types.
 ===================================================================== */
 export interface YearButtonProps {
-    name: string,
+    year: string,
     baseClassName: string,
     className: string,
 };

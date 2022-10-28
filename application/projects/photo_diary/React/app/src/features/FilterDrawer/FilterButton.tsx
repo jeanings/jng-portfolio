@@ -1,6 +1,9 @@
 import React from 'react';
-import { useAppDispatch } from '../../common/hooks';
-import { addFilter, removeFilter, FilterProps } from './filterDrawerSlice';
+import { useAppDispatch, useMediaQueries } from '../../common/hooks';
+import { 
+    addFilter, 
+    removeFilter, 
+    FilterProps } from './filterDrawerSlice';
 import './FilterButton.css';
 
 
@@ -10,6 +13,7 @@ import './FilterButton.css';
 ==================================================================== */
 const FilterButton: React.FunctionComponent<FilterButtonProps> = (props: FilterButtonProps) => {
     const dispatch = useAppDispatch();
+    const classBase = useMediaQueries(props.baseClassName);
     
     /* ------------------------------------------------------------
         Handle clicks on buttons.
@@ -32,7 +36,7 @@ const FilterButton: React.FunctionComponent<FilterButtonProps> = (props: FilterB
         let payloadFilter: FilterProps;
         // Assign payload its corresponding key:val pairs based on category.
         switch(filterElem.getAttribute('aria-label')) {
-            case 'FilterDrawer-format-item':
+            case 'filter-drawer-format-item':
                 // "Format" includes both medium (film, digital) and type (35mm, mirrorless)
                 // but fetch API handles both as separate for querying. This handles separation
                 // of each for querying MongoDB.
@@ -45,14 +49,14 @@ const FilterButton: React.FunctionComponent<FilterButtonProps> = (props: FilterB
                     : dispatch(removeFilter(payloadFilter));
                 break;
 
-            case 'FilterDrawer-film-item':
+            case 'filter-drawer-film-item':
                 payloadFilter = { 'film': buttonText };
                 ariaPressed === 'true'
                     ? dispatch(addFilter(payloadFilter))
                     : dispatch(removeFilter(payloadFilter));
                 break;
         
-            case 'FilterDrawer-camera-item':
+            case 'filter-drawer-camera-item':
                 // Only dispatch camera model as 'camera'.
                 const make: string = buttonText.split(' ', 1)[0];
                 const modelStrings: Array<string> = buttonText.split(' ')
@@ -70,14 +74,14 @@ const FilterButton: React.FunctionComponent<FilterButtonProps> = (props: FilterB
                     : dispatch(removeFilter(payloadFilter));
                 break;
 
-            case 'FilterDrawer-lens-item':
+            case 'filter-drawer-lens-item':
                 payloadFilter = { 'lens': buttonText };
                 ariaPressed === 'true'
                     ? dispatch(addFilter(payloadFilter))
                     : dispatch(removeFilter(payloadFilter));
                 break;
 
-            case 'FilterDrawer-focalLength-item':
+            case 'filter-drawer-focalLength-item':
                 // Metadata have focal lengths in int, cleaning string is necessary.
                 const focalLength: number = parseInt(buttonText.replace('mm', ''));
                 payloadFilter = { 'focalLength': focalLength };
@@ -86,7 +90,7 @@ const FilterButton: React.FunctionComponent<FilterButtonProps> = (props: FilterB
                     : dispatch(removeFilter(payloadFilter));
                 break;
 
-            case 'FilterDrawer-tags-item':
+            case 'filter-drawer-tags-item':
                 payloadFilter = { 'tags': buttonText };
                 ariaPressed === 'true'
                     ? dispatch(addFilter(payloadFilter))
@@ -98,8 +102,8 @@ const FilterButton: React.FunctionComponent<FilterButtonProps> = (props: FilterB
    
 
     return (
-        <button className={"FilterDrawer".concat("__", props.categoryName, "-item")}
-            role="checkbox" aria-label={"FilterDrawer".concat("-", props.categoryName, "-item")}
+        <button className={useMediaQueries(classBase.concat("__", "buttons"))}
+            role="checkbox" aria-label={"filter-drawer".concat("-", props.categoryName, "-item")}
             aria-pressed="false"
             onClick={onFilterClick}>
 
@@ -116,8 +120,9 @@ const FilterButton: React.FunctionComponent<FilterButtonProps> = (props: FilterB
     Types.
 ===================================================================== */
 export interface FilterButtonProps {
-    categoryName: string
-    selectable: string | number
+    'baseClassName': string,
+    'categoryName': string,
+    'selectable': string | number
 };
 
 
