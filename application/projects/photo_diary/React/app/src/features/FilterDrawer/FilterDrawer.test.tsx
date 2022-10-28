@@ -108,8 +108,6 @@ const preloadedStateWithFilter: RootState = {
 }
 
 
-
-
 /* =====================================================================
     Tests for initial rendering - async thunk, state-reliant elements.
 ===================================================================== */
@@ -123,24 +121,24 @@ describe("on initial load", () => {
         );
 
         // Verify correct number of filter buttons rendered.
-        await screen.findAllByRole('checkbox', { name: 'FilterDrawer-format-item'});
+        await screen.findAllByRole('checkbox', { name: 'filter-drawer-format-item'});
 
-        const formatButtons = screen.getAllByRole('checkbox', { name: 'FilterDrawer-format-item'});
+        const formatButtons = screen.getAllByRole('checkbox', { name: 'filter-drawer-format-item'});
         expect(formatButtons.length).toEqual(2);
 
-        const filmButtons = screen.getAllByRole('checkbox', { name: 'FilterDrawer-film-item'});
+        const filmButtons = screen.getAllByRole('checkbox', { name: 'filter-drawer-film-item'});
         expect(filmButtons.length).toEqual(2);
 
-        const cameraButtons = screen.getAllByRole('checkbox', { name: 'FilterDrawer-camera-item'});
+        const cameraButtons = screen.getAllByRole('checkbox', { name: 'filter-drawer-camera-item'});
         expect(cameraButtons.length).toEqual(2);
 
-        const lensButtons = screen.getAllByRole('checkbox', { name: 'FilterDrawer-lens-item'});
+        const lensButtons = screen.getAllByRole('checkbox', { name: 'filter-drawer-lens-item'});
         expect(lensButtons.length).toEqual(2);
 
-        const focalLengthButtons = screen.getAllByRole('checkbox', { name: 'FilterDrawer-focalLength-item'});
+        const focalLengthButtons = screen.getAllByRole('checkbox', { name: 'filter-drawer-focalLength-item'});
         expect(focalLengthButtons.length).toEqual(1);
 
-        const tags = screen.getAllByRole('checkbox', { name: 'FilterDrawer-tags-item'});
+        const tags = screen.getAllByRole('checkbox', { name: 'filter-drawer-tags-item'});
         expect(tags.length).toEqual(36);
     });
 });
@@ -160,12 +158,12 @@ describe("on filter button clicks", () => {
     });
 
     const filterCategories = [
-        { category: 'format', ariaLabel: 'FilterDrawer-format-item' },
-        { category: 'film', ariaLabel: 'FilterDrawer-film-item' },
-        { category: 'camera', ariaLabel: 'FilterDrawer-camera-item' },
-        { category: 'lens', ariaLabel: 'FilterDrawer-lens-item' },
-        { category: 'focalLength', ariaLabel: 'FilterDrawer-focalLength-item' },
-        { category: 'tags', ariaLabel: 'FilterDrawer-tags-item' },
+        { category: 'format', ariaLabel: 'filter-drawer-format-item' },
+        { category: 'film', ariaLabel: 'filter-drawer-film-item' },
+        { category: 'camera', ariaLabel: 'filter-drawer-camera-item' },
+        { category: 'lens', ariaLabel: 'filter-drawer-lens-item' },
+        { category: 'focalLength', ariaLabel: 'filter-drawer-focalLength-item' },
+        { category: 'tags', ariaLabel: 'filter-drawer-tags-item' },
     ];
 
     filterCategories.forEach(group => {
@@ -349,8 +347,8 @@ test("<< filter >> state resets to initial state when year is changed", async() 
     await waitFor(() => screen.findAllByRole('menuitemradio', { name: 'year-item'}));
     const yearElems = screen.getAllByRole('menuitemradio', { name: 'year-item' });
 
-    screen.findAllByRole('checkbox', { name: "FilterDrawer-film-item" });
-    const filterButtons = screen.getAllByRole('checkbox', { name: "FilterDrawer-film-item" });
+    await waitFor(() => screen.findAllByRole('checkbox', { name: "filter-drawer-film-item" }));
+    const filterButtons = screen.getAllByRole('checkbox', { name: "filter-drawer-film-item" });
 
     // Get filter button element to click: FILM -> Kodak Gold 200.
     let filterButtonToClick = filterButtons.filter(button => button.textContent === 'Kodak Gold 200')[0];
@@ -400,8 +398,8 @@ test("dispatches fetch request on << filter >> state changes", async() => {
     // Verify number of docs for initial fetch request.
     expect(newStore.getState().timeline.counter.all).toEqual(40);
 
-    screen.findAllByRole('checkbox', { name: "FilterDrawer-format-item" });
-    const filterButtons = screen.getAllByRole('checkbox', { name: "FilterDrawer-format-item" });
+    screen.findAllByRole('checkbox', { name: "filter-drawer-format-item" });
+    const filterButtons = screen.getAllByRole('checkbox', { name: "filter-drawer-format-item" });
 
     // Get filter button element to click: FORMAT -> film.
     let filterButtonToClick = filterButtons.filter(button => button.textContent === 'film')[0];

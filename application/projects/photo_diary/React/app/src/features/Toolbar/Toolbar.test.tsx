@@ -98,15 +98,15 @@ test("renders bottom UI buttons", async() => {
 
     await waitFor(() => {
         screen.findByRole('menu', { name: 'Toolbar' })
-        screen.findAllByRole('button', { name: 'Toolbar-button' })
+        screen.findAllByRole('button', { name: 'toolbar-button' })
     });
 
     // Verify toolbar is rendered.
-    const toolbar = screen.getByRole('menu', { name: 'Toolbar' });
+    const toolbar = screen.getByRole('menu', { name: 'toolbar' });
     expect(toolbar).toBeInTheDocument();
 
     // Verify individual toolbar buttons are rendered.
-    const toolbarButtons = screen.getAllByRole('button', { name: 'Toolbar-button' });
+    const toolbarButtons = screen.getAllByRole('button', { name: 'toolbar-button' });
     expect(toolbarButtons.length).toEqual(3);
 });
 
@@ -120,16 +120,16 @@ test("clicks on toolbar buttons register changes to pressed status, style update
     );
 
     await waitFor(() => {
-        screen.findByRole('menu', { name: 'Toolbar' })
-        screen.findAllByRole('button', { name: 'Toolbar-button' })
+        screen.findByRole('menu', { name: 'toolbar' })
+        screen.findAllByRole('button', { name: 'toolbar-button' })
     });
 
     // Verify toolbar is rendered.
-    const toolbar = screen.getByRole('menu', { name: 'Toolbar' });
+    const toolbar = screen.getByRole('menu', { name: 'toolbar' });
     expect(toolbar).toBeInTheDocument();
 
     // Verify individual toolbar buttons are rendered.
-    const toolbarButtons = screen.getAllByRole('button', { name: 'Toolbar-button' });
+    const toolbarButtons = screen.getAllByRole('button', { name: 'toolbar-button' });
     expect(toolbarButtons.length).toEqual(3);
 
     // Verify button is not clicked.
@@ -165,16 +165,16 @@ test("drawer button clicks reveal, hide filter elements", async() => {
     );
 
     await waitFor(() => {
-        screen.findByRole('menu', { name: 'Toolbar' })
-        screen.findAllByRole('button', { name: 'Toolbar-button' })
+        screen.findByRole('menu', { name: 'toolbar' })
+        screen.findAllByRole('button', { name: 'toolbar-button' })
     });
 
     // Verify toolbar is rendered.
-    const toolbar = screen.getByRole('menu', { name: 'Toolbar' });
+    const toolbar = screen.getByRole('menu', { name: 'toolbar' });
     expect(toolbar).toBeInTheDocument();
 
     // Verify individual toolbar buttons are rendered.
-    const toolbarButtons = screen.getAllByRole('button', { name: 'Toolbar-button' });
+    const toolbarButtons = screen.getAllByRole('button', { name: 'toolbar-button' });
     expect(toolbarButtons.length).toEqual(3);
 
     // Get target button.
@@ -266,7 +266,7 @@ test("bounds button calls mapbox's fitBounds method", async() => {
     });
 
     // Verify individual toolbar buttons are rendered.
-    const toolbarButtons = screen.getAllByRole('button', { name: 'Toolbar-button' });
+    const toolbarButtons = screen.getAllByRole('button', { name: 'toolbar-button' });
     expect(toolbarButtons.length).toEqual(3);
 
     // Get target button.

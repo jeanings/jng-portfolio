@@ -1,5 +1,5 @@
-import React, { useEffect } from 'react';
-import { useAppSelector, useAppDispatch, useMediaQueries } from '../../common/hooks';
+import React from 'react';
+import { useMediaQueries } from '../../common/hooks';
 import ToolbarButton, { ToolbarButtonProps } from './ToolbarButton';
 import './Toolbar.css';
 
@@ -14,7 +14,7 @@ const Toolbar: React.FunctionComponent = () => {
     
     return (
         <menu className={useMediaQueries(classBase)}
-            role="menu" aria-label={classBase}>
+            role="menu" aria-label={"toolbar"}>
             
             <div className={useMediaQueries(classBase.concat("__", "button-container"))}>
                 {createToolbarButton(classBase, 'filter')}

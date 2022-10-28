@@ -70,9 +70,9 @@ const ToolbarButton: React.FunctionComponent<ToolbarButtonProps> = (props: Toolb
    
 
     return (
-        <button className={props.baseClassName.concat("__", "button")} 
+        <button className={useMediaQueries(props.baseClassName.concat("__", "button"))} 
             id={props.baseClassName.concat("-", props.name)}
-            aria-label={props.baseClassName.concat("-", "button")}
+            aria-label={"toolbar".concat("-", "button")}
             aria-pressed="false"
             onClick={onToolbarButtonClick}>
                 

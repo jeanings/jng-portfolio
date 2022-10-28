@@ -10,7 +10,7 @@ import './MonthButton.css';
 
 /* =============================================================
     Button constructor for row of month items.
-    Clicks will dispatch to change ... state
+    Clicks will dispatch to change << timeline.month >> state
 ============================================================= */
 const MonthButton: React.FunctionComponent<MonthButtonProps> = (props: MonthButtonProps) => {
     const dispatch = useAppDispatch();
@@ -23,14 +23,14 @@ const MonthButton: React.FunctionComponent<MonthButtonProps> = (props: MonthButt
         and remove the same for the rest of the month selector elements.
     ------------------------------------------------------------------ */
     useEffect(() => {
-        switch(props.name) {
+        switch(props.month) {
             case 'all':
                 const defaultActiveMonthSelectorElem = document.getElementById("month-item-all") as HTMLElement;
                 defaultActiveMonthSelectorElem.setAttribute('aria-checked', 'true');
                 defaultActiveMonthSelectorElem.classList.add("active");
                 break;
             default: 
-                const monthSelectorElem = document.getElementById("month-item-".concat(props.name)) as HTMLElement;
+                const monthSelectorElem = document.getElementById("month-item-".concat(props.month)) as HTMLElement;
                 monthSelectorElem.setAttribute('aria-checked', 'false');
                 monthSelectorElem.classList.remove("active");
         }
@@ -71,14 +71,14 @@ const MonthButton: React.FunctionComponent<MonthButtonProps> = (props: MonthButt
 
     return (
         <div className={useMediaQueries(props.baseClassName.concat("__", props.className))}
-            id={props.className.concat('-', props.name)}
+            id={props.className.concat('-', props.month)}
             role="menuitemradio" aria-label={props.className}
             aria-checked="false"
             onClick={onMonthSelect}>
 
-                {props.name.toUpperCase()}
+                {props.month.toUpperCase()}
                 {/* Counter for images taken in the month */}
-                {createMonthCounter(props.name, props.baseClassName, props.keyIndex)}
+                {createMonthCounter(props.month, props.baseClassName, props.keyIndex)}
         </div>
     );
 }
@@ -91,12 +91,12 @@ const MonthButton: React.FunctionComponent<MonthButtonProps> = (props: MonthButt
 /* -----------------------------------------------------
     Wrapper for creating image counters for the month.
 ----------------------------------------------------- */
-function createMonthCounter(name: string, classBase: string, index: number) {
+function createMonthCounter(month: string, classBase: string, index: number) {
     let monthCounter : JSX.Element;
 
     monthCounter = (
         <MonthCounter
-            name={name}
+            month={month}
             baseClassName={classBase}
             className='month-counter'
             key={'key-month-counter_'.concat(index.toString())}
@@ -111,7 +111,7 @@ function createMonthCounter(name: string, classBase: string, index: number) {
     Types.
 ===================================================================== */
 export interface MonthButtonProps {
-    name: string,
+    month: string,
     baseClassName: string,
     className: string,
     keyIndex: number
