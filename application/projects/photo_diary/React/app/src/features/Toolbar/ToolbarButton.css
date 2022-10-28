@@ -1,0 +1,31 @@
+.Toolbar__button {
+    background: none;
+    border: none;
+    pointer-events: all;
+    cursor: pointer;
+    width: 80%;
+    justify-self: center;
+    transition: all 350ms;
+}
+
+    /* Disable directly interacting with icon svg itself. */
+    .Toolbar__button svg {
+        width: 2rem;
+        height: 2rem;
+        pointer-events: none;
+        transition: all 350ms;
+        fill: var(--colour-text-inactive);
+    }
+
+    .Toolbar__button:hover > svg {
+        fill: var(--colour-accent-secondary);
+    }
+
+    .Toolbar__button.active > svg {
+        fill: var(--colour-accent-primary);
+    }
+
+    /* Flip icon on x-axis */
+    #icon-side-panel {
+        transform: scaleX(-1);
+    }

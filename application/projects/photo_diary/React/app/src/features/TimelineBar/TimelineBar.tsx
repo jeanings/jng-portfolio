@@ -62,7 +62,7 @@ const TimelineBar: React.FunctionComponent = () => {
 
     return (
         <div className={useMediaQueries(classBase)}
-            role="region" aria-label="timeline">
+            role="region" aria-label="timeline-bar">
             <div className={useMediaQueries(classBase.concat("__", "year-selector"))}
                 role="menubar" aria-label="year-selector">
 
@@ -99,7 +99,7 @@ function createYearButton(year: string, index: number, classBase: string) {
 
     yearButton = (
         <YearButton
-            name={year}
+            year={year}
             baseClassName={classBase}
             className='year-item'
             key={'key-year_'.concat(index.toString())}
@@ -117,7 +117,7 @@ function createMonthButton(month: string, index: number, classBase: string) {
 
     monthButton = (
         <MonthButton 
-            name={month}
+            month={month}
             baseClassName={classBase}
             className='month-item'
             keyIndex={index}

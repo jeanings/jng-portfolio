@@ -1,14 +1,56 @@
 .FilterDrawer {
     grid-column: 2 / 3;
-    grid-row: 2 / -1;
+    grid-row: 2 / 3;
     display: grid;
     padding-left: 1.5rem;
     padding-right: 1.5rem;
     font-family: 'Barlow Condensed', sans-serif;
+    opacity: 0;
     pointer-events: none;
     user-select: none;
-    z-index: 2;
-}
+}    
+    
+    .FilterDrawer.show {
+        animation-name: filterDrawer-show;
+        animation-duration: 350ms;
+        animation-timing-function: ease-in;
+        animation-fill-mode: forwards;
+        z-index: 2;
+    }
+
+        @keyframes filterDrawer-show {
+            0% {
+                opacity: 0;
+            }
+
+            100% {
+                opacity: 1;
+            }
+        }
+
+    .FilterDrawer.hide {
+        animation-name: filterDrawer-hide;
+        animation-duration: 350ms;
+        animation-timing-function: ease-out;
+        animation-fill-mode: forwards;
+    }
+
+        @keyframes filterDrawer-hide {
+            0% {
+                opacity: 1;
+                z-index: 2;
+            }
+
+            99% {
+                opacity: 0.05;
+                z-index: 2
+            }
+
+            100% {
+                opacity: 0;
+                z-index: 0;
+            }
+        }
 
     .FilterDrawer__parameters-container {
         display: grid;
