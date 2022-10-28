@@ -7,7 +7,8 @@ import {
     setStyleLoadStatus, 
     setSourceStatus, 
     setMarkersStatus, 
-    cleanupMarkerSource } from './mapCanvasSlice';
+    cleanupMarkerSource,
+    setBoundsButton } from './mapCanvasSlice';
 import './MapCanvas.css';
 // @ts-ignore
 import mapboxgl from 'mapbox-gl'; 
@@ -91,6 +92,36 @@ const MapCanvas: React.FunctionComponent = () => {
     }, [bounds, mapState.styleLoaded]);
 
     
+    /* -------------------------------------------------
+        Map bounds-fitter for toolbar bounds button.
+    ------------------------------------------------- */
+    useEffect(() => {
+        if (mapState.sourceStatus === 'loaded'
+            && mapState.fitBoundsButton === 'clicked'
+            && bounds !== null) {
+                
+            // Adjust and zoom map to fit all markers. 
+            map.current.fitBounds(
+            bbox,
+            {
+                padding: {
+                    top: 150,
+                    bottom: 150,
+                    left: 250, 
+                    right: 250
+                },
+                linear: false,
+                animate: true,
+                duration: 3500,
+                curve: 1.2,
+                maxZoom: 13
+            });
+
+            dispatch(setBoundsButton('idle'));
+        }
+    }, [mapState.fitBoundsButton])
+
+
     // Add marker layer if map is set up.
     if (mapState.sourceStatus === 'loaded'
         && mapState.markersStatus === 'idle'
@@ -126,7 +157,7 @@ const MapCanvas: React.FunctionComponent = () => {
                 duration: 3500,
                 curve: 1.2,
                 maxZoom: 13
-            },
+            }
         );
 
         dispatch(setMarkersStatus('loaded'));

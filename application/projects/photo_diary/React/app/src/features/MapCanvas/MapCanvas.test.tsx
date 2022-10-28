@@ -83,7 +83,8 @@ const preloadedState: RootState = {
     mapCanvas: {
         styleLoaded: false,
         sourceStatus: 'idle',
-        markersStatus: 'idle'
+        markersStatus: 'idle',
+        fitBoundsButton: 'idle'
     }
 };
 
@@ -290,7 +291,8 @@ test("adds marker layer and fits map to bounds", async() => {
     expect(newStore.getState().mapCanvas).toEqual({
         'styleLoaded': true,
         'markersStatus': 'idle', 
-        'sourceStatus': 'loaded'
+        'sourceStatus': 'loaded',
+        'fitBoundsButton': 'idle'
     });
 
     // Map layer added and bounds fitted.
@@ -373,7 +375,8 @@ test("replaces previous layer and source on new data fetches", async() => {
     expect(newStore.getState().mapCanvas).toEqual({
         'styleLoaded': true,
         'markersStatus': 'idle', 
-        'sourceStatus': 'loaded'
+        'sourceStatus': 'loaded',
+        'fitBoundsButton': 'idle'
     });
 
     // Map layer added and bounds fitted.

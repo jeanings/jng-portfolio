@@ -14,7 +14,8 @@ import { RootState } from '../../app/store';
 const initialState: MapStatusProps = {
     styleLoaded: false,
     sourceStatus: 'idle',
-    markersStatus: 'idle'
+    markersStatus: 'idle',
+    fitBoundsButton: 'idle'
 };
 
 const mapCanvasSlice = createSlice({
@@ -29,18 +30,18 @@ const mapCanvasSlice = createSlice({
             const loadStatus: boolean = action.payload;
             state.styleLoaded = loadStatus;           
         },
-        /* -------------------------------------------------------
+        /* -------------------------------------
             Handles source added status.
             Affects marker layer adding effect.
-        ------------------------------------------------------- */
+        ------------------------------------- */
         setSourceStatus: (state, action: PayloadAction<MapStatusProps['sourceStatus']>) => {
             const sourceStatus: MapStatusProps['sourceStatus'] = action.payload;
             state.sourceStatus = sourceStatus;
         },
-         /* -------------------------------------------------------
+         /* ------------------------------------
             Handles marker layer added status.
             Affects marker layer adding effect.
-        ------------------------------------------------------- */
+        ------------------------------------- */
         setMarkersStatus: (state, action: PayloadAction<MapStatusProps['markersStatus']>) => {
             const markersStatus: MapStatusProps['markersStatus'] = action.payload;
             state.markersStatus = markersStatus;
@@ -53,6 +54,14 @@ const mapCanvasSlice = createSlice({
             const markerSourceStatus: MapStatusProps['markersStatus'] = action.payload;
             state.markersStatus = markerSourceStatus;
             state.sourceStatus = markerSourceStatus;
+        },
+        /* --------------------------------------------
+            Handles fitBounds toolbar button.
+            Calls hook in MapCanvas to call fitBounds.
+        -------------------------------------------- */
+        setBoundsButton: (state, action: PayloadAction<MapStatusProps['fitBoundsButton']>) => {
+            const fitBoundsStatus: MapStatusProps['fitBoundsButton'] = action.payload;
+            state.fitBoundsButton = fitBoundsStatus;
         }
     }
 });
@@ -62,10 +71,11 @@ const mapCanvasSlice = createSlice({
     Types.
 ===================================================================== */
 export interface MapStatusProps {
-    [index: string]: boolean | 'idle' | 'loaded',
+    [index: string]: boolean | 'idle' | 'loaded' | 'clicked',
     styleLoaded: boolean,
     sourceStatus: 'idle' | 'loaded',
-    markersStatus: 'idle' | 'loaded'
+    markersStatus: 'idle' | 'loaded',
+    fitBoundsButton: 'idle' | 'clicked'
 };
 
 
@@ -75,5 +85,10 @@ export const mapCanvas = (state: RootState) => state.mapCanvas;
 
 // Export actions, reducers.
 const { actions, reducer } = mapCanvasSlice;
-export const { setStyleLoadStatus, setSourceStatus, setMarkersStatus, cleanupMarkerSource } = actions;
+export const {
+    setStyleLoadStatus, 
+    setSourceStatus, 
+    setMarkersStatus, 
+    cleanupMarkerSource, 
+    setBoundsButton } = actions;
 export default reducer;

@@ -4,12 +4,13 @@
 }
   
 .App {
+    --month-column: calc(50vw - 6.5rem - 1.5rem);
     grid-column: 1 / -1;
     grid-row: 1 / -1;
     min-height: 100%;
     display: grid;
-    grid-template-columns: 6.5rem 45vw auto;
-    grid-template-rows: 3.5rem auto;
+    grid-template-columns: 6.5rem var(--month-column) auto;
+    grid-template-rows: 3.5rem auto 3.5rem;
     column-gap: 1.5rem;
     row-gap: 2rem;
     background-color: var(--colour-background);
