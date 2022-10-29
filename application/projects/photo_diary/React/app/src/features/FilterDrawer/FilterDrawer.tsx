@@ -154,7 +154,7 @@ const FilterDrawer: React.FunctionComponent = () => {
             : classNameAddOn = "unavailable";
 
         return classNameAddOn;
-    }
+    };
     
    
   
@@ -198,27 +198,36 @@ const FilterDrawer: React.FunctionComponent = () => {
     Constructor for filter drawer categories.
 -------------------------------------------- */
 function createCategory(classNames: ClassNameTypes, categoryName: string, selectables: Array<string | number>) {
+    let sortedSelectables: Array<string | number> = [];
+    if (selectables.length !== 0) {
+        sortedSelectables = [...selectables].sort();
+    } 
+
     return (
         <div className={classNames['parent']} id={categoryName}
             role="group" aria-label={"filter-drawer".concat("-", categoryName)}>
 
             <h1 className={classNames['title']}>
-                {categoryName !== "focalLength"
-                    ? categoryName.toUpperCase()
-                    : "FOCAL LENGTH"}
+                {
+                    categoryName !== "focalLength"
+                        ? categoryName.toUpperCase()
+                        : "FOCAL LENGTH"
+                }
             </h1>
 
             <div className={classNames['options']}
                 role="group" aria-label={"filter-drawer".concat("-", categoryName, "-options")}>
                 
                 {/* Generate buttons for all the values in each filter category. */}
-                {selectables.map((selectable, index) => (
-                    <FilterButton
-                        baseClassName={classNames['base']}
-                        categoryName={categoryName}
-                        selectable={selectable}
-                        key={"key".concat("_", categoryName, "_", index.toString())}
-                    />))
+                {
+                    sortedSelectables.map((selectable, index) => (
+                        <FilterButton
+                            baseClassName={classNames['base']}
+                            categoryName={categoryName}
+                            selectable={selectable}
+                            key={"key".concat("_", categoryName, "_", index.toString())}
+                        />
+                    ))
                 }
             </div>
         </div>
