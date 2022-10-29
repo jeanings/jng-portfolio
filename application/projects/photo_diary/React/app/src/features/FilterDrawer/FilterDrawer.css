@@ -2,8 +2,8 @@
     grid-column: 2 / 3;
     grid-row: 2 / 3;
     display: grid;
-    padding-left: 1.5rem;
-    padding-right: 1.5rem;
+    padding-left: 1rem;
+    padding-right: 0.5rem;
     font-family: 'Barlow Condensed', sans-serif;
     opacity: 0;
     pointer-events: none;
@@ -108,4 +108,41 @@
             row-gap: 0.25rem;
             align-content: start;
             justify-content: start;
+        }
+    
+    .FilterDrawer__reset {
+        background: none;
+        border: none;
+        grid-column: 2 / -1;
+        grid-row: 5 / -1;
+        width: 3rem;
+        height: 3rem;
+        align-self: end;
+        justify-self: end;
+        pointer-events: all;
+        cursor: pointer;
+    }
+
+        .FilterDrawer__reset svg {
+            width: 100%;
+            height: 100%;
+            fill: var(--colour-text-inactive);
+            transition: all 350ms;
+            pointer-events: none;
+        }
+
+        .FilterDrawer__reset:hover svg {
+            fill: var(--colour-accent-secondary);
+        }
+
+        .FilterDrawer__reset.unavailable {
+            cursor: no-drop;
+        }
+
+        .FilterDrawer__reset.unavailable svg {
+            fill: hsla(0, 0%, 25%, 0.3);
+        }
+        
+        .FilterDrawer__reset.unavailable:hover svg {
+            fill: hsla(0, 0%, 25%, 0.3);
         }

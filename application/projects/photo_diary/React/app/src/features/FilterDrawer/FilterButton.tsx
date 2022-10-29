@@ -13,7 +13,6 @@ import './FilterButton.css';
 ==================================================================== */
 const FilterButton: React.FunctionComponent<FilterButtonProps> = (props: FilterButtonProps) => {
     const dispatch = useAppDispatch();
-    const classBase = useMediaQueries(props.baseClassName);
     
     /* ------------------------------------------------------------
         Handle clicks on buttons.
@@ -102,7 +101,7 @@ const FilterButton: React.FunctionComponent<FilterButtonProps> = (props: FilterB
    
 
     return (
-        <button className={useMediaQueries(classBase.concat("__", "buttons"))}
+        <button className={useMediaQueries(props.baseClassName.concat("__", "buttons"))}
             role="checkbox" aria-label={"filter-drawer".concat("-", props.categoryName, "-item")}
             aria-pressed="false"
             onClick={onFilterClick}>
