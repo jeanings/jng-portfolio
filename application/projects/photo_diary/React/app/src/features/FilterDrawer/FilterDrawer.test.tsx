@@ -310,6 +310,102 @@ describe("on filter button clicks", () => {
             });
         });
     });
+
+
+    test("clicks on reset button clears all filters", async() => {
+        const newStore = setupStore(preloadedState);
+        render(
+            <Provider store={newStore}>
+                <FilterDrawer />
+            </Provider>
+        );
+    
+        expect(newStore.getState().timeline.request).toEqual('complete');
+        // Verify filter to click's state is blank.
+        expect(newStore.getState().filter.film!.length).toEqual(0);
+        
+        // Wait for elements to render.
+        await waitFor(() => screen.findAllByRole('checkbox'));
+        const filterButtons = screen.getAllByRole('checkbox');
+    
+        // Mock-click a bunch of filter buttons.
+        const buttonsCategory: object = {
+            'film': 'Kodak Gold 200',
+            'formatType': '35mm',
+            'tags': 'day'
+        };
+        let filterButtonsToClick = filterButtons.filter(button => 
+            Object.values(buttonsCategory).includes(button.textContent as string));
+
+        for (let button of filterButtonsToClick) {
+            button.setAttribute('aria-pressed', 'true');
+            let filterName = button.textContent as string;
+            let filterType = '';
+
+            for (let option of Object.entries(buttonsCategory)) {
+                if (filterName === option[1]) {
+                    filterType = option[0]
+                }
+            }
+            
+            let payload = { [filterType]: filterName };
+            newStore.dispatch(addFilter(payload));
+            expect(newStore.getState().filter[filterType]).toContain(filterName);
+        };
+
+        // Click reset button
+        const resetButton = screen.getByRole('button', { name: 'filter-drawer-reset' })
+        expect(resetButton).toBeInTheDocument();
+        await waitFor(() => user.click(resetButton));
+    
+        for (let option of Object.entries(buttonsCategory)) {
+            expect(newStore.getState().filter[option[0]]).not.toContain(option[1]);
+        }
+    });
+
+
+    test("grey-out reset button if no filters selected", async() => {
+        const newStore = setupStore(preloadedState);
+        render(
+            <Provider store={newStore}>
+                <FilterDrawer />
+            </Provider>
+        );
+
+        expect(newStore.getState().timeline.request).toEqual('complete');
+        // Verify filter to click's state is blank.
+        expect(newStore.getState().filter.film!.length).toEqual(0);
+        
+        // Wait for elements to render.
+        await waitFor(() => screen.findAllByRole('checkbox'));
+        const filterButtons = screen.getAllByRole('checkbox');
+
+        // Mock-click a filter button.
+        const buttonsCategory: object = {
+            'film': 'Kodak Gold 200',
+        };
+        let filterButtonToClick = filterButtons.filter(button => 
+            Object.values(buttonsCategory).includes(button.textContent as string))[0];
+        
+        filterButtonToClick.setAttribute('aria-pressed', 'true');
+        let filterType = Object.keys(buttonsCategory)[0];
+        let filterName = Object.values(buttonsCategory)[0];        
+        let payload = { [filterType]: filterName };
+        newStore.dispatch(addFilter(payload));
+        expect(newStore.getState().filter[filterType]).toContain(filterName);
+        
+        const resetButton = screen.getByRole('button', { name: 'filter-drawer-reset' })
+        expect(resetButton).toBeInTheDocument();
+
+        // Verify reset button not greyed out.
+        expect(resetButton).not.toHaveClass("unavailable");
+
+        // Click reset button.
+        await waitFor(() => user.click(resetButton));
+        
+        // Verify reset button greyed out.
+        expect(resetButton).toHaveClass("unavailable");
+    });
 });
 
 
@@ -366,7 +462,7 @@ test("<< filter >> state resets to initial state when year is changed", async() 
     
     // Filters get cleared.
     expect(newStore.getState().filter.film!.length).toEqual(0);        
-})
+});
 
 
 test("dispatches fetch request on << filter >> state changes", async() => {
