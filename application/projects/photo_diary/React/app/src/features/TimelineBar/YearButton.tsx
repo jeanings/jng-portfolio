@@ -22,10 +22,23 @@ const YearButton: React.FunctionComponent<YearButtonProps> = (props: YearButtonP
             props.baseClassName.concat("__", props.className));
 
         // Reset all radios to false.
-        for (let element of Array.from(yearElems)) {
-            element.setAttribute('aria-checked', 'false');
+        for (let yearElem of Array.from(yearElems)) {
+            yearElem.setAttribute('aria-checked', 'false');
         }
 
+        // Set active month to 'all', unset the rest.
+        const monthSelectorElems = document.getElementsByClassName(
+            props.baseClassName.concat("__", "month-item"));
+
+        for (let monthSelectorElem of Array.from(monthSelectorElems)) {
+            monthSelectorElem.setAttribute('aria-checked', 'false');
+            monthSelectorElem.classList.remove("active");
+        }
+
+        const defaultMonthSelectorElem = document.getElementById("month-item-all") as HTMLElement;
+        defaultMonthSelectorElem.setAttribute('aria-checked', 'true');
+        defaultMonthSelectorElem.classList.add("active");
+        
         // Get clicked year text and set to checked.
         const yearSelectElemText: string = yearSelectElem.textContent as string;
         yearSelectElem.setAttribute('aria-checked', 'true');

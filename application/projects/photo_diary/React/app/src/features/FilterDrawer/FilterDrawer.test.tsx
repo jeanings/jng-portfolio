@@ -37,10 +37,10 @@ afterEach(() => {
 const preloadedState: RootState = {
     timeline: {
         request: 'complete',
+        query: { year: 2022 },
         yearInit: 2022,
         yearSelected: 2022,
         years: mockDefaultData.years,
-        month: 'all',
         counter: {
             'all': 0,
             'jan': 0, 'feb': 0, 'mar': 0,
@@ -57,6 +57,7 @@ const preloadedState: RootState = {
         },
         imageDocs: null,
         filterSelectables: mockDefaultData.filterSelectables[0],
+        filteredSelectables: null,
         geojson: null,
         bounds: null
     },
@@ -80,13 +81,14 @@ const preloadedState: RootState = {
 const preloadedStateWithFilter: RootState = {
     timeline: {
         request: 'complete',
+        query: { year: 2022 },
         yearInit: 2022,
         yearSelected: 2022,
         years: mockDefaultData.years,
-        month: 'jan',
         counter: preloadedState.timeline.counter,
         imageDocs: preloadedState.timeline.imageDocs,
         filterSelectables: mockDefaultData.filterSelectables[0],
+        filteredSelectables: null,
         geojson: null,
         bounds: null
     },

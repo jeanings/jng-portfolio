@@ -91,18 +91,18 @@ export const fetchDocs = (apiUrl: string, request: ImageDocsRequestProps) => {
 // State for initial render.
 const initialState: TimelineProps = {
     request: 'idle',
+    query: null,
     yearInit: null,
     yearSelected: null,
     years: null,
-    month: 'all',
     counter: {
-        'all': 0,
+        'all': 0,   // For actual counts.
         'jan': 0, 'feb': 0, 'mar': 0,
         'apr': 0, 'may': 0, 'jun': 0,
         'jul': 0, 'aug': 0, 'sep': 0,
         'oct': 0, 'nov': 0, 'dec': 0,
         'previous': {
-            'all': 0,
+            'all': 0,   // For visual rolling counter.
             'jan': 0, 'feb': 0, 'mar': 0,
             'apr': 0, 'may': 0, 'jun': 0,
             'jul': 0, 'aug': 0, 'sep': 0,
@@ -111,6 +111,7 @@ const initialState: TimelineProps = {
     },
     imageDocs: null,
     filterSelectables: null,
+    filteredSelectables: null,
     geojson: null,
     bounds: null
 };
@@ -119,10 +120,6 @@ const timelineSlice = createSlice({
     name: 'timeline',
     initialState,
     reducers: {
-        handleTimelineMonth: (state, action: PayloadAction<TimelineProps['month']>) => {
-            const selectedMonth = action.payload;
-            state.month = selectedMonth;
-        },
         handleMonthCounter: (state, action) => {
             const month = action.payload.month;
             const count = action.payload.count;
@@ -140,18 +137,25 @@ const timelineSlice = createSlice({
             ------------------------------------- */
             .addCase(fetchImagesData.fulfilled, (state, action) => {
                 const data = action.payload;
+                const args = action.meta.arg;
                 const counter: CounterTypes = data.counter;
                 const filterSelectables: FilterableTypes = data.filterSelectables[0];
+                const filteredSelectables: FilterableTypes = data.filteredSelectables;
                 const imageDocs: Array<ImageDocTypes> = data.docs;
                 const years: Array<string> = data.years;
                 const geojsonFeatures: GeojsonFeatureCollectionProps = data.featureCollection;
                 const bbox: BboxType = data.bounds;
 
-                // Set states.
+                /* ----------------------------
+                    Set << timeline >> states.
+                ---------------------------- */
+                state.query = args;
+
+                // Assigning year-related states on init.
                 if (state.yearInit === null) {
                     const yearInit: number = action.meta.arg.year !== 'default'
                         ? action.meta.arg.year          // Sets to year of fetch request
-                        : imageDocs[0].date.year        // Sets to year of image docs if default
+                        : imageDocs[0].date.year        // Sets to year of image docs if 'default'
                     state.yearInit = yearInit;
                     state.yearSelected = yearInit;
                 }
@@ -159,11 +163,23 @@ const timelineSlice = createSlice({
                     state.yearSelected = imageDocs[0].date.year as number;
                 }
                 state.years = years;
-                state.counter = {...counter, 'previous': state.counter.previous};
-                state.imageDocs = imageDocs;
-                if (Object.keys(action.meta.arg).length === 1) {    // Only set filter selectables
-                    state.filterSelectables = filterSelectables;    // if only 1 arg - ie only 'year'
+                
+                // Don't update counters on month queries.
+                if (args['month'] === undefined) {
+                    state.counter = {...counter, 'previous': state.counter.previous};
                 }
+                
+                state.imageDocs = imageDocs;
+
+                // Set main selectables only on single 'year' queries.
+                if (Object.keys(args).length === 1) {
+                    state.filterSelectables = filterSelectables;
+                }
+                // For use in disabling filter buttons. 
+                else {
+                    state.filteredSelectables = filteredSelectables;
+                }
+
                 state.geojson = geojsonFeatures;
                 state.bounds = bbox;
                 state.request = 'complete';
@@ -185,13 +201,14 @@ const timelineSlice = createSlice({
 export interface TimelineProps {
     [index: string]: string | any,
     'request': 'idle' | 'pending' | 'complete' | 'error',
+    'query': ImageDocsRequestProps | null,
     'yearInit': number | null,
     'yearSelected': number | null,
     'years': Array<string> | null,
-    'month': TimelineMonthTypes,
     'counter': CounterTypes,
     'imageDocs': Array<ImageDocTypes> | null,
     'filterSelectables': FilterableTypes | null,
+    'filteredSelectables': FilterableTypes | null, 
     'geojson': GeojsonFeatureCollectionProps | null
     'bounds': BboxType | null
 };
@@ -317,5 +334,5 @@ export const timelineSelection = (state: RootState) => state.timeline;
 
 // Export actions, reducers.
 const { actions, reducer } = timelineSlice;
-export const { handleTimelineMonth, handleMonthCounter } = actions;
+export const { handleMonthCounter } = actions;
 export default reducer;

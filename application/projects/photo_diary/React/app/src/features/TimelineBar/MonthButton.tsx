@@ -3,7 +3,10 @@ import {
     useAppDispatch, 
     useAppSelector,
     useMediaQueries } from '../../common/hooks';
-import { handleTimelineMonth, TimelineProps } from './timelineSlice';
+import { 
+    fetchImagesData, 
+    TimelineProps, 
+    ImageDocsRequestProps } from './timelineSlice';
 import MonthCounter from './MonthCounter';
 import './MonthButton.css';
 
@@ -17,24 +20,16 @@ const MonthButton: React.FunctionComponent<MonthButtonProps> = (props: MonthButt
     const yearSelected = useAppSelector(state => state.timeline.yearSelected);
 
     /* ------------------------------------------------------------------
-        On year selected changes, set 'ALL' months selector to 
+        On initialization, set 'ALL' months selector to 
             - aria-checked true
             - active class styling
-        and remove the same for the rest of the month selector elements.
     ------------------------------------------------------------------ */
     useEffect(() => {
-        switch(props.month) {
-            case 'all':
-                const defaultActiveMonthSelectorElem = document.getElementById("month-item-all") as HTMLElement;
-                defaultActiveMonthSelectorElem.setAttribute('aria-checked', 'true');
-                defaultActiveMonthSelectorElem.classList.add("active");
-                break;
-            default: 
-                const monthSelectorElem = document.getElementById("month-item-".concat(props.month)) as HTMLElement;
-                monthSelectorElem.setAttribute('aria-checked', 'false');
-                monthSelectorElem.classList.remove("active");
-        }
-    }, [yearSelected]);
+        // Set active month to 'all', unset the rest.
+        const defaultMonthSelectorElem = document.getElementById("month-item-all") as HTMLElement;
+        defaultMonthSelectorElem.setAttribute('aria-checked', 'true');
+        defaultMonthSelectorElem.classList.add("active");
+    }, []);
 
 
     /* ------------------------------------------------------------------
@@ -57,15 +52,21 @@ const MonthButton: React.FunctionComponent<MonthButtonProps> = (props: MonthButt
         }
 
         // Change to clicked month.
-        const monthElemToSelectName: string = monthElemToSelect.textContent!.replace(/\d/, "");
         monthElemToSelect.setAttribute('aria-checked', 'true');
 
         // Update styling and highlight new month.
         monthElemToSelect.classList.add("active");
 
         // Dispatch selected month to reducer.
-        const payloadMonth = monthElemToSelectName.toLowerCase() as TimelineProps["month"];
-        dispatch(handleTimelineMonth(payloadMonth));
+        const monthElemToSelectName: string = monthElemToSelect.textContent!.replace(/\d+/, "");
+        const monthNum = getNumericalMonth(monthElemToSelectName.toLowerCase());
+
+        const monthQuery: ImageDocsRequestProps= {
+            'year': yearSelected as number,
+            'month': monthNum
+        };
+
+        dispatch(fetchImagesData(monthQuery));
     };
     
 
@@ -77,7 +78,7 @@ const MonthButton: React.FunctionComponent<MonthButtonProps> = (props: MonthButt
             onClick={onMonthSelect}>
 
                 {props.month.toUpperCase()}
-                {/* Counter for images taken in the month */}
+                {/* Generate counter for images taken in the month */}
                 {createMonthCounter(props.month, props.baseClassName, props.keyIndex)}
         </div>
     );
@@ -105,6 +106,23 @@ function createMonthCounter(month: string, classBase: string, index: number) {
 
     return monthCounter;
 }
+
+/* -----------------------------------
+    Month to numerical month mapper.
+----------------------------------- */
+function getNumericalMonth(month: string) {
+    const monthToNum: { [key: string]: number } = {
+        'jan': 1, 'feb': 2, 'mar': 3,
+        'apr': 4, 'may': 5, 'jun': 6,
+        'jul': 7, 'aug': 8, 'sep': 9,
+        'oct': 10, 'nov': 11, 'dec': 12
+    };
+
+    const monthNum: number = monthToNum[month];
+
+    return monthNum
+};
+
 
 
 /* =====================================================================
