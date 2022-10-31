@@ -1,5 +1,7 @@
 import React from 'react';
-import { useAppDispatch, useAppSelector, useMediaQueries } from '../../common/hooks';
+import { useAppDispatch, useMediaQueries } from '../../common/hooks';
+import { resetFilterStyling } from '../FilterDrawer/FilterDrawer';
+import { clearFilters } from '../FilterDrawer/filterDrawerSlice';
 import { fetchImagesData, ImageDocsRequestProps } from './timelineSlice';
 import './YearButton.css';
 
@@ -46,7 +48,6 @@ const YearButton: React.FunctionComponent<YearButtonProps> = (props: YearButtonP
         // Change selected year to clicked year.
         const yearSelectedElem: HTMLElement = document.querySelector(
             ".".concat(props.baseClassName, "__", "year-selected")) as HTMLElement;
-        
         if (yearSelectedElem) {
             yearSelectedElem.textContent = yearSelectElemText;
         }
@@ -56,6 +57,8 @@ const YearButton: React.FunctionComponent<YearButtonProps> = (props: YearButtonP
             'year': parseInt(yearSelectElemText)
         };
 
+        resetFilterStyling();
+        dispatch(clearFilters("RESET TO INIT STATE"));
         dispatch(fetchImagesData(payloadForYear));
     };
     

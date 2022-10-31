@@ -20,6 +20,7 @@ const FilterDrawer: React.FunctionComponent = () => {
     const dispatch = useAppDispatch();
     const filterables = useAppSelector(state => state.timeline.filterSelectables);
     const yearSelected = useAppSelector(state => state.timeline.yearSelected);
+    const queried = useAppSelector(state => state.timeline.query);
     const filterState = useAppSelector(state => state.filter);
     const classBase: string = "FilterDrawer";
     const classNames: ClassNameTypes = {
@@ -35,11 +36,25 @@ const FilterDrawer: React.FunctionComponent = () => {
         as those are fixed to the selected year.
     ------------------------------------------------------------- */
     useEffect(() => {
-        if (yearSelected !== null) {
+        let filterStatus: string = 'off';
+        for (let category in filterState) {
+            if (filterState[category]!.length > 0) {
+                filterStatus = 'on';
+                break;
+            }
+        }
+
+        // Only traverse to dispatch action filter activated.
+        if (filterStatus === 'on') {
             let filterQueries: ImageDocsRequestProps= {
                 'year': yearSelected as number
             }
-            
+
+            // Add month query if used.
+            if (queried!['month'] !== undefined) {
+                filterQueries['month'] = queried!['month'] as number
+            }
+
             // Assign correct string for keys.
             for (let category in filterState) {
                 if (filterState[category]!.length > 0) {
@@ -73,33 +88,13 @@ const FilterDrawer: React.FunctionComponent = () => {
         }
     }, [filterState]);
 
-
-    /* ---------------------------
-        Dispatches reset action.
-    --------------------------- */
-    function resetFilters() {
-        // Clear all "active" styling on pressed buttons.
-        document.querySelectorAll('[role="checkbox"]').forEach(button =>
-            button.classList.remove("active")
-        );
-        
-        dispatch(clearFilters("RESET TO INIT STATE"));
-    };
-
-
-    /* ---------------------------------------------
-        Clear << filter >> state on changing year. 
-    --------------------------------------------- */
-    useEffect(() => {
-        resetFilters();
-    }, [yearSelected])
-
-
+    
     /* -----------------------------------------------
         Handle button for resetting of filter state.
     ----------------------------------------------- */
     const onResetClick = (event: React.SyntheticEvent) => {
-        resetFilters();
+        resetFilterStyling();
+        dispatch(clearFilters("RESET TO INIT STATE"));
     };
 
 
@@ -234,6 +229,17 @@ function createCategory(classNames: ClassNameTypes, categoryName: string, select
     )
 }
 
+
+/* -------------------------
+    Resets filter styling.
+------------------------- */
+export function resetFilterStyling() {
+    // Clear all "active" styling on pressed buttons.
+    document.querySelectorAll('[role="checkbox"]').forEach(button => {
+        button.classList.remove("active");
+        button.setAttribute('aria-pressed', 'false');
+    });
+};
 
 /* =====================================================================
     Types.

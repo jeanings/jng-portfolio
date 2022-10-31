@@ -424,8 +424,6 @@ test("<< filter >> state resets to initial state when year is changed", async() 
     // Mocked Axios calls.
     mockAxios = new MockAdapter(axios);
     mockAxios
-        .onGet(apiUrl, { params: { 'year': 2022, 'format-medium': 'film' } })
-        .replyOnce(200, mock2015Data)
         .onGet(apiUrl, { params: { 'year': 2015 } })
         .replyOnce(200, mock2015Data)
     /* --------------------------------------------------------
@@ -440,23 +438,12 @@ test("<< filter >> state resets to initial state when year is changed", async() 
         </Provider>
     );
 
-    expect(newStore.getState().timeline.request).toEqual('complete');
-    // Verify filter to click's state is blank.
-    expect(newStore.getState().filter.film!.length).toEqual(0);
-    
     // Wait for elements to render.
     await waitFor(() => screen.findAllByRole('menuitemradio', { name: 'year-item'}));
     const yearElems = screen.getAllByRole('menuitemradio', { name: 'year-item' });
 
-    await waitFor(() => screen.findAllByRole('checkbox', { name: "filter-drawer-film-item" }));
-    const filterButtons = screen.getAllByRole('checkbox', { name: "filter-drawer-film-item" });
-
-    // Get filter button element to click: FILM -> Kodak Gold 200.
-    let filterButtonToClick = filterButtons.filter(button => button.textContent === 'Kodak Gold 200')[0];
-    await waitFor(() => user.click(filterButtonToClick));
-
     // Verify filter state isn't blank.
-    await waitFor(() => expect(newStore.getState().filter.film).toContain(filterButtonToClick.textContent));
+    expect(newStore.getState().filter.film!.length).not.toEqual(0);
 
     // Click on a year.
     const yearSelectElem = yearElems.find(element => element.textContent === '2015') as HTMLElement;
@@ -465,7 +452,7 @@ test("<< filter >> state resets to initial state when year is changed", async() 
     // Wait for fetch to resolve.
     await waitFor(() => expect(newStore.getState().timeline.yearSelected).toEqual(2015));
     
-    // Filters get cleared.
+    // Verify filters get cleared.
     expect(newStore.getState().filter.film!.length).toEqual(0);        
 });
 
@@ -506,8 +493,7 @@ test("dispatches fetch request on << filter >> state changes", async() => {
     let filterButtonToClick = filterButtons.filter(button => button.textContent === 'film')[0];
     await waitFor(() => user.click(filterButtonToClick));
 
-    expect(newStore.getState().filter.formatMedium).toContain('film');
-
+    expect(newStore.getState().filter.formatMedium).toContain('film')
     // Verify fetch returning different set of data.
     expect(newStore.getState().timeline.counter.all).not.toEqual(40);
 });
