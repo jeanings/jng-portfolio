@@ -162,24 +162,26 @@ const timelineSlice = createSlice({
                 else {
                     state.yearSelected = imageDocs[0].date.year as number;
                 }
+
+                // Assign list of years in the collection.
                 state.years = years;
                 
-                // Don't update counters on month queries.
+                // For non-month queries, update counter and clear filteredSelectables.
                 if (args['month'] === undefined) {
                     state.counter = {...counter, 'previous': state.counter.previous};
+                    state.filteredSelectables = null;
+                }
+                // Only assign filteredSelectables if month query.
+                else {
+                    state.filteredSelectables = filteredSelectables;
                 }
                 
-                state.imageDocs = imageDocs;
-
                 // Set main selectables only on single 'year' queries.
                 if (Object.keys(args).length === 1) {
                     state.filterSelectables = filterSelectables;
                 }
-                // For use in disabling filter buttons. 
-                else {
-                    state.filteredSelectables = filteredSelectables;
-                }
 
+                state.imageDocs = imageDocs;
                 state.geojson = geojsonFeatures;
                 state.bounds = bbox;
                 state.request = 'complete';
