@@ -1,9 +1,10 @@
 .FilterDrawer {
-    grid-column: 2 / 3;
+    grid-column: 2 / 4;
     grid-row: 2 / 3;
     display: grid;
+    grid-template-columns: 100%;
+    grid-template-rows: 100%;
     padding-left: 1rem;
-    padding-right: 0.5rem;
     font-family: 'Barlow Condensed', sans-serif;
     opacity: 0;
     pointer-events: none;
@@ -54,9 +55,9 @@
 
     .FilterDrawer__parameters-container {
         display: grid;
-        row-gap: 2rem;
-        column-gap: 2rem;
-        grid-template-columns: 50% 50%;
+        row-gap: 1rem;
+        column-gap: 1.5rem;
+        grid-template-columns: 36% 64%;
         grid-template-rows: repeat(5, 1fr);
     }
 
@@ -113,12 +114,13 @@
     .FilterDrawer__reset {
         background: none;
         border: none;
-        grid-column: 2 / -1;
-        grid-row: 5 / -1;
+        display: block;
         width: 3rem;
         height: 3rem;
+        position: absolute;
+        left: calc(50vw - 1.5rem);      /* minus half of button width */
         align-self: end;
-        justify-self: end;
+        justify-self: center;
         pointer-events: all;
         cursor: pointer;
     }

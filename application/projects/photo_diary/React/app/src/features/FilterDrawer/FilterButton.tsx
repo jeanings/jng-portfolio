@@ -1,5 +1,8 @@
 import React from 'react';
-import { useAppDispatch, useMediaQueries } from '../../common/hooks';
+import { 
+    useAppDispatch, 
+    useAppSelector, 
+    useMediaQueries } from '../../common/hooks';
 import { 
     addFilter, 
     removeFilter, 
@@ -13,7 +16,42 @@ import './FilterButton.css';
 ==================================================================== */
 const FilterButton: React.FunctionComponent<FilterButtonProps> = (props: FilterButtonProps) => {
     const dispatch = useAppDispatch();
+    const baseSelectables = useAppSelector(state => state.timeline.filterSelectables);
+    const monthSelectables = useAppSelector(state => state.timeline.filteredSelectables);
+
+    /* ---------------------------------------------------------
+        Gets add-on to class name for greying out reset button
+        when no filters are selected.
+    --------------------------------------------------------- */
+    const getAvailability = () => {
+        let buttonsToDisable: Array<string | number | null> = [];
+        let classNameAddOn: string = '';
+
+        if (baseSelectables !== null) {
+            for (let filter of Object.entries(baseSelectables)) {
+                const category = filter[0];
+                const itemList = filter[1] as Array<string | number | null>;
+        
+                if (monthSelectables !== null) {
+                    let difference = itemList?.filter(x => 
+                        !monthSelectables[category]?.includes(x)
+                    );
+                    
+                    // Append non-intersecting values of base/month selectables.
+                    buttonsToDisable = [...buttonsToDisable, ...difference];
+                }
+            }
+        }
+            
+        // Assign styling through classname.
+        buttonsToDisable.includes(props.selectableName) === false
+            ? classNameAddOn = ""
+            : classNameAddOn = "unavailable";
+
+        return classNameAddOn;
+    };
     
+
     /* ------------------------------------------------------------
         Handle clicks on buttons.
         Dispatches addFilter or removeFilter actions depending if 
@@ -81,7 +119,7 @@ const FilterButton: React.FunctionComponent<FilterButtonProps> = (props: FilterB
                 break;
 
             case 'filter-drawer-focalLength-item':
-                // Metadata have focal lengths in int, cleaning string is necessary.
+                // Metadata has focal lengths in int, cleaning string is necessary.
                 const focalLength: number = parseInt(buttonText.replace('mm', ''));
                 payloadFilter = { 'focalLength': focalLength };
                 ariaPressed === 'true'
@@ -101,14 +139,15 @@ const FilterButton: React.FunctionComponent<FilterButtonProps> = (props: FilterB
    
 
     return (
-        <button className={useMediaQueries(props.baseClassName.concat("__", "buttons"))}
+        <button 
+            className={useMediaQueries(props.baseClassName.concat("__", "buttons")) + getAvailability()}
             role="checkbox" aria-label={"filter-drawer".concat("-", props.categoryName, "-item")}
             aria-pressed="false"
             onClick={onFilterClick}>
 
                 {props.categoryName === 'focalLength'
-                    ? props.selectable.toString().concat('mm')      // Add focal length unit.
-                    : props.selectable}
+                    ? props.selectableName.toString().concat('mm')      // Add focal length unit.
+                    : props.selectableName}
                 
         </button>
     );
@@ -121,7 +160,7 @@ const FilterButton: React.FunctionComponent<FilterButtonProps> = (props: FilterB
 export interface FilterButtonProps {
     'baseClassName': string,
     'categoryName': string,
-    'selectable': string | number
+    'selectableName': string | number
 };
 
 

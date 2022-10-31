@@ -3,6 +3,7 @@ import { Provider } from 'react-redux';
 import { setupStore, RootState } from '../../app/store';
 import { 
     cleanup, 
+    getAllByRole, 
     render, 
     screen, 
     waitFor } from '@testing-library/react';
@@ -13,8 +14,10 @@ import { apiUrl } from '../../app/App';
 import '@testing-library/jest-dom';
 import mockDefaultData from '../../utils/mockDefaultData.json';
 import mock2022Data from '../../utils/mock2022Data.json';
+import mock2022DataJun from '../../utils/mock2022DataJun.json';
 import mock2015Data from '../../utils/mock2015Data.json';
 import TimelineBar from '../TimelineBar/TimelineBar';
+import { TimelineProps } from '../TimelineBar/timelineSlice';
 import FilterDrawer from './FilterDrawer';
 import { addFilter } from './filterDrawerSlice';
 
@@ -507,4 +510,76 @@ test("dispatches fetch request on << filter >> state changes", async() => {
 
     // Verify fetch returning different set of data.
     expect(newStore.getState().timeline.counter.all).not.toEqual(40);
+});
+
+
+test("disables/greys out filter buttons not available on selected month", async() => {
+    /* --------------------------------------------------------
+        Mocks                                          start
+    -------------------------------------------------------- */
+    // Mocked Axios calls.
+    mockAxios = new MockAdapter(axios);
+    mockAxios
+        .onGet(apiUrl, { params: { 'year': 'default' } })
+        .replyOnce(200, mockDefaultData)
+        .onGet(apiUrl, { params: { 'year': 2022, 'month': 6 } })
+        .replyOnce(200, mock2022DataJun)
+    /* --------------------------------------------------------
+        Mocks                                            end
+    -------------------------------------------------------- */
+
+    const newStore = setupStore();
+        render(
+            <Provider store={newStore}>
+                <TimelineBar />
+                <FilterDrawer />
+            </Provider>
+        );
+    
+    // Wait for initial render.
+    expect(newStore.getState().timeline.request).toEqual('idle');
+    await waitFor(() => expect(newStore.getState().timeline.request).toEqual('complete'));
+
+    // Verify all filter buttons are enabled.
+    const filterButtons = screen.getAllByRole('checkbox');
+    filterButtons.forEach((button) => {
+        expect(button).not.toHaveClass("unavailable");
+    });
+
+    // Select a month.
+    const monthToSelect: string = 'jun';
+    const monthElems = screen.getAllByRole('menuitemradio', { name: 'month-item' });
+    const monthElemToSelect = monthElems.find(element => 
+        element.textContent!.replace(/\d+/, "") === monthToSelect.toUpperCase()) as HTMLElement;
+    
+    await waitFor(() => user.click(monthElemToSelect));
+
+    const monthSelectables = newStore.getState().timeline.filteredSelectables;
+    expect(monthSelectables).not.toBeNull();
+    
+    // Verify non-overlapped values in << filter/filteredSelectables >>
+    // to be disabled with class "unavailable".
+    const baseSelectables = newStore.getState().timeline.filterSelectables;
+    let buttonsToDisable: Array<string | number | null> = []
+
+    for (let item of Object.entries(baseSelectables!)) {
+        const category = item[0];
+        const itemList = item[1] as Array<string | number | null>;
+
+        if (monthSelectables !== null) {
+            let difference = itemList?.filter(x => 
+                !monthSelectables[category]?.includes(x)
+            );
+            
+            // Append non-intersecting values of base/month selectables.
+            buttonsToDisable = [...buttonsToDisable, ...difference];
+        }
+    }
+
+    // Verify "unavailable" class.
+    filterButtons.forEach(button => {
+        if (buttonsToDisable.includes(button.textContent)) {
+            expect(button).toHaveClass("unavailable");
+        }
+    })
 });
