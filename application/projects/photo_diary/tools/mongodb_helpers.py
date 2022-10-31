@@ -93,19 +93,50 @@ def get_facet_pipeline(query, target_field):
     'month' is equivalent, and the rest are additive where queries broaden results.
     """
 
-    # Sets and subsets will be different depending on target data field.
+    # Operators will be different depending on target data field.
     if target_field == 'date.month':
-        operator = '$eq'
+        # Returns true if query matches field.
         comparand_a = query
-        comparand_b = "$" + target_field
+        comparand_b = '$' + target_field
+        operator = {
+            '$eq': [
+                comparand_a,    # queried month
+                comparand_b     # matches doc's month.
+            ]
+        }
     elif target_field == 'tags':
-        operator = '$setIsSubset'
-        comparand_a = query                     # subset
-        comparand_b = "$" + target_field        # set
+        # Returns true if any element in query exists in field.
+        comparand_a = query              
+        comparand_b = '$' + target_field
+        operator = {
+           '$eq': [
+                {
+                    '$size': {
+                        '$ifNull': [
+                            {
+                                '$setIntersection': [
+                                    comparand_a,
+                                    comparand_b
+                                ]   # Return non-empty array if intersects found.
+                            },
+                            []      # Return non-null result, else return empty array.
+                        ]
+                    }               # Return 1 if non-empty array.
+                },
+                1       
+           ]                        # Return true if size is 1 (non-empty array).
+        }
     else:
-        operator = '$setIsSubset'
-        comparand_a = ["$" + target_field]      # subset
-        comparand_b = query                     # set
+        # Returns true if field value in query.
+        comparand_a = ['$' + target_field]
+        comparand_b = query
+        operator = {
+            '$setIsSubset': [
+                comparand_a,    # single value in field
+                comparand_b     # exists in query array.
+            ]
+        }
+        
 
     pipeline = [
         { 
@@ -127,12 +158,7 @@ def get_facet_pipeline(query, target_field):
                 'url': 1,
                 'title': 1,
                 'description': 1,
-                'isSubset': {
-                    operator: [
-                        comparand_a,
-                        comparand_b 
-                    ]
-                }
+                'isSubset': operator
             }
         },
         {
