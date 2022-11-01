@@ -9,6 +9,7 @@ import {
     fetchImagesData, 
     ImageDocsRequestProps, 
     ImageDocFormatTypes } from '../TimelineBar/timelineSlice';
+import { resetMonthStyling } from '../TimelineBar/YearButton';
 import './FilterDrawer.css';
 
 
@@ -49,16 +50,16 @@ const FilterDrawer: React.FunctionComponent = () => {
             let filterQueries: ImageDocsRequestProps= {
                 'year': yearSelected as number
             }
-
-            // Add month query if used.
-            if (queried) {
-                if ('month' in queried) {
-                    filterQueries['month'] = queried!['month'] as number
-                }
-            }
         
             // Only build filters query if filters activated.
             if (filterStatus === 'on') {
+                 // Add month query if used.
+                if (queried) {
+                    if ('month' in queried) {
+                        filterQueries['month'] = queried!['month'] as number
+                    }
+                }
+
                 // Assign correct string for keys.
                 for (let category in filterState) {
                     if (filterState[category]!.length > 0) {
@@ -88,7 +89,10 @@ const FilterDrawer: React.FunctionComponent = () => {
                     }
                 }
             }
-            
+            // else if (filterStatus === 'off'){
+            //     resetMonthStyling();
+            // }
+
             dispatch(fetchImagesData(filterQueries));
         }
     }, [filterState]);

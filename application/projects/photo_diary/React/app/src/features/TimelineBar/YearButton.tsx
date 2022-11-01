@@ -29,17 +29,7 @@ const YearButton: React.FunctionComponent<YearButtonProps> = (props: YearButtonP
         }
 
         // Set active month to 'all', unset the rest.
-        const monthSelectorElems = document.getElementsByClassName(
-            props.baseClassName.concat("__", "month-item"));
-
-        for (let monthSelectorElem of Array.from(monthSelectorElems)) {
-            monthSelectorElem.setAttribute('aria-checked', 'false');
-            monthSelectorElem.classList.remove("active");
-        }
-
-        const defaultMonthSelectorElem = document.getElementById("month-item-all") as HTMLElement;
-        defaultMonthSelectorElem.setAttribute('aria-checked', 'true');
-        defaultMonthSelectorElem.classList.add("active");
+        resetMonthStyling();
         
         // Get clicked year text and set to checked.
         const yearSelectElemText: string = yearSelectElem.textContent as string;
@@ -74,6 +64,26 @@ const YearButton: React.FunctionComponent<YearButtonProps> = (props: YearButtonP
         </li>
     );
 }
+
+
+/* =====================================================================
+    Helper functions.
+===================================================================== */
+
+/* -------------------------
+    Resets month styling.
+------------------------- */
+export function resetMonthStyling() {
+    const monthElems = document.querySelectorAll('[aria-label="month-item"]');
+    monthElems.forEach(elem => {
+        elem.setAttribute('aria-checked', 'false');
+        elem.classList.remove("active");
+    });
+
+    const defaultMonthElem = document.getElementById("month-item-all") as HTMLElement;
+    defaultMonthElem.setAttribute('aria-checked', 'true');
+    defaultMonthElem.classList.add("active");
+};
 
 
 /* =====================================================================
