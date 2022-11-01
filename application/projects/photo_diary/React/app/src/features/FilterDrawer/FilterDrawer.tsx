@@ -9,6 +9,7 @@ import {
     fetchImagesData, 
     ImageDocsRequestProps, 
     ImageDocFormatTypes } from '../TimelineBar/timelineSlice';
+import { resetMonthStyling } from '../TimelineBar/YearButton';
 import './FilterDrawer.css';
 
 
@@ -20,6 +21,7 @@ const FilterDrawer: React.FunctionComponent = () => {
     const dispatch = useAppDispatch();
     const filterables = useAppSelector(state => state.timeline.filterSelectables);
     const yearSelected = useAppSelector(state => state.timeline.yearSelected);
+    const queried = useAppSelector(state => state.timeline.query);
     const filterState = useAppSelector(state => state.filter);
     const classBase: string = "FilterDrawer";
     const classNames: ClassNameTypes = {
@@ -36,70 +38,72 @@ const FilterDrawer: React.FunctionComponent = () => {
     ------------------------------------------------------------- */
     useEffect(() => {
         if (yearSelected !== null) {
+            // Get status of filters.
+            let filterStatus: string = 'off';
+            for (let category in filterState) {
+                if (filterState[category]!.length > 0) {
+                    filterStatus = 'on';
+                    break;
+                }
+            }
+            
             let filterQueries: ImageDocsRequestProps= {
                 'year': yearSelected as number
             }
-            
-            // Assign correct string for keys.
-            for (let category in filterState) {
-                if (filterState[category]!.length > 0) {
-                    switch(category) {
-                        case 'formatMedium':
-                            filterQueries['format-medium'] = filterState[category] as Array<ImageDocFormatTypes['medium']>
-                            break;
-                        case 'formatType': 
-                            filterQueries['format-type'] = filterState[category] as Array<ImageDocFormatTypes['type']>
-                            break;
-                        case 'film':
-                            filterQueries['film'] = filterState[category] as Array<string>
-                            break;
-                        case 'camera':
-                            filterQueries['camera'] = filterState[category]
-                            break;
-                        case 'lens':
-                            filterQueries['lens'] = filterState[category]
-                            break;
-                        case 'focalLength':
-                            filterQueries['focal-length'] = filterState[category] as Array<number>
-                            break;
-                        case 'tags':
-                            filterQueries['tags'] = filterState[category]
-                            break;
+        
+            // Only build filters query if filters activated.
+            if (filterStatus === 'on') {
+                 // Add month query if used.
+                if (queried) {
+                    if ('month' in queried) {
+                        filterQueries['month'] = queried!['month'] as number
+                    }
+                }
+
+                // Assign correct string for keys.
+                for (let category in filterState) {
+                    if (filterState[category]!.length > 0) {
+                        switch(category) {
+                            case 'formatMedium':
+                                filterQueries['format-medium'] = filterState[category] as Array<ImageDocFormatTypes['medium']>
+                                break;
+                            case 'formatType': 
+                                filterQueries['format-type'] = filterState[category] as Array<ImageDocFormatTypes['type']>
+                                break;
+                            case 'film':
+                                filterQueries['film'] = filterState[category] as Array<string>
+                                break;
+                            case 'camera':
+                                filterQueries['camera'] = filterState[category]
+                                break;
+                            case 'lens':
+                                filterQueries['lens'] = filterState[category]
+                                break;
+                            case 'focalLength':
+                                filterQueries['focal-length'] = filterState[category] as Array<number>
+                                break;
+                            case 'tags':
+                                filterQueries['tags'] = filterState[category]
+                                break;
+                        }
                     }
                 }
             }
-           
-            dispatch(fetchImagesData(filterQueries))
+            // else if (filterStatus === 'off'){
+            //     resetMonthStyling();
+            // }
+
+            dispatch(fetchImagesData(filterQueries));
         }
     }, [filterState]);
 
-
-    /* ---------------------------
-        Dispatches reset action.
-    --------------------------- */
-    function resetFilters() {
-        // Clear all "active" styling on pressed buttons.
-        document.querySelectorAll('[role="checkbox"]').forEach(button =>
-            button.classList.remove("active")
-        );
-        
-        dispatch(clearFilters("RESET TO INIT STATE"));
-    };
-
-
-    /* ---------------------------------------------
-        Clear << filter >> state on changing year. 
-    --------------------------------------------- */
-    useEffect(() => {
-        resetFilters();
-    }, [yearSelected])
-
-
+    
     /* -----------------------------------------------
         Handle button for resetting of filter state.
     ----------------------------------------------- */
     const onResetClick = (event: React.SyntheticEvent) => {
-        resetFilters();
+        resetFilterStyling();
+        dispatch(clearFilters("RESET TO INIT STATE"));
     };
 
 
@@ -234,6 +238,17 @@ function createCategory(classNames: ClassNameTypes, categoryName: string, select
     )
 }
 
+
+/* -------------------------
+    Resets filter styling.
+------------------------- */
+export function resetFilterStyling() {
+    // Clear all "active" styling on pressed buttons.
+    document.querySelectorAll('[role="checkbox"]').forEach(button => {
+        button.classList.remove("active");
+        button.setAttribute('aria-pressed', 'false');
+    });
+};
 
 /* =====================================================================
     Types.

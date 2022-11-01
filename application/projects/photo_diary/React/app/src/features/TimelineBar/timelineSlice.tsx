@@ -171,8 +171,9 @@ const timelineSlice = createSlice({
                     state.counter = {...counter, 'previous': state.counter.previous};
                     state.filteredSelectables = null;
                 }
-                // Only assign filteredSelectables if month query.
-                else {
+                // Only assign filteredSelectables if year-month query.
+                else if (Object.keys(args).length === 2 
+                    && args['month'] !== undefined) {
                     state.filteredSelectables = filteredSelectables;
                 }
                 
