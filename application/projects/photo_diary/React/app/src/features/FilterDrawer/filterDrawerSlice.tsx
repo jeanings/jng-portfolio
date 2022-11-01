@@ -41,7 +41,7 @@ const filterSlice = createSlice({
         ------------------------------------------------------- */
         removeFilter: (state, action: PayloadAction<FilterProps>) => {
             const filterRequest = Object.entries(action.payload);
-
+            
             for (let [key, val] of filterRequest) {
                 if (state[key]!.includes(val as string | number)){
                     let updatedArray = state[key]!.filter(x => x !== val);

@@ -36,55 +36,60 @@ const FilterDrawer: React.FunctionComponent = () => {
         as those are fixed to the selected year.
     ------------------------------------------------------------- */
     useEffect(() => {
-        let filterStatus: string = 'off';
-        for (let category in filterState) {
-            if (filterState[category]!.length > 0) {
-                filterStatus = 'on';
-                break;
+        if (yearSelected !== null) {
+            // Get status of filters.
+            let filterStatus: string = 'off';
+            for (let category in filterState) {
+                if (filterState[category]!.length > 0) {
+                    filterStatus = 'on';
+                    break;
+                }
             }
-        }
-
-        // Only traverse to dispatch action filter activated.
-        if (filterStatus === 'on') {
+            
             let filterQueries: ImageDocsRequestProps= {
                 'year': yearSelected as number
             }
 
             // Add month query if used.
-            if (queried!['month'] !== undefined) {
-                filterQueries['month'] = queried!['month'] as number
+            if (queried) {
+                if ('month' in queried) {
+                    filterQueries['month'] = queried!['month'] as number
+                }
             }
-
-            // Assign correct string for keys.
-            for (let category in filterState) {
-                if (filterState[category]!.length > 0) {
-                    switch(category) {
-                        case 'formatMedium':
-                            filterQueries['format-medium'] = filterState[category] as Array<ImageDocFormatTypes['medium']>
-                            break;
-                        case 'formatType': 
-                            filterQueries['format-type'] = filterState[category] as Array<ImageDocFormatTypes['type']>
-                            break;
-                        case 'film':
-                            filterQueries['film'] = filterState[category] as Array<string>
-                            break;
-                        case 'camera':
-                            filterQueries['camera'] = filterState[category]
-                            break;
-                        case 'lens':
-                            filterQueries['lens'] = filterState[category]
-                            break;
-                        case 'focalLength':
-                            filterQueries['focal-length'] = filterState[category] as Array<number>
-                            break;
-                        case 'tags':
-                            filterQueries['tags'] = filterState[category]
-                            break;
+        
+            // Only build filters query if filters activated.
+            if (filterStatus === 'on') {
+                // Assign correct string for keys.
+                for (let category in filterState) {
+                    if (filterState[category]!.length > 0) {
+                        switch(category) {
+                            case 'formatMedium':
+                                filterQueries['format-medium'] = filterState[category] as Array<ImageDocFormatTypes['medium']>
+                                break;
+                            case 'formatType': 
+                                filterQueries['format-type'] = filterState[category] as Array<ImageDocFormatTypes['type']>
+                                break;
+                            case 'film':
+                                filterQueries['film'] = filterState[category] as Array<string>
+                                break;
+                            case 'camera':
+                                filterQueries['camera'] = filterState[category]
+                                break;
+                            case 'lens':
+                                filterQueries['lens'] = filterState[category]
+                                break;
+                            case 'focalLength':
+                                filterQueries['focal-length'] = filterState[category] as Array<number>
+                                break;
+                            case 'tags':
+                                filterQueries['tags'] = filterState[category]
+                                break;
+                        }
                     }
                 }
             }
-           
-            dispatch(fetchImagesData(filterQueries))
+            
+            dispatch(fetchImagesData(filterQueries));
         }
     }, [filterState]);
 

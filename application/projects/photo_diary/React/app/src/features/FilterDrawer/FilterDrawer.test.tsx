@@ -84,7 +84,7 @@ const preloadedState: RootState = {
 const preloadedStateWithFilter: RootState = {
     timeline: {
         request: 'complete',
-        query: { year: 2022 },
+        query: { year: 2022, tags: [ "Kodak_Gold_200", "Fujifilm_Superia_X-TRA_400" ] },
         yearInit: 2022,
         yearSelected: 2022,
         years: mockDefaultData.years,
@@ -98,7 +98,7 @@ const preloadedStateWithFilter: RootState = {
     filter: {
         formatMedium: [],
         formatType: [],
-        film: [ "Kodak_Gold_200", "Fujifilm_Superia_X-TRA_400" ],
+        film: [ "Kodak Gold 200", "Fujifilm Superia X-TRA 400" ],
         camera: [],
         lens: [],
         focalLength: [],
@@ -569,3 +569,65 @@ test("disables/greys out filter buttons not available on selected month", async(
         }
     })
 });
+
+
+test("fetches year's data when going from filters activated to deactivated", async() => {
+    /* --------------------------------------------------------
+        Mocks                                          start
+    -------------------------------------------------------- */
+    // Mocked Axios calls.
+    mockAxios = new MockAdapter(axios);
+    mockAxios
+        .onGet(apiUrl, { params: { 'year': 2022 } })
+        .replyOnce(200, mockDefaultData)
+    /* --------------------------------------------------------
+        Mocks                                            end
+    -------------------------------------------------------- */
+
+    const newStore = setupStore(preloadedStateWithFilter);
+    render(
+        <Provider store={newStore}>
+            <TimelineBar />
+            <FilterDrawer />
+        </Provider>
+    );
+
+    // Verify preloaded state with filters activated.
+    expect(newStore.getState().timeline.query).toEqual(
+        { year: 2022, tags: [ "Kodak_Gold_200", "Fujifilm_Superia_X-TRA_400" ] }
+    );
+    const filterState = newStore.getState().filter;
+    expect(filterState.film?.length).not.toEqual(0);
+
+    // Mock-set aria-pressed and styling.
+    const filterElems = screen.getAllByRole('checkbox', { name: 'filter-drawer-film-item' });
+    const filterElemsClicked: Array<HTMLElement> = [];
+    
+    for (let item of filterState.film!) {
+        for (let elem of filterElems) {
+            let originalText = item?.replace(/_/g, ' ');
+            if (originalText === elem.textContent) {
+                filterElemsClicked.push(elem);
+            }
+        }
+    }
+
+    expect(filterElemsClicked.length).toEqual(2);
+    for (let elemsClicked of filterElemsClicked) {
+        elemsClicked.setAttribute('aria-pressed', 'true');
+        elemsClicked.classList.add("active");
+    }
+
+    // Click-deactivate filters.
+    await waitFor(() => user.click(filterElemsClicked[0]));
+    expect(filterElemsClicked[0]).toHaveAttribute('aria-pressed', 'false');
+    expect(newStore.getState().filter.film!.length).toEqual(1);
+
+    await waitFor(() => user.click(filterElemsClicked[1]));
+    expect(filterElemsClicked[1]).toHaveAttribute('aria-pressed', 'false');
+    expect(newStore.getState().filter.film!.length).toEqual(0);
+
+
+    // Verify deactivating filters manually (not using reset button) triggers current year fetch.
+    expect(newStore.getState().timeline.query).toEqual({ year: 2022 });
+})
