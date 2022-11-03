@@ -29,7 +29,7 @@ const filterSlice = createSlice({
         /* ---------------------------------------------------
             Handles adding filter to existing array in state.
         --------------------------------------------------- */
-        addFilter: (state, action: PayloadAction<FilterProps>) => {
+        addFilter: (state, action: PayloadAction<FilterPayloadType>) => {
             const filterRequest = Object.entries(action.payload);
 
             for (let [key, val] of filterRequest) {
@@ -39,7 +39,7 @@ const filterSlice = createSlice({
         /* -------------------------------------------------------
             Handles removing filter from existing array in state.
         ------------------------------------------------------- */
-        removeFilter: (state, action: PayloadAction<FilterProps>) => {
+        removeFilter: (state, action: PayloadAction<FilterPayloadType>) => {
             const filterRequest = Object.entries(action.payload);
             
             for (let [key, val] of filterRequest) {
@@ -65,7 +65,7 @@ const filterSlice = createSlice({
 /* =====================================================================
     Types.
 ===================================================================== */
-export interface FilterProps {
+export type FilterPayloadType = {
     [index: string]: string | number | undefined,
     'make?'?: string,
     'model'?: string,

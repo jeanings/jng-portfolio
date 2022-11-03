@@ -6,7 +6,7 @@ import {
 import { 
     addFilter, 
     removeFilter, 
-    FilterProps } from './filterDrawerSlice';
+    FilterPayloadType } from './filterDrawerSlice';
 import './FilterButton.css';
 
 
@@ -16,7 +16,7 @@ import './FilterButton.css';
 ==================================================================== */
 const FilterButton: React.FunctionComponent<FilterButtonProps> = (props: FilterButtonProps) => {
     const dispatch = useAppDispatch();
-    const baseSelectables = useAppSelector(state => state.timeline.filterSelectables);
+    const yearSelectables = useAppSelector(state => state.timeline.filterSelectables);
     const monthSelectables = useAppSelector(state => state.timeline.filteredSelectables);
 
     /* ---------------------------------------------------------
@@ -27,14 +27,14 @@ const FilterButton: React.FunctionComponent<FilterButtonProps> = (props: FilterB
         let buttonsToDisable: Array<string | number | null> = [];
         let classNameAddOn: string = '';
 
-        if (baseSelectables !== null) {
-            for (let filter of Object.entries(baseSelectables)) {
+        if (yearSelectables !== null) {
+            for (let filter of Object.entries(yearSelectables)) {
                 const category = filter[0];
-                const itemList = filter[1] as Array<string | number | null>;
+                const itemList = filter[1] as Array<any>;
         
                 if (monthSelectables !== null) {
-                    let difference = itemList?.filter(x => 
-                        !monthSelectables[category]?.includes(x)
+                    let difference = itemList.filter(x => 
+                        !monthSelectables[category]!.includes(x)
                     );
                     
                     // Append non-intersecting values of base/month selectables.
@@ -60,19 +60,21 @@ const FilterButton: React.FunctionComponent<FilterButtonProps> = (props: FilterB
     const onFilterClick = (event: React.SyntheticEvent) => {
         const filterElem = event.target as HTMLButtonElement;
         const buttonText = filterElem.textContent as string;
+
         // Sets aria-checked, determines addFilter/removeFilter dispatches below.
-        const setAriaPressed = filterElem.getAttribute('aria-pressed') === 'false'
+        const setAriaPressed = filterElem.getAttribute("aria-pressed") === 'false'
             ? 'true' : 'false';
         filterElem.setAttribute('aria-pressed', setAriaPressed);
-        const ariaPressed = filterElem.getAttribute('aria-pressed');
+        const ariaPressed = filterElem.getAttribute("aria-pressed");
+        
         // Add class active for styling.
         ariaPressed === 'true'
             ? filterElem.classList.add("active")
             : filterElem.classList.remove("active");
 
-        let payloadFilter: FilterProps;
+        let payloadFilter: FilterPayloadType;
         // Assign payload its corresponding key:val pairs based on category.
-        switch(filterElem.getAttribute('aria-label')) {
+        switch(filterElem.getAttribute("aria-label")) {
             case 'filter-drawer-format-item':
                 // "Format" includes both medium (film, digital) and type (35mm, mirrorless)
                 // but fetch API handles both as separate for querying. This handles separation
@@ -140,14 +142,16 @@ const FilterButton: React.FunctionComponent<FilterButtonProps> = (props: FilterB
 
     return (
         <button 
-            className={useMediaQueries(props.baseClassName.concat("__", "buttons")) + getAvailability()}
-            role="checkbox" aria-label={"filter-drawer".concat("-", props.categoryName, "-item")}
+            className={ useMediaQueries(props.baseClassName.concat("__", "buttons")) 
+                + getAvailability() }
+            role="checkbox" aria-label={ "filter-drawer".concat("-", props.categoryName, "-item") }
             aria-pressed="false"
-            onClick={onFilterClick}>
+            onClick={ onFilterClick }>
 
-                {props.categoryName === 'focalLength'
-                    ? props.selectableName.toString().concat('mm')      // Add focal length unit.
-                    : props.selectableName}
+                { props.categoryName === 'focalLength'
+                        ? props.selectableName.toString().concat('mm')      // Add focal length unit.
+                        : props.selectableName
+                }
                 
         </button>
     );

@@ -42,7 +42,7 @@ const preloadedState: RootState = {
         request: 'complete',
         query: { year: 2022 },
         yearInit: 2022,
-        yearSelected: 2022,
+        selected: { year: 2022, month: 'all' },
         years: mockDefaultData.years,
         counter: {
             'all': 0,
@@ -86,7 +86,7 @@ const preloadedStateWithFilter: RootState = {
         request: 'complete',
         query: { year: 2022, tags: [ "Kodak_Gold_200", "Fujifilm_Superia_X-TRA_400" ] },
         yearInit: 2022,
-        yearSelected: 2022,
+        selected: { year: 2022, month: 'all' },
         years: mockDefaultData.years,
         counter: preloadedState.timeline.counter,
         imageDocs: preloadedState.timeline.imageDocs,
@@ -450,7 +450,7 @@ test("<< filter >> state resets to initial state when year is changed", async() 
     await waitFor(() => user.click(yearSelectElem));
 
     // Wait for fetch to resolve.
-    await waitFor(() => expect(newStore.getState().timeline.yearSelected).toEqual(2015));
+    await waitFor(() => expect(newStore.getState().timeline.selected.year).toEqual(2015));
     
     // Verify filters get cleared.
     expect(newStore.getState().filter.film!.length).toEqual(0);        

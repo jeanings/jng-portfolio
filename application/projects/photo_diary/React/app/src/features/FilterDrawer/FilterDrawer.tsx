@@ -8,20 +8,26 @@ import { clearFilters } from './filterDrawerSlice';
 import {
     fetchImagesData, 
     ImageDocsRequestProps, 
-    ImageDocFormatTypes } from '../TimelineBar/timelineSlice';
-import { resetMonthStyling } from '../TimelineBar/YearButton';
+    ImageDocFormatTypes,
+    TimelineMonthTypes, 
+    FilterableTypes} from '../TimelineBar/timelineSlice';
+import { getNumericalMonth } from '../TimelineBar/TimelineBar';
 import './FilterDrawer.css';
 
 
 /* ====================================================================
     A main component - container for filtering options.
-    Renders all the filter options available in the set of image data.
+    Renders all the filter options available in the set of image data,
+    as well as handling filtered query fetches.
 ==================================================================== */
 const FilterDrawer: React.FunctionComponent = () => {
     const dispatch = useAppDispatch();
     const filterables = useAppSelector(state => state.timeline.filterSelectables);
-    const yearSelected = useAppSelector(state => state.timeline.yearSelected);
-    const queried = useAppSelector(state => state.timeline.query);
+    const initFetch: boolean = useAppSelector(state => state.timeline.request) === 'initialized'
+        ? true
+        : false;
+    const selectedYear = useAppSelector(state => state.timeline.selected.year);
+    const selectedMonth = useAppSelector(state => state.timeline.selected.month);
     const filterState = useAppSelector(state => state.filter);
     const classBase: string = "FilterDrawer";
     const classNames: ClassNameTypes = {
@@ -31,35 +37,27 @@ const FilterDrawer: React.FunctionComponent = () => {
         'base': classBase
     };
 
-    /* -------------------------------------------------------------
-        Changes to << filter >> state will dispatch fetch request.
+    /* ----------------------------------------------------------------------
+        Changes to << filter >> state will dispatch filtered fetch request.
         Image counters will update but filterable items will not change,
         as those are fixed to the selected year.
-    ------------------------------------------------------------- */
+    ---------------------------------------------------------------------- */
     useEffect(() => {
-        if (yearSelected !== null) {
-            // Get status of filters.
-            let filterStatus: string = 'off';
-            for (let category in filterState) {
-                if (filterState[category]!.length > 0) {
-                    filterStatus = 'on';
-                    break;
-                }
-            }
-            
+        if (selectedYear !== null  && initFetch === false) {
             let filterQueries: ImageDocsRequestProps= {
-                'year': yearSelected as number
+                'year': selectedYear as number
             }
         
-            // Only build filters query if filters activated.
-            if (filterStatus === 'on') {
-                 // Add month query if used.
-                if (queried) {
-                    if ('month' in queried) {
-                        filterQueries['month'] = queried!['month'] as number
-                    }
-                }
+            // Add month if selected.
+            if (selectedMonth !== 'all') {
+                filterQueries['month'] = getNumericalMonth(selectedMonth as TimelineMonthTypes);
+            }
 
+            // Get status of filters.
+            const filterStatus = getFilterStateStatus(filterState);
+
+            // Only dispatch fetch query if filters activated.
+            if (filterStatus === 'on') {
                 // Assign correct string for keys.
                 for (let category in filterState) {
                     if (filterState[category]!.length > 0) {
@@ -88,19 +86,20 @@ const FilterDrawer: React.FunctionComponent = () => {
                         }
                     }
                 }
+                dispatch(fetchImagesData(filterQueries));
             }
-            // else if (filterStatus === 'off'){
-            //     resetMonthStyling();
-            // }
-
-            dispatch(fetchImagesData(filterQueries));
+            // Otherwise let TimelineBar useEffect handle unfiltered queries.
+            else if (filterStatus === 'off') {
+                resetFilterStyling();
+            }
         }
     }, [filterState]);
 
-    
-    /* -----------------------------------------------
+
+    /* --------------------------------------------------------
         Handle button for resetting of filter state.
-    ----------------------------------------------- */
+        Clears << filter >> and triggers fetch via useEffect.
+    -------------------------------------------------------- */
     const onResetClick = (event: React.SyntheticEvent) => {
         resetFilterStyling();
         dispatch(clearFilters("RESET TO INIT STATE"));
@@ -154,7 +153,7 @@ const FilterDrawer: React.FunctionComponent = () => {
 
         // Assign styling through classname.
         filtersActive === true
-            ? resetAvailablity = ''
+            ? resetAvailablity = ""
             : resetAvailablity = "unavailable";
 
         return resetAvailablity;
@@ -163,26 +162,27 @@ const FilterDrawer: React.FunctionComponent = () => {
    
   
     return (
-        <section className={useMediaQueries(classBase)} id={classBase}
+        <section className={ useMediaQueries(classBase) } id={ classBase }
             role="form" aria-label="filter-drawer">
-            <div className={useMediaQueries(classBase.concat("__", "parameters-container"))}
-                role="group" aria-label={"filter-drawer".concat("-", "container")}>
+            <div className={ useMediaQueries(classBase.concat("__", "parameters-container")) }
+                role="group" aria-label={ "filter-drawer".concat("-", "container") }>
 
                 {/* Generates each filter category and its buttons. */}
-                {createCategory(classNames, "format", formats)}
-                {createCategory(classNames, "film", films as Array<string>)}
-                {createCategory(classNames, "camera", cameras)}
-                {createCategory(classNames, "lens", lenses)}
-                {createCategory(classNames, "focalLength", focalLengths)}
-                {createCategory(classNames, "tags", tags)}
+                { createCategory(classNames, "format", formats) }
+                { createCategory(classNames, "film", films as Array<string>) }
+                { createCategory(classNames, "camera", cameras) }
+                { createCategory(classNames, "lens", lenses) }
+                { createCategory(classNames, "focalLength", focalLengths) }
+                { createCategory(classNames, "tags", tags) }
 
             </div>
 
             <button 
-                    className={useMediaQueries(classBase.concat("__", "reset")) + getResetAvailability()}
+                    className={ useMediaQueries(classBase.concat("__", "reset")) 
+                        + getResetAvailability() }
                     id="Toolbar__reset"
                     aria-label="filter-drawer-reset"
-                    onClick={onResetClick}>
+                    onClick={ onResetClick }>
 
                     <svg xmlns="http://www.w3.org/2000/svg" id="icon-filter-reset" width="24" height="24" viewBox="0 0 24 24">
                         <path d="M12 16c1.671 0 3-1.331 3-3s-1.329-3-3-3-3 1.331-3 3 1.329 3 3 3z"/>
@@ -208,10 +208,10 @@ function createCategory(classNames: ClassNameTypes, categoryName: string, select
     } 
 
     return (
-        <div className={classNames['parent']} id={categoryName}
-            role="group" aria-label={"filter-drawer".concat("-", categoryName)}>
+        <div className={ classNames['parent'] } id={ categoryName }
+            role="group" aria-label={ "filter-drawer".concat("-", categoryName) }>
 
-            <h1 className={classNames['title']}>
+            <h1 className={ classNames['title']} >
                 {
                     categoryName !== "focalLength"
                         ? categoryName.toUpperCase()
@@ -219,23 +219,37 @@ function createCategory(classNames: ClassNameTypes, categoryName: string, select
                 }
             </h1>
 
-            <div className={classNames['options']}
-                role="group" aria-label={"filter-drawer".concat("-", categoryName, "-options")}>
+            <div className={ classNames['options'] }
+                role="group" aria-label={ "filter-drawer".concat("-", categoryName, "-options") }>
                 
-                {/* Generate buttons for all the values in each filter category. */}
-                {
+                {/* Generate buttons for all the values in each filter category. */
                     sortedSelectables.map((selectable, index) => (
                         <FilterButton
-                            baseClassName={classNames['base']}
-                            categoryName={categoryName}
-                            selectableName={selectable}
-                            key={"key".concat("_", categoryName, "_", index.toString())}
+                            baseClassName={ classNames['base'] }
+                            categoryName={ categoryName }
+                            selectableName={ selectable }
+                            key={ "key".concat("_", categoryName, "_", index.toString()) }
                         />
                     ))
                 }
             </div>
         </div>
     )
+}
+
+
+/* ------------------------------------------
+    Get de/activated status of << filter >>
+------------------------------------------ */
+export function getFilterStateStatus(filterState: FilterableTypes) {
+    let filterStatus: string = 'off';
+    for (let category in filterState) {
+        if (filterState[category]!.length > 0) {
+            filterStatus = 'on';
+            break;
+        }
+    }
+    return filterStatus;
 }
 
 
@@ -246,7 +260,7 @@ export function resetFilterStyling() {
     // Clear all "active" styling on pressed buttons.
     document.querySelectorAll('[role="checkbox"]').forEach(button => {
         button.classList.remove("active");
-        button.setAttribute('aria-pressed', 'false');
+        button.setAttribute("aria-pressed", 'false');
     });
 };
 
