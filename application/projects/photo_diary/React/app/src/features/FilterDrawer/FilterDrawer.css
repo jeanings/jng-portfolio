@@ -1,9 +1,10 @@
 .FilterDrawer {
-    grid-column: 2 / 3;
+    grid-column: 2 / 4;
     grid-row: 2 / 3;
     display: grid;
-    padding-left: 1.5rem;
-    padding-right: 1.5rem;
+    grid-template-columns: 100%;
+    grid-template-rows: 100%;
+    padding-left: 1rem;
     font-family: 'Barlow Condensed', sans-serif;
     opacity: 0;
     pointer-events: none;
@@ -54,9 +55,9 @@
 
     .FilterDrawer__parameters-container {
         display: grid;
-        row-gap: 2rem;
-        column-gap: 2rem;
-        grid-template-columns: 50% 50%;
+        row-gap: 1rem;
+        column-gap: 1.5rem;
+        grid-template-columns: 36% 64%;
         grid-template-rows: repeat(5, 1fr);
     }
 
@@ -108,4 +109,42 @@
             row-gap: 0.25rem;
             align-content: start;
             justify-content: start;
+        }
+    
+    .FilterDrawer__reset {
+        background: none;
+        border: none;
+        display: block;
+        width: 3rem;
+        height: 3rem;
+        position: absolute;
+        left: calc(50vw - 1.5rem);      /* minus half of button width */
+        align-self: end;
+        justify-self: center;
+        pointer-events: all;
+        cursor: pointer;
+    }
+
+        .FilterDrawer__reset svg {
+            width: 100%;
+            height: 100%;
+            fill: var(--colour-text-inactive);
+            transition: all 350ms;
+            pointer-events: none;
+        }
+
+        .FilterDrawer__reset:hover svg {
+            fill: var(--colour-accent-secondary);
+        }
+
+        .FilterDrawer__reset.unavailable {
+            cursor: no-drop;
+        }
+
+        .FilterDrawer__reset.unavailable svg {
+            fill: hsla(0, 0%, 25%, 0.3);
+        }
+        
+        .FilterDrawer__reset.unavailable:hover svg {
+            fill: hsla(0, 0%, 25%, 0.3);
         }

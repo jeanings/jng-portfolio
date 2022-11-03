@@ -12,6 +12,7 @@ from urllib.parse import quote_plus
 from .tools.mongodb_helpers import (
     create_facet_stage,
     create_projection_stage,
+    get_filtered_selectables,
     get_image_counts,
     get_selectables_pipeline,
     build_geojson_collection,
@@ -131,10 +132,6 @@ def photo_diary_data():
         'focal_length': 'focal_length_35mm',
         'tags': 'tags'
     }
-
-    # Get unique values from fields for selectables to display in filter component.
-    # Uses values from images in the whole year.
-    filter_selectables = list(collection.aggregate(get_selectables_pipeline()))
     
     # Query MongoDB.
     if len(queries) == 0:
@@ -152,6 +149,15 @@ def photo_diary_data():
     # Get image counts for each month.
     counter = get_image_counts(docs)
 
+    # Get unique values from fields for selectables to display in filter component.
+    # Uses values from images in the whole year.
+    filter_selectables = list(collection.aggregate(get_selectables_pipeline()))
+    # For month queries, build separate dict.
+    if month != None:
+        filtered_selectables = get_filtered_selectables(docs)
+    else:
+        filtered_selectables = []
+
     # Build geojson collection.
     feature_collection = build_geojson_collection(docs)
 
@@ -162,9 +168,10 @@ def photo_diary_data():
         'years': collections,
         'counter': counter,
         'filterSelectables': filter_selectables,
+        'filteredSelectables': filtered_selectables,
         'docs': docs,
         'featureCollection': feature_collection,
-        'bounds': bounding_box
+        'bounds': bounding_box,
     }
         
     response = jsonify(results)

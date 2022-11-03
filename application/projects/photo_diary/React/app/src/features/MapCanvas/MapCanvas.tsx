@@ -24,8 +24,11 @@ const MapCanvas: React.FunctionComponent = () => {
     const dispatch = useAppDispatch();
     const geojson = useAppSelector(state => state.timeline.geojson);
     const bounds = useAppSelector(state => state.timeline.bounds);
-    const mapState = useAppSelector(state => state.mapCanvas);
-    const classBase: string = 'MapCanvas';
+    const styleLoaded = useAppSelector(state => state.mapCanvas.styleLoaded);
+    const fitBoundsButton = useAppSelector(state => state.mapCanvas.fitBoundsButton);
+    const sourceStatus = useAppSelector(state => state.mapCanvas.sourceStatus);
+    const markersStatus = useAppSelector(state => state.mapCanvas.markersStatus);
+    const classBase: string = "MapCanvas";
     // Mapbox variables.
     const MAPBOX_ACCESS_TOKEN = process.env.REACT_APP_MAPBOX;
     const mapContainer = useRef(null);
@@ -62,7 +65,7 @@ const MapCanvas: React.FunctionComponent = () => {
                 });
             }
             // Add or refresh marker source.
-            else if (mapState.styleLoaded === true) {
+            else if (styleLoaded === true) {
                 // Remove previous marker layer.
                 if (map.current.getLayer('imageMarkers') !== undefined) {
                     map.current.removeLayer('imageMarkers');
@@ -89,15 +92,15 @@ const MapCanvas: React.FunctionComponent = () => {
                 dispatch(setSourceStatus('loaded'));
             }
         }
-    }, [bounds, mapState.styleLoaded]);
+    }, [bounds, styleLoaded]);
 
     
     /* -------------------------------------------------
         Map bounds-fitter for toolbar bounds button.
     ------------------------------------------------- */
     useEffect(() => {
-        if (mapState.sourceStatus === 'loaded'
-            && mapState.fitBoundsButton === 'clicked'
+        if (sourceStatus === 'loaded'
+            && fitBoundsButton === 'clicked'
             && bounds !== null) {
                 
             // Adjust and zoom map to fit all markers. 
@@ -119,12 +122,12 @@ const MapCanvas: React.FunctionComponent = () => {
 
             dispatch(setBoundsButton('idle'));
         }
-    }, [mapState.fitBoundsButton])
+    }, [fitBoundsButton])
 
 
     // Add marker layer if map is set up.
-    if (mapState.sourceStatus === 'loaded'
-        && mapState.markersStatus === 'idle'
+    if (sourceStatus === 'loaded'
+        && markersStatus === 'idle'
         && bounds !== null) {
 
         // Create new photo marker layer.
@@ -166,8 +169,8 @@ const MapCanvas: React.FunctionComponent = () => {
 
     
     return (
-        <main className={useMediaQueries(classBase)} 
-            id="map" ref={mapContainer}
+        <main className={ useMediaQueries(classBase) } 
+            id="map" ref={ mapContainer }
             role="main" aria-label="map-canvas">
         </main>
     );

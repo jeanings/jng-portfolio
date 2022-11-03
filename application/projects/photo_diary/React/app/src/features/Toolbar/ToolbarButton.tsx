@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { 
     useAppSelector, 
     useAppDispatch, 
@@ -22,10 +22,10 @@ const ToolbarButton: React.FunctionComponent<ToolbarButtonProps> = (props: Toolb
         const toolbarButtonElem = event.target as HTMLButtonElement;
 
         // Sets aria-checked, determines addFilter/removeFilter dispatches below.
-        const setAriaPressed = toolbarButtonElem.getAttribute('aria-pressed') === 'false'
+        const setAriaPressed = toolbarButtonElem.getAttribute("aria-pressed") === 'false'
             ? 'true' : 'false';
-        toolbarButtonElem.setAttribute('aria-pressed', setAriaPressed);
-        const ariaPressed = toolbarButtonElem.getAttribute('aria-pressed');
+        toolbarButtonElem.setAttribute("aria-pressed", setAriaPressed);
+        const ariaPressed = toolbarButtonElem.getAttribute("aria-pressed");
 
         // Add active class for styling.
         if (toolbarButtonElem.id !== "Toolbar-bounds") {
@@ -70,13 +70,15 @@ const ToolbarButton: React.FunctionComponent<ToolbarButtonProps> = (props: Toolb
    
 
     return (
-        <button className={useMediaQueries(props.baseClassName.concat("__", "button"))} 
-            id={props.baseClassName.concat("-", props.name)}
-            aria-label={"toolbar".concat("-", "button")}
+        <button className={ useMediaQueries(props.baseClassName.concat("__", "button")) } 
+            id={ props.baseClassName.concat("-", props.name) }
+            aria-label={ "toolbar".concat("-", "button") }
             aria-pressed="false"
-            onClick={onToolbarButtonClick}>
+            onClick={ onToolbarButtonClick }>
                 
-                {getIcon(props.name)}
+                { /* Assign icon based on button type. */
+                    getIcon(props.name)
+                }
 
         </button>
     );

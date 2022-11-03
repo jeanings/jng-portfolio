@@ -19,7 +19,8 @@ import TimelineBar from '../TimelineBar/TimelineBar';
 import {
     fetchImagesData,
     GeojsonFeatureCollectionProps,
-    BboxType } from '../TimelineBar/timelineSlice';
+    BboxType, 
+    handleYearSelect} from '../TimelineBar/timelineSlice';
 import MapCanvas from './MapCanvas';
 import { 
     setStyleLoadStatus, 
@@ -48,10 +49,10 @@ afterEach(() => {
 const preloadedState: RootState = {
     timeline: {
         request: 'complete',
+        query: { year: 2022 },
         yearInit: 2022,
-        yearSelected: 2022,
+        selected: { year: 2022, month: 'all' },
         years: mockDefaultData.years,
-        month: 'all',
         counter: {
             'all': 0,
             'jan': 0, 'feb': 0, 'mar': 0,
@@ -68,6 +69,7 @@ const preloadedState: RootState = {
         },
         imageDocs: null,
         filterSelectables: mockDefaultData.filterSelectables[0],
+        filteredSelectables: null,
         geojson: mockDefaultData.featureCollection as GeojsonFeatureCollectionProps,
         bounds: mockDefaultData.bounds as BboxType
     },
@@ -220,9 +222,11 @@ test("adds new data source on new fetches", async() => {
     newStore.dispatch(setStyleLoadStatus(true))
     
     await waitFor(() => {
-        // useEffect << styleLoaded >> else block.
-        // cleanupMarkerSource and setSourceStatus dispatches.
-        expect(mockDispatch).toHaveBeenCalledTimes(2);
+        // setStyleLoadStatus(true)         --> doesn't count, set above manually, not mocked. 
+        // cleanupMarkerSource('idle')
+        // setSourceStatus('loaded')
+        // setMarkersStatus('loaded')
+        expect(mockDispatch).toHaveBeenCalledTimes(3);
     });
 
     // Verify map.addsource() call, new data added.
@@ -384,15 +388,12 @@ test("replaces previous layer and source on new data fetches", async() => {
     expect(mockMapFitBounds).toHaveBeenCalled();
 
     // Mock year selection dispatch.
-    newStore.dispatch(fetchImagesData({ 'year': 2015 }));
+    newStore.dispatch(handleYearSelect(2015));
 
     await waitFor(() => {
         expect(newStore.getState().timeline.request).toEqual('complete');
-        expect(newStore.getState().timeline.yearSelected).toEqual(2015);
-        // Verify updated bounds.
-        expect(newStore.getState().timeline.bounds).not.toEqual(bounds2022);
+        expect(newStore.getState().timeline.selected.year).toEqual(2015);
     });
-
 
     // Verify removal of previous layer.
     expect(mockMapGetLayer).toHaveBeenCalled();         // not undefined,
