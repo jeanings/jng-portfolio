@@ -39,7 +39,7 @@ const MapCanvas: React.FunctionComponent = () => {
     const bbox: Array<Array<number>> = bounds !== null
         ? [ [ bounds!.lng[0], bounds!.lat[0] ],     // min bound coords
             [ bounds!.lng[1], bounds!.lat[1] ] ]    // max bound coords
-        : []
+        : [];
 
     /* -------------------------------------------------
         Initialize map and add data source for markers 
@@ -68,6 +68,11 @@ const MapCanvas: React.FunctionComponent = () => {
             }
             // Add or refresh marker source.
             else if (styleLoaded === true) {
+                // Remove previous marker counter layer.
+                if (map.current.getLayer('imageMarkersCounter') !== undefined) {
+                    map.current.removeLayer('imageMarkersCounter');
+                }
+
                 // Remove previous marker layer.
                 if (map.current.getLayer('imageMarkers') !== undefined) {
                     map.current.removeLayer('imageMarkers');
@@ -77,6 +82,8 @@ const MapCanvas: React.FunctionComponent = () => {
                 if (map.current.getSource('imageSource') !== undefined) {
                     map.current.removeSource('imageSource');
                 }
+
+                // Remove previous
     
                 // Update map state so layer-adding effect triggers later.
                 dispatch(cleanupMarkerSource('idle'));
@@ -143,6 +150,25 @@ const MapCanvas: React.FunctionComponent = () => {
                 'icon-size': 1,
                 // 'symbol-z-order': 'source'
             },
+        });
+
+        // Cluster counter.
+        map.current.addLayer({
+            'id': 'imageMarkersCounter',
+            'type': 'symbol',
+            'source': 'imageSource',
+            'layout': {
+                'text-field': '{point_count}',
+                "text-font": ['Knewave Regular', 'Courgette Regular'], 
+                'text-size': 20,
+                'text-anchor': 'bottom',
+                'text-offset': [-0.25, 2]
+            },
+            'paint': {
+                'text-color': '#333333',            // warm grey css --colour-text-inactive
+                "text-halo-width": 1,
+                "text-halo-color": "#FFFFCC"        // offwhite  css --colour-text-active
+            }
         });
         
         // Adjust and zoom map to fit all markers. 
