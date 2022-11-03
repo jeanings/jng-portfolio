@@ -9,6 +9,7 @@ import {
     setMarkersStatus, 
     cleanupMarkerSource,
     setBoundsButton } from './mapCanvasSlice';
+import { ImageDocTypes } from '../TimelineBar/timelineSlice';
 import './MapCanvas.css';
 // @ts-ignore
 import mapboxgl from 'mapbox-gl'; 
@@ -28,6 +29,7 @@ const MapCanvas: React.FunctionComponent = () => {
     const fitBoundsButton = useAppSelector(state => state.mapCanvas.fitBoundsButton);
     const sourceStatus = useAppSelector(state => state.mapCanvas.sourceStatus);
     const markersStatus = useAppSelector(state => state.mapCanvas.markersStatus);
+    const imageDocs = useAppSelector(state => state.timeline.imageDocs);
     const classBase: string = "MapCanvas";
     // Mapbox variables.
     const MAPBOX_ACCESS_TOKEN = process.env.REACT_APP_MAPBOX;
@@ -138,13 +140,11 @@ const MapCanvas: React.FunctionComponent = () => {
             'layout': {
                 'icon-image': 'bxs-pin',
                 'icon-allow-overlap': true,
-                // 'icon-anchor': 'top-right',
                 'icon-size': 1,
-                // 'icon-padding': 15,
                 // 'symbol-z-order': 'source'
             },
         });
-
+        
         // Adjust and zoom map to fit all markers. 
         map.current.fitBounds(
             bbox,
@@ -165,6 +165,33 @@ const MapCanvas: React.FunctionComponent = () => {
 
         dispatch(setMarkersStatus('loaded'));
     }   
+
+
+    /* --------------------------------------- 
+        Handle clicks on markers for popups.
+    ----------------------------------------*/
+    if (markersStatus === 'loaded') {
+        map.current.on('click', 'imageMarkers', (event: any) => {
+            // Get document corresponding to marker.
+            // const markerDocId = event.features[0].properties.id;
+            // let markerDoc: ImageDocTypes;
+            // for (let doc of imageDocs!) {
+            //     if (doc._id === markerDocId) {               //  TODO: works on single markers, not clusters.
+                    // markerDoc = doc;                         //  Look into using spiderify
+            //     }
+            // }
+            const imageClassName = classBase.concat("__", "marker-image");
+            const imageTag = '<img class="' + imageClassName + '" src="' + 'markerDoc!.url' + '">';
+
+            new mapboxgl.Popup({
+                closeButton: false,
+                closeOnClick: true,
+            })
+                .setLngLat(event.lngLat)
+                .setHTML(imageTag)
+                .addTo(map.current)
+        });
+    }
 
 
     
