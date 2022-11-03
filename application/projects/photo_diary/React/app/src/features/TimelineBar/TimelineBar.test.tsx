@@ -69,7 +69,7 @@ describe("on initial renders", () => {
         });
 
         // States should update to default fetch values.
-        expect(newStore.getState().timeline.yearSelected).toEqual(2022);
+        expect(newStore.getState().timeline.selected.year).toEqual(2022);
         expect(newStore.getState().timeline.request).toEqual('complete');
     });
 
@@ -262,11 +262,6 @@ describe("clicks on dropdown year selector elements", () => {
         await waitFor(() => screen.findAllByRole('menuitemradio', { name: 'year-item' }));
         const yearElems = screen.getAllByRole('menuitemradio', { name: 'year-item' });
 
-        // Confirm nothing is selected.
-        yearElems.forEach(element => {
-            expect(element).toHaveAttribute('aria-checked', 'false');
-        });
-
         // Click on a year.
         const yearSelectElem = yearElems.find(element => element.textContent === '2015') as HTMLElement;
         await waitFor(() => user.click(yearSelectElem));
@@ -278,7 +273,7 @@ describe("clicks on dropdown year selector elements", () => {
         });
 
         // Verify that new image doc has same date year metadata as clicked year.
-        expect(newStore.getState().timeline.yearSelected).toEqual(2015);
+        expect(newStore.getState().timeline.selected.year).toEqual(2015);
         expect(newStore.getState().timeline.imageDocs![0].date.year).toEqual(2015);
 
         // Check screen's year selected element updates to 2015.
@@ -328,7 +323,7 @@ describe("clicks on dropdown year selector elements", () => {
         // Confirm changes.
         const yearSelectedElem = screen.getByRole('menuitem', { name: 'year-selected' });
         expect(yearSelectedElem).toHaveTextContent('2022');
-        expect(newStore.getState().timeline.yearSelected).toEqual(2022);
+        expect(newStore.getState().timeline.selected.year).toEqual(2022);
         expect(newStore.getState().timeline.request).toEqual('complete')
 
         // Wait for initial fetch to render year selector items.
@@ -360,7 +355,7 @@ describe("clicks on dropdown year selector elements", () => {
         act(() => {
             jest.advanceTimersByTime(3000);
         });
-        await waitFor(() => expect(newStore.getState().timeline.yearSelected).toEqual(2022));
+        await waitFor(() => expect(newStore.getState().timeline.selected.year).toEqual(2022));
 
         // Verify default counts to be equal after rolling counters end.
         await waitFor(() => {
@@ -380,7 +375,7 @@ describe("clicks on dropdown year selector elements", () => {
         });
         
         // Verify << timeline >> state update.
-        expect(newStore.getState().timeline.yearSelected).toEqual(2015);
+        expect(newStore.getState().timeline.selected.year).toEqual(2015);
         expect(newStore.getState().timeline.counter[allMonthsElemKey]).toEqual(59);
 
         // Let rolling counts and dispatch actions to finish.
@@ -457,20 +452,21 @@ describe("clicks on dropdown year selector elements", () => {
         // Select a year.
         const yearSelectElem = yearElems.find(element => element.textContent === '2015') as HTMLElement;
         await waitFor(() => user.click(yearSelectElem));
-        expect(newStore.getState().timeline.yearSelected).toEqual(2015);
+        expect(newStore.getState().timeline.selected.year).toEqual(2015);
 
         // Check for checked and style updates.
         const monthAllName: string = 'all';
         const monthElemAll = monthElems.find(element => 
             element.textContent!.replace(/\d+/, "") === monthAllName.toUpperCase()) as HTMLElement;
         
+        expect(newStore.getState().timeline.selected.month).toEqual(monthAllName);
         expect(monthElemAll).toHaveAttribute('aria-checked', 'true');
         expect(monthElemAll).toHaveClass("active");
 
         // Mocked June element.
-        const mockedMonthElemToSelect = mockHTMLCollection[0]; 
-        expect(mockedMonthElemToSelect).toHaveAttribute('aria-checked', 'false');
-        expect(mockedMonthElemToSelect).not.toHaveClass("active");
+        // const mockedMonthElemToSelect = mockHTMLCollection[0]; 
+        // expect(mockedMonthElemToSelect).toHaveAttribute('aria-checked', 'false');
+        // expect(mockedMonthElemToSelect).not.toHaveClass("active");
     })
 });
 
@@ -593,11 +589,11 @@ describe("clicks on month selector elements", () => {
         
         await waitFor(() => user.click(monthElemToSelect));
         
+        expect(newStore.getState().timeline.selected.month).toEqual(monthToSelect);
+
         // Check for checked and style updates.
         expect(monthElemToSelect).toHaveAttribute('aria-checked', 'true');
         expect(monthElemToSelect).toHaveClass("active");
-        // If called, other radios have been reset.
-        expect(getElemByClassSpy).toHaveBeenCalled();
     });
 
 
@@ -636,13 +632,13 @@ describe("clicks on month selector elements", () => {
             element.textContent!.replace(/\d+/, "") === monthToSelect.toUpperCase()) as HTMLElement;
 
         await waitFor(() => user.click(monthElemToSelect));
-            
+        
+        expect(newStore.getState().timeline.selected.month).toEqual(monthToSelect);
+
         // Check for checked and style updates.
         expect(monthElemToSelect).toHaveAttribute('aria-checked', 'true');
         expect(monthElemToSelect).toHaveClass("active");
-        // If called, other radios have been reset.
-        expect(getElemByClassSpy).toHaveBeenCalled();
-
+   
         // Verify << filteredSelectables >> state is populated.
         expect(newStore.getState().timeline.query?.month).toEqual(6);
         expect(newStore.getState().timeline.filteredSelectables).not.toBeNull();

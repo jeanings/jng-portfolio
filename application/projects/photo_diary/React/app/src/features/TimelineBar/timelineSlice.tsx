@@ -52,7 +52,7 @@ export const fetchDocs = (apiUrl: string, request: ImageDocsRequestProps) => {
     // Convert arrays of parameters into joined query string. 
     for (let parameter in request) {
         if (typeof request[parameter] !== 'object') {
-            parsedRequest[parameter] = request[parameter]
+            parsedRequest[parameter] = request[parameter];
         }
         else {
             let parsedArrayToString: string = '';
@@ -69,7 +69,7 @@ export const fetchDocs = (apiUrl: string, request: ImageDocsRequestProps) => {
                 parsedArrayToString = parsedArrayToString === ''
                     ? parsed
                     : parsedArrayToString.concat('+', parsed);
-            })
+            });
 
             parsedRequest[parameter] = parsedArrayToString;
         }
@@ -93,7 +93,10 @@ const initialState: TimelineProps = {
     request: 'idle',
     query: null,
     yearInit: null,
-    yearSelected: null,
+    selected: {
+        year: null,
+        month: 'all'
+    },
     years: null,
     counter: {
         'all': 0,   // For actual counts.
@@ -120,6 +123,35 @@ const timelineSlice = createSlice({
     name: 'timeline',
     initialState,
     reducers: {
+        /* -------------------------------------------------
+            Handles setting request after app initialized.
+        ------------------------------------------------- */
+        handleInitStatus: (state, action) => {
+            const status = action.payload;
+            state.request = status;
+        },
+        /* ----------------------------------------------------------
+            Handles year selection for style, attribute updates.
+            << year >> triggers fetch useEffect,
+            << month >> resetting to 'all' triggers fetch useEffect.
+        ---------------------------------------------------------- */
+        handleYearSelect: (state, action) => {
+            const selectedYear = action.payload;
+            state.selected.year = selectedYear;
+            state.selected.month = 'all';
+        },
+        /* --------------------------------------------------------
+            Handles month selection for style, attribute updates.
+            << month >> setting triggers fetch useEffect.
+        -------------------------------------------------------- */
+        handleMonthSelect: (state, action) => {
+            const selectedMonth = action.payload;
+            state.selected.month = selectedMonth;
+        },
+        /* --------------------------------------------
+            Handles storing previous counter to start 
+            rolling counter from.
+        -------------------------------------------- */
         handleMonthCounter: (state, action) => {
             const month = action.payload.month;
             const count = action.payload.count;
@@ -138,11 +170,11 @@ const timelineSlice = createSlice({
             .addCase(fetchImagesData.fulfilled, (state, action) => {
                 const data = action.payload;
                 const args = action.meta.arg;
+                const years: Array<string> = data.years;
                 const counter: CounterTypes = data.counter;
                 const filterSelectables: FilterableTypes = data.filterSelectables[0];
                 const filteredSelectables: FilterableTypes = data.filteredSelectables;
                 const imageDocs: Array<ImageDocTypes> = data.docs;
-                const years: Array<string> = data.years;
                 const geojsonFeatures: GeojsonFeatureCollectionProps = data.featureCollection;
                 const bbox: BboxType = data.bounds;
 
@@ -153,16 +185,17 @@ const timelineSlice = createSlice({
 
                 // Assigning year-related states on init.
                 if (state.yearInit === null) {
-                    const yearInit: number = action.meta.arg.year !== 'default'
-                        ? action.meta.arg.year          // Sets to year of fetch request
+                    const yearInit: number = args.year !== 'default'
+                        ? args.year                     // Sets to year of fetch request
                         : imageDocs[0].date.year        // Sets to year of image docs if 'default'
                     state.yearInit = yearInit;
-                    state.yearSelected = yearInit;
+                    state.selected.year = yearInit;
+                    state.request = 'initialized';
                 }
                 else {
-                    state.yearSelected = imageDocs[0].date.year as number;
+                    state.request = 'complete';
                 }
-
+    
                 // Assign list of years in the collection.
                 state.years = years;
                 
@@ -185,13 +218,12 @@ const timelineSlice = createSlice({
                 state.imageDocs = imageDocs;
                 state.geojson = geojsonFeatures;
                 state.bounds = bbox;
-                state.request = 'complete';
             })
             /* --------------------------------------- 
                 Catches errors on fetching from API.
             --------------------------------------- */
             .addMatcher(isRejectedAction, (state, action) => {
-                // console.log("MongoDB image data action rejected.");
+                // MongoDB image data action rejected.
                 state.request = 'error';
             })
     },
@@ -203,10 +235,13 @@ const timelineSlice = createSlice({
 ===================================================================== */
 export interface TimelineProps {
     [index: string]: string | any,
-    'request': 'idle' | 'pending' | 'complete' | 'error',
+    'request': 'idle' | 'pending' | 'initialized' | 'complete' | 'error',
     'query': ImageDocsRequestProps | null,
     'yearInit': number | null,
-    'yearSelected': number | null,
+    'selected': {
+        'year': number | null,
+        'month': string | null
+    },
     'years': Array<string> | null,
     'counter': CounterTypes,
     'imageDocs': Array<ImageDocTypes> | null,
@@ -337,5 +372,9 @@ export const timelineSelection = (state: RootState) => state.timeline;
 
 // Export actions, reducers.
 const { actions, reducer } = timelineSlice;
-export const { handleMonthCounter } = actions;
+export const { 
+    handleYearSelect, 
+    handleMonthSelect, 
+    handleMonthCounter,
+    handleInitStatus } = actions;
 export default reducer;

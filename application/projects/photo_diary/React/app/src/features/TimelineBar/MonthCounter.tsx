@@ -46,19 +46,24 @@ const MonthCounter: React.FunctionComponent<MonthCounterProps> = (props: MonthCo
     // Create rolling counter component.
     const updateCount: JSX.Element = (
         <Countup
-            start={countStart as number} 
-            end={countCurrent === undefined ? 0 : countCurrent as number}   // Avoids passing in undefined
-            duration={1.5}                                                  // when fetches result in 
-            decimals={0}                                                    // non-existent keys.
+            start={ countStart as number } 
+            end={ countCurrent === undefined        // Avoids passing in undefined
+                ? 0                                 // when fetches result in 
+                : countCurrent as number            // non-existent keys.
+            }
+            duration={ 1.5 }
+            decimals={ 0 }
         />
     );
     
 
     return (
-        <div className={useMediaQueries(props.baseClassName.concat("__", props.className))}
-            role='none' aria-label='month-counter'>
+        <div className={ useMediaQueries(props.baseClassName.concat("__", props.className)) }
+            role="none" aria-label="month-counter">
 
-            {updateCount}
+            {/* Create rolling counter. */
+                updateCount
+            }
         </div>
     );
 }

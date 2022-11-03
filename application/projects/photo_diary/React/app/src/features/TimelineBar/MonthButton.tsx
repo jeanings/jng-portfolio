@@ -3,10 +3,7 @@ import {
     useAppDispatch, 
     useAppSelector,
     useMediaQueries } from '../../common/hooks';
-import { 
-    fetchImagesData, 
-    TimelineProps, 
-    ImageDocsRequestProps } from './timelineSlice';
+import { handleMonthSelect } from './timelineSlice';
 import MonthCounter from './MonthCounter';
 import './MonthButton.css';
 
@@ -17,7 +14,7 @@ import './MonthButton.css';
 ============================================================= */
 const MonthButton: React.FunctionComponent<MonthButtonProps> = (props: MonthButtonProps) => {
     const dispatch = useAppDispatch();
-    const yearSelected = useAppSelector(state => state.timeline.yearSelected);
+    const selectedMonth = useAppSelector(state => state.timeline.selected.month);
 
     /* ------------------------------------------------------------------
         On initialization, set 'ALL' months selector to 
@@ -26,60 +23,64 @@ const MonthButton: React.FunctionComponent<MonthButtonProps> = (props: MonthButt
     ------------------------------------------------------------------ */
     useEffect(() => {
         // Set active month to 'all', unset the rest.
-        const defaultMonthSelectorElem = document.getElementById("month-item-all") as HTMLElement;
-        defaultMonthSelectorElem.setAttribute('aria-checked', 'true');
-        defaultMonthSelectorElem.classList.add("active");
+        const defaultMonthElem = document.getElementById("month-item-all") as HTMLElement;
+        defaultMonthElem.setAttribute("aria-checked", 'true');
+        defaultMonthElem.classList.add("active");
     }, []);
 
 
-    /* ------------------------------------------------------------------
-        Clicks on month selector items will dispatch action to
-        update selected month, showing only images from selected month.
-    ------------------------------------------------------------------ */
+    /* --------------------------------------------------------------
+        Handles month elements' style and attribute updates through 
+        listening on << timeline.selected.month >> changes.
+    -------------------------------------------------------------- */
+    useEffect(() => {
+        const thisMonthButton = document.getElementById(
+            props.className.concat("-", props.month)) as HTMLElement;
+
+        // Styling and attribute assigning based on if month was queried.
+        switch (selectedMonth === props.month) {
+            case (true):
+                thisMonthButton.setAttribute("aria-checked", 'true');
+                thisMonthButton.classList.add("active");
+                break;
+            case (false):
+                thisMonthButton.setAttribute("aria-checked", 'false');
+                thisMonthButton.classList.remove("active");
+                break;
+        }   
+    }, [selectedMonth])
+
+
+    /* -------------------------------------------------------------
+        Clicks on month selector items will update selected month, 
+        triggering a useEffect fetch dispatch in component.
+    ------------------------------------------------------------- */
     const onMonthSelect = (event: React.SyntheticEvent) => {
         const monthElemToSelect = event.target as HTMLButtonElement;
-        const monthSelectorElems: HTMLCollectionOf<Element> = document.getElementsByClassName(
-            "TimelineBar".concat("__", "month-item"));
-
-        // Reset all other radios to false, unhighlight styling.
-        for (let element of Array.from(monthSelectorElems)) {
-            if (element !== monthElemToSelect) {
-                if (element.getAttribute('aria-checked') === 'true') {
-                    element.setAttribute('aria-checked', 'false');
-                    element.classList.remove("active");
-                }
-            }
-        }
-
-        // Change to clicked month.
-        monthElemToSelect.setAttribute('aria-checked', 'true');
-
-        // Update styling and highlight new month.
-        monthElemToSelect.classList.add("active");
 
         // Dispatch selected month to reducer.
-        const monthElemToSelectName: string = monthElemToSelect.textContent!.replace(/\d+/, "");
-        const monthNum = getNumericalMonth(monthElemToSelectName.toLowerCase());
+        const monthElemSelected: string = monthElemToSelect.textContent!
+            .replace(/\d+/, "")
+            .toLowerCase();
+        const payloadMonthSelected: string = monthElemSelected;
 
-        const monthQuery: ImageDocsRequestProps= {
-            'year': yearSelected as number,
-            'month': monthNum
-        };
-
-        dispatch(fetchImagesData(monthQuery));
+        dispatch(handleMonthSelect(payloadMonthSelected));
     };
     
 
     return (
-        <div className={useMediaQueries(props.baseClassName.concat("__", props.className))}
-            id={props.className.concat('-', props.month)}
-            role="menuitemradio" aria-label={props.className}
+        <div className={ useMediaQueries(props.baseClassName.concat("__", props.className)) }
+            id={ props.className.concat('-', props.month) }
+            role="menuitemradio" aria-label={ props.className }
             aria-checked="false"
-            onClick={onMonthSelect}>
+            onClick={ onMonthSelect }>
 
-                {props.month.toUpperCase()}
-                {/* Generate counter for images taken in the month */}
-                {createMonthCounter(props.month, props.baseClassName, props.keyIndex)}
+                {/* Month text styled in upper case. */
+                    props.month.toUpperCase()
+                }
+                {/* Generate counter for images taken in the month. */
+                    createMonthCounter(props.month, props.baseClassName, props.keyIndex)
+                }
         </div>
     );
 }
@@ -97,32 +98,15 @@ function createMonthCounter(month: string, classBase: string, index: number) {
 
     monthCounter = (
         <MonthCounter
-            month={month}
-            baseClassName={classBase}
-            className='month-counter'
-            key={'key-month-counter_'.concat(index.toString())}
+            month={ month }
+            baseClassName={ classBase }
+            className="month-counter"
+            key={ "key-month-counter_".concat(index.toString()) }
         />
     );
 
     return monthCounter;
 }
-
-/* -----------------------------------
-    Month to numerical month mapper.
------------------------------------ */
-function getNumericalMonth(month: string) {
-    const monthToNum: { [key: string]: number } = {
-        'jan': 1, 'feb': 2, 'mar': 3,
-        'apr': 4, 'may': 5, 'jun': 6,
-        'jul': 7, 'aug': 8, 'sep': 9,
-        'oct': 10, 'nov': 11, 'dec': 12
-    };
-
-    const monthNum: number = monthToNum[month];
-
-    return monthNum
-};
-
 
 
 /* =====================================================================

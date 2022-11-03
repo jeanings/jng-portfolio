@@ -46,7 +46,7 @@ const preloadedState: RootState = {
         request: 'complete',
         query: { year: 2022 },
         yearInit: 2022,
-        yearSelected: 2022,
+        selected: { year: 2022, month: 'all' },
         years: mockDefaultData.years,
         counter: {
             'all': 0,
