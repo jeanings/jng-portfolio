@@ -213,6 +213,7 @@ def get_metadata(image, cameras_dict, image_url):
         
         # URL for uploaded image.
         metadata.url = image_url
+        metadata.url_thumb = image_url.replace('images', 'thumbs')
 
         # Tags.
         metadata.tags = raw_tags
@@ -255,6 +256,7 @@ def get_metadata(image, cameras_dict, image_url):
 
         # URL for uploaded image.
         metadata.url = image_url
+        metadata.url_thumb = image_url.replace('images', 'thumbs')
 
         # Tags.
         metadata.tags = strip_metadata_in_tags(raw_tags)
@@ -342,7 +344,9 @@ def create_mongodb_docs():
             'lat': [], 'lng': []
         }
 
+        # image_set == tz code folder name, 'Japan', 'America.Vancouver'
         for image_set in year_folder.iterdir():
+            # item == files
             for item in image_set.iterdir():
                 if item.suffix in image_extensions:
                     # Add GPS data for calculating bounds.

@@ -33,6 +33,7 @@ class Metadata(object):
         }
         self.tags = None
         self.url = None
+        self.url_thumb = None
         self.title = None
         self.description = None
 
@@ -83,6 +84,7 @@ class Metadata(object):
             'gps': self.gps,
             'tags': self.tags,
             'url': self.url,
+            'url_thumb': self.url_thumb,
             'title': self.title,
             'description': self.description
         }
