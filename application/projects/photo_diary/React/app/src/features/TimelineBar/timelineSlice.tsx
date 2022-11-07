@@ -310,7 +310,8 @@ export type ImageDocTypes = {
     'shutter_speed': number | null,
     'tags': Array<string>,
     'title': string | null,
-    'url': string
+    'url': string,
+    'url_thumb': string
 };
 
 export type ImageDocFormatTypes = {
@@ -345,6 +346,7 @@ export type GeojsonFeatureType = {
         'coordinates': Array<number>
     },
     'properties': {
+        'doc_id': string,
         'name': string,
         'date': {
             'year': number,

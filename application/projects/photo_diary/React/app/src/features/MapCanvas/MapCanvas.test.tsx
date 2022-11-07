@@ -30,6 +30,7 @@ import {
 import mapboxgl from 'mapbox-gl'; 
 import 'mapbox-gl/dist/mapbox-gl.css';
 
+const MapboxglSpiderfier: any = require('mapboxgl-spiderifier');
 
 var mockAxios = new MockAdapter(axios);
 var user = userEvent.setup();
@@ -181,7 +182,7 @@ test("adds new data source on new fetches", async() => {
     const mockMapGetLayer = jest.fn();
     const mockMapRemoveLayer = jest.fn();
 
-    jest.spyOn(mapboxgl, "Map")
+    jest.spyOn(mapboxgl, 'Map')
         .mockImplementation(() => {
             return {
                 on: mockMapOn,
@@ -252,7 +253,7 @@ test("adds marker layer and fits map to bounds", async() => {
     const mockMapGetLayer = jest.fn();
     const mockMapFitBounds = jest.fn();
 
-    jest.spyOn(mapboxgl, "Map")
+    jest.spyOn(mapboxgl, 'Map')
         .mockImplementation(() => {
             return {
                 on: mockMapOn,
@@ -329,7 +330,7 @@ test("replaces previous layer and source on new data fetches", async() => {
     const mockMapRemoveLayer = jest.fn();
     const mockMapFitBounds = jest.fn();
 
-    jest.spyOn(mapboxgl, "Map")
+    jest.spyOn(mapboxgl, 'Map')
         .mockImplementation(() => {
             return {
                 on: mockMapOn,
@@ -367,8 +368,6 @@ test("replaces previous layer and source on new data fetches", async() => {
         screen.findByRole('main', { name: 'map-canvas' });
         expect(newStore.getState().timeline.bounds).not.toBeNull();
     });
-
-    const bounds2022 = newStore.getState().timeline.bounds;
 
     // Mock dispatches for layer-adding conditions.
     newStore.dispatch(setStyleLoadStatus(true));
@@ -407,71 +406,6 @@ test("replaces previous layer and source on new data fetches", async() => {
     expect(mockMapAddSource).toHaveBeenCalled();
 });
     
-
-xtest("creates popups for markers on map", async() => {
-/* --------------------------------------------------------
-        Mocks                                          start
-    -------------------------------------------------------- */
-    // Mocked Axios calls.
-    mockAxios = new MockAdapter(axios);
-    mockAxios
-        .onGet(apiUrl, { params: { 'year': 'default' } })
-        .replyOnce(200, mockDefaultData)
-
-    // Mocked Mapbox methods.
-    const mockMapOn = jest.fn();
-    const mockMapAddSource = jest.fn();
-    const mockMapGetSource = jest.fn();
-    const mockMapRemoveSource = jest.fn();
-    const mockMapAddLayer = jest.fn();
-    const mockMapGetLayer = jest.fn();
-    const mockMapRemoveLayer = jest.fn();
-    const mockMapFitBounds = jest.fn();
-
-    jest.spyOn(mapboxgl, "Map")
-        .mockImplementation(() => {
-            return {
-                on: mockMapOn,
-                addSource: mockMapAddSource,
-                getSource: mockMapGetSource,
-                removeSource: mockMapRemoveSource,
-                addLayer: mockMapAddLayer,
-                getLayer: mockMapGetLayer,
-                removeLayer: mockMapRemoveLayer,
-                fitBounds: mockMapFitBounds
-            }
-        })
-
-    mockMapGetLayer.mockReturnValue('some-layer');
-    mockMapGetSource.mockReturnValue('some-source');
-
-    // Mocked React functions.
-    const useDispatchSpy = jest.spyOn(reactRedux, 'useDispatch');
-    const mockDispatch = jest.fn();
-    useDispatchSpy.mockReturnValue(mockDispatch);
-    /* --------------------------------------------------------
-        Mocks                                            end
-    -------------------------------------------------------- */
-
-    const newStore = setupStore(preloadedState);
-        render(
-            <Provider store={newStore}>
-                <TimelineBar />
-                <MapCanvas />
-            </Provider>
-        );
-    
-    // Wait for fetch.
-    await waitFor(() => {
-        screen.findByRole('main', { name: 'map-canvas' });
-        expect(newStore.getState().timeline.bounds).not.toBeNull();
-    });
-
-});
-
-
-
-
 
 
 /* =====================================================
