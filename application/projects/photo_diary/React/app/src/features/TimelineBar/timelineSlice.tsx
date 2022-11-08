@@ -315,8 +315,8 @@ export type ImageDocTypes = {
 };
 
 export type ImageDocFormatTypes = {
-    'medium': 'digital' | 'film',
-    'type': '120' | '35mm' | 'APS-C' | 'Micro43' | 'Full-frame'
+    'medium': 'digital' | 'film' | string,
+    'type': '120' | '35mm' | 'APS-C' | 'Micro43' | 'Full-frame' | string
 };
 
 export type FilterableTypes = {

@@ -1,0 +1,9 @@
+.ImageFrame {
+    display: block;
+}
+
+    .ImageFrame__image {
+        width: 15rem;
+        height: 15rem;
+        object-fit: cover;
+    }
