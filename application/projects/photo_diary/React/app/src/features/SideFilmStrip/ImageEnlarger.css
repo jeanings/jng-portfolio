@@ -1,0 +1,9 @@
+.SideFilmStrip__image-enlarger {
+    grid-column: 1 / 2;
+    grid-row: 1;
+}
+
+    .SideFilmStrip__image-enlarger__image {
+        max-width: 70vw;
+        max-height: 70vh;
+    }

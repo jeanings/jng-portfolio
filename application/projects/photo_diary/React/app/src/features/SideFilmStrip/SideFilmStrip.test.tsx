@@ -83,6 +83,9 @@ const preloadedState: RootState = {
         sourceStatus: 'idle',
         markersStatus: 'idle',
         fitBoundsButton: 'idle'
+    },
+    sideFilmStrip: {
+        enlargeDoc: null
     }
 };
 
@@ -92,18 +95,6 @@ const preloadedState: RootState = {
     Tests on state data, map, and image displaying interactions. 
 =============================================================== */
 test("renders side strip panel", async() => {
-    /* --------------------------------------------------------
-        Mocks                                          start
-    -------------------------------------------------------- */
-    // Mocked Axios calls.
-    mockAxios = new MockAdapter(axios);
-    mockAxios
-        .onGet(apiUrl, { params: { 'year': 'default' } })
-        .replyOnce(200, mockDefaultData);
-    /* --------------------------------------------------------
-        Mocks                                            end
-    -------------------------------------------------------- */
-
     const newStore = setupStore(preloadedState);
         render(
             <Provider store={newStore}>
@@ -122,18 +113,6 @@ test("renders side strip panel", async() => {
 
 
 test("displays image collection in side strip panel", async() => {
-    /* --------------------------------------------------------
-        Mocks                                          start
-    -------------------------------------------------------- */
-    // Mocked Axios calls.
-    mockAxios = new MockAdapter(axios);
-    mockAxios
-        .onGet(apiUrl, { params: { 'year': 'default' } })
-        .replyOnce(200, mockDefaultData)
-    /* --------------------------------------------------------
-        Mocks                                            end
-    -------------------------------------------------------- */
-
     const newStore = setupStore(preloadedState);
         render(
             <Provider store={newStore}>
@@ -155,6 +134,127 @@ test("displays image collection in side strip panel", async() => {
     await waitFor(() => screen.findAllByRole('none', { name: 'image-frame' }));
     const imageFrameElems = screen.getAllByRole('none', { name: 'image-frame' });
     expect(imageFrameElems.length).toEqual(imageDocs!.length);
+});
 
-   
+
+test("clicks on images in film strip dispatches action", async() => {
+    const newStore = setupStore(preloadedState);
+        render(
+            <Provider store={newStore}>
+                <SideFilmStrip />
+            </Provider>
+        );
+    
+    // Verify data to build film strip is available.
+    const imageDocs = newStore.getState().timeline.imageDocs
+    expect(imageDocs).not.toBeNull();
+    expect(imageDocs!.length).toEqual(40);
+
+    // Wait for render.
+    await waitFor(() => screen.findByRole('aside', { name: 'side-film-strip' }));
+    const filmStripElem = screen.getByRole('aside', { name: 'side-film-strip' });
+    expect(filmStripElem).toBeInTheDocument();
+
+    // Verify correct length of image frames rendered.
+    await waitFor(() => screen.findAllByRole('none', { name: 'image-frame' }));
+    const imageFrameElems = screen.getAllByRole('none', { name: 'image-frame' });
+    expect(imageFrameElems.length).toEqual(imageDocs!.length);
+    
+    // Verify empty state.
+    expect(newStore.getState().sideFilmStrip.enlargeDoc).toBeNull();
+
+    // Get image to click on.
+    const imageToClick = imageFrameElems[0];
+
+    await waitFor(() => user.click(imageToClick));
+
+    // Verify clicked image state updated.
+    expect(newStore.getState().sideFilmStrip.enlargeDoc).not.toBeNull();
+});
+
+
+test("renders 'image-enlarger' popup for showing enlarged image", async() => {
+    const newStore = setupStore(preloadedState);
+        render(
+            <Provider store={newStore}>
+                <SideFilmStrip />
+            </Provider>
+        );
+    
+    // Verify data to build film strip is available.
+    const imageDocs = newStore.getState().timeline.imageDocs
+    expect(imageDocs).not.toBeNull();
+    expect(imageDocs!.length).toEqual(40);
+
+    // Wait for render.
+    await waitFor(() => screen.findByRole('aside', { name: 'side-film-strip' }));
+    const filmStripElem = screen.getByRole('aside', { name: 'side-film-strip' });
+    expect(filmStripElem).toBeInTheDocument();
+
+    // Verify correct length of image frames rendered.
+    await waitFor(() => screen.findAllByRole('none', { name: 'image-frame' }));
+    const imageFrameElems = screen.getAllByRole('none', { name: 'image-frame' });
+    expect(imageFrameElems.length).toEqual(imageDocs!.length);
+    
+    // Verify empty state.
+    expect(newStore.getState().sideFilmStrip.enlargeDoc).toBeNull();
+    
+    // Get image to click on.
+    const imageToClick = imageFrameElems[0];
+
+    await waitFor(() => user.click(imageToClick));
+
+    // Verify clicked image state updated.
+    expect(newStore.getState().sideFilmStrip.enlargeDoc).not.toBeNull();
+
+    // Check for enlarger popup to be rendered.
+    await waitFor(() => screen.findByRole('none', { name: 'image-enlarger' }));
+    const imageEnlargerElem = screen.getByRole('none', { name: 'image-enlarger'} );
+    expect(imageEnlargerElem).toBeInTheDocument();
+});
+
+
+test("renders image to be enlarged based on << enlargeDoc >> state", async() => {
+    const newStore = setupStore(preloadedState);
+        render(
+            <Provider store={newStore}>
+                <SideFilmStrip />
+            </Provider>
+        );
+    
+    // Verify data to build film strip is available.
+    const imageDocs = newStore.getState().timeline.imageDocs
+    expect(imageDocs).not.toBeNull();
+    expect(imageDocs!.length).toEqual(40);
+
+    // Wait for render.
+    await waitFor(() => screen.findByRole('aside', { name: 'side-film-strip' }));
+    const filmStripElem = screen.getByRole('aside', { name: 'side-film-strip' });
+    expect(filmStripElem).toBeInTheDocument();
+
+    // Verify correct length of image frames rendered.
+    await waitFor(() => screen.findAllByRole('none', { name: 'image-frame' }));
+    const imageFrameElems = screen.getAllByRole('none', { name: 'image-frame' });
+    expect(imageFrameElems.length).toEqual(imageDocs!.length);
+    
+    // Get image to click on.
+    const imageToClick = imageFrameElems[0];
+
+    await waitFor(() => user.click(imageToClick));
+
+    // Verify clicked image state updated.
+    expect(newStore.getState().sideFilmStrip.enlargeDoc).not.toBeNull();
+
+    // Check for enlarger popup to be rendered.
+    await waitFor(() => screen.findByRole('none', { name: 'image-enlarger' }));
+    const imageEnlargerElem = screen.getByRole('none', { name: 'image-enlarger'} );
+    expect(imageEnlargerElem).toBeInTheDocument();
+
+    // Verify correct image gets shown.
+    await waitFor(() => screen.findByRole('img', { name: 'enlarged-image' }));
+    const enlargedImageElem = screen.getByRole('img', { name: 'enlarged-image' });
+    
+    const imageDocUrl = newStore.getState().sideFilmStrip.enlargeDoc!.url;
+    const renderedImageUrl = enlargedImageElem.getAttribute('src');
+    expect(renderedImageUrl).toEqual(imageDocUrl);
 });

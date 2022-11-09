@@ -1,23 +1,26 @@
 import React from 'react';
 import { useAppDispatch, useMediaQueries } from '../../common/hooks';
 import { ImageDocTypes } from '../TimelineBar/timelineSlice';
+import { handleEnlarger } from './sideFilmStripSlice';
 import './ImageFrame.css';
 
 
-/* ====================================================================
-    A main component - container for filtering options.
-==================================================================== */
+/* ===============================================================
+    Constructor for rendering images in << timeline.imageDocs >>
+    state, sets them in container for styling.
+=============================================================== */
 const ImageFrame: React.FunctionComponent <ImageFrameProps> = (props: ImageFrameProps) => {
     const dispatch = useAppDispatch();
     const classBase: string = "ImageFrame";   
 
-    /* ----------------------------------------------------------
-        Clicks on image dispatches action to change << >>, so
-        an enlarged version with stats will be shown in a panel
-        to the left.
-    ---------------------------------------------------------- */
+    /* ---------------------------------------------------------------
+        Clicks on image dispatches action to change << enlargeDoc >>
+        state, so an enlarged version with stats will be shown 
+        in a panel to the left of film strip.
+    --------------------------------------------------------------- */
     const onImageClick = (event: React.SyntheticEvent) => {
-       
+        const payloadImageDoc: ImageDocTypes = props.imageDoc;
+        dispatch(handleEnlarger(payloadImageDoc));
     };
 
     
