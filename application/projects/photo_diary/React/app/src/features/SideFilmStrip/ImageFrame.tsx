@@ -28,7 +28,8 @@ const ImageFrame: React.FunctionComponent <ImageFrameProps> = (props: ImageFrame
 
             <img className={ useMediaQueries(classBase.concat("__", "image")) }
                 src={ props.imageDoc.url_thumb }
-                aria-label="image-frame-image" 
+                aria-label="image-frame-image"
+                draggable="false"
             />
             
         </div>

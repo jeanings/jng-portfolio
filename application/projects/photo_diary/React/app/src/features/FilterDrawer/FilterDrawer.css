@@ -57,7 +57,7 @@
         display: grid;
         row-gap: 1rem;
         column-gap: 1.5rem;
-        grid-template-columns: 36% 64%;
+        grid-template-columns: 36% 50% auto;
         grid-template-rows: repeat(5, 1fr);
     }
 
@@ -91,7 +91,7 @@
             }
 
             #tags {
-                grid-column: 2 / -1;
+                grid-column: 2 / 3;
                 grid-row: 1 / -1;
             }
 

@@ -1,9 +1,17 @@
 .ImageFrame {
-    display: block;
+    display: flex;
 }
 
     .ImageFrame__image {
-        width: 15rem;
-        height: 15rem;
+        width: 8rem;
+        height: 8rem;
         object-fit: cover;
+        border-radius: 0.25rem;
     }
+
+/* .ImageFrame__image {
+        width: 10rem;
+        height: 10rem;
+        object-fit: cover;
+        border-radius: 0.25rem;
+    } */

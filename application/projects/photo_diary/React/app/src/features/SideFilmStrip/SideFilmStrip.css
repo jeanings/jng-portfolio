@@ -1,13 +1,40 @@
 .SideFilmStrip {
+    grid-column: 3 / 6;
+    grid-row: 2 / -1;
+    margin-left: 8rem;
+    display: grid;
+    grid-template-columns: auto 18rem;
+    overflow: hidden;
+    user-select: none;
+    z-index: 2;
+}
+
+    .SideFilmStrip__container {
+        grid-column: 2 / 3;
+        display: flex;
+        flex-wrap: wrap;
+        column-gap: 0.85rem;
+        row-gap: 0.85rem;
+        overflow-y: auto;
+    }
+
+/* 
+.SideFilmStrip {
     grid-column: 4 / 6;
     grid-row: 2 / -1;
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: 60% 40%;
     overflow: hidden;
     z-index: 2;
 }
 
     .SideFilmStrip__container {
-        overflow-y: auto;
         grid-column: 2 / 3;
-    }
+        display: grid;
+        margin-top: 1rem;
+        margin-bottom: 1rem;
+        grid-template-columns: 100%;
+        grid-template-rows: auto;
+        row-gap: 1rem;
+        overflow-y: auto;
+    } */

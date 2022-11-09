@@ -19,7 +19,7 @@ const SideFilmStrip: React.FunctionComponent = () => {
     let imageFrameElems: Array<JSX.Element> = [];
     
     if (imageDocs) {
-        imageDocs.map((imageDoc, index) => (
+        [...imageDocs].reverse().map((imageDoc, index) => (
             imageFrameElems.push(createImageFrames(classBase, imageDoc, index))
         ));
     }
