@@ -13,7 +13,7 @@ import './SideFilmStrip.css';
 ======================================================================= */
 const SideFilmStrip: React.FunctionComponent = () => {
     const imageDocs = useAppSelector(state => state.timeline.imageDocs);
-    const classBase: string = "SideFilmStrip";   
+    const classBase: string = "SideFilmStrip";
 
     /* -----------------------------------------------------------
         Generate image frame elements for array of MongoDB docs.
@@ -36,6 +36,7 @@ const SideFilmStrip: React.FunctionComponent = () => {
     const onImageHover = (event: React.SyntheticEvent) => {
         const filmStripContainerElem = document.getElementById("film-strip") as HTMLElement;
         const imageEnlargerContainerElem = document.getElementById("image-enlarger-container") as HTMLElement;
+        filmStripContainerElem.setAttribute("aria-expanded", 'true');
         filmStripContainerElem.classList.add("expand");
         imageEnlargerContainerElem.classList.add("slide");
     };
@@ -43,6 +44,7 @@ const SideFilmStrip: React.FunctionComponent = () => {
     const onImageUnhover = (event: React.SyntheticEvent) => {
         const filmStripContainerElem = document.getElementById("film-strip") as HTMLElement;
         const imageEnlargerContainerElem = document.getElementById("image-enlarger-container") as HTMLElement;
+        filmStripContainerElem.setAttribute("aria-expanded", 'false');
         filmStripContainerElem!.classList.remove("expand");
         imageEnlargerContainerElem.classList.remove("slide");
 
@@ -66,6 +68,7 @@ const SideFilmStrip: React.FunctionComponent = () => {
             <div className={ useMediaQueries(classBase.concat("__", "film-strip")) }
                 id="film-strip"
                 role="none" aria-label="film-strip-container"
+                aria-expanded="false"
                 onTouchStart={ onImageHover }
                 onTouchEnd={ onImageUnhover }
                 onMouseEnter={ onImageHover }

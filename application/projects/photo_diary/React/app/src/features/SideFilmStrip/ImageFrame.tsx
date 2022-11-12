@@ -1,7 +1,7 @@
 import React from 'react';
 import { useAppDispatch, useMediaQueries } from '../../common/hooks';
 import { ImageDocTypes } from '../TimelineBar/timelineSlice';
-import { handleEnlarger } from './sideFilmStripSlice';
+import { handleEnlarger, SideFilmStripProps } from './sideFilmStripSlice';
 import './ImageFrame.css';
 
 
@@ -19,7 +19,7 @@ const ImageFrame: React.FunctionComponent <ImageFrameProps> = (props: ImageFrame
         in a panel to the left of film strip.
     --------------------------------------------------------------- */
     const onImageClick = (event: React.SyntheticEvent) => {
-        const payloadImageDoc: ImageDocTypes = props.imageDoc;
+        const payloadImageDoc: SideFilmStripProps['enlargeDoc'] = props.imageDoc;
         dispatch(handleEnlarger(payloadImageDoc));
     };
 

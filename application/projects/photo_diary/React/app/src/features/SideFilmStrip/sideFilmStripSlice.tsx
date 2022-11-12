@@ -2,6 +2,7 @@ import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { RootState } from '../../app/store';
 import { ImageDocTypes } from '../TimelineBar/timelineSlice';
 
+
 /* ==============================================================================
     Slice for handling expanded view in side panel 'film strip' component.
 ============================================================================== */
@@ -19,7 +20,7 @@ const sideFilmStripSlice = createSlice({
             Handles setting clicked image in film strip or map marker to be 
             shown, enlarged, to the left of film strip panel.
         ------------------------------------------------------------------ */
-        handleEnlarger: (state, action: PayloadAction<ImageDocTypes>) => {
+        handleEnlarger: (state, action: PayloadAction<SideFilmStripProps['enlargeDoc']>) => {
             const imageDoc = action.payload;
             state.enlargeDoc = imageDoc;
         }
@@ -33,7 +34,6 @@ const sideFilmStripSlice = createSlice({
 export interface SideFilmStripProps {
     [index: string]: ImageDocTypes | null,
     enlargeDoc: ImageDocTypes | null ,
-    
 };
 
 

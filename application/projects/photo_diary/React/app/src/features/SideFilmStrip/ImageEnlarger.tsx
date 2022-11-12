@@ -28,10 +28,19 @@ const ImageEnlarger: React.FunctionComponent <ImageEnlargerProps> = (props: Imag
         TODO: don't show image enlarger panel if no image clicked.
     --------------------------------------------------------------- */
     useEffect(() => {
+
         if (imageDoc !== null) {
-            // add class to show panel
+            // Add class to show panel.
+            const imageEnlargerElem = document.getElementById("image-enlarger") as HTMLElement;
+            imageEnlargerElem.setAttribute("aria-expanded", 'true');
+            imageEnlargerElem.classList.add("show");
         }
-        // else don't show
+        else {
+            // Hide panel if no image clicked.
+            const imageEnlargerElem = document.getElementById("image-enlarger") as HTMLElement;
+            imageEnlargerElem.setAttribute("aria-expanded", 'false');
+            imageEnlargerElem.classList.remove("show");
+        }
     }, [imageDoc])
 
 
@@ -120,6 +129,7 @@ const ImageEnlarger: React.FunctionComponent <ImageEnlargerProps> = (props: Imag
     
     return (
         <div className={ useMediaQueries(props.baseClassName.concat("__", classBase)) }
+            id="image-enlarger"
             role="figure" aria-label={ classBase }
             aria-expanded="false">
             

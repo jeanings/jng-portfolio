@@ -22,6 +22,7 @@ import {
 import mapboxgl from 'mapbox-gl'; 
 import 'mapbox-gl/dist/mapbox-gl.css';
 import SideFilmStrip from './SideFilmStrip';
+import { handleEnlarger } from './sideFilmStripSlice';
 
 const MapboxglSpiderfier: any = require('mapboxgl-spiderifier');
 
@@ -329,15 +330,36 @@ test("expands/contracts second column of thumbnails on hovering over strip", asy
 });
 
 
+test("reveals/hides enlarger depending on state availability", async() => {
+    const newStore = setupStore(preloadedState);
+        render(
+            <Provider store={newStore}>
+                <SideFilmStrip />
+            </Provider>
+        );
+    
+    // "Reset" << enlargeDoc >> to null, unlicked state.
+    newStore.dispatch(handleEnlarger(null));
+    expect(newStore.getState().sideFilmStrip.enlargeDoc).toBeNull();
 
+    // Verify enlarger panel is hidden.
+    await waitFor(() => screen.findByRole('figure', { name: 'image-enlarger' }));
+    const imageEnlargerElem = screen.getByRole('figure', { name: 'image-enlarger' });
+    expect(imageEnlargerElem).toHaveAttribute("aria-expanded", 'false');
+    expect(imageEnlargerElem).not.toHaveClass("show");
+
+    // Verify enlarger panel becomes visible on imageDoc existence.
+    newStore.dispatch(handleEnlarger(mockDefaultData.docs[0]));
+    expect(newStore.getState().sideFilmStrip.enlargeDoc).not.toBeNull();
+    await waitFor(() => {
+        expect(imageEnlargerElem).toHaveAttribute("aria-expanded", 'true');
+        expect(imageEnlargerElem).toHaveClass("show");
+    });
+});
 
 
 /*
 
-
-test("reveals/hides enlarger depending on state availability", async() => {
-    
-});
 
 test("flies to map position on gps lock on button click", async() => {
     
