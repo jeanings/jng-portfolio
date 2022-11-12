@@ -1,5 +1,8 @@
 .ImageFrame {
     display: flex;
+    pointer-events: all;
+    user-select: all;
+    cursor: pointer;
 }
 
     .ImageFrame__image {
@@ -7,7 +10,7 @@
         height: 8rem;
         object-fit: cover;
         border-radius: 0.25rem;
-        cursor: pointer;
+        
     }
 
 /* .ImageFrame__image {

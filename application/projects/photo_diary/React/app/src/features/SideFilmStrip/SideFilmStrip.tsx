@@ -8,8 +8,8 @@ import './SideFilmStrip.css';
 
 /* =======================================================================
     A main component - container for showing thumbnail images from state 
-    as well as showing enlarged image with stats from clicks on them and 
-    through map markers. 
+    as well as showing enlarged image with stats from clicks on thumbnails
+    and through map markers. 
 ======================================================================= */
 const SideFilmStrip: React.FunctionComponent = () => {
     const imageDocs = useAppSelector(state => state.timeline.imageDocs);
@@ -30,24 +30,52 @@ const SideFilmStrip: React.FunctionComponent = () => {
     }
 
 
+    /* ------------------------------------------------------
+        Handle expand/contract of film strip on hover/touch.
+    ------------------------------------------------------ */
+    const onImageHover = (event: React.SyntheticEvent) => {
+        const filmStripContainerElem = document.getElementById("film-strip") as HTMLElement;
+        const imageEnlargerContainerElem = document.getElementById("image-enlarger-container") as HTMLElement;
+        filmStripContainerElem.classList.add("expand");
+        imageEnlargerContainerElem.classList.add("slide");
+    };
+
+    const onImageUnhover = (event: React.SyntheticEvent) => {
+        const filmStripContainerElem = document.getElementById("film-strip") as HTMLElement;
+        const imageEnlargerContainerElem = document.getElementById("image-enlarger-container") as HTMLElement;
+        filmStripContainerElem!.classList.remove("expand");
+        imageEnlargerContainerElem.classList.remove("slide");
+
+    };
+
 
     return (
         <aside className={ useMediaQueries(classBase) } id={ classBase }
-            role="aside" aria-label="side-film-strip">
-            
-            {/* Panel for showing stats and enlarged image, if a thumbnail or
-                map marker is clicked. */}
-            <ImageEnlarger 
-                baseClassName={ classBase }/>
+            role="aside" aria-label="side-film-strip-panel">
 
-            <div className={ useMediaQueries(classBase.concat("__", "container")) }
-                role="none" aria-label="film-strip-container">
+            {/* Panel for enlarged image and its stats. */}
+            <div className={ useMediaQueries(classBase.concat("__", "image-enlarger-container")) }
+                id="image-enlarger-container"
+                role="none" aria-label="image-enlarger-container">
+
+                <ImageEnlarger 
+                    baseClassName={ classBase }/>
+            </div>
+
+            {/* "Film strip" showing image collection in columnar form. */}
+            <div className={ useMediaQueries(classBase.concat("__", "film-strip")) }
+                id="film-strip"
+                role="none" aria-label="film-strip-container"
+                onTouchStart={ onImageHover }
+                onTouchEnd={ onImageUnhover }
+                onMouseEnter={ onImageHover }
+                onMouseLeave={ onImageUnhover }>
 
                 {/* Image containers for all docs in collection. */
                     imageFrameElems
                 }
             </div>
-                
+
         </aside>
     );
 }

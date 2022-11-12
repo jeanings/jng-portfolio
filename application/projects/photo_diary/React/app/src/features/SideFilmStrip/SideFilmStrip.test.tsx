@@ -16,10 +16,8 @@ import mockDefaultData from '../../utils/mockDefaultData.json';
 import mock2015Data from '../../utils/mock2015Data.json';
 import TimelineBar from '../TimelineBar/TimelineBar';
 import {
-    fetchImagesData,
     GeojsonFeatureCollectionProps,
-    BboxType, 
-    handleYearSelect} from '../TimelineBar/timelineSlice';
+    BboxType } from '../TimelineBar/timelineSlice';
 // @ts-ignore
 import mapboxgl from 'mapbox-gl'; 
 import 'mapbox-gl/dist/mapbox-gl.css';
@@ -106,8 +104,8 @@ test("renders side strip panel", async() => {
     expect(newStore.getState().timeline.imageDocs).not.toBeNull();
 
     // Check for side strip panel to be rendered.
-    await waitFor(() => screen.findByRole('aside', { name: 'side-film-strip' }));
-    const filmStripElem = screen.getByRole('aside', { name: 'side-film-strip' });
+    await waitFor(() => screen.findByRole('aside', { name: 'side-film-strip-panel' }));
+    const filmStripElem = screen.getByRole('aside', { name: 'side-film-strip-panel' });
     expect(filmStripElem).toBeInTheDocument();
 });
 
@@ -126,8 +124,8 @@ test("displays image collection in side strip panel", async() => {
     expect(imageDocs!.length).toEqual(40);
 
     // Wait for render.
-    await waitFor(() => screen.findByRole('aside', { name: 'side-film-strip' }));
-    const filmStripElem = screen.getByRole('aside', { name: 'side-film-strip' });
+    await waitFor(() => screen.findByRole('aside', { name: 'side-film-strip-panel' }));
+    const filmStripElem = screen.getByRole('aside', { name: 'side-film-strip-panel' });
     expect(filmStripElem).toBeInTheDocument();
 
     // Verify correct length of image frames rendered.
@@ -151,8 +149,8 @@ test("clicks on images in film strip dispatches action", async() => {
     expect(imageDocs!.length).toEqual(40);
 
     // Wait for render.
-    await waitFor(() => screen.findByRole('aside', { name: 'side-film-strip' }));
-    const filmStripElem = screen.getByRole('aside', { name: 'side-film-strip' });
+    await waitFor(() => screen.findByRole('aside', { name: 'side-film-strip-panel' }));
+    const filmStripElem = screen.getByRole('aside', { name: 'side-film-strip-panel' });
     expect(filmStripElem).toBeInTheDocument();
 
     // Verify correct length of image frames rendered.
@@ -187,8 +185,8 @@ test("renders 'image-enlarger' popup for showing enlarged image", async() => {
     expect(imageDocs!.length).toEqual(40);
 
     // Wait for render.
-    await waitFor(() => screen.findByRole('aside', { name: 'side-film-strip' }));
-    const filmStripElem = screen.getByRole('aside', { name: 'side-film-strip' });
+    await waitFor(() => screen.findByRole('aside', { name: 'side-film-strip-panel' }));
+    const filmStripElem = screen.getByRole('aside', { name: 'side-film-strip-panel' });
     expect(filmStripElem).toBeInTheDocument();
 
     // Verify correct length of image frames rendered.
@@ -208,9 +206,50 @@ test("renders 'image-enlarger' popup for showing enlarged image", async() => {
     expect(newStore.getState().sideFilmStrip.enlargeDoc).not.toBeNull();
 
     // Check for enlarger popup to be rendered.
-    await waitFor(() => screen.findByRole('none', { name: 'image-enlarger' }));
-    const imageEnlargerElem = screen.getByRole('none', { name: 'image-enlarger'} );
+    await waitFor(() => screen.findByRole('figure', { name: 'image-enlarger' }));
+    const imageEnlargerElem = screen.getByRole('figure', { name: 'image-enlarger'} );
     expect(imageEnlargerElem).toBeInTheDocument();
+});
+
+
+test("renders 'image-enlarger' element", async() => {
+    const newStore = setupStore(preloadedState);
+        render(
+            <Provider store={newStore}>
+                <SideFilmStrip />
+            </Provider>
+        );
+    
+    // Verify data to build film strip is available.
+    const imageDocs = newStore.getState().timeline.imageDocs
+    expect(imageDocs).not.toBeNull();
+    expect(imageDocs!.length).toEqual(40);
+
+    // Wait for render.
+    await waitFor(() => screen.findByRole('aside', { name: 'side-film-strip-panel' }));
+    const filmStripElem = screen.getByRole('aside', { name: 'side-film-strip-panel' });
+    expect(filmStripElem).toBeInTheDocument();
+
+    // Verify correct length of image frames rendered.
+    await waitFor(() => screen.findAllByRole('none', { name: 'image-frame' }));
+    const imageFrameElems = screen.getAllByRole('none', { name: 'image-frame' });
+    expect(imageFrameElems.length).toEqual(imageDocs!.length);
+    
+    // Get image to click on.
+    const imageToClick = imageFrameElems[0];
+
+    await waitFor(() => user.click(imageToClick));
+
+    // Verify clicked image state updated.
+    expect(newStore.getState().sideFilmStrip.enlargeDoc).not.toBeNull();
+
+    // Check for enlarger popup to be rendered.
+    await waitFor(() => screen.findByRole('figure', { name: 'image-enlarger' }));
+    const imageEnlargerElem = screen.getByRole('figure', { name: 'image-enlarger'} );
+    expect(imageEnlargerElem).toBeInTheDocument();
+
+    const imageStatsElem = screen.getByRole('none', { name: 'enlarged-image-info' });
+    expect(imageStatsElem).toBeInTheDocument();
 });
 
 
@@ -228,8 +267,8 @@ test("renders image to be enlarged based on << enlargeDoc >> state", async() => 
     expect(imageDocs!.length).toEqual(40);
 
     // Wait for render.
-    await waitFor(() => screen.findByRole('aside', { name: 'side-film-strip' }));
-    const filmStripElem = screen.getByRole('aside', { name: 'side-film-strip' });
+    await waitFor(() => screen.findByRole('aside', { name: 'side-film-strip-panel' }));
+    const filmStripElem = screen.getByRole('aside', { name: 'side-film-strip-panel' });
     expect(filmStripElem).toBeInTheDocument();
 
     // Verify correct length of image frames rendered.
@@ -246,8 +285,8 @@ test("renders image to be enlarged based on << enlargeDoc >> state", async() => 
     expect(newStore.getState().sideFilmStrip.enlargeDoc).not.toBeNull();
 
     // Check for enlarger popup to be rendered.
-    await waitFor(() => screen.findByRole('none', { name: 'image-enlarger' }));
-    const imageEnlargerElem = screen.getByRole('none', { name: 'image-enlarger'} );
+    await waitFor(() => screen.findByRole('figure', { name: 'image-enlarger' }));
+    const imageEnlargerElem = screen.getByRole('figure', { name: 'image-enlarger'} );
     expect(imageEnlargerElem).toBeInTheDocument();
 
     // Verify correct image gets shown.
@@ -258,3 +297,51 @@ test("renders image to be enlarged based on << enlargeDoc >> state", async() => 
     const renderedImageUrl = enlargedImageElem.getAttribute('src');
     expect(renderedImageUrl).toEqual(imageDocUrl);
 });
+
+
+test("expands/contracts second column of thumbnails on hovering over strip", async() => {
+    const newStore = setupStore(preloadedState);
+        render(
+            <Provider store={newStore}>
+                <SideFilmStrip />
+            </Provider>
+        );
+    
+    // Verify data to build film strip is available.
+    const imageDocs = newStore.getState().timeline.imageDocs
+    expect(imageDocs).not.toBeNull();
+    expect(imageDocs!.length).toEqual(40);
+
+    // Wait for render.
+    await waitFor(() => screen.findByRole('aside', { name: 'side-film-strip-panel' }));
+    const filmStripElem = screen.getByRole('aside', { name: 'side-film-strip-panel' });
+    expect(filmStripElem).toBeInTheDocument();
+
+    const imageEnlargerContainerElem = screen.getByRole('none', { name: 'image-enlarger-container' });
+    const filmStripContainerElem = screen.getByRole('none', { name: 'film-strip-container' });
+    expect(imageEnlargerContainerElem).not.toHaveClass("slide");
+    expect(filmStripContainerElem).not.toHaveClass("expand");
+
+    // Verify hovering will add reveal animation.
+    await waitFor(() => user.hover(filmStripContainerElem));
+    expect(imageEnlargerContainerElem).toHaveClass("slide");
+    expect(filmStripContainerElem).toHaveClass("expand");
+});
+
+
+
+
+
+/*
+
+
+test("reveals/hides enlarger depending on state availability", async() => {
+    
+});
+
+test("flies to map position on gps lock on button click", async() => {
+    
+});
+
+
+*/
