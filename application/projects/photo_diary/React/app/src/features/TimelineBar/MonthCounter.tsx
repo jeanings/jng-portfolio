@@ -14,10 +14,10 @@ import './MonthCounter.css';
 ============================================================== */
 const MonthCounter: React.FunctionComponent<MonthCounterProps> = (props: MonthCounterProps) => {
     const dispatch = useAppDispatch();
-    const countState = useAppSelector(state => state.timeline.counter[props.name]);
-    const countPrevState = useAppSelector(state => state.timeline.counter.previous[props.name]);
-    const countStart = countPrevState !== undefined
-        ? countPrevState
+    const countCurrent = useAppSelector(state => state.timeline.counter[props.month]);
+    const countPrev = useAppSelector(state => state.timeline.counter.previous[props.month]);
+    const countStart = countPrev !== undefined
+        ? countPrev
         : 0;
     
     /* ------------------------------------------------------
@@ -26,12 +26,12 @@ const MonthCounter: React.FunctionComponent<MonthCounterProps> = (props: MonthCo
     useEffect(() => {
         // Wait out the rolling counter's duration.
         setTimeout(() => {
-            const endCount = countState !== undefined
-                ? countState as number
+            const endCount = countCurrent !== undefined
+                ? countCurrent as number
                 : 0;
 
             const payloadUpdatePrevCounter = {
-                month: props.name,
+                month: props.month,
                 count: endCount
             };
 
@@ -40,25 +40,30 @@ const MonthCounter: React.FunctionComponent<MonthCounterProps> = (props: MonthCo
                 dispatch(handleMonthCounter(payloadUpdatePrevCounter));
             }
         }, 2000)
-    }, [countState])
+    }, [countCurrent])
 
 
     // Create rolling counter component.
     const updateCount: JSX.Element = (
         <Countup
-            start={countStart as number} 
-            end={countState === undefined ? 0 : countState as number}   // Avoids passing in undefined
-            duration={1.5}                                              // when fetches result in 
-            decimals={0}                                                // non-existent keys.
+            start={ countStart as number } 
+            end={ countCurrent === undefined        // Avoids passing in undefined
+                ? 0                                 // when fetches result in 
+                : countCurrent as number            // non-existent keys.
+            }
+            duration={ 1.5 }
+            decimals={ 0 }
         />
     );
     
 
     return (
-        <div className={useMediaQueries(props.baseClassName.concat("__", props.className))}
-            role='none' aria-label='month-counter'>
+        <div className={ useMediaQueries(props.baseClassName.concat("__", props.className)) }
+            role="none" aria-label="month-counter">
 
-            {updateCount}
+            {/* Create rolling counter. */
+                updateCount
+            }
         </div>
     );
 }
@@ -68,7 +73,7 @@ const MonthCounter: React.FunctionComponent<MonthCounterProps> = (props: MonthCo
     Types.
 ===================================================================== */
 export interface MonthCounterProps {
-    name: string,
+    month: string,
     baseClassName: string,
     className: string,
 };

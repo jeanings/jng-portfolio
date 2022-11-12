@@ -13,6 +13,7 @@ import axios, { AxiosResponse } from 'axios';
 import MockAdapter from 'axios-mock-adapter';
 import mockDefaultData from '../../utils/mockDefaultData.json';
 import mock2015Data from '../../utils/mock2015Data.json';
+import mock2022DataJun from '../../utils/mock2022DataJun.json';
 import TimelineBar from './TimelineBar';
 import { fetchDocs, ImageDocsRequestProps } from './timelineSlice';
 import { apiUrl } from '../../app/App';
@@ -68,7 +69,7 @@ describe("on initial renders", () => {
         });
 
         // States should update to default fetch values.
-        expect(newStore.getState().timeline.yearSelected).toEqual(2022);
+        expect(newStore.getState().timeline.selected.year).toEqual(2022);
         expect(newStore.getState().timeline.request).toEqual('complete');
     });
 
@@ -111,10 +112,12 @@ describe("on initial renders", () => {
         // API succesfully called and populated list of selectable years.
         await waitFor(() => {
             expect(newStore.getState().timeline.request).toEqual('complete');
-            const yearElems = screen.getAllByRole('menuitemradio', { name: 'year-item'});
-            expect(yearElems.length).toBeGreaterThanOrEqual(1);
         });
-        
+
+        // Verify correct number of year items to render.
+        const yearElems = screen.getAllByRole('menuitemradio', { name: 'year-item'});
+        const yearItems = newStore.getState().timeline.years;
+        expect(yearElems.length).toEqual(yearItems!.length);
     });
 
     
@@ -142,7 +145,7 @@ describe("on initial renders", () => {
         );
 
         const monthItems = screen.getAllByRole('menuitemradio', { name: 'month-item' });
-        expect(monthItems.length).toBeGreaterThanOrEqual(12);
+        expect(monthItems.length).toBeGreaterThanOrEqual(13);
     });
 });
 
@@ -259,23 +262,18 @@ describe("clicks on dropdown year selector elements", () => {
         await waitFor(() => screen.findAllByRole('menuitemradio', { name: 'year-item' }));
         const yearElems = screen.getAllByRole('menuitemradio', { name: 'year-item' });
 
-        // Confirm nothing is selected.
-        yearElems.forEach(element => {
-            expect(element).toHaveAttribute('aria-checked', 'false');
-        });
-
         // Click on a year.
         const yearSelectElem = yearElems.find(element => element.textContent === '2015') as HTMLElement;
         await waitFor(() => user.click(yearSelectElem));
 
         await waitFor(() => {
             // Clicked element gets checked value and state is updated.
-            expect(yearSelectElem.getAttribute('aria-checked')).toEqual('true');
+            expect(yearSelectElem).toHaveAttribute('aria-checked', 'true');
             expect(newStore.getState().timeline.request).toEqual('complete');
         });
 
         // Verify that new image doc has same date year metadata as clicked year.
-        expect(newStore.getState().timeline.yearSelected).toEqual(2015);
+        expect(newStore.getState().timeline.selected.year).toEqual(2015);
         expect(newStore.getState().timeline.imageDocs![0].date.year).toEqual(2015);
 
         // Check screen's year selected element updates to 2015.
@@ -320,11 +318,12 @@ describe("clicks on dropdown year selector elements", () => {
         await waitFor(() => {
             expect(newStore.getState().timeline.yearInit).toEqual(2022);
             screen.findAllByRole('menuitem', { name: 'year-selected' });
-            const yearSelectedElem = screen.getByRole('menuitem', { name: 'year-selected' });
-            expect(yearSelectedElem).toHaveTextContent('2022');
         });
 
-        expect(newStore.getState().timeline.yearSelected).toEqual(2022);
+        // Confirm changes.
+        const yearSelectedElem = screen.getByRole('menuitem', { name: 'year-selected' });
+        expect(yearSelectedElem).toHaveTextContent('2022');
+        expect(newStore.getState().timeline.selected.year).toEqual(2022);
         expect(newStore.getState().timeline.request).toEqual('complete')
 
         // Wait for initial fetch to render year selector items.
@@ -356,7 +355,7 @@ describe("clicks on dropdown year selector elements", () => {
         act(() => {
             jest.advanceTimersByTime(3000);
         });
-        await waitFor(() => expect(newStore.getState().timeline.yearSelected).toEqual(2022));
+        await waitFor(() => expect(newStore.getState().timeline.selected.year).toEqual(2022));
 
         // Verify default counts to be equal after rolling counters end.
         await waitFor(() => {
@@ -376,7 +375,7 @@ describe("clicks on dropdown year selector elements", () => {
         });
         
         // Verify << timeline >> state update.
-        expect(newStore.getState().timeline.yearSelected).toEqual(2015);
+        expect(newStore.getState().timeline.selected.year).toEqual(2015);
         expect(newStore.getState().timeline.counter[allMonthsElemKey]).toEqual(59);
 
         // Let rolling counts and dispatch actions to finish.
@@ -397,6 +396,144 @@ describe("clicks on dropdown year selector elements", () => {
 
         jest.useRealTimers();
     });
+
+
+    test("resets active month element to 'all'", async() => {
+        /* --------------------------------------------------------
+            Mocks                                          start
+        -------------------------------------------------------- */
+        // Mocked Axios calls.
+        mockAxios = new MockAdapter(axios);
+        mockAxios
+            .onGet(apiUrl, { params: { 'year': 'default' } })
+            .replyOnce(200, mockDefaultData)
+            .onGet(apiUrl, { params: { 'year': 2015 } })
+            .replyOnce(200, mock2015Data);
+
+        // Mocked document methods.
+        // Mock HTML collection.
+        const mockMonthElem = document.createElement('div');
+        let docFragment = document.createDocumentFragment();
+        docFragment.appendChild(mockMonthElem);
+        const mockHTMLCollection = docFragment.children;
+
+        const getElemByClassSpy = jest.spyOn(document, "getElementsByClassName");
+        getElemByClassSpy.mockReturnValue(mockHTMLCollection);
+        /* --------------------------------------------------------
+            Mocks                                            end
+        -------------------------------------------------------- */
+        
+        const newStore = setupStore();
+        render(
+            <Provider store={newStore}>
+                <TimelineBar />
+            </Provider>
+        );
+        
+        // Wait for year elements to render.
+        await waitFor(() => screen.findAllByRole('menuitemradio', { name: 'year-item' }))
+        const yearElems = screen.getAllByRole('menuitemradio', { name: 'year-item' }); 
+        const yearItems = mockDefaultData.years.length;
+        expect(yearElems.length).toEqual(yearItems);
+        expect(yearElems[0]).toBeInTheDocument();
+
+        // Select a month.
+        const monthToSelect: string = 'jun';
+        const monthElems = screen.getAllByRole('menuitemradio', { name: 'month-item' });
+        const monthElemToSelect = monthElems.find(element => 
+            element.textContent!.replace(/\d+/, "") === monthToSelect.toUpperCase()) as HTMLElement;
+
+        await waitFor(() => user.click(monthElemToSelect));
+            
+        // Check for checked and style updates.
+        expect(monthElemToSelect).toHaveAttribute('aria-checked', 'true');
+        expect(monthElemToSelect).toHaveClass("active");
+
+        // Select a year.
+        const yearSelectElem = yearElems.find(element => element.textContent === '2015') as HTMLElement;
+        await waitFor(() => user.click(yearSelectElem));
+        expect(newStore.getState().timeline.selected.year).toEqual(2015);
+
+        // Check for checked and style updates.
+        const monthAllName: string = 'all';
+        const monthElemAll = monthElems.find(element => 
+            element.textContent!.replace(/\d+/, "") === monthAllName.toUpperCase()) as HTMLElement;
+        
+        expect(newStore.getState().timeline.selected.month).toEqual(monthAllName);
+        expect(monthElemAll).toHaveAttribute('aria-checked', 'true');
+        expect(monthElemAll).toHaveClass("active");
+
+        // Mocked June element.
+        // const mockedMonthElemToSelect = mockHTMLCollection[0]; 
+        // expect(mockedMonthElemToSelect).toHaveAttribute('aria-checked', 'false');
+        // expect(mockedMonthElemToSelect).not.toHaveClass("active");
+    })
+});
+
+
+test("resets << timeline.filteredSelectables >> to null", async() => { 
+    /* --------------------------------------------------------
+        Mocks                                          start
+    -------------------------------------------------------- */
+    // Mocked Axios calls.
+    mockAxios = new MockAdapter(axios);
+    mockAxios
+        .onGet(apiUrl, { params: { 'year': 'default' } })
+        .replyOnce(200, mockDefaultData)
+        .onGet(apiUrl, { params: { 'year': 2022, 'month': 6 } })
+        .replyOnce(200, mock2022DataJun)
+        .onGet(apiUrl, { params: { 'year': 2022 } })
+        .replyOnce(200, mockDefaultData);
+
+    // Mocked document methods.
+    // Mock HTML collection.
+    const mockMonthElem = document.createElement('div');
+    let docFragment = document.createDocumentFragment();
+    docFragment.appendChild(mockMonthElem);
+    const mockHTMLCollection = docFragment.children;
+
+    const getElemByClassSpy = jest.spyOn(document, "getElementsByClassName");
+    getElemByClassSpy.mockReturnValue(mockHTMLCollection);
+    /* --------------------------------------------------------
+        Mocks                                            end
+    -------------------------------------------------------- */
+
+    const newStore = setupStore();
+    render(
+        <Provider store={newStore}>
+            <TimelineBar />
+        </Provider>
+    );
+    
+    // Wait for year elements to render.
+    await waitFor(() => screen.findAllByRole('menuitemradio', { name: 'year-item' }))
+    const yearElems = screen.getAllByRole('menuitemradio', { name: 'year-item' });
+    const yearItems = mockDefaultData.years.length;
+    expect(yearElems.length).toEqual(yearItems);
+    expect(yearElems[0]).toBeInTheDocument();
+
+    // Get month to click.
+    const monthElems = screen.getAllByRole('menuitemradio', { name: 'month-item' });
+    const monthToSelect = 'jun';
+    const monthElemToSelect = monthElems.find(element => 
+        element.textContent!.replace(/\d+/, "") === monthToSelect.toUpperCase()) as HTMLElement;
+    
+    await waitFor(() => user.click(monthElemToSelect));
+
+    // Verify succesful fetch.
+    expect(newStore.getState().timeline.query).toEqual({ 'year': 2022, 'month': 6 });
+    expect(newStore.getState().timeline.filteredSelectables).not.toBeNull();
+    expect(monthElemToSelect).toHaveAttribute('aria-checked', 'true');
+    
+    // Get year to click.
+    const yearToSelect = 2022;
+    const yearElemToSelect = yearElems.find(element => 
+        parseInt(element.textContent!) === yearToSelect) as HTMLElement;
+
+    await waitFor(() => user.click(yearElemToSelect));
+    
+    // Verify << filteredSelectables >> reset to null.
+    expect(newStore.getState().timeline.filteredSelectables).toBeNull();
 });
 
 
@@ -407,6 +544,8 @@ describe("clicks on month selector elements", () => {
         mockAxios
             .onGet(apiUrl, { params: { 'year': 'default' } })
             .replyOnce(200, mockDefaultData)
+            .onGet(apiUrl, { params: { 'year': 2022, 'month': 6 } })
+            .replyOnce(200, mock2022DataJun);
     });
 
     afterEach(() => {
@@ -414,7 +553,22 @@ describe("clicks on month selector elements", () => {
         cleanup;
     });
     
-    test("dispatches to change selected month, updates element style", async() => {
+    test("updates clicked month's element style", async() => {
+        /* --------------------------------------------------------
+            Mocks                                          start
+        -------------------------------------------------------- */
+        // Mocked document methods.
+        // Mock HTML collection.
+        const mockMonthElem = document.createElement('div');
+        let docFragment = document.createDocumentFragment();
+        docFragment.appendChild(mockMonthElem);
+        const mockHTMLCollection = docFragment.children;
+
+        const getElemByClassSpy = jest.spyOn(document, "getElementsByClassName");
+        getElemByClassSpy.mockReturnValue(mockHTMLCollection);
+        /* --------------------------------------------------------
+            Mocks                                            end
+        -------------------------------------------------------- */
         const newStore = setupStore();
         render(
             <Provider store={newStore}>
@@ -429,25 +583,64 @@ describe("clicks on month selector elements", () => {
         const monthElems = screen.getAllByRole('menuitemradio', { name: 'month-item' });
 
         // Select a month.
-        const monthToSelect: string = 'all';
+        const monthToSelect: string = 'jun';
         const monthElemToSelect = monthElems.find(element => 
-            element.textContent!.replace(/\d/, "") === monthToSelect.toUpperCase()) as HTMLElement;
+            element.textContent!.replace(/\d+/, "") === monthToSelect.toUpperCase()) as HTMLElement;
+        
+        await waitFor(() => user.click(monthElemToSelect));
+        
+        expect(newStore.getState().timeline.selected.month).toEqual(monthToSelect);
 
-        user.click(monthElemToSelect);
-            
-        monthElems.forEach(element => {
-            // Check for radios and aria-checked to be reset. 
-            if (element !== monthElemToSelect) {
-                expect(element).toHaveAttribute('aria-checked', 'false');
-                expect(element).not.toHaveClass("active");
-            }
-        });
+        // Check for checked and style updates.
+        expect(monthElemToSelect).toHaveAttribute('aria-checked', 'true');
+        expect(monthElemToSelect).toHaveClass("active");
+    });
 
-        // Check for checked and style updates to counter.
-        await waitFor(() => {
-            expect(newStore.getState().timeline.month).toEqual(monthToSelect)
-            // expect(monthElemToSelect).toHaveAttribute('aria-checked', 'true');
-            expect(monthElemToSelect).toHaveClass("active");
-        });
+
+    test("dispatches fetch request for selected month only", async() => {
+        /* --------------------------------------------------------
+            Mocks                                          start
+        -------------------------------------------------------- */
+        // Mocked document methods.
+        // Mock HTML collection.
+        const mockMonthElem = document.createElement('div');
+        let docFragment = document.createDocumentFragment();
+        docFragment.appendChild(mockMonthElem);
+        const mockHTMLCollection = docFragment.children;
+
+        const getElemByClassSpy = jest.spyOn(document, "getElementsByClassName");
+        getElemByClassSpy.mockReturnValue(mockHTMLCollection);
+        /* --------------------------------------------------------
+            Mocks                                            end
+        -------------------------------------------------------- */
+        const newStore = setupStore();
+        render(
+            <Provider store={newStore}>
+                <TimelineBar />
+            </Provider>
+        );
+        
+        // Confirm initial << timeline.request >> state.
+        expect(newStore.getState().timeline.request).toEqual('idle');
+
+        // Check for all radios to be false.
+        const monthElems = screen.getAllByRole('menuitemradio', { name: 'month-item' });
+
+        // Select a month.
+        const monthToSelect: string = 'jun';
+        const monthElemToSelect = monthElems.find(element => 
+            element.textContent!.replace(/\d+/, "") === monthToSelect.toUpperCase()) as HTMLElement;
+
+        await waitFor(() => user.click(monthElemToSelect));
+        
+        expect(newStore.getState().timeline.selected.month).toEqual(monthToSelect);
+
+        // Check for checked and style updates.
+        expect(monthElemToSelect).toHaveAttribute('aria-checked', 'true');
+        expect(monthElemToSelect).toHaveClass("active");
+   
+        // Verify << filteredSelectables >> state is populated.
+        expect(newStore.getState().timeline.query?.month).toEqual(6);
+        expect(newStore.getState().timeline.filteredSelectables).not.toBeNull();
     });
 });

@@ -13,13 +13,13 @@ import MockAdapter from 'axios-mock-adapter';
 import { apiUrl } from '../../app/App';
 import '@testing-library/jest-dom';
 import mockDefaultData from '../../utils/mockDefaultData.json';
-import mock2022Data from '../../utils/mock2022Data.json';
 import mock2015Data from '../../utils/mock2015Data.json';
 import TimelineBar from '../TimelineBar/TimelineBar';
 import {
     fetchImagesData,
     GeojsonFeatureCollectionProps,
-    BboxType } from '../TimelineBar/timelineSlice';
+    BboxType, 
+    handleYearSelect} from '../TimelineBar/timelineSlice';
 import MapCanvas from './MapCanvas';
 import { 
     setStyleLoadStatus, 
@@ -29,6 +29,7 @@ import {
 import mapboxgl from 'mapbox-gl'; 
 import 'mapbox-gl/dist/mapbox-gl.css';
 
+const MapboxglSpiderfier: any = require('mapboxgl-spiderifier');
 
 var mockAxios = new MockAdapter(axios);
 var user = userEvent.setup();
@@ -48,10 +49,10 @@ afterEach(() => {
 const preloadedState: RootState = {
     timeline: {
         request: 'complete',
+        query: { year: 2022 },
         yearInit: 2022,
-        yearSelected: 2022,
+        selected: { year: 2022, month: 'all' },
         years: mockDefaultData.years,
-        month: 'all',
         counter: {
             'all': 0,
             'jan': 0, 'feb': 0, 'mar': 0,
@@ -66,8 +67,9 @@ const preloadedState: RootState = {
                 'oct': 0, 'nov': 0, 'dec': 0,
             }
         },
-        imageDocs: null,
+        imageDocs: mockDefaultData.docs,
         filterSelectables: mockDefaultData.filterSelectables[0],
+        filteredSelectables: null,
         geojson: mockDefaultData.featureCollection as GeojsonFeatureCollectionProps,
         bounds: mockDefaultData.bounds as BboxType
     },
@@ -85,6 +87,9 @@ const preloadedState: RootState = {
         sourceStatus: 'idle',
         markersStatus: 'idle',
         fitBoundsButton: 'idle'
+    },
+    sideFilmStrip: {
+        enlargeDoc: null
     }
 };
 
@@ -179,7 +184,7 @@ test("adds new data source on new fetches", async() => {
     const mockMapGetLayer = jest.fn();
     const mockMapRemoveLayer = jest.fn();
 
-    jest.spyOn(mapboxgl, "Map")
+    jest.spyOn(mapboxgl, 'Map')
         .mockImplementation(() => {
             return {
                 on: mockMapOn,
@@ -220,9 +225,11 @@ test("adds new data source on new fetches", async() => {
     newStore.dispatch(setStyleLoadStatus(true))
     
     await waitFor(() => {
-        // useEffect << styleLoaded >> else block.
-        // cleanupMarkerSource and setSourceStatus dispatches.
-        expect(mockDispatch).toHaveBeenCalledTimes(2);
+        // setStyleLoadStatus(true)         --> doesn't count, set above manually, not mocked. 
+        // cleanupMarkerSource('idle')
+        // setSourceStatus('loaded')
+        // setMarkersStatus('loaded')
+        expect(mockDispatch).toHaveBeenCalledTimes(3);
     });
 
     // Verify map.addsource() call, new data added.
@@ -248,7 +255,7 @@ test("adds marker layer and fits map to bounds", async() => {
     const mockMapGetLayer = jest.fn();
     const mockMapFitBounds = jest.fn();
 
-    jest.spyOn(mapboxgl, "Map")
+    jest.spyOn(mapboxgl, 'Map')
         .mockImplementation(() => {
             return {
                 on: mockMapOn,
@@ -325,7 +332,7 @@ test("replaces previous layer and source on new data fetches", async() => {
     const mockMapRemoveLayer = jest.fn();
     const mockMapFitBounds = jest.fn();
 
-    jest.spyOn(mapboxgl, "Map")
+    jest.spyOn(mapboxgl, 'Map')
         .mockImplementation(() => {
             return {
                 on: mockMapOn,
@@ -364,8 +371,6 @@ test("replaces previous layer and source on new data fetches", async() => {
         expect(newStore.getState().timeline.bounds).not.toBeNull();
     });
 
-    const bounds2022 = newStore.getState().timeline.bounds;
-
     // Mock dispatches for layer-adding conditions.
     newStore.dispatch(setStyleLoadStatus(true));
     newStore.dispatch(cleanupMarkerSource('idle'));
@@ -384,15 +389,12 @@ test("replaces previous layer and source on new data fetches", async() => {
     expect(mockMapFitBounds).toHaveBeenCalled();
 
     // Mock year selection dispatch.
-    newStore.dispatch(fetchImagesData({ 'year': 2015 }));
+    newStore.dispatch(handleYearSelect(2015));
 
     await waitFor(() => {
         expect(newStore.getState().timeline.request).toEqual('complete');
-        expect(newStore.getState().timeline.yearSelected).toEqual(2015);
-        // Verify updated bounds.
-        expect(newStore.getState().timeline.bounds).not.toEqual(bounds2022);
+        expect(newStore.getState().timeline.selected.year).toEqual(2015);
     });
-
 
     // Verify removal of previous layer.
     expect(mockMapGetLayer).toHaveBeenCalled();         // not undefined,
@@ -406,6 +408,7 @@ test("replaces previous layer and source on new data fetches", async() => {
     expect(mockMapAddSource).toHaveBeenCalled();
 });
     
+
 
 /* =====================================================
     Tests on fetch errors affecting map functionality.

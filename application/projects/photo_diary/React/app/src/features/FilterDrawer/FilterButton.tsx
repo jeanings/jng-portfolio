@@ -1,6 +1,12 @@
 import React from 'react';
-import { useAppDispatch } from '../../common/hooks';
-import { addFilter, removeFilter, FilterProps } from './filterDrawerSlice';
+import { 
+    useAppDispatch, 
+    useAppSelector, 
+    useMediaQueries } from '../../common/hooks';
+import { 
+    addFilter, 
+    removeFilter, 
+    FilterPayloadType } from './filterDrawerSlice';
 import './FilterButton.css';
 
 
@@ -10,7 +16,42 @@ import './FilterButton.css';
 ==================================================================== */
 const FilterButton: React.FunctionComponent<FilterButtonProps> = (props: FilterButtonProps) => {
     const dispatch = useAppDispatch();
+    const yearSelectables = useAppSelector(state => state.timeline.filterSelectables);
+    const monthSelectables = useAppSelector(state => state.timeline.filteredSelectables);
+
+    /* ---------------------------------------------------------
+        Gets add-on to class name for greying out reset button
+        when no filters are selected.
+    --------------------------------------------------------- */
+    const getAvailability = () => {
+        let buttonsToDisable: Array<string | number | null> = [];
+        let classNameAddOn: string = '';
+
+        if (yearSelectables !== null) {
+            for (let filter of Object.entries(yearSelectables)) {
+                const category = filter[0];
+                const itemList = filter[1] as Array<any>;
+        
+                if (monthSelectables !== null) {
+                    let difference = itemList.filter(x => 
+                        !monthSelectables[category]!.includes(x)
+                    );
+                    
+                    // Append non-intersecting values of base/month selectables.
+                    buttonsToDisable = [...buttonsToDisable, ...difference];
+                }
+            }
+        }
+            
+        // Assign styling through classname.
+        buttonsToDisable.includes(props.selectableName) === false
+            ? classNameAddOn = ""
+            : classNameAddOn = "unavailable";
+
+        return classNameAddOn;
+    };
     
+
     /* ------------------------------------------------------------
         Handle clicks on buttons.
         Dispatches addFilter or removeFilter actions depending if 
@@ -19,20 +60,22 @@ const FilterButton: React.FunctionComponent<FilterButtonProps> = (props: FilterB
     const onFilterClick = (event: React.SyntheticEvent) => {
         const filterElem = event.target as HTMLButtonElement;
         const buttonText = filterElem.textContent as string;
+
         // Sets aria-checked, determines addFilter/removeFilter dispatches below.
-        const setAriaPressed = filterElem.getAttribute('aria-pressed') === 'false'
+        const setAriaPressed = filterElem.getAttribute("aria-pressed") === 'false'
             ? 'true' : 'false';
         filterElem.setAttribute('aria-pressed', setAriaPressed);
-        const ariaPressed = filterElem.getAttribute('aria-pressed');
+        const ariaPressed = filterElem.getAttribute("aria-pressed");
+        
         // Add class active for styling.
         ariaPressed === 'true'
             ? filterElem.classList.add("active")
             : filterElem.classList.remove("active");
 
-        let payloadFilter: FilterProps;
+        let payloadFilter: FilterPayloadType;
         // Assign payload its corresponding key:val pairs based on category.
-        switch(filterElem.getAttribute('aria-label')) {
-            case 'FilterDrawer-format-item':
+        switch(filterElem.getAttribute("aria-label")) {
+            case 'filter-drawer-format-item':
                 // "Format" includes both medium (film, digital) and type (35mm, mirrorless)
                 // but fetch API handles both as separate for querying. This handles separation
                 // of each for querying MongoDB.
@@ -45,14 +88,14 @@ const FilterButton: React.FunctionComponent<FilterButtonProps> = (props: FilterB
                     : dispatch(removeFilter(payloadFilter));
                 break;
 
-            case 'FilterDrawer-film-item':
+            case 'filter-drawer-film-item':
                 payloadFilter = { 'film': buttonText };
                 ariaPressed === 'true'
                     ? dispatch(addFilter(payloadFilter))
                     : dispatch(removeFilter(payloadFilter));
                 break;
         
-            case 'FilterDrawer-camera-item':
+            case 'filter-drawer-camera-item':
                 // Only dispatch camera model as 'camera'.
                 const make: string = buttonText.split(' ', 1)[0];
                 const modelStrings: Array<string> = buttonText.split(' ')
@@ -70,15 +113,15 @@ const FilterButton: React.FunctionComponent<FilterButtonProps> = (props: FilterB
                     : dispatch(removeFilter(payloadFilter));
                 break;
 
-            case 'FilterDrawer-lens-item':
+            case 'filter-drawer-lens-item':
                 payloadFilter = { 'lens': buttonText };
                 ariaPressed === 'true'
                     ? dispatch(addFilter(payloadFilter))
                     : dispatch(removeFilter(payloadFilter));
                 break;
 
-            case 'FilterDrawer-focalLength-item':
-                // Metadata have focal lengths in int, cleaning string is necessary.
+            case 'filter-drawer-focalLength-item':
+                // Metadata has focal lengths in int, cleaning string is necessary.
                 const focalLength: number = parseInt(buttonText.replace('mm', ''));
                 payloadFilter = { 'focalLength': focalLength };
                 ariaPressed === 'true'
@@ -86,7 +129,7 @@ const FilterButton: React.FunctionComponent<FilterButtonProps> = (props: FilterB
                     : dispatch(removeFilter(payloadFilter));
                 break;
 
-            case 'FilterDrawer-tags-item':
+            case 'filter-drawer-tags-item':
                 payloadFilter = { 'tags': buttonText };
                 ariaPressed === 'true'
                     ? dispatch(addFilter(payloadFilter))
@@ -98,14 +141,17 @@ const FilterButton: React.FunctionComponent<FilterButtonProps> = (props: FilterB
    
 
     return (
-        <button className={"FilterDrawer".concat("__", "buttons")}
-            role="checkbox" aria-label={"FilterDrawer".concat("-", props.categoryName, "-item")}
+        <button 
+            className={ useMediaQueries(props.baseClassName.concat("__", "buttons")) 
+                + getAvailability() }
+            role="checkbox" aria-label={ "filter-drawer".concat("-", props.categoryName, "-item") }
             aria-pressed="false"
-            onClick={onFilterClick}>
+            onClick={ onFilterClick }>
 
-                {props.categoryName === 'focalLength'
-                    ? props.selectable.toString().concat('mm')      // Add focal length unit.
-                    : props.selectable}
+                { props.categoryName === 'focalLength'
+                        ? props.selectableName.toString().concat('mm')      // Add focal length unit.
+                        : props.selectableName
+                }
                 
         </button>
     );
@@ -116,8 +162,9 @@ const FilterButton: React.FunctionComponent<FilterButtonProps> = (props: FilterB
     Types.
 ===================================================================== */
 export interface FilterButtonProps {
-    categoryName: string
-    selectable: string | number
+    'baseClassName': string,
+    'categoryName': string,
+    'selectableName': string | number
 };
 
 

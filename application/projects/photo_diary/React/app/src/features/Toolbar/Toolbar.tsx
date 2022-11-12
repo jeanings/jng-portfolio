@@ -1,5 +1,5 @@
-import React, { useEffect } from 'react';
-import { useAppSelector, useAppDispatch, useMediaQueries } from '../../common/hooks';
+import React from 'react';
+import { useMediaQueries } from '../../common/hooks';
 import ToolbarButton, { ToolbarButtonProps } from './ToolbarButton';
 import './Toolbar.css';
 
@@ -13,13 +13,13 @@ const Toolbar: React.FunctionComponent = () => {
 
     
     return (
-        <menu className={useMediaQueries(classBase)}
-            role="menu" aria-label={classBase}>
+        <menu className={ useMediaQueries(classBase) }
+            role="menu" aria-label="toolbar">
             
-            <div className={useMediaQueries(classBase.concat("__", "button-container"))}>
-                {createToolbarButton(classBase, 'filter')}
-                {createToolbarButton(classBase, 'bounds')}
-                {createToolbarButton(classBase, 'sidePanel')}
+            <div className={ useMediaQueries(classBase.concat("__", "button-container")) }>
+                { createToolbarButton(classBase, 'filter') }
+                { createToolbarButton(classBase, 'bounds') }
+                { createToolbarButton(classBase, 'sidePanel') }
             </div>
 
         </menu>
@@ -37,9 +37,9 @@ const Toolbar: React.FunctionComponent = () => {
 function createToolbarButton(classBase: string, buttonName: ToolbarButtonProps['name']) {
     return (
         <ToolbarButton 
-            name={buttonName}
-            baseClassName={classBase}
-            key={"key".concat("_", classBase, "-", buttonName)}
+            name={ buttonName }
+            baseClassName={ classBase }
+            key={ "key".concat("_", classBase, "-", buttonName) }
         />
     )
 }
