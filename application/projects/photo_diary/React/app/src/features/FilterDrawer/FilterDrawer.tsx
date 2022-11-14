@@ -29,6 +29,7 @@ const FilterDrawer: React.FunctionComponent = () => {
     const selectedYear = useAppSelector(state => state.timeline.selected.year);
     const selectedMonth = useAppSelector(state => state.timeline.selected.month);
     const filterState = useAppSelector(state => state.filter);
+    const toolbarFilterSwitch = useAppSelector(state => state.toolbar.filter);
     const classBase: string = "FilterDrawer";
     const classNames: ClassNameTypes = {
         'parent': useMediaQueries(classBase.concat("__", "parameters")),
@@ -158,12 +159,19 @@ const FilterDrawer: React.FunctionComponent = () => {
 
         return resetAvailablity;
     };
-    
    
+
   
     return (
-        <section className={ useMediaQueries(classBase) } id={ classBase }
+        <section 
+            className={ useMediaQueries(classBase) + 
+                // Add "show" styling based on clicked state.
+                (toolbarFilterSwitch === 'off'
+                        ? ""
+                        : "show") }
+            id={ classBase }
             role="form" aria-label="filter-drawer">
+
             <div className={ useMediaQueries(classBase.concat("__", "parameters-container")) }
                 role="group" aria-label={ "filter-drawer".concat("-", "container") }>
 
@@ -174,12 +182,10 @@ const FilterDrawer: React.FunctionComponent = () => {
                 { createCategory(classNames, "lens", lenses) }
                 { createCategory(classNames, "focalLength", focalLengths) }
                 { createCategory(classNames, "tags", tags) }
-
             </div>
 
             <button 
-                    className={ useMediaQueries(classBase.concat("__", "reset")) 
-                        + getResetAvailability() }
+                    className={ useMediaQueries(classBase.concat("__", "reset")) + getResetAvailability() }
                     id="Toolbar__reset"
                     aria-label="filter-drawer-reset"
                     onClick={ onResetClick }>
@@ -212,17 +218,15 @@ function createCategory(classNames: ClassNameTypes, categoryName: string, select
             role="group" aria-label={ "filter-drawer".concat("-", categoryName) }>
 
             <h1 className={ classNames['title']} >
-                {
-                    categoryName !== "focalLength"
+                { categoryName !== "focalLength"
                         ? categoryName.toUpperCase()
-                        : "FOCAL LENGTH"
-                }
+                        : "FOCAL LENGTH" }
             </h1>
 
             <div className={ classNames['options'] }
                 role="group" aria-label={ "filter-drawer".concat("-", categoryName, "-options") }>
                 
-                {/* Generate buttons for all the values in each filter category. */
+                { /* Generate buttons for all the values in each filter category. */
                     sortedSelectables.map((selectable, index) => (
                         <FilterButton
                             baseClassName={ classNames['base'] }
@@ -230,8 +234,7 @@ function createCategory(classNames: ClassNameTypes, categoryName: string, select
                             selectableName={ selectable }
                             key={ "key".concat("_", categoryName, "_", index.toString()) }
                         />
-                    ))
-                }
+                    )) }
             </div>
         </div>
     )

@@ -4,6 +4,7 @@ import { Provider } from 'react-redux';
 import { setupStore, RootState } from '../../app/store';
 import {
     cleanup,
+    getAllByRole,
     render,
     screen,
     waitFor } from '@testing-library/react';
@@ -24,6 +25,8 @@ import Toolbar from './Toolbar';
 // @ts-ignore
 import mapboxgl from 'mapbox-gl'; 
 import 'mapbox-gl/dist/mapbox-gl.css';
+import FilterDrawer from '../FilterDrawer/FilterDrawer';
+import SideFilmStrip from '../SideFilmStrip/SideFilmStrip';
 
 
 var mockAxios = new MockAdapter(axios);
@@ -35,6 +38,9 @@ beforeEach(() => {
 
 afterEach(() => {
     mockAxios.reset();
+    jest.clearAllMocks(); 
+    jest.resetAllMocks(); 
+    jest.resetModules(); 
     cleanup;
 });
 
@@ -82,6 +88,13 @@ const preloadedState: RootState = {
         sourceStatus: 'idle',
         markersStatus: 'idle',
         fitBoundsButton: 'idle'
+    },
+    sideFilmStrip: {
+        enlargeDoc: null
+    },
+    toolbar: {
+        filter: 'off',
+        imageEnlarger: 'off'
     }
 };
 
@@ -98,8 +111,8 @@ test("renders bottom UI buttons", async() => {
     );
 
     await waitFor(() => {
-        screen.findByRole('menu', { name: 'Toolbar' })
-        screen.findAllByRole('button', { name: 'toolbar-button' })
+        screen.findByRole('menu', { name: 'toolbar' });
+        screen.findAllByRole('button', { name: 'toolbar-button' });
     });
 
     // Verify toolbar is rendered.
@@ -112,7 +125,7 @@ test("renders bottom UI buttons", async() => {
 });
 
 
-test("clicks on toolbar buttons register changes to pressed status, style update", async() => {
+test("clicks on toolbar buttons updates pressed status, style, and switched on/off state", async() => {
     const newStore = setupStore();
     render(
         <Provider store={newStore}>
@@ -131,36 +144,29 @@ test("clicks on toolbar buttons register changes to pressed status, style update
 
     // Verify individual toolbar buttons are rendered.
     const toolbarButtons = screen.getAllByRole('button', { name: 'toolbar-button' });
+    
     expect(toolbarButtons.length).toEqual(3);
 
     // Verify button is not clicked.
-    const buttonToClick = toolbarButtons[0];
-    expect(buttonToClick.getAttribute('aria-pressed')).toEqual('false');
+    const buttonToClick = toolbarButtons.filter(button => 
+        button.id === "Toolbar-filter")[0];
+    expect(buttonToClick).toHaveAttribute('aria-pressed', 'false');
     expect(buttonToClick).not.toHaveClass("active");
 
     await waitFor(() => user.click(buttonToClick));
 
     // Verify button clicked.
-    expect(buttonToClick.getAttribute('aria-pressed')).toEqual('true');
+    expect(newStore.getState().toolbar.filter).toEqual('on');
+    expect(buttonToClick).toHaveAttribute('aria-pressed', 'true');
     expect(buttonToClick).toHaveClass("active");
 });
 
 
 test("drawer button clicks reveal, hide filter elements", async() => {
-    /* --------------------------------------------------------
-        Mocks                                          start
-    -------------------------------------------------------- */
-    // Mocked document methods.
-    const getElemByIdSpy = jest.spyOn(document, "getElementById");
-    const mockFilterDrawerElem = document.createElement('div');
-    getElemByIdSpy.mockReturnValue(mockFilterDrawerElem);
-
-    /* --------------------------------------------------------
-        Mocks                                            end
-    -------------------------------------------------------- */
     const newStore = setupStore(preloadedState);
     render(
         <Provider store={newStore}>
+            <FilterDrawer />
             <Toolbar />
         </Provider>
     );
@@ -179,17 +185,19 @@ test("drawer button clicks reveal, hide filter elements", async() => {
     expect(toolbarButtons.length).toEqual(3);
 
     // Get target button.
-    const toolbarFilterButton: HTMLElement = toolbarButtons.filter(
-        button => button.id === "Toolbar-filter")[0];
+    const toolbarFilterButton: HTMLElement = toolbarButtons.filter(button => 
+        button.id === "Toolbar-filter")[0];
    
     // Test opening of filter drawer.
     await waitFor(() => user.click(toolbarFilterButton));
     expect(toolbarFilterButton.getAttribute('aria-pressed')).toEqual('true');
     expect(toolbarFilterButton).toHaveClass("active");
 
+    await waitFor(() => screen.findByRole('form', { name: 'filter-drawer' }));
+    const filterDrawerElem = screen.getByRole('form', { name: 'filter-drawer' });
+
     // Verify filter drawer is shown.
-    expect(getElemByIdSpy).toHaveBeenCalled();
-    expect(mockFilterDrawerElem).toHaveClass("show");
+    expect(filterDrawerElem).toHaveClass("show");
     
     // Test closing of filter drawer.
     await waitFor(() => user.click(toolbarFilterButton));
@@ -197,7 +205,93 @@ test("drawer button clicks reveal, hide filter elements", async() => {
     expect(toolbarFilterButton).not.toHaveClass("active");
 
     // Verify filter drawer is hidden.
-    expect(mockFilterDrawerElem).toHaveClass("hide");
+    expect(filterDrawerElem).not.toHaveClass("show");
+});
+
+
+test("clicks on either 'filter drawer' or 'image enlarger' button hides the other", async() => {
+    const newStore = setupStore(preloadedState);
+    render(
+        <Provider store={newStore}>
+            <FilterDrawer />
+            <SideFilmStrip />
+            <Toolbar />
+        </Provider>
+    );
+
+    await waitFor(() => {
+        screen.findByRole('menu', { name: 'toolbar' })
+        screen.findAllByRole('button', { name: 'toolbar-button' })
+    });
+
+    await waitFor(() => screen.findByRole('figure', { name: 'image-enlarger' }));
+    await waitFor(() => screen.findByRole('form', { name: 'filter-drawer' }));
+    const imageEnlargerElem = screen.getByRole('figure', { name: 'image-enlarger' });
+    const filterDrawerElem = screen.getByRole('form', { name: 'filter-drawer' });
+    expect(imageEnlargerElem).toBeInTheDocument();
+    expect(filterDrawerElem).toBeInTheDocument();
+
+    // Verify toolbar is rendered.
+    const toolbar = screen.getByRole('menu', { name: 'toolbar' });
+    expect(toolbar).toBeInTheDocument();
+
+    // Verify individual toolbar buttons are rendered.
+    const toolbarButtons = screen.getAllByRole('button', { name: 'toolbar-button' });
+    expect(toolbarButtons.length).toEqual(3);
+
+    expect(newStore.getState().toolbar.imageEnlarger).toEqual('off');
+
+    // Get target button.
+    const imageEnlargerButton: HTMLElement = toolbarButtons.filter(button => 
+        button.id === "Toolbar-imageEnlarger")[0];
+   
+    await waitFor(() => user.click(imageEnlargerButton));
+
+    await waitFor(() => {
+        expect(newStore.getState().toolbar.imageEnlarger).toEqual('on');
+        expect(newStore.getState().toolbar.filter).toEqual('off');
+    });
+    expect(imageEnlargerElem).toHaveClass("show");
+    expect(filterDrawerElem).not.toHaveClass("show");
+    
+    // Repeat for filter drawer button.
+    const filterDrawerButton: HTMLElement = toolbarButtons.filter(button => 
+        button.id === "Toolbar-filter")[0];
+   
+    await waitFor(() => user.click(filterDrawerButton));
+    
+    await waitFor(() => {
+        expect(newStore.getState().toolbar.filter).toEqual('on');
+        expect(newStore.getState().toolbar.imageEnlarger).toEqual('off');
+    });
+    expect(filterDrawerElem).toHaveClass("show");
+    expect(imageEnlargerElem).not.toHaveClass("show");
+});
+
+
+test("disables image enlarger button if no film strip image clicked", async() => {
+    const newStore = setupStore(preloadedState);
+    render(
+        <Provider store={newStore}>
+            <SideFilmStrip />
+            <Toolbar />
+        </Provider>
+    );
+
+    await waitFor(() => {
+        screen.findByRole('menu', { name: 'toolbar' })
+        screen.findAllByRole('button', { name: 'toolbar-button' })
+    });
+
+    // Verify << enlargeDoc >> state is null.
+    expect(newStore.getState().sideFilmStrip.enlargeDoc).toBeNull();
+
+    const toolbarButtons = screen.getAllByRole('button', { name: 'toolbar-button' });
+    const imageEnlargerButton = toolbarButtons.filter(button => 
+        button.id === "Toolbar-imageEnlarger")[0];  
+
+    // Verify image enlarger button is disabled.
+    expect(imageEnlargerButton).toHaveClass("unavailable");
 });
 
 

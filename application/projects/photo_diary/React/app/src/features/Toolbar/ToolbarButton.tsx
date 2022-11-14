@@ -4,6 +4,7 @@ import {
     useAppDispatch, 
     useMediaQueries } from '../../common/hooks';
 import { setBoundsButton } from '../MapCanvas/mapCanvasSlice';
+import { handleToolbarButtons, ToolbarProps } from './toolbarSlice';
 import './ToolbarButton.css';
 
 
@@ -13,7 +14,10 @@ import './ToolbarButton.css';
 ==================================================================== */
 const ToolbarButton: React.FunctionComponent<ToolbarButtonProps> = (props: ToolbarButtonProps) => {    
     const dispatch = useAppDispatch();
+    const toolbarState = useAppSelector(state => state.toolbar);
     const mapStyleLoaded = useAppSelector(state => state.mapCanvas.styleLoaded);
+    const enlargeDoc = useAppSelector(state => state.sideFilmStrip.enlargeDoc);
+   
 
     /* -----------------------------------
         Handle clicks on toolbar buttons.
@@ -21,37 +25,23 @@ const ToolbarButton: React.FunctionComponent<ToolbarButtonProps> = (props: Toolb
     const onToolbarButtonClick = (event: React.SyntheticEvent) => {
         const toolbarButtonElem = event.target as HTMLButtonElement;
 
-        // Sets aria-checked, determines addFilter/removeFilter dispatches below.
-        const setAriaPressed = toolbarButtonElem.getAttribute("aria-pressed") === 'false'
-            ? 'true' : 'false';
-        toolbarButtonElem.setAttribute("aria-pressed", setAriaPressed);
-        const ariaPressed = toolbarButtonElem.getAttribute("aria-pressed");
-
-        // Add active class for styling.
-        if (toolbarButtonElem.id !== "Toolbar-bounds") {
-            ariaPressed === 'true'
-                ? toolbarButtonElem.classList.add("active")
-                : toolbarButtonElem.classList.remove("active");
-        }
-
-        // Assign payload its corresponding key:val pairs based on category.
         switch(toolbarButtonElem.id) {
-            case 'Toolbar-filter':
-                const filterDrawerElem = document.getElementById("FilterDrawer");
-                   
-                if (filterDrawerElem !== null) {
-                    // Fade in.
-                    if (ariaPressed === 'true') {
-                        filterDrawerElem.classList.add("show");
-                        filterDrawerElem.classList.remove("hide");
-
-                    }
-                    // Fade out, changing z-index to be under map canvas
-                    // so all clickable elements are disabled. 
-                    else {
-                        filterDrawerElem.classList.remove("show");
-                        filterDrawerElem.classList.add("hide");
-                    }
+            case 'Toolbar-filter': 
+                // Fade in.
+                if (toolbarState.filter === 'off') {
+                    const payloadToolbarButtons: ToolbarProps = {
+                        'filter': 'on',
+                        'imageEnlarger': 'off'
+                    };
+                    dispatch(handleToolbarButtons(payloadToolbarButtons));
+                }
+                // Fade out, changing z-index to be under map canvas
+                // so all clickable elements are disabled. 
+                else {
+                    const payloadToolbarButtons: ToolbarProps = {
+                        'filter': 'off',
+                    };
+                    dispatch(handleToolbarButtons(payloadToolbarButtons));
                 }
                 break;
 
@@ -61,8 +51,23 @@ const ToolbarButton: React.FunctionComponent<ToolbarButtonProps> = (props: Toolb
                 }
                 break;
 
-            case 'Toolbar-sidePanel':
-                
+            case 'Toolbar-imageEnlarger':
+                // Fade in.
+                if (toolbarState.imageEnlarger === 'off') {
+                    const payloadToolbarButtons: ToolbarProps = {
+                        'filter': 'off',
+                        'imageEnlarger': 'on'
+                    };
+                    dispatch(handleToolbarButtons(payloadToolbarButtons));
+                }
+                // Fade out, changing z-index to be under map canvas
+                // so all clickable elements are disabled. 
+                else {
+                    const payloadToolbarButtons: ToolbarProps = {
+                        'imageEnlarger': 'off'
+                    };
+                    dispatch(handleToolbarButtons(payloadToolbarButtons));
+                }
                 break;
         }
     };
@@ -70,15 +75,34 @@ const ToolbarButton: React.FunctionComponent<ToolbarButtonProps> = (props: Toolb
    
 
     return (
-        <button className={ useMediaQueries(props.baseClassName.concat("__", "button")) } 
+        <button 
+            className={ useMediaQueries(props.baseClassName.concat("__", "button")) + 
+                // Disable image enlarger button if no image is clicked for enlarging.
+                (enlargeDoc !== null
+                    ? ""
+                    : props.name === 'imageEnlarger'
+                        ? "unavailable"
+                        : ""
+                ) +
+                // Add "active" styling based on clicked state.
+                (props.name === 'bounds'
+                    ? ""
+                    : toolbarState[props.name] === 'off'
+                        ? ""
+                        : "active") }
             id={ props.baseClassName.concat("-", props.name) }
             aria-label={ "toolbar".concat("-", "button") }
-            aria-pressed="false"
+            aria-pressed={ 
+                // Change pressed status based on clicked state.  
+                props.name === 'bounds'
+                    ? "false"
+                    : toolbarState[props.name] === 'off'
+                        ? "false"
+                        : "true" }
             onClick={ onToolbarButtonClick }>
                 
                 { /* Assign icon based on button type. */
-                    getIcon(props.name)
-                }
+                    getIcon(props.name) }
 
         </button>
     );
@@ -107,7 +131,7 @@ function getIcon(buttonName: string) {
         </svg>
     );
 
-    const sidePanelIcon = (
+    const imageEnlargerIcon = (
         <svg xmlns="http://www.w3.org/2000/svg" id="icon-side-panel" width="24" height="24" viewBox="0 0 24 24">
             <path d="M20 3H4c-1.103 0-2 .897-2 2v14c0 1.103.897 2 2 2h16c1.103 0 2-.897 2-2V5c0-1.103-.897-2-2-2zM4 19V7h6v12H4zm8 0V7h8V5l.002 14H12z"/>
         <path d="M6 10h2v2H6zm0 4h2v2H6z"/></svg>
@@ -119,8 +143,8 @@ function getIcon(buttonName: string) {
             return filterIcon;
         case 'bounds':
             return boundsIcon;
-        case 'sidePanel':
-            return sidePanelIcon;
+        case 'imageEnlarger':
+            return imageEnlargerIcon;
     };
 };
 

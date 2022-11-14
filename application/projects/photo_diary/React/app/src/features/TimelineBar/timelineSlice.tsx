@@ -310,12 +310,13 @@ export type ImageDocTypes = {
     'shutter_speed': number | null,
     'tags': Array<string>,
     'title': string | null,
-    'url': string
+    'url': string,
+    'url_thumb': string
 };
 
 export type ImageDocFormatTypes = {
-    'medium': 'digital' | 'film',
-    'type': '120' | '35mm' | 'APS-C' | 'Micro43' | 'Full-frame'
+    'medium': 'digital' | 'film' | string,
+    'type': '120' | '35mm' | 'APS-C' | 'Micro43' | 'Full-frame' | string
 };
 
 export type FilterableTypes = {
@@ -345,6 +346,7 @@ export type GeojsonFeatureType = {
         'coordinates': Array<number>
     },
     'properties': {
+        'doc_id': string,
         'name': string,
         'date': {
             'year': number,

@@ -13,7 +13,6 @@ import MockAdapter from 'axios-mock-adapter';
 import { apiUrl } from '../../app/App';
 import '@testing-library/jest-dom';
 import mockDefaultData from '../../utils/mockDefaultData.json';
-import mock2022Data from '../../utils/mock2022Data.json';
 import mock2015Data from '../../utils/mock2015Data.json';
 import TimelineBar from '../TimelineBar/TimelineBar';
 import {
@@ -30,6 +29,7 @@ import {
 import mapboxgl from 'mapbox-gl'; 
 import 'mapbox-gl/dist/mapbox-gl.css';
 
+const MapboxglSpiderfier: any = require('mapboxgl-spiderifier');
 
 var mockAxios = new MockAdapter(axios);
 var user = userEvent.setup();
@@ -67,7 +67,7 @@ const preloadedState: RootState = {
                 'oct': 0, 'nov': 0, 'dec': 0,
             }
         },
-        imageDocs: null,
+        imageDocs: mockDefaultData.docs,
         filterSelectables: mockDefaultData.filterSelectables[0],
         filteredSelectables: null,
         geojson: mockDefaultData.featureCollection as GeojsonFeatureCollectionProps,
@@ -87,6 +87,13 @@ const preloadedState: RootState = {
         sourceStatus: 'idle',
         markersStatus: 'idle',
         fitBoundsButton: 'idle'
+    },
+    sideFilmStrip: {
+        enlargeDoc: null
+    },
+    toolbar: {
+        filter: 'off',
+        imageEnlarger: 'off'
     }
 };
 
@@ -181,7 +188,7 @@ test("adds new data source on new fetches", async() => {
     const mockMapGetLayer = jest.fn();
     const mockMapRemoveLayer = jest.fn();
 
-    jest.spyOn(mapboxgl, "Map")
+    jest.spyOn(mapboxgl, 'Map')
         .mockImplementation(() => {
             return {
                 on: mockMapOn,
@@ -252,7 +259,7 @@ test("adds marker layer and fits map to bounds", async() => {
     const mockMapGetLayer = jest.fn();
     const mockMapFitBounds = jest.fn();
 
-    jest.spyOn(mapboxgl, "Map")
+    jest.spyOn(mapboxgl, 'Map')
         .mockImplementation(() => {
             return {
                 on: mockMapOn,
@@ -329,7 +336,7 @@ test("replaces previous layer and source on new data fetches", async() => {
     const mockMapRemoveLayer = jest.fn();
     const mockMapFitBounds = jest.fn();
 
-    jest.spyOn(mapboxgl, "Map")
+    jest.spyOn(mapboxgl, 'Map')
         .mockImplementation(() => {
             return {
                 on: mockMapOn,
@@ -368,8 +375,6 @@ test("replaces previous layer and source on new data fetches", async() => {
         expect(newStore.getState().timeline.bounds).not.toBeNull();
     });
 
-    const bounds2022 = newStore.getState().timeline.bounds;
-
     // Mock dispatches for layer-adding conditions.
     newStore.dispatch(setStyleLoadStatus(true));
     newStore.dispatch(cleanupMarkerSource('idle'));
@@ -407,6 +412,7 @@ test("replaces previous layer and source on new data fetches", async() => {
     expect(mockMapAddSource).toHaveBeenCalled();
 });
     
+
 
 /* =====================================================
     Tests on fetch errors affecting map functionality.

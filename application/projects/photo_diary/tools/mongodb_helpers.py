@@ -282,7 +282,7 @@ def build_geojson_collection(docs):
                 ]
             },
             "properties": {
-                "id": doc['_id'],
+                "doc_id": doc['_id'],
                 "name": doc['filename'],
                 "date": {
                     "year": doc['date']['year'],
