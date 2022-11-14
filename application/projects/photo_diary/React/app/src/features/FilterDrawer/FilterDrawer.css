@@ -9,7 +9,28 @@
     opacity: 0;
     pointer-events: none;
     user-select: none;
+    animation-name: filterDrawer-hide;
+    animation-duration: 350ms;
+    animation-timing-function: ease-out;
+    animation-fill-mode: forwards;
 }    
+
+    @keyframes filterDrawer-hide {
+        0% {
+            opacity: 1;
+            z-index: 2;
+        }
+
+        99% {
+            opacity: 0.05;
+            z-index: 2
+        }
+
+        100% {
+            opacity: 0;
+            z-index: 0;
+        }
+    }
     
     .FilterDrawer.show {
         animation-name: filterDrawer-show;
@@ -26,30 +47,6 @@
 
             100% {
                 opacity: 1;
-            }
-        }
-
-    .FilterDrawer.hide {
-        animation-name: filterDrawer-hide;
-        animation-duration: 350ms;
-        animation-timing-function: ease-out;
-        animation-fill-mode: forwards;
-    }
-
-        @keyframes filterDrawer-hide {
-            0% {
-                opacity: 1;
-                z-index: 2;
-            }
-
-            99% {
-                opacity: 0.05;
-                z-index: 2
-            }
-
-            100% {
-                opacity: 0;
-                z-index: 0;
             }
         }
 

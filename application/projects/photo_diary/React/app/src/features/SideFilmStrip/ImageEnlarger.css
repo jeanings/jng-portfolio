@@ -8,7 +8,28 @@
     opacity: 0;
     pointer-events: none;
     user-select: none;
+    animation-name: image-enlarger-hide;
+    animation-duration: 350ms;
+    animation-timing-function: ease-out;
+    animation-fill-mode: forwards;
 }
+
+    @keyframes image-enlarger-hide {
+        0% {
+            opacity: 1;
+            z-index: 2;
+        }
+
+        99% {
+            opacity: 0.05;
+            z-index: 2
+        }
+
+        100% {
+            opacity: 0;
+            z-index: 0;
+        }
+    }
 
     .SideFilmStrip__image-enlarger.show {
         animation-name: image-enlarger-show;
@@ -28,6 +49,13 @@
             }
         }
 
+    .SideFilmStrip__image-enlarger.hide {
+        animation-name: image-enlarger-hide;
+        animation-duration: 350ms;
+        animation-timing-function: ease-out;
+        animation-fill-mode: forwards;
+    }
+    
     .SideFilmStrip__image-enlarger__image {
         max-width: 41vw;
         max-height: 82vh;

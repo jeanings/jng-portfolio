@@ -10,7 +10,6 @@ import './Toolbar.css';
 const Toolbar: React.FunctionComponent = () => {
     const classBase: string = "Toolbar";
 
-
     
     return (
         <menu className={ useMediaQueries(classBase) }
@@ -19,7 +18,7 @@ const Toolbar: React.FunctionComponent = () => {
             <div className={ useMediaQueries(classBase.concat("__", "button-container")) }>
                 { createToolbarButton(classBase, 'filter') }
                 { createToolbarButton(classBase, 'bounds') }
-                { createToolbarButton(classBase, 'sidePanel') }
+                { createToolbarButton(classBase, 'imageEnlarger') }
             </div>
 
         </menu>

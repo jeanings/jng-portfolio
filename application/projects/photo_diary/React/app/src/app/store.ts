@@ -8,6 +8,7 @@ import timelineReducer from '../features/TimelineBar/timelineSlice';
 import filterReducer from '../features/FilterDrawer/filterDrawerSlice';
 import mapCanvasReducer from '../features/MapCanvas/mapCanvasSlice';
 import sideFilmStripReducer from '../features/SideFilmStrip/sideFilmStripSlice';
+import toolbarReducer from '../features/Toolbar/toolbarSlice';
 
 
 // Create the root reducer independently to obtain the RootState type.
@@ -15,7 +16,8 @@ const rootReducer = combineReducers({
     timeline: timelineReducer,
     filter: filterReducer,
     mapCanvas: mapCanvasReducer,
-    sideFilmStrip: sideFilmStripReducer
+    sideFilmStrip: sideFilmStripReducer,
+    toolbar: toolbarReducer
 });
 
 export function setupStore(preloadedState?: PreloadedState<RootState>) {
@@ -30,7 +32,8 @@ export const store = configureStore({
         timeline: timelineReducer,
         filter: filterReducer,
         mapCanvas: mapCanvasReducer,
-        sideFilmStrip: sideFilmStripReducer
+        sideFilmStrip: sideFilmStripReducer,
+        toolbar: toolbarReducer
     },
 });
 
