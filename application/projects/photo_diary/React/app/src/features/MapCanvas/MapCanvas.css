@@ -10,3 +10,18 @@
 .mapboxgl-ctrl-bottom-right {
     display: none !important;
 }
+
+.mapboxgl-popup-content {
+    max-width: 21rem !important;
+    max-height: 21rem !important;
+    align-self: center;
+    padding: 1rem !important;
+    border-radius: 0 !important;
+    box-shadow: 0 3px 6px rgb(0 0 0 / 50%) !important;
+}
+
+    .MapCanvas__marker-img {
+        min-width: 100%;
+        /* max-height: 100%; */
+        vertical-align: middle;
+    }

@@ -78,6 +78,13 @@ const preloadedState: RootState = {
         sourceStatus: 'idle',
         markersStatus: 'idle',
         fitBoundsButton: 'idle'
+    },
+    sideFilmStrip: {
+        enlargeDoc: null
+    },
+    toolbar: {
+        filter: 'off',
+        imageEnlarger: 'off'
     }
 };
 
@@ -109,6 +116,13 @@ const preloadedStateWithFilter: RootState = {
         sourceStatus: 'idle',
         markersStatus: 'idle',
         fitBoundsButton: 'idle'
+    },
+    sideFilmStrip: {
+        enlargeDoc: null
+    },
+    toolbar: {
+        filter: 'off',
+        imageEnlarger: 'off'
     }
 }
 
