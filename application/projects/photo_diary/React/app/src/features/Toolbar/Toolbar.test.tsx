@@ -4,6 +4,7 @@ import { Provider } from 'react-redux';
 import { setupStore, RootState } from '../../app/store';
 import {
     cleanup,
+    getAllByRole,
     render,
     screen,
     waitFor } from '@testing-library/react';
@@ -265,6 +266,32 @@ test("clicks on either 'filter drawer' or 'image enlarger' button hides the othe
     });
     expect(filterDrawerElem).toHaveClass("show");
     expect(imageEnlargerElem).not.toHaveClass("show");
+});
+
+
+test("disables image enlarger button if no film strip image clicked", async() => {
+    const newStore = setupStore(preloadedState);
+    render(
+        <Provider store={newStore}>
+            <SideFilmStrip />
+            <Toolbar />
+        </Provider>
+    );
+
+    await waitFor(() => {
+        screen.findByRole('menu', { name: 'toolbar' })
+        screen.findAllByRole('button', { name: 'toolbar-button' })
+    });
+
+    // Verify << enlargeDoc >> state is null.
+    expect(newStore.getState().sideFilmStrip.enlargeDoc).toBeNull();
+
+    const toolbarButtons = screen.getAllByRole('button', { name: 'toolbar-button' });
+    const imageEnlargerButton = toolbarButtons.filter(button => 
+        button.id === "Toolbar-imageEnlarger")[0];  
+
+    // Verify image enlarger button is disabled.
+    expect(imageEnlargerButton).toHaveClass("unavailable");
 });
 
 

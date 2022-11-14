@@ -16,6 +16,7 @@ const ToolbarButton: React.FunctionComponent<ToolbarButtonProps> = (props: Toolb
     const dispatch = useAppDispatch();
     const toolbarState = useAppSelector(state => state.toolbar);
     const mapStyleLoaded = useAppSelector(state => state.mapCanvas.styleLoaded);
+    const enlargeDoc = useAppSelector(state => state.sideFilmStrip.enlargeDoc);
    
 
     /* -----------------------------------
@@ -76,6 +77,13 @@ const ToolbarButton: React.FunctionComponent<ToolbarButtonProps> = (props: Toolb
     return (
         <button 
             className={ useMediaQueries(props.baseClassName.concat("__", "button")) + 
+                // Disable image enlarger button if no image is clicked for enlarging.
+                (enlargeDoc !== null
+                    ? ""
+                    : props.name === 'imageEnlarger'
+                        ? "unavailable"
+                        : ""
+                ) +
                 // Add "active" styling based on clicked state.
                 (props.name === 'bounds'
                     ? ""
