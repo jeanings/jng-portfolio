@@ -25,12 +25,15 @@ const ImageFrame: React.FunctionComponent <ImageFrameProps> = (props: ImageFrame
 
     
     return (
-        <div className={ useMediaQueries(classBase) }
+        <div 
+            className={ useMediaQueries(classBase) }
             id={ props.imageDoc._id }
-            role="none" aria-label="image-frame"
+            role="none"
+            aria-label="image-frame"
             onClick={ onImageClick }>
 
-            <img className={ useMediaQueries(classBase.concat("__", "image")) }
+            <img 
+                className={ useMediaQueries(classBase.concat("__", "image")) }
                 src={ props.imageDoc.url_thumb }
                 aria-label="image-frame-image"
                 draggable="false"

@@ -10,7 +10,7 @@ import {
     ImageDocsRequestProps, 
     ImageDocFormatTypes,
     TimelineMonthTypes, 
-    FilterableTypes} from '../TimelineBar/timelineSlice';
+    FilterableTypes } from '../TimelineBar/timelineSlice';
 import { getNumericalMonth } from '../TimelineBar/TimelineBar';
 import './FilterDrawer.css';
 
@@ -89,10 +89,6 @@ const FilterDrawer: React.FunctionComponent = () => {
                 }
                 dispatch(fetchImagesData(filterQueries));
             }
-            // Otherwise let TimelineBar useEffect handle unfiltered queries.
-            else if (filterStatus === 'off') {
-                resetFilterStyling();
-            }
         }
     }, [filterState]);
 
@@ -102,34 +98,33 @@ const FilterDrawer: React.FunctionComponent = () => {
         Clears << filter >> and triggers fetch via useEffect.
     -------------------------------------------------------- */
     const onResetClick = (event: React.SyntheticEvent) => {
-        resetFilterStyling();
         dispatch(clearFilters("RESET TO INIT STATE"));
     };
 
 
     // Prep fetched data for the filter groups.
-    const cameras: Array<string> = filterables?.camera === undefined 
-        ? []
-        : filterables!.camera;
-    const films: Array<string | null> = (filterables?.film === undefined
-        || filterables?.film.includes(null) === true)      // for digital images, arrays have null value
-            ? []
-            : filterables!.film;
-    const lenses: Array<string> = filterables?.lens === undefined
-        ? []
-        : filterables!.lens;
-    const tags: Array<string> = filterables?.tags === undefined
-        ? []
-        : filterables!.tags;
-    const focalLengths: Array<number> = filterables?.focalLength === undefined
-        ? []
-        : filterables!.focalLength;
-    const formats: Array<string> = filterables?.formatMedium === undefined
-        ? []
-        : filterables?.formatType === undefined
-            ? filterables!.formatMedium
+    const cameras: Array<string> = filterables?.camera !== undefined 
+        ? filterables!.camera
+        : [];
+    const films: Array<string | null> = (filterables?.film !== undefined
+        && filterables?.film.includes(null) === false)      // for digital images, arrays have null value
+            ? filterables!.film
+            : [];
+    const lenses: Array<string> = filterables?.lens !== undefined
+        ? filterables!.lens
+        : [];
+    const tags: Array<string> = filterables?.tags !== undefined
+        ? filterables!.tags
+        : [];
+    const focalLengths: Array<number> = filterables?.focalLength !== undefined
+        ? filterables!.focalLength
+        : [];
+    const formats: Array<string> = filterables?.formatMedium !== undefined
+        ? filterables?.formatType !== undefined
             // Combines format medium and type values into the same 'format' category.
-            : filterables!.formatMedium.concat(filterables!.formatType);
+            ? filterables!.formatMedium.concat(filterables!.formatType)
+            : filterables!.formatMedium
+        : [];
 
     
     /* ---------------------------------------------------------
@@ -159,21 +154,23 @@ const FilterDrawer: React.FunctionComponent = () => {
 
         return resetAvailablity;
     };
-   
 
   
     return (
         <section 
-            className={ useMediaQueries(classBase) + 
-                // Add "show" styling based on clicked state.
+            className={ useMediaQueries(classBase) 
+                +   // Add "show" styling based on clicked state.
                 (toolbarFilterSwitch === 'off'
                         ? ""
                         : "show") }
             id={ classBase }
-            role="form" aria-label="filter-drawer">
+            role="form" 
+            aria-label="filter-drawer">
 
-            <div className={ useMediaQueries(classBase.concat("__", "parameters-container")) }
-                role="group" aria-label={ "filter-drawer".concat("-", "container") }>
+            <div 
+                className={ useMediaQueries(classBase.concat("__", "parameters-container")) }
+                role="group" 
+                aria-label={ "filter-drawer".concat("-", "container") }>
 
                 {/* Generates each filter category and its buttons. */}
                 { createCategory(classNames, "format", formats) }
@@ -214,19 +211,25 @@ function createCategory(classNames: ClassNameTypes, categoryName: string, select
     } 
 
     return (
-        <div className={ classNames['parent'] } id={ categoryName }
-            role="group" aria-label={ "filter-drawer".concat("-", categoryName) }>
+        <div 
+            className={ classNames['parent'] }
+            id={ categoryName }
+            role="group"
+            aria-label={ "filter-drawer".concat("-", categoryName) }>
 
-            <h1 className={ classNames['title']} >
-                { categoryName !== "focalLength"
+            <h1 
+                className={ classNames['title']}>
+                    { categoryName !== "focalLength"
                         ? categoryName.toUpperCase()
                         : "FOCAL LENGTH" }
             </h1>
 
-            <div className={ classNames['options'] }
-                role="group" aria-label={ "filter-drawer".concat("-", categoryName, "-options") }>
+            <div 
+                className={ classNames['options'] }
+                role="group" 
+                aria-label={ "filter-drawer".concat("-", categoryName, "-options") }>
                 
-                { /* Generate buttons for all the values in each filter category. */
+                {/* Generate buttons for all the values in each filter category. */
                     sortedSelectables.map((selectable, index) => (
                         <FilterButton
                             baseClassName={ classNames['base'] }
@@ -255,17 +258,6 @@ export function getFilterStateStatus(filterState: FilterableTypes) {
     return filterStatus;
 }
 
-
-/* -------------------------
-    Resets filter styling.
-------------------------- */
-export function resetFilterStyling() {
-    // Clear all "active" styling on pressed buttons.
-    document.querySelectorAll('[role="checkbox"]').forEach(button => {
-        button.classList.remove("active");
-        button.setAttribute("aria-pressed", 'false');
-    });
-};
 
 /* =====================================================================
     Types.
