@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useAppSelector, useMediaQueries } from '../../common/hooks';
 import { ImageDocTypes } from '../TimelineBar/timelineSlice';
 import ImageFrame from './ImageFrame';
@@ -15,6 +15,7 @@ const SideFilmStrip: React.FunctionComponent = () => {
     const imageDocs = useAppSelector(state => state.timeline.imageDocs);
     const classBase: string = "SideFilmStrip";
 
+    
     /* -----------------------------------------------------------
         Generate image frame elements for array of MongoDB docs.
     ----------------------------------------------------------- */
@@ -74,9 +75,8 @@ const SideFilmStrip: React.FunctionComponent = () => {
                 onMouseEnter={ onImageHover }
                 onMouseLeave={ onImageUnhover }>
 
-                {/* Image containers for all docs in collection. */
-                    imageFrameElems
-                }
+                { /* Image containers for all docs in collection. */
+                    imageFrameElems }
             </div>
 
         </aside>

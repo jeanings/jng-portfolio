@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react';
-import { useAppSelector, useMediaQueries } from '../../common/hooks';
+import { useAppDispatch, useAppSelector, useMediaQueries } from '../../common/hooks';
+import { handleToolbarButtons, ToolbarProps } from '../Toolbar/toolbarSlice';
 import './ImageEnlarger.css';
 
 
@@ -8,8 +9,11 @@ import './ImageEnlarger.css';
     Image metadata/info shown along with image.
 ===================================================================== */
 const ImageEnlarger: React.FunctionComponent <ImageEnlargerProps> = (props: ImageEnlargerProps) => {
+    const dispatch = useAppDispatch();
     const imageDoc = useAppSelector(state => state.sideFilmStrip.enlargeDoc);
+    const toolbarEnlargerSwitch = useAppSelector(state => state.toolbar.imageEnlarger);
     const classBase: string = "image-enlarger";
+    
     let imageSource: string = "";
     let imageInfo: ImageInfoType = {
         'Title': null,
@@ -24,24 +28,26 @@ const ImageEnlarger: React.FunctionComponent <ImageEnlargerProps> = (props: Imag
         'Description': null
     };
 
-    /* ---------------------------------------------------------------
-        TODO: don't show image enlarger panel if no image clicked.
-    --------------------------------------------------------------- */
+    /* ------------------------------------------------------------------
+        Handles showing image enlarger only if << imageDoc >> state set.
+    ------------------------------------------------------------------ */
     useEffect(() => {
-
         if (imageDoc !== null) {
             // Add class to show panel.
-            const imageEnlargerElem = document.getElementById("image-enlarger") as HTMLElement;
-            imageEnlargerElem.setAttribute("aria-expanded", 'true');
-            imageEnlargerElem.classList.add("show");
+            const payloadToolbarButtons: ToolbarProps = {
+                'filter': 'off',
+                'imageEnlarger': 'on'
+            };
+            dispatch(handleToolbarButtons(payloadToolbarButtons));
         }
         else {
             // Hide panel if no image clicked.
-            const imageEnlargerElem = document.getElementById("image-enlarger") as HTMLElement;
-            imageEnlargerElem.setAttribute("aria-expanded", 'false');
-            imageEnlargerElem.classList.remove("show");
+            const payloadToolbarButtons: ToolbarProps = {
+                'imageEnlarger': 'off'
+            };
+            dispatch(handleToolbarButtons(payloadToolbarButtons));
         }
-    }, [imageDoc])
+    }, [imageDoc]);
 
 
     /* ------------------------------------------------------------------
@@ -121,17 +127,26 @@ const ImageEnlarger: React.FunctionComponent <ImageEnlargerProps> = (props: Imag
             id="enlarged-image-info"
             role="none" aria-label="enlarged-image-info">
 
-            {/* List of image stats. */
+            { /* List of image stats. */
                 infoElems }
         </figcaption>
     );
 
     
     return (
-        <div className={ useMediaQueries(props.baseClassName.concat("__", classBase)) }
+        <div 
+            className={ useMediaQueries(props.baseClassName.concat("__", classBase)) + 
+                // Add "show" styling based on clicked state. 
+                (toolbarEnlargerSwitch === 'off'
+                    ? ""
+                    : "show") }
             id="image-enlarger"
             role="figure" aria-label={ classBase }
-            aria-expanded="false">
+            aria-expanded={
+                // Change expanded status based on clicked state.
+                toolbarEnlargerSwitch === 'off'
+                    ? "false"
+                    : "true" }>
             
             { enlargedImageElem }
 

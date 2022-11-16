@@ -81,6 +81,10 @@ const preloadedState: RootState = {
     },
     sideFilmStrip: {
         enlargeDoc: null
+    },
+    toolbar: {
+        filter: 'off',
+        imageEnlarger: 'off'
     }
 };
 
@@ -115,6 +119,10 @@ const preloadedStateWithFilter: RootState = {
     },
     sideFilmStrip: {
         enlargeDoc: null
+    },
+    toolbar: {
+        filter: 'off',
+        imageEnlarger: 'off'
     }
 }
 
