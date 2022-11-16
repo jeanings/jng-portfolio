@@ -15,6 +15,7 @@ import 'mapboxgl-spiderifier/index.css';
 // @ts-ignore
 import mapboxgl from 'mapbox-gl'; 
 import 'mapbox-gl/dist/mapbox-gl.css';
+import SideFilmStrip from '../SideFilmStrip/SideFilmStrip';
 
 const MapboxglSpiderfier: any = require('mapboxgl-spiderifier');
 
@@ -271,9 +272,12 @@ const MapCanvas: React.FunctionComponent = () => {
 
 
     return (
-        <main className={ useMediaQueries(classBase) } 
-            id="map" ref={ mapContainer }
-            role="main" aria-label="map-canvas">
+        <main 
+            className={ useMediaQueries(classBase) } 
+            id="map"
+            ref={ mapContainer }
+            role="main"
+            aria-label="map-canvas">
         </main>
     );
 }

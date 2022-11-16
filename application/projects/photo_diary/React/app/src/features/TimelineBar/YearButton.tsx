@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { 
     useAppDispatch, 
     useAppSelector, 
@@ -19,27 +19,6 @@ const YearButton: React.FunctionComponent<YearButtonProps> = (props: YearButtonP
     const selectedYear = useAppSelector(state => state.timeline.selected.year);
     const filterState = useAppSelector(state => state.filter);
 
-    /* --------------------------------------------------------------
-        Handles year elements' style and attribute updates through 
-        listening on << timeline.selected.year >> changes.
-    -------------------------------------------------------------- */
-    useEffect(() => {
-        const thisYearButton = document.getElementById(
-            props.className.concat("-", props.year)) as HTMLElement;
-
-        // Styling and attribute assigning based on if month was queried.
-        switch (selectedYear === parseInt(props.year)) {
-            case (true):
-                thisYearButton.setAttribute("aria-checked", 'true');
-                thisYearButton.classList.add("active");
-                break;
-            case (false):
-                thisYearButton.setAttribute("aria-checked", 'false');
-                thisYearButton.classList.remove("active");
-                break;
-        }   
-    }, [selectedYear])
-
 
     /* -------------------------------------------------------
         Clicks on year selector items will dispatch action to
@@ -47,20 +26,8 @@ const YearButton: React.FunctionComponent<YearButtonProps> = (props: YearButtonP
         Fetches handled by useEffect in TimelineBar.
     ------------------------------------------------------- */
     const onYearSelect = (event: React.SyntheticEvent) => {
-        const yearElemToSelect = event.target as HTMLButtonElement;
-        
-        // Get clicked year text.
-        const yearElemToSelectText: string = yearElemToSelect.textContent as string;
-
-        // Change selected year to clicked year.
-        const yearSelectedElem: HTMLElement = document.querySelector(
-            ".".concat(props.baseClassName, "__", "year-selected")) as HTMLElement;
-        if (yearSelectedElem) {
-            yearSelectedElem.textContent = yearElemToSelectText;
-        }
-
         // Dispatch selected year to reducer.
-        const payloadYearSelected: number = parseInt(yearElemToSelectText);
+        const payloadYearSelected: number = parseInt(props.year);
         const filterStatus = getFilterStateStatus(filterState);
 
         if (filterStatus === 'on') {
@@ -78,38 +45,25 @@ const YearButton: React.FunctionComponent<YearButtonProps> = (props: YearButtonP
 
     return (
         <li 
-            className={ useMediaQueries(props.baseClassName.concat("__", props.className)) }
+            className={ useMediaQueries(props.baseClassName.concat("__", props.className)) 
+                +   // Add "active" styling if selected.
+                (selectedYear === parseInt(props.year)
+                    ? "active"
+                    : "" ) }
             id={ props.className.concat("-", props.year) }
-            role="menuitemradio" aria-label={ props.className }
-            aria-checked="false"
+            role="menuitemradio" 
+            aria-label={ props.className }
+            aria-checked={
+                selectedYear === parseInt(props.year)
+                    ? "true"
+                    : "false" }
             onClick={ onYearSelect }>
 
                 {/* Year text. */
-                    props.year
-                }
+                    props.year }
         </li>
     );
 }
-
-
-/* =====================================================================
-    Helper functions.
-===================================================================== */
-
-/* -------------------------
-    Resets month styling.
-------------------------- */
-export function resetMonthStyling() {
-    const monthElems = document.querySelectorAll('[aria-label="month-item"]');
-    monthElems.forEach(elem => {
-        elem.setAttribute("aria-checked", 'false');
-        elem.classList.remove("active");
-    });
-
-    const defaultMonthElem = document.getElementById("month-item-all") as HTMLElement;
-    defaultMonthElem.setAttribute("aria-checked", 'true');
-    defaultMonthElem.classList.add("active");
-};
 
 
 /* =====================================================================

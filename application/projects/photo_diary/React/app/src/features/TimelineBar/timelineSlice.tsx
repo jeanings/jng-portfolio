@@ -2,8 +2,7 @@ import {
     createSlice, 
     createAsyncThunk,
     Action,
-    AnyAction,
-    PayloadAction } from '@reduxjs/toolkit';
+    AnyAction } from '@reduxjs/toolkit';
 import axios, { AxiosError, AxiosResponse } from 'axios';
 import { RootState } from '../../app/store';
 import { apiUrl } from '../../app/App';
@@ -315,8 +314,8 @@ export type ImageDocTypes = {
 };
 
 export type ImageDocFormatTypes = {
-    'medium': 'digital' | 'film',
-    'type': '120' | '35mm' | 'APS-C' | 'Micro43' | 'Full-frame'
+    'medium': 'digital' | 'film' | string,
+    'type': '120' | '35mm' | 'APS-C' | 'Micro43' | 'Full-frame' | string
 };
 
 export type FilterableTypes = {

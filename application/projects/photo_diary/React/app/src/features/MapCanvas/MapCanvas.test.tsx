@@ -13,7 +13,6 @@ import MockAdapter from 'axios-mock-adapter';
 import { apiUrl } from '../../app/App';
 import '@testing-library/jest-dom';
 import mockDefaultData from '../../utils/mockDefaultData.json';
-import mock2022Data from '../../utils/mock2022Data.json';
 import mock2015Data from '../../utils/mock2015Data.json';
 import TimelineBar from '../TimelineBar/TimelineBar';
 import {
@@ -68,7 +67,7 @@ const preloadedState: RootState = {
                 'oct': 0, 'nov': 0, 'dec': 0,
             }
         },
-        imageDocs: null,
+        imageDocs: mockDefaultData.docs,
         filterSelectables: mockDefaultData.filterSelectables[0],
         filteredSelectables: null,
         geojson: mockDefaultData.featureCollection as GeojsonFeatureCollectionProps,
@@ -88,6 +87,13 @@ const preloadedState: RootState = {
         sourceStatus: 'idle',
         markersStatus: 'idle',
         fitBoundsButton: 'idle'
+    },
+    sideFilmStrip: {
+        enlargeDoc: null
+    },
+    toolbar: {
+        filter: 'off',
+        imageEnlarger: 'off'
     }
 };
 

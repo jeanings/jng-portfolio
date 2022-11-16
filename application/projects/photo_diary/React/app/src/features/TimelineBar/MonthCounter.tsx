@@ -58,12 +58,13 @@ const MonthCounter: React.FunctionComponent<MonthCounterProps> = (props: MonthCo
     
 
     return (
-        <div className={ useMediaQueries(props.baseClassName.concat("__", props.className)) }
-            role="none" aria-label="month-counter">
+        <div 
+            className={ useMediaQueries(props.baseClassName.concat("__", props.className)) }
+            role="none" 
+            aria-label="month-counter">
 
             {/* Create rolling counter. */
-                updateCount
-            }
+                updateCount }
         </div>
     );
 }

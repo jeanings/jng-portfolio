@@ -25,6 +25,11 @@
         fill: var(--colour-accent-primary);
     }
 
+    .Toolbar__button.unavailable {
+        opacity: 0.175;
+        pointer-events: none;
+    }
+
     /* Flip icon on x-axis */
     #icon-side-panel {
         transform: scaleX(-1);
