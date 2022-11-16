@@ -12,10 +12,14 @@ const Toolbar: React.FunctionComponent = () => {
 
     
     return (
-        <menu className={ useMediaQueries(classBase) }
-            role="menu" aria-label="toolbar">
+        <menu 
+            className={ useMediaQueries(classBase) }
+            role="menu"
+            aria-label="toolbar">
             
-            <div className={ useMediaQueries(classBase.concat("__", "button-container")) }>
+            <div 
+                className={ useMediaQueries(classBase.concat("__", "button-container")) }>
+                
                 { createToolbarButton(classBase, 'filter') }
                 { createToolbarButton(classBase, 'bounds') }
                 { createToolbarButton(classBase, 'imageEnlarger') }

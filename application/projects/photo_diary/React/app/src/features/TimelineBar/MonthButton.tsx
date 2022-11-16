@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { 
     useAppDispatch, 
     useAppSelector,
@@ -16,71 +16,37 @@ const MonthButton: React.FunctionComponent<MonthButtonProps> = (props: MonthButt
     const dispatch = useAppDispatch();
     const selectedMonth = useAppSelector(state => state.timeline.selected.month);
 
-    /* ------------------------------------------------------------------
-        On initialization, set 'ALL' months selector to 
-            - aria-checked true
-            - active class styling
-    ------------------------------------------------------------------ */
-    useEffect(() => {
-        // Set active month to 'all', unset the rest.
-        const defaultMonthElem = document.getElementById("month-item-all") as HTMLElement;
-        defaultMonthElem.setAttribute("aria-checked", 'true');
-        defaultMonthElem.classList.add("active");
-    }, []);
-
-
-    /* --------------------------------------------------------------
-        Handles month elements' style and attribute updates through 
-        listening on << timeline.selected.month >> changes.
-    -------------------------------------------------------------- */
-    useEffect(() => {
-        const thisMonthButton = document.getElementById(
-            props.className.concat("-", props.month)) as HTMLElement;
-
-        // Styling and attribute assigning based on if month was queried.
-        switch (selectedMonth === props.month) {
-            case (true):
-                thisMonthButton.setAttribute("aria-checked", 'true');
-                thisMonthButton.classList.add("active");
-                break;
-            case (false):
-                thisMonthButton.setAttribute("aria-checked", 'false');
-                thisMonthButton.classList.remove("active");
-                break;
-        }   
-    }, [selectedMonth])
-
-
+    
     /* -------------------------------------------------------------
         Clicks on month selector items will update selected month, 
         triggering a useEffect fetch dispatch in component.
     ------------------------------------------------------------- */
     const onMonthSelect = (event: React.SyntheticEvent) => {
-        const monthElemToSelect = event.target as HTMLButtonElement;
-
-        // Dispatch selected month to reducer.
-        const monthElemSelected: string = monthElemToSelect.textContent!
-            .replace(/\d+/, "")
-            .toLowerCase();
-        const payloadMonthSelected: string = monthElemSelected;
-
+        const payloadMonthSelected: string = props.month;
         dispatch(handleMonthSelect(payloadMonthSelected));
     };
+  
     
-
     return (
-        <div className={ useMediaQueries(props.baseClassName.concat("__", props.className)) }
+        <div 
+            className={ useMediaQueries(props.baseClassName.concat("__", props.className)) 
+                +   // Add "active" styling for selected element.
+                (selectedMonth === props.month
+                    ? "active"
+                    : "") }
             id={ props.className.concat('-', props.month) }
-            role="menuitemradio" aria-label={ props.className }
-            aria-checked="false"
+            role="menuitemradio" 
+            aria-label={ props.className }
+            aria-checked={// Changed pressed state based on selected element.
+                selectedMonth === props.month 
+                    ? "true"
+                    : "false" }
             onClick={ onMonthSelect }>
 
                 {/* Month text styled in upper case. */
-                    props.month.toUpperCase()
-                }
+                    props.month.toUpperCase() }
                 {/* Generate counter for images taken in the month. */
-                    createMonthCounter(props.month, props.baseClassName, props.keyIndex)
-                }
+                    createMonthCounter(props.month, props.baseClassName, props.keyIndex) }
         </div>
     );
 }

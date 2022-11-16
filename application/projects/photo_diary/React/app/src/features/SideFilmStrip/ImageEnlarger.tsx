@@ -1,5 +1,8 @@
 import React, { useEffect } from 'react';
-import { useAppDispatch, useAppSelector, useMediaQueries } from '../../common/hooks';
+import { 
+    useAppDispatch, 
+    useAppSelector, 
+    useMediaQueries } from '../../common/hooks';
 import { handleToolbarButtons, ToolbarProps } from '../Toolbar/toolbarSlice';
 import './ImageEnlarger.css';
 
@@ -84,7 +87,8 @@ const ImageEnlarger: React.FunctionComponent <ImageEnlargerProps> = (props: Imag
 
     // Create englarged image element.
     const enlargedImageElem: JSX.Element = (
-        <img className={ useMediaQueries(props.baseClassName.concat("__", classBase, "__", "image")) }
+        <img 
+            className={ useMediaQueries(props.baseClassName.concat("__", classBase, "__", "image")) }
             src={ imageSource } 
             aria-label="enlarged-image"
         />
@@ -99,12 +103,17 @@ const ImageEnlarger: React.FunctionComponent <ImageEnlargerProps> = (props: Imag
         // Only add category if their content exists.
         if (item[1] !== null) {
             const category: JSX.Element = (
-                <div className={ infoElemsClassName }
-                    role="none" aria-label="enlarged-image-info-categories"
+                <div 
+                    className={ infoElemsClassName }
+                    role="none"
+                    aria-label="enlarged-image-info-categories"
                     key={ "key".concat("_", "image-info", "_", item[0]) }>
                     
                     {/* Category titles. */}
-                    <span role="none" aria-label={ "enlarged-image-info-category".concat("-", item[0]) }>
+                    <span
+                        role="none"
+                        aria-label={ "enlarged-image-info-category".concat("-", item[0]) }>
+                        
                         { item[0].toUpperCase() }
                     </span>
 
@@ -112,8 +121,7 @@ const ImageEnlarger: React.FunctionComponent <ImageEnlargerProps> = (props: Imag
                     <span>
                         { typeof(item[1]) === "object"
                             ? item[1]?.map(tag => tag).join(', ')   // for string[] in tags
-                            : item[1]
-                        }
+                            : item[1] }
                     </span>
                 </div>
             )
@@ -123,9 +131,11 @@ const ImageEnlarger: React.FunctionComponent <ImageEnlargerProps> = (props: Imag
     
     // Create image stats elements to populate info panel next to enlarged image.
     const imageInfoElem: JSX.Element = (
-        <figcaption className={ useMediaQueries(props.baseClassName.concat("__", classBase, "__", "info")) }
+        <figcaption
+            className={ useMediaQueries(props.baseClassName.concat("__", classBase, "__", "info")) }
             id="enlarged-image-info"
-            role="none" aria-label="enlarged-image-info">
+            role="none"
+            aria-label="enlarged-image-info">
 
             { /* List of image stats. */
                 infoElems }
@@ -141,7 +151,8 @@ const ImageEnlarger: React.FunctionComponent <ImageEnlargerProps> = (props: Imag
                     ? ""
                     : "show") }
             id="image-enlarger"
-            role="figure" aria-label={ classBase }
+            role="figure" 
+            aria-label={ classBase }
             aria-expanded={
                 // Change expanded status based on clicked state.
                 toolbarEnlargerSwitch === 'off'

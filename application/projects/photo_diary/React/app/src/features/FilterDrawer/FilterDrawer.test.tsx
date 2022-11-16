@@ -500,7 +500,7 @@ test("dispatches fetch request on << filter >> state changes", async() => {
     // Verify number of docs for initial fetch request.
     expect(newStore.getState().timeline.counter.all).toEqual(40);
 
-    screen.findAllByRole('checkbox', { name: "filter-drawer-format-item" });
+    await waitFor(() => screen.findAllByRole('checkbox', { name: "filter-drawer-format-item" }));
     const filterButtons = screen.getAllByRole('checkbox', { name: "filter-drawer-format-item" });
 
     // Get filter button element to click: FORMAT -> film.

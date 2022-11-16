@@ -87,7 +87,7 @@ const TimelineBar: React.FunctionComponent = () => {
     selectableYears = collectionYears as Array<string>
 
     if (selectableYears) {
-        selectableYears.map((year, index) => (
+        [...selectableYears].reverse().map((year, index) => (
             yearElems.push(createYearButton(year, index, classBase))
         ));
     }
@@ -107,32 +107,36 @@ const TimelineBar: React.FunctionComponent = () => {
     ));
 
 
-
     return (
-        <div className={ useMediaQueries(classBase) }
-            role="region" aria-label="timeline-bar">
-            <div className={ useMediaQueries(classBase.concat("__", "year-selector")) }
-                role="menubar" aria-label="year-selector">
+        <div 
+            className={ useMediaQueries(classBase) }
+            role="region"
+            aria-label="timeline-bar">
+            
+            <div 
+                className={ useMediaQueries(classBase.concat("__", "year-selector")) }
+                role="menubar"
+                aria-label="year-selector">
 
-                <div className={ useMediaQueries(classBase.concat("__", "year-selected")) }
-                    role="menuitem" aria-label="year-selected">
+                <div 
+                    className={ useMediaQueries(classBase.concat("__", "year-selected")) }
+                    role="menuitem"
+                    aria-label="year-selected">
+                    
                     { selectedYear }
                 </div>
 
                 {/* Dropdown menu of selectable years based on db collections. */
-                    yearElems
-                }
-                
+                    yearElems }
             </div>
 
-
-            <div className={ useMediaQueries(classBase.concat("__", "month-selector")) }
-                role="menubar" aria-label="month-selector">
+            <div
+                className={ useMediaQueries(classBase.concat("__", "month-selector")) }
+                role="menubar"
+                aria-label="month-selector">
                 
                 {/* Months selection labels: JAN, FEB, etc. */
-                    monthElems
-                }
-                
+                    monthElems }
             </div>
         </div>
     );
