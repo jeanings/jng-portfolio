@@ -4,6 +4,7 @@ import {
     useAppSelector, 
     useMediaQueries } from '../../common/hooks';
 import { handleToolbarButtons, ToolbarProps } from '../Toolbar/toolbarSlice';
+import { handleEnlarger, SideFilmStripProps } from './sideFilmStripSlice';
 import './ImageEnlarger.css';
 
 
@@ -14,7 +15,8 @@ import './ImageEnlarger.css';
 const ImageEnlarger: React.FunctionComponent <ImageEnlargerProps> = (props: ImageEnlargerProps) => {
     const dispatch = useAppDispatch();
     const imageDoc = useAppSelector(state => state.sideFilmStrip.enlargeDoc);
-    const toolbarEnlargerSwitch = useAppSelector(state => state.toolbar.imageEnlarger);
+    const toolbarEnlarger = useAppSelector(state => state.toolbar.imageEnlarger);
+    const timelineSelected = useAppSelector(state => state.timeline.selected);
     const classBase: string = "image-enlarger";
     
     let imageSource: string = "";
@@ -31,9 +33,9 @@ const ImageEnlarger: React.FunctionComponent <ImageEnlargerProps> = (props: Imag
         'Description': null
     };
 
-    /* ------------------------------------------------------------------
+    /* -------------------------------------------------------------------
         Handles showing image enlarger only if << imageDoc >> state set.
-    ------------------------------------------------------------------ */
+    ------------------------------------------------------------------- */
     useEffect(() => {
         if (imageDoc !== null) {
             // Add class to show panel.
@@ -51,6 +53,19 @@ const ImageEnlarger: React.FunctionComponent <ImageEnlargerProps> = (props: Imag
             dispatch(handleToolbarButtons(payloadToolbarButtons));
         }
     }, [imageDoc]);
+
+
+    /* -----------------------------------------------------------------
+        Year or month selection triggers image enlarger panel to close.
+    ----------------------------------------------------------------- */
+    useEffect(() => {
+        if (toolbarEnlarger === 'on') {
+            const payloadToolbarButtons: ToolbarProps = {
+                'imageEnlarger': 'off'
+            };
+            dispatch(handleToolbarButtons(payloadToolbarButtons));
+        }
+    }, [timelineSelected]);
 
 
     /* ------------------------------------------------------------------
@@ -147,7 +162,7 @@ const ImageEnlarger: React.FunctionComponent <ImageEnlargerProps> = (props: Imag
         <div 
             className={ useMediaQueries(props.baseClassName.concat("__", classBase)) + 
                 // Add "show" styling based on clicked state. 
-                (toolbarEnlargerSwitch === 'off'
+                (toolbarEnlarger === 'off'
                     ? ""
                     : "show") }
             id="image-enlarger"
@@ -155,7 +170,7 @@ const ImageEnlarger: React.FunctionComponent <ImageEnlargerProps> = (props: Imag
             aria-label={ classBase }
             aria-expanded={
                 // Change expanded status based on clicked state.
-                toolbarEnlargerSwitch === 'off'
+                toolbarEnlarger === 'off'
                     ? "false"
                     : "true" }>
             

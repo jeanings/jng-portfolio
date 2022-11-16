@@ -10,12 +10,11 @@ import {
 import userEvent from '@testing-library/user-event';
 import axios from 'axios';
 import MockAdapter from 'axios-mock-adapter';
-import { apiUrl } from '../../app/App';
 import '@testing-library/jest-dom';
 import mockDefaultData from '../../utils/mockDefaultData.json';
-import mock2015Data from '../../utils/mock2015Data.json';
-import TimelineBar from '../TimelineBar/TimelineBar';
 import {
+    handleYearSelect,
+    handleMonthSelect,
     GeojsonFeatureCollectionProps,
     BboxType } from '../TimelineBar/timelineSlice';
 import Toolbar from '../Toolbar/Toolbar';
@@ -417,8 +416,62 @@ test("opens image enlarger (if closed) if same image clicked on", async() => {
         expect(imageEnlargerElem).toHaveAttribute("aria-expanded", 'true');
         expect(imageEnlargerElem).toHaveClass("show");
     });
+});
 
-})
+
+test("closes image enlarger on year or month selection", async() => {
+    const newStore = setupStore(preloadedState);
+        render(
+            <Provider store={newStore}>
+                <Toolbar />
+                <SideFilmStrip />
+            </Provider>
+        );
+    
+    expect(newStore.getState().sideFilmStrip.enlargeDoc).toBeNull();
+    const imageEnlargerElem = screen.getByRole('figure', { name: 'image-enlarger' });
+
+    // Verify enlarger panel becomes visible on imageDoc existence.
+    const idForImageToEnlarge = mockDefaultData.docs[0]._id;
+    const thumbnailElems = screen.getAllByRole('none', { name: 'image-frame' });
+    const thumbnailToClick = thumbnailElems.filter(thumbnail => 
+        thumbnail.id === idForImageToEnlarge)[0];
+
+    await waitFor(() => user.click(thumbnailToClick));
+    expect(newStore.getState().sideFilmStrip.enlargeDoc).not.toBeNull();
+    
+    await waitFor(() => {
+        expect(imageEnlargerElem).toHaveAttribute("aria-expanded", 'true');
+        expect(imageEnlargerElem).toHaveClass("show");
+    });
+
+    // Select year.
+    newStore.dispatch(handleYearSelect(2017));
+
+    // Verify enlarger panel is hidden.
+    await waitFor(() => {
+        expect(imageEnlargerElem).toHaveAttribute("aria-expanded", 'false');
+        expect(imageEnlargerElem).not.toHaveClass("show");
+    });
+
+    // Click on image in strip again.
+    await waitFor(() => user.click(thumbnailToClick));
+
+    // Verify enlarger opened.
+    await waitFor(() => {
+        expect(imageEnlargerElem).toHaveAttribute("aria-expanded", 'true');
+        expect(imageEnlargerElem).toHaveClass("show");
+    });
+
+    // Select year.
+    newStore.dispatch(handleMonthSelect('may'));
+
+    // Verify enlarger panel is hidden.
+    await waitFor(() => {
+        expect(imageEnlargerElem).toHaveAttribute("aria-expanded", 'false');
+        expect(imageEnlargerElem).not.toHaveClass("show");
+    });
+});
 
 /*
 
