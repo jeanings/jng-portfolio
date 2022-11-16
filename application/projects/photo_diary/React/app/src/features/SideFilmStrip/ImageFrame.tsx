@@ -1,7 +1,8 @@
 import React from 'react';
-import { useAppDispatch, useMediaQueries } from '../../common/hooks';
+import { useAppDispatch, useAppSelector, useMediaQueries } from '../../common/hooks';
 import { ImageDocTypes } from '../TimelineBar/timelineSlice';
 import { handleEnlarger, SideFilmStripProps } from './sideFilmStripSlice';
+import { handleToolbarButtons, ToolbarProps } from '../Toolbar/toolbarSlice';
 import './ImageFrame.css';
 
 
@@ -11,6 +12,8 @@ import './ImageFrame.css';
 =============================================================== */
 const ImageFrame: React.FunctionComponent <ImageFrameProps> = (props: ImageFrameProps) => {
     const dispatch = useAppDispatch();
+    const enlargeDoc = useAppSelector(state => state.sideFilmStrip.enlargeDoc);
+    const toolbarImageEnlarger = useAppSelector(state => state.toolbar.imageEnlarger);
     const classBase: string = "ImageFrame";   
 
     /* ---------------------------------------------------------------
@@ -19,8 +22,21 @@ const ImageFrame: React.FunctionComponent <ImageFrameProps> = (props: ImageFrame
         in a panel to the left of film strip.
     --------------------------------------------------------------- */
     const onImageClick = (event: React.SyntheticEvent) => {
-        const payloadImageDoc: SideFilmStripProps['enlargeDoc'] = props.imageDoc;
-        dispatch(handleEnlarger(payloadImageDoc));
+        if (props.imageDoc !== enlargeDoc) {
+            const payloadImageDoc: SideFilmStripProps['enlargeDoc'] = props.imageDoc;
+            dispatch(handleEnlarger(payloadImageDoc));
+        }
+        else if (props.imageDoc === enlargeDoc) {
+            // Show image enlarger if same image clicked.
+            const payloadToolbarButtons: ToolbarProps = {
+                'filter': 'off',
+                'imageEnlarger': 'on'
+            };
+            
+            if (toolbarImageEnlarger !== 'on') {
+                dispatch(handleToolbarButtons(payloadToolbarButtons));
+            }
+        }
     };
 
     

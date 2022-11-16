@@ -1,6 +1,6 @@
 import React from 'react';
 import * as reactRedux from 'react-redux';
-import { Provider, useDispatch } from 'react-redux';
+import { Provider } from 'react-redux';
 import { setupStore, RootState } from '../../app/store';
 import { 
     cleanup, 
@@ -18,11 +18,14 @@ import TimelineBar from '../TimelineBar/TimelineBar';
 import {
     GeojsonFeatureCollectionProps,
     BboxType } from '../TimelineBar/timelineSlice';
+import Toolbar from '../Toolbar/Toolbar';
+import { handleToolbarButtons, ToolbarProps } from '../Toolbar/toolbarSlice';
+import SideFilmStrip from './SideFilmStrip';
+import { handleEnlarger } from './sideFilmStripSlice';
 // @ts-ignore
 import mapboxgl from 'mapbox-gl'; 
 import 'mapbox-gl/dist/mapbox-gl.css';
-import SideFilmStrip from './SideFilmStrip';
-import { handleEnlarger } from './sideFilmStripSlice';
+
 
 const MapboxglSpiderfier: any = require('mapboxgl-spiderifier');
 
@@ -342,7 +345,7 @@ test("reveals/hides enlarger depending on state availability", async() => {
             </Provider>
         );
     
-    // "Reset" << enlargeDoc >> to null, unlicked state.
+    // "Reset" << enlargeDoc >> to null, unclicked state.
     newStore.dispatch(handleEnlarger(null));
     expect(newStore.getState().sideFilmStrip.enlargeDoc).toBeNull();
 
@@ -361,6 +364,61 @@ test("reveals/hides enlarger depending on state availability", async() => {
     });
 });
 
+
+test("opens image enlarger (if closed) if same image clicked on", async() => {
+    const newStore = setupStore(preloadedState);
+        render(
+            <Provider store={newStore}>
+                <Toolbar />
+                <SideFilmStrip />
+            </Provider>
+        );
+    
+    expect(newStore.getState().sideFilmStrip.enlargeDoc).toBeNull();
+
+    // Verify enlarger panel is hidden.
+    await waitFor(() => screen.findByRole('figure', { name: 'image-enlarger' }));
+    const imageEnlargerElem = screen.getByRole('figure', { name: 'image-enlarger' });
+    expect(imageEnlargerElem).toHaveAttribute("aria-expanded", 'false');
+    expect(imageEnlargerElem).not.toHaveClass("show");
+
+    // Verify enlarger panel becomes visible on imageDoc existence.
+    const idForImageToEnlarge = mockDefaultData.docs[0]._id;
+    const thumbnailElems = screen.getAllByRole('none', { name: 'image-frame' });
+    const thumbnailToClick = thumbnailElems.filter(thumbnail => 
+        thumbnail.id === idForImageToEnlarge)[0];
+
+    await waitFor(() => user.click(thumbnailToClick));
+    expect(newStore.getState().sideFilmStrip.enlargeDoc).not.toBeNull();
+    
+    await waitFor(() => {
+        expect(imageEnlargerElem).toHaveAttribute("aria-expanded", 'true');
+        expect(imageEnlargerElem).toHaveClass("show");
+    });
+
+    // Close image enlarger with toolbar button.
+    const payloadToolbarButtons: ToolbarProps = {
+        'filter': 'on',
+        'imageEnlarger': 'off'
+    };
+    newStore.dispatch(handleToolbarButtons(payloadToolbarButtons));
+
+    // Verify enlarger panel is hidden.
+    await waitFor(() => {
+        expect(imageEnlargerElem).toHaveAttribute("aria-expanded", 'false');
+        expect(imageEnlargerElem).not.toHaveClass("show");
+    });
+
+    // Click on image in strip again.
+    await waitFor(() => user.click(thumbnailToClick));
+
+    // Verify image enlarger opens.
+    await waitFor(() => {
+        expect(imageEnlargerElem).toHaveAttribute("aria-expanded", 'true');
+        expect(imageEnlargerElem).toHaveClass("show");
+    });
+
+})
 
 /*
 
