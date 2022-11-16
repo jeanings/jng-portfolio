@@ -272,10 +272,12 @@ const MapCanvas: React.FunctionComponent = () => {
 
 
     return (
-        <main className={ useMediaQueries(classBase) } 
-            id="map" ref={ mapContainer }
-            role="main" aria-label="map-canvas">
-
+        <main 
+            className={ useMediaQueries(classBase) } 
+            id="map"
+            ref={ mapContainer }
+            role="main"
+            aria-label="map-canvas">
         </main>
     );
 }

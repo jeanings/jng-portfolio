@@ -1,6 +1,5 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { RootState } from '../../app/store';
-import { FilterableTypes } from '../TimelineBar/timelineSlice';
 
 
 /* ==============================================================================
@@ -12,7 +11,7 @@ import { FilterableTypes } from '../TimelineBar/timelineSlice';
     Handles updates to filter selection.
 ------------------------------------------ */
 // State for initial render.
-const initialState: FilterableTypes = {
+const initialState: FilterProps = {
     formatMedium: [],
     formatType: [],
     film: [],
@@ -65,9 +64,20 @@ const filterSlice = createSlice({
 /* =====================================================================
     Types.
 ===================================================================== */
+export interface FilterProps {
+    [index: string]: Array<string | number>,
+    'formatMedium': Array<string>,
+    'formatType': Array<string>,
+    'film': Array<string>,
+    'camera': Array<string>,
+    'lens': Array<string>,
+    'focalLength': Array<number>,
+    'tags': Array<string>
+};
+
 export type FilterPayloadType = {
     [index: string]: string | number | undefined,
-    'make?'?: string,
+    'make'?: string,
     'model'?: string,
     'camera'?: string,
     'film'?: string,

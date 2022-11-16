@@ -19,6 +19,40 @@ const FilterButton: React.FunctionComponent<FilterButtonProps> = (props: FilterB
     const yearSelectables = useAppSelector(state => state.timeline.filterSelectables);
     const monthSelectables = useAppSelector(state => state.timeline.filteredSelectables);
 
+    // Get corresponding category in filter state (may be different than props one).
+    let filterCategory: string = props.categoryName;
+    let selectable: string | number = props.selectableName;
+    // Process and clean categoryName and selectableName.
+    switch(props.categoryName) {
+        case 'format':
+            // Differentiate the categories for the format selectables.
+            props.selectableName === 'film' || props.selectableName === 'digital'
+                ? filterCategory = 'formatMedium'
+                : filterCategory = 'formatType';
+            break;
+
+        case 'camera':
+            // Get cleaned selectableName for filter state.
+            const cameraMakeModel = props.selectableName as string;
+            const make: string = cameraMakeModel.split(' ', 1)[0];
+            const modelStrings: Array<string> = cameraMakeModel.split(' ')
+                .filter(model => !model.includes(make));
+            let cameraModelOnlyName: string = '';
+            
+            // Reconstruct camera model if it contains multiple parts of text.
+            modelStrings.forEach(modelString =>
+                cameraModelOnlyName = cameraModelOnlyName.concat(' ', modelString).trim()
+            );
+            selectable = cameraModelOnlyName;
+            break;
+    }
+
+    let selectedInCategory = useAppSelector(state => state.filter[filterCategory]);
+    if (!selectedInCategory) {
+        selectedInCategory = [];
+    }
+
+
     /* ---------------------------------------------------------
         Gets add-on to class name for greying out reset button
         when no filters are selected.
@@ -58,101 +92,35 @@ const FilterButton: React.FunctionComponent<FilterButtonProps> = (props: FilterB
         filter exists or not in << filter >> state.
     ------------------------------------------------------------ */
     const onFilterClick = (event: React.SyntheticEvent) => {
-        const filterElem = event.target as HTMLButtonElement;
-        const buttonText = filterElem.textContent as string;
+        let payloadFilter: FilterPayloadType = {
+            [filterCategory]: selectable
+        };
 
-        // Sets aria-checked, determines addFilter/removeFilter dispatches below.
-        const setAriaPressed = filterElem.getAttribute("aria-pressed") === 'false'
-            ? 'true' : 'false';
-        filterElem.setAttribute('aria-pressed', setAriaPressed);
-        const ariaPressed = filterElem.getAttribute("aria-pressed");
-        
-        // Add class active for styling.
-        ariaPressed === 'true'
-            ? filterElem.classList.add("active")
-            : filterElem.classList.remove("active");
-
-        let payloadFilter: FilterPayloadType;
-        // Assign payload its corresponding key:val pairs based on category.
-        switch(filterElem.getAttribute("aria-label")) {
-            case 'filter-drawer-format-item':
-                // "Format" includes both medium (film, digital) and type (35mm, mirrorless)
-                // but fetch API handles both as separate for querying. This handles separation
-                // of each for querying MongoDB.
-                payloadFilter = (filterElem.textContent === 'film'
-                    || filterElem.textContent === 'digital')
-                        ? { 'formatMedium': buttonText }
-                        : { 'formatType': buttonText };
-                ariaPressed === 'true'
-                    ? dispatch(addFilter(payloadFilter))
-                    : dispatch(removeFilter(payloadFilter));
-                break;
-
-            case 'filter-drawer-film-item':
-                payloadFilter = { 'film': buttonText };
-                ariaPressed === 'true'
-                    ? dispatch(addFilter(payloadFilter))
-                    : dispatch(removeFilter(payloadFilter));
-                break;
-        
-            case 'filter-drawer-camera-item':
-                // Only dispatch camera model as 'camera'.
-                const make: string = buttonText.split(' ', 1)[0];
-                const modelStrings: Array<string> = buttonText.split(' ')
-                    .filter(model => !model.includes(make));
-                let camera: string = '';
-                
-                // Reconstruct camera model if it contains multiple parts of text.
-                modelStrings.forEach(modelString =>
-                    camera = camera.concat(' ', modelString).trim()
-                );
-
-                payloadFilter = { 'camera': camera };
-                ariaPressed === 'true'
-                    ? dispatch(addFilter(payloadFilter))
-                    : dispatch(removeFilter(payloadFilter));
-                break;
-
-            case 'filter-drawer-lens-item':
-                payloadFilter = { 'lens': buttonText };
-                ariaPressed === 'true'
-                    ? dispatch(addFilter(payloadFilter))
-                    : dispatch(removeFilter(payloadFilter));
-                break;
-
-            case 'filter-drawer-focalLength-item':
-                // Metadata has focal lengths in int, cleaning string is necessary.
-                const focalLength: number = parseInt(buttonText.replace('mm', ''));
-                payloadFilter = { 'focalLength': focalLength };
-                ariaPressed === 'true'
-                    ? dispatch(addFilter(payloadFilter))
-                    : dispatch(removeFilter(payloadFilter));
-                break;
-
-            case 'filter-drawer-tags-item':
-                payloadFilter = { 'tags': buttonText };
-                ariaPressed === 'true'
-                    ? dispatch(addFilter(payloadFilter))
-                    : dispatch(removeFilter(payloadFilter));
-                break;
-        }
+        selectedInCategory.includes(selectable) === false
+            ? dispatch(addFilter(payloadFilter))
+            : dispatch(removeFilter(payloadFilter));
     };
 
    
-
     return (
         <button 
-            className={ useMediaQueries(props.baseClassName.concat("__", "buttons")) 
-                + getAvailability() }
-            role="checkbox" aria-label={ "filter-drawer".concat("-", props.categoryName, "-item") }
-            aria-pressed="false"
+            className={ useMediaQueries(props.baseClassName.concat("__", "buttons"))
+                +   // Grey out and disable button if unavailable for set of data.
+                getAvailability()
+                +   // Set "active" styling if filter is selected. 
+                (selectedInCategory.includes(selectable) === false
+                    ? ""
+                    : "active") }
+            role="checkbox"
+            aria-label={ "filter-drawer".concat("-", props.categoryName, "-item") }
+            aria-pressed={ selectedInCategory.includes(selectable) === false
+                ? "false"
+                : "true" }
             onClick={ onFilterClick }>
 
                 { props.categoryName === 'focalLength'
                         ? props.selectableName.toString().concat('mm')      // Add focal length unit.
-                        : props.selectableName
-                }
-                
+                        : props.selectableName }                
         </button>
     );
 }

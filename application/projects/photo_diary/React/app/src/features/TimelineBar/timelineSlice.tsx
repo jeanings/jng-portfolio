@@ -2,8 +2,7 @@ import {
     createSlice, 
     createAsyncThunk,
     Action,
-    AnyAction,
-    PayloadAction } from '@reduxjs/toolkit';
+    AnyAction } from '@reduxjs/toolkit';
 import axios, { AxiosError, AxiosResponse } from 'axios';
 import { RootState } from '../../app/store';
 import { apiUrl } from '../../app/App';

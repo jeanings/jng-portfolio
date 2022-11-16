@@ -23,10 +23,8 @@ const ToolbarButton: React.FunctionComponent<ToolbarButtonProps> = (props: Toolb
         Handle clicks on toolbar buttons.
     ----------------------------------- */
     const onToolbarButtonClick = (event: React.SyntheticEvent) => {
-        const toolbarButtonElem = event.target as HTMLButtonElement;
-
-        switch(toolbarButtonElem.id) {
-            case 'Toolbar-filter': 
+        switch(props.name) {
+            case 'filter': 
                 // Fade in.
                 if (toolbarState.filter === 'off') {
                     const payloadToolbarButtons: ToolbarProps = {
@@ -45,13 +43,13 @@ const ToolbarButton: React.FunctionComponent<ToolbarButtonProps> = (props: Toolb
                 }
                 break;
 
-            case 'Toolbar-bounds':
+            case 'bounds':
                 if (mapStyleLoaded === true) {
                     dispatch(setBoundsButton('clicked'));
                 }
                 break;
 
-            case 'Toolbar-imageEnlarger':
+            case 'imageEnlarger':
                 // Fade in.
                 if (toolbarState.imageEnlarger === 'off') {
                     const payloadToolbarButtons: ToolbarProps = {
@@ -71,20 +69,18 @@ const ToolbarButton: React.FunctionComponent<ToolbarButtonProps> = (props: Toolb
                 break;
         }
     };
-
    
 
     return (
         <button 
-            className={ useMediaQueries(props.baseClassName.concat("__", "button")) + 
-                // Disable image enlarger button if no image is clicked for enlarging.
+            className={ useMediaQueries(props.baseClassName.concat("__", "button"))
+                +   // Disable image enlarger button if no image is clicked for enlarging. 
                 (enlargeDoc !== null
                     ? ""
                     : props.name === 'imageEnlarger'
                         ? "unavailable"
-                        : ""
-                ) +
-                // Add "active" styling based on clicked state.
+                        : "")
+                +   // Add "active" styling based on clicked state.
                 (props.name === 'bounds'
                     ? ""
                     : toolbarState[props.name] === 'off'
@@ -92,15 +88,13 @@ const ToolbarButton: React.FunctionComponent<ToolbarButtonProps> = (props: Toolb
                         : "active") }
             id={ props.baseClassName.concat("-", props.name) }
             aria-label={ "toolbar".concat("-", "button") }
-            aria-pressed={ 
-                // Change pressed status based on clicked state.  
+            aria-pressed={ // Change pressed status based on clicked state.  
                 props.name === 'bounds'
                     ? "false"
                     : toolbarState[props.name] === 'off'
                         ? "false"
                         : "true" }
             onClick={ onToolbarButtonClick }>
-                
                 { /* Assign icon based on button type. */
                     getIcon(props.name) }
 
