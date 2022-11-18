@@ -77,7 +77,8 @@ const preloadedState: RootState = {
         styleLoaded: false,
         sourceStatus: 'idle',
         markersStatus: 'idle',
-        fitBoundsButton: 'idle'
+        fitBoundsButton: 'idle',
+        markerLocator: 'idle'
     },
     sideFilmStrip: {
         enlargeDoc: null
@@ -115,7 +116,8 @@ const preloadedStateWithFilter: RootState = {
         styleLoaded: false,
         sourceStatus: 'idle',
         markersStatus: 'idle',
-        fitBoundsButton: 'idle'
+        fitBoundsButton: 'idle',
+        markerLocator: 'idle'
     },
     sideFilmStrip: {
         enlargeDoc: null

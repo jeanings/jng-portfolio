@@ -1,6 +1,6 @@
 import React from 'react';
 import * as reactRedux from 'react-redux';
-import { Provider, useDispatch } from 'react-redux';
+import { Provider } from 'react-redux';
 import { setupStore, RootState } from '../../app/store';
 import { 
     cleanup, 
@@ -16,7 +16,6 @@ import mockDefaultData from '../../utils/mockDefaultData.json';
 import mock2015Data from '../../utils/mock2015Data.json';
 import TimelineBar from '../TimelineBar/TimelineBar';
 import {
-    fetchImagesData,
     GeojsonFeatureCollectionProps,
     BboxType, 
     handleYearSelect} from '../TimelineBar/timelineSlice';
@@ -86,7 +85,8 @@ const preloadedState: RootState = {
         styleLoaded: false,
         sourceStatus: 'idle',
         markersStatus: 'idle',
-        fitBoundsButton: 'idle'
+        fitBoundsButton: 'idle',
+        markerLocator: 'idle'
     },
     sideFilmStrip: {
         enlargeDoc: null
@@ -303,7 +303,8 @@ test("adds marker layer and fits map to bounds", async() => {
         'styleLoaded': true,
         'markersStatus': 'idle', 
         'sourceStatus': 'loaded',
-        'fitBoundsButton': 'idle'
+        'fitBoundsButton': 'idle',
+        'markerLocator': 'idle'
     });
 
     // Map layer added and bounds fitted.
@@ -385,7 +386,8 @@ test("replaces previous layer and source on new data fetches", async() => {
         'styleLoaded': true,
         'markersStatus': 'idle', 
         'sourceStatus': 'loaded',
-        'fitBoundsButton': 'idle'
+        'fitBoundsButton': 'idle',
+        'markerLocator': 'idle'
     });
 
     // Map layer added and bounds fitted.

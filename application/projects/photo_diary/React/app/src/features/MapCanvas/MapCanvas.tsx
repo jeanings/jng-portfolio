@@ -8,7 +8,8 @@ import {
     setSourceStatus, 
     setMarkersStatus, 
     cleanupMarkerSource,
-    setBoundsButton } from './mapCanvasSlice';
+    handleBoundsButton, 
+    handleMarkerLocator } from './mapCanvasSlice';
 import { ImageDocTypes } from '../TimelineBar/timelineSlice';
 import { handleEnlarger, SideFilmStripProps } from '../SideFilmStrip/sideFilmStripSlice';
 import { handleToolbarButtons, ToolbarProps } from '../Toolbar/toolbarSlice';
@@ -36,6 +37,7 @@ const MapCanvas: React.FunctionComponent = () => {
     const imageDocs = useAppSelector(state => state.timeline.imageDocs);
     const enlargeDoc = useAppSelector(state => state.sideFilmStrip.enlargeDoc);
     const toolbarImageEnlarger = useAppSelector(state => state.toolbar.imageEnlarger);
+    const markerLocator = useAppSelector(state => state.mapCanvas.markerLocator);
     const classBase: string = "MapCanvas";
     // Mapbox variables.
     const MAPBOX_ACCESS_TOKEN = process.env.REACT_APP_MAPBOX;
@@ -137,10 +139,42 @@ const MapCanvas: React.FunctionComponent = () => {
             });
 
             // Reset button state.
-            dispatch(setBoundsButton('idle'));
+            dispatch(handleBoundsButton('idle'));
         }
     }, [fitBoundsButton])
 
+
+    /* ------------------------------------------------
+        Map marker locator for use in image enlarger.
+    ------------------------------------------------ */
+    useEffect(() => {
+        if (sourceStatus === 'loaded'
+            && markerLocator === 'clicked'
+            && enlargeDoc !== null) {
+            // Fly map to marker with offset to the left for image enlarger.
+            const markerCoords: Array<number> = [
+                enlargeDoc.gps.lng, enlargeDoc.gps.lat
+            ]; 
+
+            map.current.flyTo({
+                center: markerCoords,
+                padding: {
+                    top: 150,
+                    bottom: 150,
+                    left: 100, 
+                    right: 1000
+                },
+                linear: false,
+                animate: true,
+                duration: 2500,
+                zoom: 14,
+                maxZoom: 17
+            });
+
+            // Reset button state.
+            dispatch(handleMarkerLocator('idle'));
+        }
+    }, [markerLocator])
 
     
     /* -------------------------------------------
