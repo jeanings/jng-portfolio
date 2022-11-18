@@ -15,7 +15,8 @@ const initialState: MapStatusProps = {
     styleLoaded: false,
     sourceStatus: 'idle',
     markersStatus: 'idle',
-    fitBoundsButton: 'idle'
+    fitBoundsButton: 'idle',
+    markerLocator: 'idle'
 };
 
 const mapCanvasSlice = createSlice({
@@ -59,9 +60,16 @@ const mapCanvasSlice = createSlice({
             Handles fitBounds toolbar button.
             Calls hook in MapCanvas to call fitBounds.
         -------------------------------------------- */
-        setBoundsButton: (state, action: PayloadAction<MapStatusProps['fitBoundsButton']>) => {
+        handleBoundsButton: (state, action: PayloadAction<MapStatusProps['fitBoundsButton']>) => {
             const fitBoundsStatus: MapStatusProps['fitBoundsButton'] = action.payload;
             state.fitBoundsButton = fitBoundsStatus;
+        },
+         /* ----------------------------------------
+            Handles image enlarger marker locator.
+        ----------------------------------------- */
+        handleMarkerLocator: (state, action: PayloadAction<MapStatusProps['markerLocator']>) => {
+            const locatorStatus: MapStatusProps['markerLocator'] = action.payload;
+            state.markerLocator = locatorStatus;
         }
     }
 });
@@ -76,8 +84,8 @@ export interface MapStatusProps {
     sourceStatus: 'idle' | 'loaded',
     markersStatus: 'idle' | 'loaded',
     fitBoundsButton: 'idle' | 'clicked'
+    markerLocator: 'idle' | 'clicked'
 };
-
 
 
 // Selector for selection state.
@@ -90,5 +98,6 @@ export const {
     setSourceStatus, 
     setMarkersStatus, 
     cleanupMarkerSource, 
-    setBoundsButton } = actions;
+    handleBoundsButton, 
+    handleMarkerLocator } = actions;
 export default reducer;

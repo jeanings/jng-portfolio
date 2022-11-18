@@ -52,7 +52,7 @@ const YearButton: React.FunctionComponent<YearButtonProps> = (props: YearButtonP
                     : "" ) }
             id={ props.className.concat("-", props.year) }
             role="menuitemradio" 
-            aria-label={ props.className }
+            aria-label={ "year selector option" }
             aria-checked={
                 selectedYear === parseInt(props.year)
                     ? "true"

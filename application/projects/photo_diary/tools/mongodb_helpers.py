@@ -156,6 +156,7 @@ def get_facet_pipeline(query, target_field):
                 'gps': 1,
                 'tags': 1,
                 'url': 1,
+                'url_thumb': 1,
                 'title': 1,
                 'description': 1,
                 'isSubset': operator

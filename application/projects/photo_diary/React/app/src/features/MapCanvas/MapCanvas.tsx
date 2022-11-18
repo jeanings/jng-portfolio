@@ -8,14 +8,17 @@ import {
     setSourceStatus, 
     setMarkersStatus, 
     cleanupMarkerSource,
-    setBoundsButton } from './mapCanvasSlice';
+    handleBoundsButton, 
+    handleMarkerLocator } from './mapCanvasSlice';
 import { ImageDocTypes } from '../TimelineBar/timelineSlice';
+import { handleEnlarger, SideFilmStripProps } from '../SideFilmStrip/sideFilmStripSlice';
+import { handleToolbarButtons, ToolbarProps } from '../Toolbar/toolbarSlice';
 import './MapCanvas.css';
 import 'mapboxgl-spiderifier/index.css';
 // @ts-ignore
 import mapboxgl from 'mapbox-gl'; 
 import 'mapbox-gl/dist/mapbox-gl.css';
-import SideFilmStrip from '../SideFilmStrip/SideFilmStrip';
+
 
 const MapboxglSpiderfier: any = require('mapboxgl-spiderifier');
 
@@ -32,15 +35,18 @@ const MapCanvas: React.FunctionComponent = () => {
     const sourceStatus = useAppSelector(state => state.mapCanvas.sourceStatus);
     const markersStatus = useAppSelector(state => state.mapCanvas.markersStatus);
     const imageDocs = useAppSelector(state => state.timeline.imageDocs);
+    const enlargeDoc = useAppSelector(state => state.sideFilmStrip.enlargeDoc);
+    const toolbarImageEnlarger = useAppSelector(state => state.toolbar.imageEnlarger);
+    const markerLocator = useAppSelector(state => state.mapCanvas.markerLocator);
     const classBase: string = "MapCanvas";
     // Mapbox variables.
     const MAPBOX_ACCESS_TOKEN = process.env.REACT_APP_MAPBOX;
+    const mapStyle: string = process.env.REACT_APP_MAPBOX_STYLE as string;
     const mapContainer = useRef(null);
     const map = useRef<mapboxgl.map | null>(null);
     const markerIconImage: string = 'bxs-image';
     const markerIconPin: string ='bxs-pin';
     const spiderfier = useRef<any | null>(null);
-    const mapStyle: string = process.env.REACT_APP_MAPBOX_STYLE as string;
     const bbox: Array<Array<number>> = bounds !== null
         ? [ [ bounds!.lng[0], bounds!.lat[0] ],     // min bound coords
             [ bounds!.lng[1], bounds!.lat[1] ] ]    // max bound coords
@@ -133,11 +139,44 @@ const MapCanvas: React.FunctionComponent = () => {
             });
 
             // Reset button state.
-            dispatch(setBoundsButton('idle'));
+            dispatch(handleBoundsButton('idle'));
         }
     }, [fitBoundsButton])
 
 
+    /* ------------------------------------------------
+        Map marker locator for use in image enlarger.
+    ------------------------------------------------ */
+    useEffect(() => {
+        if (sourceStatus === 'loaded'
+            && markerLocator === 'clicked'
+            && enlargeDoc !== null) {
+            // Fly map to marker with offset to the left for image enlarger.
+            const markerCoords: Array<number> = [
+                enlargeDoc.gps.lng, enlargeDoc.gps.lat
+            ]; 
+
+            map.current.flyTo({
+                center: markerCoords,
+                padding: {
+                    top: 150,
+                    bottom: 150,
+                    left: 100, 
+                    right: 1000
+                },
+                linear: false,
+                animate: true,
+                duration: 2500,
+                zoom: 14,
+                maxZoom: 17
+            });
+
+            // Reset button state.
+            dispatch(handleMarkerLocator('idle'));
+        }
+    }, [markerLocator])
+
+    
     /* -------------------------------------------
         Add marker layers when source is added.
     ------------------------------------------- */
@@ -209,9 +248,26 @@ const MapCanvas: React.FunctionComponent = () => {
             spiralFootSeparation: 85,
             spiralLengthStart: 55,
             spiralLengthFactor: 10,
-            initializeLeg: ((branch: any) => 
-                createBranch(branch, map, imageDocs as ImageDocTypes[])
-            )
+            initializeLeg: ((branch: any) => {
+                // Assign variables for each branch.
+                const leafElem: HTMLElement = branch.elements.pin;
+                const feature = branch.feature;
+                const leafDocId: string = feature.doc_id;
+                leafElem.appendChild(getLeafSvgIconElem());
+                
+                // Get matching MongoDB doc with id.
+                const dbDoc = imageDocs?.filter(doc => doc._id === leafDocId)[0] as ImageDocTypes;
+                if (!dbDoc) {
+                    console.error('initBranchLeg: No MongoDB docs to match with Mapbox markers.');
+                }
+
+                // Clicks on leaves same as single markers, film strip clicks. 
+                leafElem.addEventListener('click', () => {
+                    if (leafDocId) {
+                        handleImageMarkerClicks(leafDocId);
+                    }
+                });
+            })
         });
 
         // Adjust and zoom map to fit all markers. 
@@ -237,11 +293,50 @@ const MapCanvas: React.FunctionComponent = () => {
     }   
 
 
-    /* --------------------------------------- 
-        Handle clicks on markers for popups.
-    ----------------------------------------*/
+    /* ---------------------------------------------------------------------------- 
+        Click event listener on markers with same functionality as film strip
+        thumbnail clicks.  Opens image enlarger, with added function of scrolling
+        film strip to clicked marker image.
+    ---------------------------------------------------------------------------- */
+    function handleImageMarkerClicks(markerDocId: string) {
+        // Scroll film strip to target image.
+        const imageFrame = document.getElementById(markerDocId);
+        if (imageFrame) {
+            imageFrame.scrollIntoView({behavior: 'smooth'});
+        }
+
+        const enlargeDocId: string = enlargeDoc !== null    
+            ? enlargeDoc._id
+            : '';
+
+        // Dispatch new doc ID to enlarger, triggering loading and opening of enlarger.
+        if (markerDocId !== enlargeDocId) {
+            const markerImageDoc = imageDocs?.filter(doc => doc._id === markerDocId)[0];
+    
+            if (markerImageDoc) {
+                const payloadImageDoc: SideFilmStripProps['enlargeDoc'] = markerImageDoc;
+                dispatch(handleEnlarger(payloadImageDoc));
+            }
+        }
+        // Just open image enlarger if same image clicked.
+        else if (markerDocId === enlargeDocId) {
+            const payloadToolbarButtons: ToolbarProps = {
+                'filter': 'off',
+                'imageEnlarger': 'on'
+            };
+            
+            if (toolbarImageEnlarger !== 'on') {
+                dispatch(handleToolbarButtons(payloadToolbarButtons));
+            }
+        }
+    };
+
+
+    /* --------------------------------- 
+        Handle various marker events.
+    --------------------------------- */
     if (markersStatus === 'loaded' && spiderfier.current !== null) {
-        // Change cursor when hovering over photo markers.
+        // Change cursor when hovering over image markers.
         map.current.on('mouseenter', 'imageMarkers', () => 
             map.current.getCanvas().style.cursor = 'pointer'
         );
@@ -249,7 +344,17 @@ const MapCanvas: React.FunctionComponent = () => {
             map.current.getCanvas().style.cursor = ''
         );
 
-        // Change cursor when hovering over photo clusters.
+        // Clicks on single image markers
+        map.current.on('click', 'imageMarkers', (event: any) => {
+            const markerDocId = event.features[0].properties.doc_id;
+            
+            if (markerDocId) {
+                handleImageMarkerClicks(markerDocId);
+            }               
+        });
+
+
+        // Change cursor when hovering over image clusters.
         map.current.on('mouseenter', 'imageMarkersClusters', () => 
             map.current.getCanvas().style.cursor = 'pointer'
         );
@@ -257,7 +362,6 @@ const MapCanvas: React.FunctionComponent = () => {
             map.current.getCanvas().style.cursor = ''
         );
         
-
         // Explode marker cluster into individual markers.
         map.current.on('click', 'imageMarkersClusters', (event: any) => 
             spiderfyClusters(event, map, spiderfier)
@@ -267,7 +371,6 @@ const MapCanvas: React.FunctionComponent = () => {
         map.current.on("zoomstart", () => 
             spiderfier.current.unspiderfy()
         );
-        
     }
 
 
@@ -277,7 +380,7 @@ const MapCanvas: React.FunctionComponent = () => {
             id="map"
             ref={ mapContainer }
             role="main"
-            aria-label="map-canvas">
+            aria-label="map">
         </main>
     );
 }
@@ -330,41 +433,9 @@ function removeMapLayerSource(map: React.MutableRefObject<any>, objectType: stri
 };
 
 
-/* --------------------------------------------------
-    Create branch markers and popups for clusters.
--------------------------------------------------- */
-function createBranch(branch: any, map: React.MutableRefObject<any>, imageDocs: ImageDocTypes[]) {
-    // Assign variables for each branch.
-    const leafElem: HTMLElement = branch.elements.pin;
-    const feature = branch.feature;
-    const leafDocId: string = feature.doc_id;
-    leafElem.appendChild(getLeafSvgIconElem());
-    
-    // Get matching MongoDB doc with id.
-    const dbDoc = imageDocs?.filter(doc => doc._id === leafDocId)[0] as ImageDocTypes;
-    if (!dbDoc) {
-        console.error('initBranchLeg: No MongoDB docs to match with Mapbox markers.');
-    }
-
-    // // Create marker popup.
-    // let popup = new mapboxgl.Popup({
-    //     closeButton: false,
-    //     closeOnClick: true,
-    //     offset: MapboxglSpiderfier.popupOffsetForSpiderLeg(branch)
-    // });
-    
-    // // Attach image.
-    // const popupImgTag: string = '<img class="MapCanvas__marker-img" src="' + dbDoc.url_thumb + '">';
-    // popup.setHTML(popupImgTag)
-    //     .addTo(map.current);
-    
-    // branch.mapboxMarker.setPopup(popup);
-}
-
-
 /* --------------------------------------------------------
     Draws and animates exploding of marker cluster layer
-    on click of cluster.  
+    on click of clusters.  
 -------------------------------------------------------- */
 function spiderfyClusters(event: any, 
     map: React.MutableRefObject<any>, spiderfier: React.MutableRefObject<any>) {

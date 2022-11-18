@@ -48,8 +48,8 @@ const SideFilmStrip: React.FunctionComponent = () => {
         <aside 
             className={ useMediaQueries(classBase) }
             id={ classBase }
-            role="aside"
-            aria-label="side-film-strip-panel">
+            role="main"
+            aria-label="images panel">
 
             {/* Panel for enlarged image and its stats. */}
             <div 
@@ -59,8 +59,8 @@ const SideFilmStrip: React.FunctionComponent = () => {
                         ? ""
                         : "slide") }
                 id="image-enlarger-container"
-                role="none"
-                aria-label="image-enlarger-container">
+                role="figure"
+                aria-label="enlarged image with metadata">
 
                 <ImageEnlarger 
                     baseClassName={ classBase }/>
@@ -74,8 +74,8 @@ const SideFilmStrip: React.FunctionComponent = () => {
                         ? ""
                         : "expand") }
                     id="film-strip"
-                role="none" 
-                aria-label="film-strip-container"
+                role="listbox" 
+                aria-label="images strip"
                 aria-expanded={ // Set expanded based on hover state. 
                     filmStripHovered === false
                         ? "false"

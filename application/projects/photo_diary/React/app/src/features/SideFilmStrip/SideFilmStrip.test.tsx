@@ -1,6 +1,6 @@
 import React from 'react';
 import * as reactRedux from 'react-redux';
-import { Provider, useDispatch } from 'react-redux';
+import { Provider } from 'react-redux';
 import { setupStore, RootState } from '../../app/store';
 import { 
     cleanup, 
@@ -10,19 +10,21 @@ import {
 import userEvent from '@testing-library/user-event';
 import axios from 'axios';
 import MockAdapter from 'axios-mock-adapter';
-import { apiUrl } from '../../app/App';
 import '@testing-library/jest-dom';
 import mockDefaultData from '../../utils/mockDefaultData.json';
-import mock2015Data from '../../utils/mock2015Data.json';
-import TimelineBar from '../TimelineBar/TimelineBar';
 import {
+    handleYearSelect,
+    handleMonthSelect,
     GeojsonFeatureCollectionProps,
     BboxType } from '../TimelineBar/timelineSlice';
+import Toolbar from '../Toolbar/Toolbar';
+import { handleToolbarButtons, ToolbarProps } from '../Toolbar/toolbarSlice';
+import SideFilmStrip from './SideFilmStrip';
+import { handleEnlarger } from './sideFilmStripSlice';
 // @ts-ignore
 import mapboxgl from 'mapbox-gl'; 
 import 'mapbox-gl/dist/mapbox-gl.css';
-import SideFilmStrip from './SideFilmStrip';
-import { handleEnlarger } from './sideFilmStripSlice';
+
 
 const MapboxglSpiderfier: any = require('mapboxgl-spiderifier');
 
@@ -81,7 +83,8 @@ const preloadedState: RootState = {
         styleLoaded: false,
         sourceStatus: 'idle',
         markersStatus: 'idle',
-        fitBoundsButton: 'idle'
+        fitBoundsButton: 'idle',
+        markerLocator: 'idle'
     },
     sideFilmStrip: {
         enlargeDoc: null
@@ -109,8 +112,8 @@ test("renders side strip panel", async() => {
     expect(newStore.getState().timeline.imageDocs).not.toBeNull();
 
     // Check for side strip panel to be rendered.
-    await waitFor(() => screen.findByRole('aside', { name: 'side-film-strip-panel' }));
-    const filmStripElem = screen.getByRole('aside', { name: 'side-film-strip-panel' });
+    await waitFor(() => screen.findByRole('main', { name: 'images panel' }));
+    const filmStripElem = screen.getByRole('main', { name: 'images panel' });
     expect(filmStripElem).toBeInTheDocument();
 });
 
@@ -129,13 +132,13 @@ test("displays image collection in side strip panel", async() => {
     expect(imageDocs!.length).toEqual(40);
 
     // Wait for render.
-    await waitFor(() => screen.findByRole('aside', { name: 'side-film-strip-panel' }));
-    const filmStripElem = screen.getByRole('aside', { name: 'side-film-strip-panel' });
+    await waitFor(() => screen.findByRole('main', { name: 'images panel' }));
+    const filmStripElem = screen.getByRole('main', { name: 'images panel' });
     expect(filmStripElem).toBeInTheDocument();
 
     // Verify correct length of image frames rendered.
-    await waitFor(() => screen.findAllByRole('none', { name: 'image-frame' }));
-    const imageFrameElems = screen.getAllByRole('none', { name: 'image-frame' });
+    await waitFor(() => screen.findAllByRole('img', { name: 'thumbnail image container' }));
+    const imageFrameElems = screen.getAllByRole('img', { name: 'thumbnail image container' });
     expect(imageFrameElems.length).toEqual(imageDocs!.length);
 });
 
@@ -154,13 +157,13 @@ test("clicks on images in film strip dispatches action", async() => {
     expect(imageDocs!.length).toEqual(40);
 
     // Wait for render.
-    await waitFor(() => screen.findByRole('aside', { name: 'side-film-strip-panel' }));
-    const filmStripElem = screen.getByRole('aside', { name: 'side-film-strip-panel' });
+    await waitFor(() => screen.findByRole('main', { name: 'images panel' }));
+    const filmStripElem = screen.getByRole('main', { name: 'images panel' });
     expect(filmStripElem).toBeInTheDocument();
 
     // Verify correct length of image frames rendered.
-    await waitFor(() => screen.findAllByRole('none', { name: 'image-frame' }));
-    const imageFrameElems = screen.getAllByRole('none', { name: 'image-frame' });
+    await waitFor(() => screen.findAllByRole('img', { name: 'thumbnail image container' }));
+    const imageFrameElems = screen.getAllByRole('img', { name: 'thumbnail image container' });
     expect(imageFrameElems.length).toEqual(imageDocs!.length);
     
     // Verify empty state.
@@ -190,13 +193,13 @@ test("renders 'image-enlarger' popup for showing enlarged image", async() => {
     expect(imageDocs!.length).toEqual(40);
 
     // Wait for render.
-    await waitFor(() => screen.findByRole('aside', { name: 'side-film-strip-panel' }));
-    const filmStripElem = screen.getByRole('aside', { name: 'side-film-strip-panel' });
+    await waitFor(() => screen.findByRole('main', { name: 'images panel' }));
+    const filmStripElem = screen.getByRole('main', { name: 'images panel' });
     expect(filmStripElem).toBeInTheDocument();
 
     // Verify correct length of image frames rendered.
-    await waitFor(() => screen.findAllByRole('none', { name: 'image-frame' }));
-    const imageFrameElems = screen.getAllByRole('none', { name: 'image-frame' });
+    await waitFor(() => screen.findAllByRole('img', { name: 'thumbnail image container' }));
+    const imageFrameElems = screen.getAllByRole('img', { name: 'thumbnail image container' });
     expect(imageFrameElems.length).toEqual(imageDocs!.length);
     
     // Verify empty state.
@@ -211,8 +214,8 @@ test("renders 'image-enlarger' popup for showing enlarged image", async() => {
     expect(newStore.getState().sideFilmStrip.enlargeDoc).not.toBeNull();
 
     // Check for enlarger popup to be rendered.
-    await waitFor(() => screen.findByRole('figure', { name: 'image-enlarger' }));
-    const imageEnlargerElem = screen.getByRole('figure', { name: 'image-enlarger'} );
+    await waitFor(() => screen.findByRole('tab', { name: 'image enlarger' }));
+    const imageEnlargerElem = screen.getByRole('tab', { name: 'image enlarger'} );
     expect(imageEnlargerElem).toBeInTheDocument();
 });
 
@@ -231,13 +234,13 @@ test("renders 'image-enlarger' element", async() => {
     expect(imageDocs!.length).toEqual(40);
 
     // Wait for render.
-    await waitFor(() => screen.findByRole('aside', { name: 'side-film-strip-panel' }));
-    const filmStripElem = screen.getByRole('aside', { name: 'side-film-strip-panel' });
+    await waitFor(() => screen.findByRole('main', { name: 'images panel' }));
+    const filmStripElem = screen.getByRole('main', { name: 'images panel' });
     expect(filmStripElem).toBeInTheDocument();
 
     // Verify correct length of image frames rendered.
-    await waitFor(() => screen.findAllByRole('none', { name: 'image-frame' }));
-    const imageFrameElems = screen.getAllByRole('none', { name: 'image-frame' });
+    await waitFor(() => screen.findAllByRole('img', { name: 'thumbnail image container' }));
+    const imageFrameElems = screen.getAllByRole('img', { name: 'thumbnail image container' });
     expect(imageFrameElems.length).toEqual(imageDocs!.length);
     
     // Get image to click on.
@@ -249,11 +252,11 @@ test("renders 'image-enlarger' element", async() => {
     expect(newStore.getState().sideFilmStrip.enlargeDoc).not.toBeNull();
 
     // Check for enlarger popup to be rendered.
-    await waitFor(() => screen.findByRole('figure', { name: 'image-enlarger' }));
-    const imageEnlargerElem = screen.getByRole('figure', { name: 'image-enlarger'} );
+    await waitFor(() => screen.findByRole('tab', { name: 'image enlarger' }));
+    const imageEnlargerElem = screen.getByRole('tab', { name: 'image enlarger'} );
     expect(imageEnlargerElem).toBeInTheDocument();
 
-    const imageStatsElem = screen.getByRole('none', { name: 'enlarged-image-info' });
+    const imageStatsElem = screen.getByRole('figure', { name: 'metadata for enlarged image' });
     expect(imageStatsElem).toBeInTheDocument();
 });
 
@@ -272,13 +275,13 @@ test("renders image to be enlarged based on << enlargeDoc >> state", async() => 
     expect(imageDocs!.length).toEqual(40);
 
     // Wait for render.
-    await waitFor(() => screen.findByRole('aside', { name: 'side-film-strip-panel' }));
-    const filmStripElem = screen.getByRole('aside', { name: 'side-film-strip-panel' });
+    await waitFor(() => screen.findByRole('main', { name: 'images panel' }));
+    const filmStripElem = screen.getByRole('main', { name: 'images panel' });
     expect(filmStripElem).toBeInTheDocument();
 
     // Verify correct length of image frames rendered.
-    await waitFor(() => screen.findAllByRole('none', { name: 'image-frame' }));
-    const imageFrameElems = screen.getAllByRole('none', { name: 'image-frame' });
+    await waitFor(() => screen.findAllByRole('img', { name: 'thumbnail image container' }));
+    const imageFrameElems = screen.getAllByRole('img', { name: 'thumbnail image container' });
     expect(imageFrameElems.length).toEqual(imageDocs!.length);
     
     // Get image to click on.
@@ -290,13 +293,13 @@ test("renders image to be enlarged based on << enlargeDoc >> state", async() => 
     expect(newStore.getState().sideFilmStrip.enlargeDoc).not.toBeNull();
 
     // Check for enlarger popup to be rendered.
-    await waitFor(() => screen.findByRole('figure', { name: 'image-enlarger' }));
-    const imageEnlargerElem = screen.getByRole('figure', { name: 'image-enlarger'} );
+    await waitFor(() => screen.findByRole('tab', { name: 'image enlarger' }));
+    const imageEnlargerElem = screen.getByRole('tab', { name: 'image enlarger'} );
     expect(imageEnlargerElem).toBeInTheDocument();
 
     // Verify correct image gets shown.
-    await waitFor(() => screen.findByRole('img', { name: 'enlarged-image' }));
-    const enlargedImageElem = screen.getByRole('img', { name: 'enlarged-image' });
+    await waitFor(() => screen.findByRole('img', { name: 'enlarged image' }));
+    const enlargedImageElem = screen.getByRole('img', { name: 'enlarged image' });
     
     const imageDocUrl = newStore.getState().sideFilmStrip.enlargeDoc!.url;
     const renderedImageUrl = enlargedImageElem.getAttribute('src');
@@ -318,12 +321,12 @@ test("expands/contracts second column of thumbnails on hovering over strip", asy
     expect(imageDocs!.length).toEqual(40);
 
     // Wait for render.
-    await waitFor(() => screen.findByRole('aside', { name: 'side-film-strip-panel' }));
-    const filmStripElem = screen.getByRole('aside', { name: 'side-film-strip-panel' });
+    await waitFor(() => screen.findByRole('main', { name: 'images panel' }));
+    const filmStripElem = screen.getByRole('main', { name: 'images panel' });
     expect(filmStripElem).toBeInTheDocument();
 
-    const imageEnlargerContainerElem = screen.getByRole('none', { name: 'image-enlarger-container' });
-    const filmStripContainerElem = screen.getByRole('none', { name: 'film-strip-container' });
+    const imageEnlargerContainerElem = screen.getByRole('figure', { name: 'enlarged image with metadata' });
+    const filmStripContainerElem = screen.getByRole('listbox', { name: 'images strip' });
     expect(imageEnlargerContainerElem).not.toHaveClass("slide");
     expect(filmStripContainerElem).not.toHaveClass("expand");
 
@@ -342,13 +345,13 @@ test("reveals/hides enlarger depending on state availability", async() => {
             </Provider>
         );
     
-    // "Reset" << enlargeDoc >> to null, unlicked state.
+    // "Reset" << enlargeDoc >> to null, unclicked state.
     newStore.dispatch(handleEnlarger(null));
     expect(newStore.getState().sideFilmStrip.enlargeDoc).toBeNull();
 
     // Verify enlarger panel is hidden.
-    await waitFor(() => screen.findByRole('figure', { name: 'image-enlarger' }));
-    const imageEnlargerElem = screen.getByRole('figure', { name: 'image-enlarger' });
+    await waitFor(() => screen.findByRole('tab', { name: 'image enlarger' }));
+    const imageEnlargerElem = screen.getByRole('tab', { name: 'image enlarger' });
     expect(imageEnlargerElem).toHaveAttribute("aria-expanded", 'false');
     expect(imageEnlargerElem).not.toHaveClass("show");
 
@@ -362,12 +365,147 @@ test("reveals/hides enlarger depending on state availability", async() => {
 });
 
 
-/*
-
-
-test("flies to map position on gps lock on button click", async() => {
+test("opens image enlarger (if closed) if same image clicked on", async() => {
+    const newStore = setupStore(preloadedState);
+        render(
+            <Provider store={newStore}>
+                <Toolbar />
+                <SideFilmStrip />
+            </Provider>
+        );
     
+    expect(newStore.getState().sideFilmStrip.enlargeDoc).toBeNull();
+
+    // Verify enlarger panel is hidden.
+    await waitFor(() => screen.findByRole('tab', { name: 'image enlarger' }));
+    const imageEnlargerElem = screen.getByRole('tab', { name: 'image enlarger' });
+    expect(imageEnlargerElem).toHaveAttribute("aria-expanded", 'false');
+    expect(imageEnlargerElem).not.toHaveClass("show");
+
+    // Verify enlarger panel becomes visible on imageDoc existence.
+    const idForImageToEnlarge = mockDefaultData.docs[0]._id;
+    const thumbnailElems = screen.getAllByRole('img', { name: 'thumbnail image container' });
+    const thumbnailToClick = thumbnailElems.filter(thumbnail => 
+        thumbnail.id === idForImageToEnlarge)[0];
+
+    await waitFor(() => user.click(thumbnailToClick));
+    expect(newStore.getState().sideFilmStrip.enlargeDoc).not.toBeNull();
+    
+    await waitFor(() => {
+        expect(imageEnlargerElem).toHaveAttribute("aria-expanded", 'true');
+        expect(imageEnlargerElem).toHaveClass("show");
+    });
+
+    // Close image enlarger with toolbar button.
+    const payloadToolbarButtons: ToolbarProps = {
+        'filter': 'on',
+        'imageEnlarger': 'off'
+    };
+    newStore.dispatch(handleToolbarButtons(payloadToolbarButtons));
+
+    // Verify enlarger panel is hidden.
+    await waitFor(() => {
+        expect(imageEnlargerElem).toHaveAttribute("aria-expanded", 'false');
+        expect(imageEnlargerElem).not.toHaveClass("show");
+    });
+
+    // Click on image in strip again.
+    await waitFor(() => user.click(thumbnailToClick));
+
+    // Verify image enlarger opens.
+    await waitFor(() => {
+        expect(imageEnlargerElem).toHaveAttribute("aria-expanded", 'true');
+        expect(imageEnlargerElem).toHaveClass("show");
+    });
 });
 
 
-*/
+test("closes image enlarger on year or month selection", async() => {
+    const newStore = setupStore(preloadedState);
+        render(
+            <Provider store={newStore}>
+                <Toolbar />
+                <SideFilmStrip />
+            </Provider>
+        );
+    
+    expect(newStore.getState().sideFilmStrip.enlargeDoc).toBeNull();
+    const imageEnlargerElem = screen.getByRole('tab', { name: 'image enlarger' });
+
+    // Verify enlarger panel becomes visible on imageDoc existence.
+    const idForImageToEnlarge = mockDefaultData.docs[0]._id;
+    const thumbnailElems = screen.getAllByRole('img', { name: 'thumbnail image container' });
+    const thumbnailToClick = thumbnailElems.filter(thumbnail => 
+        thumbnail.id === idForImageToEnlarge)[0];
+
+    await waitFor(() => user.click(thumbnailToClick));
+    expect(newStore.getState().sideFilmStrip.enlargeDoc).not.toBeNull();
+    
+    await waitFor(() => {
+        expect(imageEnlargerElem).toHaveAttribute("aria-expanded", 'true');
+        expect(imageEnlargerElem).toHaveClass("show");
+    });
+
+    // Select year.
+    newStore.dispatch(handleYearSelect(2017));
+
+    // Verify enlarger panel is hidden.
+    await waitFor(() => {
+        expect(imageEnlargerElem).toHaveAttribute("aria-expanded", 'false');
+        expect(imageEnlargerElem).not.toHaveClass("show");
+    });
+
+    // Click on image in strip again.
+    await waitFor(() => user.click(thumbnailToClick));
+
+    // Verify enlarger opened.
+    await waitFor(() => {
+        expect(imageEnlargerElem).toHaveAttribute("aria-expanded", 'true');
+        expect(imageEnlargerElem).toHaveClass("show");
+    });
+
+    // Select year.
+    newStore.dispatch(handleMonthSelect('may'));
+
+    // Verify enlarger panel is hidden.
+    await waitFor(() => {
+        expect(imageEnlargerElem).toHaveAttribute("aria-expanded", 'false');
+        expect(imageEnlargerElem).not.toHaveClass("show");
+    });
+});
+
+
+test("flies to map position on gps lock on button click", async() => {
+    const newStore = setupStore(preloadedState);
+        render(
+            <Provider store={newStore}>
+                <SideFilmStrip />
+            </Provider>
+        );
+    
+    expect(newStore.getState().sideFilmStrip.enlargeDoc).toBeNull();
+    const imageEnlargerElem = screen.getByRole('tab', { name: 'image enlarger' });
+
+    // Verify enlarger panel becomes visible on imageDoc existence.
+    const idForImageToEnlarge = mockDefaultData.docs[0]._id;
+    const thumbnailElems = screen.getAllByRole('img', { name: 'thumbnail image container' });
+    const thumbnailToClick = thumbnailElems.filter(thumbnail => 
+        thumbnail.id === idForImageToEnlarge)[0];
+
+    await waitFor(() => user.click(thumbnailToClick));
+    expect(newStore.getState().sideFilmStrip.enlargeDoc).not.toBeNull();
+    
+    // Verify image enlarger opened.
+    await waitFor(() => {
+        expect(imageEnlargerElem).toHaveAttribute("aria-expanded", 'true');
+        expect(imageEnlargerElem).toHaveClass("show");
+    });
+
+    const markerLocatorButton = screen.getByRole('button', { name: 'locate enlarged image on map' });
+
+    await waitFor(() => user.click(markerLocatorButton));
+
+    // Verify marker locator state change.
+    expect(newStore.getState().mapCanvas.markerLocator).toEqual('clicked');
+});
+
