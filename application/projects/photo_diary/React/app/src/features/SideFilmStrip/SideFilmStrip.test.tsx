@@ -1,6 +1,6 @@
 import React from 'react';
 import * as reactRedux from 'react-redux';
-import { Provider, useDispatch } from 'react-redux';
+import { Provider } from 'react-redux';
 import { setupStore, RootState } from '../../app/store';
 import { 
     cleanup, 
@@ -10,19 +10,21 @@ import {
 import userEvent from '@testing-library/user-event';
 import axios from 'axios';
 import MockAdapter from 'axios-mock-adapter';
-import { apiUrl } from '../../app/App';
 import '@testing-library/jest-dom';
 import mockDefaultData from '../../utils/mockDefaultData.json';
-import mock2015Data from '../../utils/mock2015Data.json';
-import TimelineBar from '../TimelineBar/TimelineBar';
 import {
+    handleYearSelect,
+    handleMonthSelect,
     GeojsonFeatureCollectionProps,
     BboxType } from '../TimelineBar/timelineSlice';
+import Toolbar from '../Toolbar/Toolbar';
+import { handleToolbarButtons, ToolbarProps } from '../Toolbar/toolbarSlice';
+import SideFilmStrip from './SideFilmStrip';
+import { handleEnlarger } from './sideFilmStripSlice';
 // @ts-ignore
 import mapboxgl from 'mapbox-gl'; 
 import 'mapbox-gl/dist/mapbox-gl.css';
-import SideFilmStrip from './SideFilmStrip';
-import { handleEnlarger } from './sideFilmStripSlice';
+
 
 const MapboxglSpiderfier: any = require('mapboxgl-spiderifier');
 
@@ -81,7 +83,8 @@ const preloadedState: RootState = {
         styleLoaded: false,
         sourceStatus: 'idle',
         markersStatus: 'idle',
-        fitBoundsButton: 'idle'
+        fitBoundsButton: 'idle',
+        markerLocator: 'idle'
     },
     sideFilmStrip: {
         enlargeDoc: null
@@ -253,7 +256,7 @@ test("renders 'image-enlarger' element", async() => {
     const imageEnlargerElem = screen.getByRole('figure', { name: 'image-enlarger'} );
     expect(imageEnlargerElem).toBeInTheDocument();
 
-    const imageStatsElem = screen.getByRole('none', { name: 'enlarged-image-info' });
+    const imageStatsElem = screen.getByRole('none', { name: 'enlarged-image-metadata' });
     expect(imageStatsElem).toBeInTheDocument();
 });
 
@@ -342,7 +345,7 @@ test("reveals/hides enlarger depending on state availability", async() => {
             </Provider>
         );
     
-    // "Reset" << enlargeDoc >> to null, unlicked state.
+    // "Reset" << enlargeDoc >> to null, unclicked state.
     newStore.dispatch(handleEnlarger(null));
     expect(newStore.getState().sideFilmStrip.enlargeDoc).toBeNull();
 
@@ -362,12 +365,147 @@ test("reveals/hides enlarger depending on state availability", async() => {
 });
 
 
-/*
-
-
-test("flies to map position on gps lock on button click", async() => {
+test("opens image enlarger (if closed) if same image clicked on", async() => {
+    const newStore = setupStore(preloadedState);
+        render(
+            <Provider store={newStore}>
+                <Toolbar />
+                <SideFilmStrip />
+            </Provider>
+        );
     
+    expect(newStore.getState().sideFilmStrip.enlargeDoc).toBeNull();
+
+    // Verify enlarger panel is hidden.
+    await waitFor(() => screen.findByRole('figure', { name: 'image-enlarger' }));
+    const imageEnlargerElem = screen.getByRole('figure', { name: 'image-enlarger' });
+    expect(imageEnlargerElem).toHaveAttribute("aria-expanded", 'false');
+    expect(imageEnlargerElem).not.toHaveClass("show");
+
+    // Verify enlarger panel becomes visible on imageDoc existence.
+    const idForImageToEnlarge = mockDefaultData.docs[0]._id;
+    const thumbnailElems = screen.getAllByRole('none', { name: 'image-frame' });
+    const thumbnailToClick = thumbnailElems.filter(thumbnail => 
+        thumbnail.id === idForImageToEnlarge)[0];
+
+    await waitFor(() => user.click(thumbnailToClick));
+    expect(newStore.getState().sideFilmStrip.enlargeDoc).not.toBeNull();
+    
+    await waitFor(() => {
+        expect(imageEnlargerElem).toHaveAttribute("aria-expanded", 'true');
+        expect(imageEnlargerElem).toHaveClass("show");
+    });
+
+    // Close image enlarger with toolbar button.
+    const payloadToolbarButtons: ToolbarProps = {
+        'filter': 'on',
+        'imageEnlarger': 'off'
+    };
+    newStore.dispatch(handleToolbarButtons(payloadToolbarButtons));
+
+    // Verify enlarger panel is hidden.
+    await waitFor(() => {
+        expect(imageEnlargerElem).toHaveAttribute("aria-expanded", 'false');
+        expect(imageEnlargerElem).not.toHaveClass("show");
+    });
+
+    // Click on image in strip again.
+    await waitFor(() => user.click(thumbnailToClick));
+
+    // Verify image enlarger opens.
+    await waitFor(() => {
+        expect(imageEnlargerElem).toHaveAttribute("aria-expanded", 'true');
+        expect(imageEnlargerElem).toHaveClass("show");
+    });
 });
 
 
-*/
+test("closes image enlarger on year or month selection", async() => {
+    const newStore = setupStore(preloadedState);
+        render(
+            <Provider store={newStore}>
+                <Toolbar />
+                <SideFilmStrip />
+            </Provider>
+        );
+    
+    expect(newStore.getState().sideFilmStrip.enlargeDoc).toBeNull();
+    const imageEnlargerElem = screen.getByRole('figure', { name: 'image-enlarger' });
+
+    // Verify enlarger panel becomes visible on imageDoc existence.
+    const idForImageToEnlarge = mockDefaultData.docs[0]._id;
+    const thumbnailElems = screen.getAllByRole('none', { name: 'image-frame' });
+    const thumbnailToClick = thumbnailElems.filter(thumbnail => 
+        thumbnail.id === idForImageToEnlarge)[0];
+
+    await waitFor(() => user.click(thumbnailToClick));
+    expect(newStore.getState().sideFilmStrip.enlargeDoc).not.toBeNull();
+    
+    await waitFor(() => {
+        expect(imageEnlargerElem).toHaveAttribute("aria-expanded", 'true');
+        expect(imageEnlargerElem).toHaveClass("show");
+    });
+
+    // Select year.
+    newStore.dispatch(handleYearSelect(2017));
+
+    // Verify enlarger panel is hidden.
+    await waitFor(() => {
+        expect(imageEnlargerElem).toHaveAttribute("aria-expanded", 'false');
+        expect(imageEnlargerElem).not.toHaveClass("show");
+    });
+
+    // Click on image in strip again.
+    await waitFor(() => user.click(thumbnailToClick));
+
+    // Verify enlarger opened.
+    await waitFor(() => {
+        expect(imageEnlargerElem).toHaveAttribute("aria-expanded", 'true');
+        expect(imageEnlargerElem).toHaveClass("show");
+    });
+
+    // Select year.
+    newStore.dispatch(handleMonthSelect('may'));
+
+    // Verify enlarger panel is hidden.
+    await waitFor(() => {
+        expect(imageEnlargerElem).toHaveAttribute("aria-expanded", 'false');
+        expect(imageEnlargerElem).not.toHaveClass("show");
+    });
+});
+
+
+test("flies to map position on gps lock on button click", async() => {
+    const newStore = setupStore(preloadedState);
+        render(
+            <Provider store={newStore}>
+                <SideFilmStrip />
+            </Provider>
+        );
+    
+    expect(newStore.getState().sideFilmStrip.enlargeDoc).toBeNull();
+    const imageEnlargerElem = screen.getByRole('figure', { name: 'image-enlarger' });
+
+    // Verify enlarger panel becomes visible on imageDoc existence.
+    const idForImageToEnlarge = mockDefaultData.docs[0]._id;
+    const thumbnailElems = screen.getAllByRole('none', { name: 'image-frame' });
+    const thumbnailToClick = thumbnailElems.filter(thumbnail => 
+        thumbnail.id === idForImageToEnlarge)[0];
+
+    await waitFor(() => user.click(thumbnailToClick));
+    expect(newStore.getState().sideFilmStrip.enlargeDoc).not.toBeNull();
+    
+    // Verify image enlarger opened.
+    await waitFor(() => {
+        expect(imageEnlargerElem).toHaveAttribute("aria-expanded", 'true');
+        expect(imageEnlargerElem).toHaveClass("show");
+    });
+
+    const markerLocatorButton = screen.getByRole('button', { name: 'clicked-image-marker-locator' });
+
+    await waitFor(() => user.click(markerLocatorButton));
+
+    // Verify marker locator state change.
+    expect(newStore.getState().mapCanvas.markerLocator).toEqual('clicked');
+});
+

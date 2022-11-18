@@ -64,25 +64,60 @@
         justify-self: end;
     }
 
-    .SideFilmStrip__image-enlarger__info {
+    .SideFilmStrip__image-enlarger__metadata {
         grid-column: 2 / 3;
         display: flex;
         flex-direction: column;
         pointer-events: all;
     }
-
-        .SideFilmStrip__image-enlarger__info span {
-            font-family: 'Barlow Semi Condensed', sans-serif;
-            font-size: 1.15rem;
+        #image-enlarger__DateLoc {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            grid-template-rows: repeat(2, 1fr);
         }
 
-            .SideFilmStrip__image-enlarger__info-category {
+        .SideFilmStrip__image-enlarger__metadata span {
+            font-family: 'Barlow Semi Condensed', sans-serif;
+        }
+            /* For category names. */
+            .image-enlarger__metadata-name {
+                font-size: 1.55rem;
+            }
+
+            /* For category values. */
+            .image-enlarger__metadata-value {
+                font-size: 1.15rem;
+            }
+
+            .SideFilmStrip__image-enlarger__metadata-category {
                 display: flex;
                 flex-direction: column;
                 padding-bottom: 1rem;
             } 
+            
+        #image-enlarger__DateLoc .image-enlarger__metadata-name {
+            grid-row: 1 / 2;
+        }
 
-            /* For category names. */
-            .SideFilmStrip__image-enlarger__info-category > :first-child {
-                font-size: 1.55rem;
-            } 
+        #image-enlarger__DateLoc .image-enlarger__metadata-value {
+            grid-row: 2 / -1;
+        }
+
+        #image-enlarger__metadata-locator {
+            width: 1.3rem;
+            height: 1.3rem;
+            pointer-events: all;
+            cursor: pointer;
+        }
+
+            #image-enlarger__metadata-locator svg {
+                width: 1.3rem;
+                height: 1.3rem;
+                pointer-events: none;
+                transition: all 350ms;
+                fill: var(--colour-text-inactive);
+            }
+    
+                #image-enlarger__metadata-locator:hover > svg {
+                    fill: var(--colour-accent-secondary);
+                }

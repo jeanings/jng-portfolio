@@ -4,7 +4,6 @@ import { Provider } from 'react-redux';
 import { setupStore, RootState } from '../../app/store';
 import {
     cleanup,
-    getAllByRole,
     render,
     screen,
     waitFor } from '@testing-library/react';
@@ -18,8 +17,8 @@ import { GeojsonFeatureCollectionProps } from '../TimelineBar/timelineSlice';
 import { 
     setStyleLoadStatus, 
     cleanupMarkerSource, 
-    setSourceStatus, 
-    setBoundsButton } from '../MapCanvas/mapCanvasSlice';
+    setSourceStatus,
+    handleBoundsButton } from '../MapCanvas/mapCanvasSlice';
 import { apiUrl } from '../../app/App';
 import Toolbar from './Toolbar';
 // @ts-ignore
@@ -87,7 +86,8 @@ const preloadedState: RootState = {
         styleLoaded: false,
         sourceStatus: 'idle',
         markersStatus: 'idle',
-        fitBoundsButton: 'idle'
+        fitBoundsButton: 'idle',
+        markerLocator: 'idle'
     },
     sideFilmStrip: {
         enlargeDoc: null
@@ -357,7 +357,8 @@ test("bounds button calls mapbox's fitBounds method", async() => {
         'styleLoaded': true,
         'markersStatus': 'idle', 
         'sourceStatus': 'loaded',
-        'fitBoundsButton': 'idle'
+        'fitBoundsButton': 'idle',
+        'markerLocator': 'idle'
     });
 
     // Verify individual toolbar buttons are rendered.
@@ -370,7 +371,7 @@ test("bounds button calls mapbox's fitBounds method", async() => {
 
     // Mock dispatch request to fitBounds.
     await waitFor (() => user.click(toolbarBoundsButton));
-    newStore.dispatch(setBoundsButton('clicked'));
+    newStore.dispatch(handleBoundsButton('clicked'));
 
     // Verify fitBounds method called, one called on init and
     // the other on button click.
