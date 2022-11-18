@@ -118,7 +118,7 @@ const ImageEnlarger: React.FunctionComponent <ImageEnlargerProps> = (props: Imag
         <img 
             className={ useMediaQueries(props.baseClassName.concat("__", classBase, "__", "image")) }
             src={ imageSource } 
-            aria-label="enlarged-image"
+            aria-label="enlarged image"
         />
     );
 
@@ -138,8 +138,8 @@ const ImageEnlarger: React.FunctionComponent <ImageEnlargerProps> = (props: Imag
                 <div 
                     className={ infoElemsClassName }
                     id={ "image-enlarger".concat("__", categoryName) }
-                    role="none"
-                    aria-label="image-enlarger-metadata-categories"
+                    role="figure"
+                    aria-label="metadata entry for enlarged image"
                     key={ "key".concat("_", "enlarger-metadata", "_", categoryName) }>
                     
                     { getCategoryMetadataSpan(categoryName, categoryData) }
@@ -155,8 +155,8 @@ const ImageEnlarger: React.FunctionComponent <ImageEnlargerProps> = (props: Imag
         <figcaption
             className={ useMediaQueries(props.baseClassName.concat("__", classBase, "__", "metadata")) }
             id="enlarged-image-metadata"
-            role="none"
-            aria-label="enlarged-image-metadata">
+            role="figure"
+            aria-label="metadata for enlarged image">
 
             { /* List of image stats. */
                 infoElems }
@@ -181,15 +181,17 @@ const ImageEnlarger: React.FunctionComponent <ImageEnlargerProps> = (props: Imag
                     {/* Category names. */}
                     <span
                         className={ "image-enlarger__metadata".concat("-", "name") }
-                        role="none"
-                        aria-label={ "enlarged-image__metadata-category".concat("-", categoryName) }>
+                        role="figure"
+                        aria-label={ categoryName.concat(" metadata") }>
                     
                         { categoryName.toUpperCase() }
                     </span>
     
                     {/* Category content. */}
                     <span
-                        className={ "image-enlarger__metadata".concat("-", "value") }>
+                        className={ "image-enlarger__metadata".concat("-", "value") }
+                        role="figure"
+                        aria-label={ categoryName.concat(" metadata value")}>
                         { getCategoryData(categoryName, categoryData) }
                     </span>
                 </>
@@ -209,8 +211,8 @@ const ImageEnlarger: React.FunctionComponent <ImageEnlargerProps> = (props: Imag
                         <span
                             className={ "image-enlarger__metadata".concat(
                                 "-", "name") }
-                            role="none"
-                            aria-label={ "enlarged-image-metadata-category".concat("-", categoryName) }>
+                            role="figure"
+                            aria-label={ subcategoryName.concat(" metadata") }>
                         
                             { subcategoryName.toUpperCase() }
                         </span>
@@ -224,10 +226,10 @@ const ImageEnlarger: React.FunctionComponent <ImageEnlargerProps> = (props: Imag
                                 : "" }
                             role={ subcategoryName === 'Loc' 
                                 ? "button"
-                                : undefined }
+                                : "figure" }
                             aria-label={ subcategoryName === 'Loc' 
-                                ? "clicked-image-marker-locator"
-                                : undefined }
+                                ? "locate enlarged image on map"
+                                : subcategoryName.concat(" metadata value") }
                             onClick={
                                 subcategoryName === 'Loc'
                                     ? onLocatorClick
@@ -257,8 +259,8 @@ const ImageEnlarger: React.FunctionComponent <ImageEnlargerProps> = (props: Imag
                     ? ""
                     : "show") }
             id="image-enlarger"
-            role="figure" 
-            aria-label={ classBase }
+            role="tab" 
+            aria-label="image enlarger"
             aria-expanded={
                 // Change expanded status based on clicked state.
                 toolbarEnlarger === 'off'

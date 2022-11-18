@@ -160,7 +160,7 @@ test("initializes map on rendering", async() => {
     
     // Wait for fetch.
     await waitFor(() => {
-        screen.findByRole('main', { name: 'map-canvas' });
+        screen.findByRole('main', { name: 'map' });
         expect(newStore.getState().timeline.bounds).not.toBeNull();
     });
 
@@ -219,7 +219,7 @@ test("adds new data source on new fetches", async() => {
     
     // Wait for fetch.
     await waitFor(() => {
-        screen.findByRole('main', { name: 'map-canvas' });
+        screen.findByRole('main', { name: 'map' });
         expect(newStore.getState().timeline.bounds).not.toBeNull();
     });
 
@@ -289,7 +289,7 @@ test("adds marker layer and fits map to bounds", async() => {
     
     // Wait for fetch.
     await waitFor(() => {
-        screen.findByRole('main', { name: 'map-canvas' });
+        screen.findByRole('main', { name: 'map' });
         expect(newStore.getState().timeline.bounds).not.toBeNull();
     });
 
@@ -372,7 +372,7 @@ test("replaces previous layer and source on new data fetches", async() => {
     
     // Wait for fetch.
     await waitFor(() => {
-        screen.findByRole('main', { name: 'map-canvas' });
+        screen.findByRole('main', { name: 'map' });
         expect(newStore.getState().timeline.bounds).not.toBeNull();
     });
 
@@ -457,7 +457,7 @@ test("does not initialize map on unsuccessful fetch", async() => {
     
     // Wait for fetch.
     await waitFor(() => {
-        screen.findByRole('main', { name: 'map-canvas' });
+        screen.findByRole('main', { name: 'map' });
         expect(newStore.getState().timeline.bounds).toBeNull();
     });
 

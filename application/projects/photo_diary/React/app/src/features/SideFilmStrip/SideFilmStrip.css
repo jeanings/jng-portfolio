@@ -17,7 +17,7 @@
         grid-row: 1;
         position: relative;
         width: 100%;
-        justify-self: end;
+        justify-self: flex-end;
         animation-name: hide-strip-panel;
         animation-duration: 300ms;
         animation-fill-mode: forwards;

@@ -142,24 +142,24 @@ describe("on initial load", () => {
         );
 
         // Verify correct number of filter buttons rendered.
-        await screen.findAllByRole('checkbox', { name: 'filter-drawer-format-item'});
+        await screen.findAllByRole('checkbox');
 
-        const formatButtons = screen.getAllByRole('checkbox', { name: 'filter-drawer-format-item'});
+        const formatButtons = screen.getAllByRole('checkbox', { name: 'format filter option'});
         expect(formatButtons.length).toEqual(2);
 
-        const filmButtons = screen.getAllByRole('checkbox', { name: 'filter-drawer-film-item'});
+        const filmButtons = screen.getAllByRole('checkbox', { name: 'film filter option'});
         expect(filmButtons.length).toEqual(2);
 
-        const cameraButtons = screen.getAllByRole('checkbox', { name: 'filter-drawer-camera-item'});
+        const cameraButtons = screen.getAllByRole('checkbox', { name: 'camera filter option'});
         expect(cameraButtons.length).toEqual(2);
 
-        const lensButtons = screen.getAllByRole('checkbox', { name: 'filter-drawer-lens-item'});
+        const lensButtons = screen.getAllByRole('checkbox', { name: 'lens filter option'});
         expect(lensButtons.length).toEqual(2);
 
-        const focalLengthButtons = screen.getAllByRole('checkbox', { name: 'filter-drawer-focalLength-item'});
+        const focalLengthButtons = screen.getAllByRole('checkbox', { name: 'focalLength filter option'});
         expect(focalLengthButtons.length).toEqual(1);
 
-        const tags = screen.getAllByRole('checkbox', { name: 'filter-drawer-tags-item'});
+        const tags = screen.getAllByRole('checkbox', { name: 'tags filter option'});
         expect(tags.length).toEqual(36);
     });
 });
@@ -179,12 +179,12 @@ describe("on filter button clicks", () => {
     });
 
     const filterCategories = [
-        { category: 'format', ariaLabel: 'filter-drawer-format-item' },
-        { category: 'film', ariaLabel: 'filter-drawer-film-item' },
-        { category: 'camera', ariaLabel: 'filter-drawer-camera-item' },
-        { category: 'lens', ariaLabel: 'filter-drawer-lens-item' },
-        { category: 'focalLength', ariaLabel: 'filter-drawer-focalLength-item' },
-        { category: 'tags', ariaLabel: 'filter-drawer-tags-item' },
+        { category: 'format', ariaLabel: 'format filter option' },
+        { category: 'film', ariaLabel: 'film filter option' },
+        { category: 'camera', ariaLabel: 'camera filter option' },
+        { category: 'lens', ariaLabel: 'lens filter option' },
+        { category: 'focalLength', ariaLabel: 'focalLength filter option' },
+        { category: 'tags', ariaLabel: 'tags filter option' },
     ];
 
     filterCategories.forEach(group => {
@@ -375,7 +375,7 @@ describe("on filter button clicks", () => {
         };
 
         // Click reset button
-        const resetButton = screen.getByRole('button', { name: 'filter-drawer-reset' })
+        const resetButton = screen.getByRole('button', { name: 'reset filters' })
         expect(resetButton).toBeInTheDocument();
         await waitFor(() => user.click(resetButton));
     
@@ -415,7 +415,7 @@ describe("on filter button clicks", () => {
         newStore.dispatch(addFilter(payload));
         expect(newStore.getState().filter[filterType]).toContain(filterName);
         
-        const resetButton = screen.getByRole('button', { name: 'filter-drawer-reset' })
+        const resetButton = screen.getByRole('button', { name: 'reset filters' })
         expect(resetButton).toBeInTheDocument();
 
         // Verify reset button not greyed out.
@@ -455,8 +455,8 @@ test("<< filter >> state resets to initial state when year is changed", async() 
     );
 
     // Wait for elements to render.
-    await waitFor(() => screen.findAllByRole('menuitemradio', { name: 'year-item'}));
-    const yearElems = screen.getAllByRole('menuitemradio', { name: 'year-item' });
+    await waitFor(() => screen.findAllByRole('menuitemradio', { name: 'year selector option'}));
+    const yearElems = screen.getAllByRole('menuitemradio', { name: 'year selector option' });
 
     // Verify filter state isn't blank.
     expect(newStore.getState().filter.film!.length).not.toEqual(0);
@@ -502,8 +502,8 @@ test("dispatches fetch request on << filter >> state changes", async() => {
     // Verify number of docs for initial fetch request.
     expect(newStore.getState().timeline.counter.all).toEqual(40);
 
-    await waitFor(() => screen.findAllByRole('checkbox', { name: "filter-drawer-format-item" }));
-    const filterButtons = screen.getAllByRole('checkbox', { name: "filter-drawer-format-item" });
+    await waitFor(() => screen.findAllByRole('checkbox', { name: "format filter option" }));
+    const filterButtons = screen.getAllByRole('checkbox', { name: "format filter option" });
 
     // Get filter button element to click: FORMAT -> film.
     let filterButtonToClick = filterButtons.filter(button => button.textContent === 'film')[0];
@@ -550,7 +550,7 @@ test("disables/greys out filter buttons not available on selected month", async(
 
     // Select a month.
     const monthToSelect: string = 'jun';
-    const monthElems = screen.getAllByRole('menuitemradio', { name: 'month-item' });
+    const monthElems = screen.getAllByRole('menuitemradio', { name: 'month selector option' });
     const monthElemToSelect = monthElems.find(element => 
         element.textContent!.replace(/\d+/, "") === monthToSelect.toUpperCase()) as HTMLElement;
     
@@ -616,7 +616,7 @@ test("fetches year's data when going from filters activated to deactivated", asy
     expect(filterState.film?.length).not.toEqual(0);
 
     // Mock-set aria-pressed and styling.
-    const filterElems = screen.getAllByRole('checkbox', { name: 'filter-drawer-film-item' });
+    const filterElems = screen.getAllByRole('checkbox', { name: 'film filter option' });
     const filterElemsClicked: Array<HTMLElement> = [];
     
     for (let item of filterState.film!) {

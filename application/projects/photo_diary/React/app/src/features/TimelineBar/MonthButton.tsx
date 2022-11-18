@@ -36,7 +36,7 @@ const MonthButton: React.FunctionComponent<MonthButtonProps> = (props: MonthButt
                     : "") }
             id={ props.className.concat('-', props.month) }
             role="menuitemradio" 
-            aria-label={ props.className }
+            aria-label={ "month selector option" }
             aria-checked={// Changed pressed state based on selected element.
                 selectedMonth === props.month 
                     ? "true"

@@ -63,7 +63,6 @@ const TimelineBar: React.FunctionComponent = () => {
                 switch (selectedMonth) {
                     case ('all'):
                         // For 'all' default cases, ie year selects.
-                        payload = payload;
                         break;
                     default:
                         // For month selected cases.
@@ -110,18 +109,18 @@ const TimelineBar: React.FunctionComponent = () => {
     return (
         <div 
             className={ useMediaQueries(classBase) }
-            role="region"
-            aria-label="timeline-bar">
+            role="menu"
+            aria-label="timeline selector">
             
             <div 
                 className={ useMediaQueries(classBase.concat("__", "year-selector")) }
                 role="menubar"
-                aria-label="year-selector">
+                aria-label="year selector">
 
                 <div 
                     className={ useMediaQueries(classBase.concat("__", "year-selected")) }
                     role="menuitem"
-                    aria-label="year-selected">
+                    aria-label="selected year">
                     
                     { selectedYear }
                 </div>
@@ -133,7 +132,7 @@ const TimelineBar: React.FunctionComponent = () => {
             <div
                 className={ useMediaQueries(classBase.concat("__", "month-selector")) }
                 role="menubar"
-                aria-label="month-selector">
+                aria-label="month selector">
                 
                 {/* Months selection labels: JAN, FEB, etc. */
                     monthElems }

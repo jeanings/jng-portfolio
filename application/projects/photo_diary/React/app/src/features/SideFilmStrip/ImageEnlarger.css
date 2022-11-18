@@ -61,7 +61,7 @@
         max-height: 82vh;
         grid-column: 1 / 2;
         border: white 2rem solid;
-        justify-self: end;
+        justify-self: flex-end;
     }
 
     .SideFilmStrip__image-enlarger__metadata {
