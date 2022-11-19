@@ -119,6 +119,7 @@ const ImageEnlarger: React.FunctionComponent <ImageEnlargerProps> = (props: Imag
             className={ useMediaQueries(props.baseClassName.concat("__", classBase, "__", "image")) }
             src={ imageSource } 
             aria-label="enlarged image"
+            draggable="false"
         />
     );
 

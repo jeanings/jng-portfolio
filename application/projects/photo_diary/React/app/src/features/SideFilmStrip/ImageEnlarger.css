@@ -55,20 +55,20 @@
         animation-timing-function: ease-out;
         animation-fill-mode: forwards;
     }
-    
+
     .SideFilmStrip__image-enlarger__image {
         max-width: 41vw;
         max-height: 82vh;
         grid-column: 1 / 2;
         border: white 2rem solid;
         justify-self: flex-end;
+        pointer-events: none;
     }
 
     .SideFilmStrip__image-enlarger__metadata {
         grid-column: 2 / 3;
         display: flex;
         flex-direction: column;
-        pointer-events: all;
     }
         #image-enlarger__DateLoc {
             display: grid;
