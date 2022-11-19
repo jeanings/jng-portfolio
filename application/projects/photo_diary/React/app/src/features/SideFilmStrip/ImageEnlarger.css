@@ -72,7 +72,7 @@
     }
         #image-enlarger__DateLoc {
             display: grid;
-            grid-template-columns: repeat(2, 1fr);
+            grid-template-columns: 75% 25%;
             grid-template-rows: repeat(2, 1fr);
         }
 
@@ -101,6 +101,11 @@
 
         #image-enlarger__DateLoc .image-enlarger__metadata-value {
             grid-row: 2 / -1;
+        }
+
+        .image-enlarger__metadata-name.locator,
+        .image-enlarger__metadata-value.locator {
+            justify-self: center;
         }
 
         #image-enlarger__metadata-locator {

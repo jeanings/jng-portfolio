@@ -211,7 +211,11 @@ const ImageEnlarger: React.FunctionComponent <ImageEnlargerProps> = (props: Imag
                         {/* Category names. */}
                         <span
                             className={ "image-enlarger__metadata".concat(
-                                "-", "name") }
+                                "-", "name") 
+                                +   // For locator spans
+                                (subcategoryName === 'Loc'
+                                    ? " locator"
+                                    : "") }
                             role="figure"
                             aria-label={ subcategoryName.concat(" metadata") }>
                         
@@ -221,7 +225,11 @@ const ImageEnlarger: React.FunctionComponent <ImageEnlargerProps> = (props: Imag
                         {/* // Category content. */}
                         <span
                             className={ "image-enlarger__metadata".concat(
-                                "-", "value") }
+                                "-", "value") 
+                                +   // For locator spans
+                                (subcategoryName === 'Loc'
+                                    ? " locator"
+                                    : "") }
                             id={ subcategoryName === 'Loc'
                                 ? "image-enlarger__metadata-locator"
                                 : "" }
