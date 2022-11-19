@@ -30,13 +30,16 @@ const MapboxglSpiderfier: any = require('mapboxgl-spiderifier');
 
 var mockAxios = new MockAdapter(axios);
 var user = userEvent.setup();
+// // Mock scrollTo.
+// global.scrollTo = jest.fn();
 
 beforeEach(() => {
-    mockAxios = new MockAdapter(axios);
+    mockAxios = new MockAdapter(axios); 
 });
 
 afterEach(() => {
     mockAxios.reset();
+    jest.clearAllMocks();
     cleanup;
 });
 
@@ -472,6 +475,44 @@ test("closes image enlarger on year or month selection", async() => {
         expect(imageEnlargerElem).toHaveAttribute("aria-expanded", 'false');
         expect(imageEnlargerElem).not.toHaveClass("show");
     });
+});
+
+
+test("expands film strip on hover and slides image enlarger to the left", async() => {
+    const newStore = setupStore(preloadedState);
+        render(
+            <Provider store={newStore}>
+                <SideFilmStrip />
+            </Provider>
+        );
+    
+    expect(newStore.getState().sideFilmStrip.enlargeDoc).toBeNull();
+    const imageEnlargerElem = screen.getByRole('tab', { name: 'image enlarger' });
+
+    // Verify enlarger panel becomes visible on imageDoc existence.
+    const idForImageToEnlarge = mockDefaultData.docs[0]._id;
+    const thumbnailElems = screen.getAllByRole('img', { name: 'thumbnail image container' });
+    const thumbnailToClick = thumbnailElems.filter(thumbnail => 
+        thumbnail.id === idForImageToEnlarge)[0];
+
+    await waitFor(() => user.click(thumbnailToClick));
+    expect(newStore.getState().sideFilmStrip.enlargeDoc).not.toBeNull();
+    
+    await waitFor(() => {
+        expect(imageEnlargerElem).toHaveAttribute("aria-expanded", 'true');
+        expect(imageEnlargerElem).toHaveClass("show");
+    });
+
+    // Hover onto film strip.
+    const filmStripElem = screen.getByRole('listbox', { name: 'images strip' });
+    const imageEnlargerMetadataContainer = screen.getByRole(
+        'figure', { name: 'enlarged image with metadata' });
+
+    await waitFor(() => user.hover(filmStripElem));
+    
+    // Verify film strip expanded and image enlarger panel shifted.
+    expect(filmStripElem).toHaveAttribute("aria-expanded", 'true');
+    expect(imageEnlargerMetadataContainer).toHaveClass("slide");
 });
 
 

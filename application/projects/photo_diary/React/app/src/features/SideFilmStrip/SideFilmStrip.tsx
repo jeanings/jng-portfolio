@@ -1,4 +1,7 @@
-import React, { useState } from 'react';
+import React, {
+    useEffect, 
+    useState, 
+    useRef } from 'react';
 import { useAppSelector, useMediaQueries } from '../../common/hooks';
 import { ImageDocTypes } from '../TimelineBar/timelineSlice';
 import ImageFrame from './ImageFrame';
@@ -14,9 +17,24 @@ import './SideFilmStrip.css';
 const SideFilmStrip: React.FunctionComponent = () => {
     const [ filmStripHovered, setFilmStripHovered ] = useState(false);
     const imageDocs = useAppSelector(state => state.timeline.imageDocs);
+    const filmStripRef = useRef<HTMLDivElement>(null);
     const classBase: string = "SideFilmStrip";
 
+
+    /* -----------------------------------------------------------------------------
+        Scroll film strip back to top on imageDoc changes - year/month selections.
+    ----------------------------------------------------------------------------- */
+    // useEffect(() => {
+    //     if (filmStripRef.current) {
+    //         filmStripRef.current.scrollTo({
+    //             top: 0,
+    //             left: 0,
+    //             behavior: 'smooth'
+    //         });
+    //     }
+    // }, [imageDocs]);
     
+
     /* -----------------------------------------------------------
         Generate image frame elements for array of MongoDB docs.
     ----------------------------------------------------------- */
@@ -36,7 +54,7 @@ const SideFilmStrip: React.FunctionComponent = () => {
         Handle expand/contract of film strip on hover/touch.
     ------------------------------------------------------ */
     const onImageHover = (event: React.SyntheticEvent) => {
-        setFilmStripHovered(true)
+        setFilmStripHovered(true);
     };
 
     const onImageUnhover = (event: React.SyntheticEvent) => {
@@ -73,7 +91,8 @@ const SideFilmStrip: React.FunctionComponent = () => {
                     (filmStripHovered === false
                         ? ""
                         : "expand") }
-                    id="film-strip"
+                id="film-strip"
+                ref={ filmStripRef }
                 role="listbox" 
                 aria-label="images strip"
                 aria-expanded={ // Set expanded based on hover state. 
