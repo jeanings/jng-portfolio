@@ -30,11 +30,11 @@ const MapboxglSpiderfier: any = require('mapboxgl-spiderifier');
 
 var mockAxios = new MockAdapter(axios);
 var user = userEvent.setup();
-// // Mock scrollTo.
-// global.scrollTo = jest.fn();
 
 beforeEach(() => {
-    mockAxios = new MockAdapter(axios); 
+    mockAxios = new MockAdapter(axios);
+    // Mock scrollTo.
+    window.HTMLElement.prototype.scrollTo = jest.fn();
 });
 
 afterEach(() => {
@@ -513,6 +513,27 @@ test("expands film strip on hover and slides image enlarger to the left", async(
     // Verify film strip expanded and image enlarger panel shifted.
     expect(filmStripElem).toHaveAttribute("aria-expanded", 'true');
     expect(imageEnlargerMetadataContainer).toHaveClass("slide");
+});
+
+
+test("expands film strip on hover and slides image enlarger to the left", async() => {
+    const newStore = setupStore(preloadedState);
+        render(
+            <Provider store={newStore}>
+                <SideFilmStrip />
+            </Provider>
+        );
+    
+    expect(newStore.getState().timeline.selected.year).toEqual(2022);
+
+    // "Select" a new year.
+    newStore.dispatch(handleYearSelect(2016));
+
+    // Verify state updated.
+    expect(newStore.getState().timeline.selected.year).toEqual(2016);
+
+    // Verify film strip element calls scrollTo to bump up view to top.
+    expect(window.HTMLElement.prototype.scrollTo).toHaveBeenCalledTimes(1);
 });
 
 

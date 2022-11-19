@@ -24,15 +24,15 @@ const SideFilmStrip: React.FunctionComponent = () => {
     /* -----------------------------------------------------------------------------
         Scroll film strip back to top on imageDoc changes - year/month selections.
     ----------------------------------------------------------------------------- */
-    // useEffect(() => {
-    //     if (filmStripRef.current) {
-    //         filmStripRef.current.scrollTo({
-    //             top: 0,
-    //             left: 0,
-    //             behavior: 'smooth'
-    //         });
-    //     }
-    // }, [imageDocs]);
+    useEffect(() => {
+        if (filmStripRef.current) {
+            filmStripRef.current.scrollTo({
+                top: 0,
+                left: 0,
+                behavior: 'smooth'
+            });
+        }
+    }, [imageDocs]);
     
 
     /* -----------------------------------------------------------
