@@ -1,6 +1,6 @@
 import React from 'react';
 import * as reactRedux from 'react-redux';
-import { Provider, useDispatch } from 'react-redux';
+import { Provider } from 'react-redux';
 import { setupStore, RootState } from '../../app/store';
 import { 
     cleanup, 
@@ -16,7 +16,6 @@ import mockDefaultData from '../../utils/mockDefaultData.json';
 import mock2015Data from '../../utils/mock2015Data.json';
 import TimelineBar from '../TimelineBar/TimelineBar';
 import {
-    fetchImagesData,
     GeojsonFeatureCollectionProps,
     BboxType, 
     handleYearSelect} from '../TimelineBar/timelineSlice';
@@ -86,7 +85,8 @@ const preloadedState: RootState = {
         styleLoaded: false,
         sourceStatus: 'idle',
         markersStatus: 'idle',
-        fitBoundsButton: 'idle'
+        fitBoundsButton: 'idle',
+        markerLocator: 'idle'
     },
     sideFilmStrip: {
         enlargeDoc: null
@@ -160,7 +160,7 @@ test("initializes map on rendering", async() => {
     
     // Wait for fetch.
     await waitFor(() => {
-        screen.findByRole('main', { name: 'map-canvas' });
+        screen.findByRole('main', { name: 'map' });
         expect(newStore.getState().timeline.bounds).not.toBeNull();
     });
 
@@ -219,7 +219,7 @@ test("adds new data source on new fetches", async() => {
     
     // Wait for fetch.
     await waitFor(() => {
-        screen.findByRole('main', { name: 'map-canvas' });
+        screen.findByRole('main', { name: 'map' });
         expect(newStore.getState().timeline.bounds).not.toBeNull();
     });
 
@@ -289,7 +289,7 @@ test("adds marker layer and fits map to bounds", async() => {
     
     // Wait for fetch.
     await waitFor(() => {
-        screen.findByRole('main', { name: 'map-canvas' });
+        screen.findByRole('main', { name: 'map' });
         expect(newStore.getState().timeline.bounds).not.toBeNull();
     });
 
@@ -303,7 +303,8 @@ test("adds marker layer and fits map to bounds", async() => {
         'styleLoaded': true,
         'markersStatus': 'idle', 
         'sourceStatus': 'loaded',
-        'fitBoundsButton': 'idle'
+        'fitBoundsButton': 'idle',
+        'markerLocator': 'idle'
     });
 
     // Map layer added and bounds fitted.
@@ -371,7 +372,7 @@ test("replaces previous layer and source on new data fetches", async() => {
     
     // Wait for fetch.
     await waitFor(() => {
-        screen.findByRole('main', { name: 'map-canvas' });
+        screen.findByRole('main', { name: 'map' });
         expect(newStore.getState().timeline.bounds).not.toBeNull();
     });
 
@@ -385,7 +386,8 @@ test("replaces previous layer and source on new data fetches", async() => {
         'styleLoaded': true,
         'markersStatus': 'idle', 
         'sourceStatus': 'loaded',
-        'fitBoundsButton': 'idle'
+        'fitBoundsButton': 'idle',
+        'markerLocator': 'idle'
     });
 
     // Map layer added and bounds fitted.
@@ -455,7 +457,7 @@ test("does not initialize map on unsuccessful fetch", async() => {
     
     // Wait for fetch.
     await waitFor(() => {
-        screen.findByRole('main', { name: 'map-canvas' });
+        screen.findByRole('main', { name: 'map' });
         expect(newStore.getState().timeline.bounds).toBeNull();
     });
 

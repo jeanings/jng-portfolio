@@ -104,8 +104,8 @@
             flex-wrap: wrap;
             column-gap: 0.25rem;
             row-gap: 0.25rem;
-            align-content: start;
-            justify-content: start;
+            align-content: flex-start;
+            justify-content: flex-start;
         }
     
     .FilterDrawer__reset {
@@ -116,7 +116,7 @@
         height: 3rem;
         position: absolute;
         left: calc(50vw - 1.5rem);      /* minus half of button width */
-        align-self: end;
+        align-self: flex-end;
         justify-self: center;
         pointer-events: all;
         cursor: pointer;

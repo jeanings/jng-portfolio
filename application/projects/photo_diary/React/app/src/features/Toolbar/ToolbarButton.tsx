@@ -3,7 +3,7 @@ import {
     useAppSelector, 
     useAppDispatch, 
     useMediaQueries } from '../../common/hooks';
-import { setBoundsButton } from '../MapCanvas/mapCanvasSlice';
+import { handleBoundsButton } from '../MapCanvas/mapCanvasSlice';
 import { handleToolbarButtons, ToolbarProps } from './toolbarSlice';
 import './ToolbarButton.css';
 
@@ -45,7 +45,7 @@ const ToolbarButton: React.FunctionComponent<ToolbarButtonProps> = (props: Toolb
 
             case 'bounds':
                 if (mapStyleLoaded === true) {
-                    dispatch(setBoundsButton('clicked'));
+                    dispatch(handleBoundsButton('clicked'));
                 }
                 break;
 
@@ -87,7 +87,12 @@ const ToolbarButton: React.FunctionComponent<ToolbarButtonProps> = (props: Toolb
                         ? ""
                         : "active") }
             id={ props.baseClassName.concat("-", props.name) }
-            aria-label={ "toolbar".concat("-", "button") }
+            aria-label={ 
+                props.name === 'filter'
+                    ? "open filter drawer"
+                    : props.name === 'bounds'
+                        ? "reset map bounds"
+                        : "open image enlarger"}
             aria-pressed={ // Change pressed status based on clicked state.  
                 props.name === 'bounds'
                     ? "false"
