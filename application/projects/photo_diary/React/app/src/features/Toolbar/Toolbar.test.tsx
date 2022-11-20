@@ -33,6 +33,8 @@ var user = userEvent.setup();
 
 beforeEach(() => {
     mockAxios = new MockAdapter(axios);
+    // Mock scrollTo.
+    window.HTMLElement.prototype.scrollTo = jest.fn();
 });
 
 afterEach(() => {
