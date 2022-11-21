@@ -16,18 +16,17 @@ export const apiUrl: string = DEV_MODE === 'True'
     Entry point of application.  Renders the base structure of the app.
 ===================================================================== */
 const App: React.FC = () => {
-    // CSS Classes
     const classBase: string = 'App';
 
     return (
-        <div className={useMediaQueries(classBase)}>
+        <div className={ useMediaQueries(classBase) }>
             <TimelineBar />
             <FilterDrawer />
             <MapCanvas />
             <SideFilmStrip />
             <Toolbar />
         </div>
-    )
+    );
 }
 
 
