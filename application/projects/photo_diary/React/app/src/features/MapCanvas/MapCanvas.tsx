@@ -380,7 +380,7 @@ const MapCanvas: React.FunctionComponent = () => {
             id="map"
             ref={ mapContainer }
             role="main"
-            aria-label="map-canvas">
+            aria-label="map">
         </main>
     );
 }

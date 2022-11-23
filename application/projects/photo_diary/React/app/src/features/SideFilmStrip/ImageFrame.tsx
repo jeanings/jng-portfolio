@@ -44,14 +44,14 @@ const ImageFrame: React.FunctionComponent <ImageFrameProps> = (props: ImageFrame
         <div 
             className={ useMediaQueries(classBase) }
             id={ props.imageDoc._id }
-            role="none"
-            aria-label="image-frame"
+            role="img"
+            aria-label="thumbnail image container"
             onClick={ onImageClick }>
 
             <img 
                 className={ useMediaQueries(classBase.concat("__", "image")) }
                 src={ props.imageDoc.url_thumb }
-                aria-label="image-frame-image"
+                aria-label="thumbnail image"
                 draggable="false"
             />
             

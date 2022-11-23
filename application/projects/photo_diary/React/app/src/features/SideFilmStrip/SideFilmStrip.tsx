@@ -1,4 +1,7 @@
-import React, { useState } from 'react';
+import React, {
+    useEffect, 
+    useState, 
+    useRef } from 'react';
 import { useAppSelector, useMediaQueries } from '../../common/hooks';
 import { ImageDocTypes } from '../TimelineBar/timelineSlice';
 import ImageFrame from './ImageFrame';
@@ -14,21 +17,66 @@ import './SideFilmStrip.css';
 const SideFilmStrip: React.FunctionComponent = () => {
     const [ filmStripHovered, setFilmStripHovered ] = useState(false);
     const imageDocs = useAppSelector(state => state.timeline.imageDocs);
+    const filmStripRef = useRef<HTMLDivElement>(null);
     const classBase: string = "SideFilmStrip";
 
+
+    /* -----------------------------------------------------------------------------
+        Scroll film strip back to top on imageDoc changes - year/month selections.
+    ----------------------------------------------------------------------------- */
+    useEffect(() => {
+        if (filmStripRef.current) {
+            filmStripRef.current.scrollTo({
+                top: 0,
+                left: 0,
+                behavior: 'smooth'
+            });
+        }
+    }, [imageDocs]);
     
+
     /* -----------------------------------------------------------
         Generate image frame elements for array of MongoDB docs.
     ----------------------------------------------------------- */
     let imageFrameElems: Array<JSX.Element> = [];
     
-    if (imageDocs) {
-        // Reverse order of collection, with most recent doc on top.
-        [...imageDocs].reverse().map((imageDoc, index) => (
+    // Sort images in descending order.
+    if (imageDocs !== null) {
+        let sortedDocs = [...imageDocs];
+        sortedDocs.sort((a, b) => {
+            const idA = a._id;
+            const idB = b._id;
+
+            // Sort using docs' _id, based on insertion time, 
+            // which in turn is based on date taken or filename.
+            switch(true) {
+                case idA < idB:
+                    return 1;
+                case idA > idB:
+                    return -1;
+                default:
+                    return 0;
+            }
+        });
+
+        sortedDocs.map((doc, index) => (
             imageFrameElems.push(
-                createImageFrames(classBase, imageDoc, index)
+                createImageFrames(classBase, doc, index)
             )
         ));
+
+    //     filenameSortedDocs.sort((a, b) => 
+    //     Object.entries(a)['_id'] < Object.entries(b)['_id']
+    //         ? -1
+    //         : 1
+    // )
+
+        // Reverse order of collection, with most recent doc on top.
+        // [...imageDocs].reverse().map((imageDoc, index) => (
+        //     imageFrameElems.push(
+        //         createImageFrames(classBase, imageDoc, index)
+        //     )
+        // ));
     }
 
 
@@ -36,7 +84,7 @@ const SideFilmStrip: React.FunctionComponent = () => {
         Handle expand/contract of film strip on hover/touch.
     ------------------------------------------------------ */
     const onImageHover = (event: React.SyntheticEvent) => {
-        setFilmStripHovered(true)
+        setFilmStripHovered(true);
     };
 
     const onImageUnhover = (event: React.SyntheticEvent) => {
@@ -48,8 +96,8 @@ const SideFilmStrip: React.FunctionComponent = () => {
         <aside 
             className={ useMediaQueries(classBase) }
             id={ classBase }
-            role="aside"
-            aria-label="side-film-strip-panel">
+            role="main"
+            aria-label="images panel">
 
             {/* Panel for enlarged image and its stats. */}
             <div 
@@ -57,10 +105,10 @@ const SideFilmStrip: React.FunctionComponent = () => {
                     +   // Add "slide" styling: slides left if mouse hovered on film strip. 
                     (filmStripHovered === false
                         ? ""
-                        : "slide") }
+                        : " ".concat("slide")) }
                 id="image-enlarger-container"
-                role="none"
-                aria-label="image-enlarger-container">
+                role="figure"
+                aria-label="enlarged image with metadata">
 
                 <ImageEnlarger 
                     baseClassName={ classBase }/>
@@ -72,10 +120,11 @@ const SideFilmStrip: React.FunctionComponent = () => {
                     +   // Add "expand" styling: reveals second column of images.
                     (filmStripHovered === false
                         ? ""
-                        : "expand") }
-                    id="film-strip"
-                role="none" 
-                aria-label="film-strip-container"
+                        : " ".concat("expand")) }
+                id="film-strip"
+                ref={ filmStripRef }
+                role="listbox" 
+                aria-label="images strip"
                 aria-expanded={ // Set expanded based on hover state. 
                     filmStripHovered === false
                         ? "false"

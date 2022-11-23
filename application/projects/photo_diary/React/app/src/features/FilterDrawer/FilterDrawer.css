@@ -4,7 +4,6 @@
     display: grid;
     grid-template-columns: 100%;
     grid-template-rows: 100%;
-    padding-left: 1rem;
     font-family: 'Barlow Condensed', sans-serif;
     opacity: 0;
     pointer-events: none;
@@ -51,6 +50,7 @@
         }
 
     .FilterDrawer__parameters-container {
+        padding-left: 1rem;
         display: grid;
         row-gap: 1rem;
         column-gap: 1.5rem;
@@ -104,8 +104,8 @@
             flex-wrap: wrap;
             column-gap: 0.25rem;
             row-gap: 0.25rem;
-            align-content: start;
-            justify-content: start;
+            align-content: flex-start;
+            justify-content: flex-start;
         }
     
     .FilterDrawer__reset {
@@ -116,7 +116,7 @@
         height: 3rem;
         position: absolute;
         left: calc(50vw - 1.5rem);      /* minus half of button width */
-        align-self: end;
+        align-self: flex-end;
         justify-self: center;
         pointer-events: all;
         cursor: pointer;
@@ -145,3 +145,68 @@
         .FilterDrawer__reset.unavailable:hover svg {
             fill: hsla(0, 0%, 25%, 0.3);
         }
+
+
+/* ==================================================================================
+                                Media breakpoints 
+================================================================================== */
+.FilterDrawer.port {
+    grid-column: 2 / 5;
+}
+
+.FilterDrawer.port.show {
+    grid-column: 2 / 5;
+}
+
+    .FilterDrawer__parameters-container.port {
+        padding-left: 1rem;
+        padding-right: 3rem;
+        grid-template-columns: 50% 50%;
+    }
+
+        #format.port {
+            grid-column: 1 / 2;
+            grid-row: 1 / 2;
+        }
+
+        #film.port {
+            grid-column: 1 / 2;
+            grid-row: 2 / 3;
+        }
+
+        #camera.port {
+            grid-column: 2 / 3;
+            grid-row: 1 / 2;
+        }
+
+        #lens.port {
+            grid-column: 2 / 3;
+            grid-row: 2 / 3;
+        }
+
+        #focalLength.port {
+            grid-column: 1 / 2;
+            grid-row: 3 / 4;
+        }
+
+        #tags.port {
+            grid-column: 1 / -1;
+            grid-row: 4 / -1;
+        }
+
+/* -------------------------------------------
+                    Mobile
+------------------------------------------- */
+.FilterDrawer.mobile.port {
+    grid-column: 1 / -1;
+    grid-row: 2 / 3;
+}
+
+.FilterDrawer.mobile.port.show {
+    grid-column: 1 / -1;
+    grid-row: 2 / 3;
+}
+
+    .FilterDrawer.mobile.port #tags {
+        display: none;
+    }

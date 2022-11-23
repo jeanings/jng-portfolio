@@ -63,8 +63,8 @@ describe("on initial renders", () => {
         await waitFor(() => {
             // Year selected element should update to most current (default) year.
             expect(newStore.getState().timeline.yearInit).toEqual(2022);
-            screen.getByRole('menuitem', { name: 'year-selected' });
-            const yearSelectedElem = screen.getByRole('menuitem', { name: 'year-selected' });
+            screen.getByRole('menuitem', { name: 'selected year' });
+            const yearSelectedElem = screen.getByRole('menuitem', { name: 'selected year' });
             expect(yearSelectedElem).toHaveTextContent('2022');
         });
 
@@ -85,7 +85,7 @@ describe("on initial renders", () => {
             </Provider>
         );
 
-        expect(screen.getByRole('menubar', { name: 'year-selector' })).toBeInTheDocument();
+        expect(screen.getByRole('menubar', { name: 'year selector' })).toBeInTheDocument();
     });
 
 
@@ -97,7 +97,7 @@ describe("on initial renders", () => {
             </Provider>
         );
 
-        expect(screen.getByRole('menuitem', { name: 'year-selected' })).toBeInTheDocument();
+        expect(screen.getByRole('menuitem', { name: 'selected year' })).toBeInTheDocument();
     });
 
 
@@ -115,7 +115,7 @@ describe("on initial renders", () => {
         });
 
         // Verify correct number of year items to render.
-        const yearElems = screen.getAllByRole('menuitemradio', { name: 'year-item'});
+        const yearElems = screen.getAllByRole('menuitemradio', { name: 'year selector option'});
         const yearItems = newStore.getState().timeline.years;
         expect(yearElems.length).toEqual(yearItems!.length);
     });
@@ -132,7 +132,7 @@ describe("on initial renders", () => {
             </Provider>
         );
 
-        expect(screen.getByRole('menubar', { name: 'month-selector' })).toBeInTheDocument();
+        expect(screen.getByRole('menubar', { name: 'month selector' })).toBeInTheDocument();
     });
 
 
@@ -144,7 +144,7 @@ describe("on initial renders", () => {
             </Provider>
         );
 
-        const monthItems = screen.getAllByRole('menuitemradio', { name: 'month-item' });
+        const monthItems = screen.getAllByRole('menuitemradio', { name: 'month selector option' });
         expect(monthItems.length).toBeGreaterThanOrEqual(13);
     });
 });
@@ -259,8 +259,8 @@ describe("clicks on dropdown year selector elements", () => {
         expect(newStore.getState().timeline.request).toEqual('idle');
 
         // Wait for initial fetch to render year selector items.
-        await waitFor(() => screen.findAllByRole('menuitemradio', { name: 'year-item' }));
-        const yearElems = screen.getAllByRole('menuitemradio', { name: 'year-item' });
+        await waitFor(() => screen.findAllByRole('menuitemradio', { name: 'year selector option' }));
+        const yearElems = screen.getAllByRole('menuitemradio', { name: 'year selector option' });
 
         // Click on a year.
         const yearSelectElem = yearElems.find(element => element.textContent === '2015') as HTMLElement;
@@ -277,7 +277,7 @@ describe("clicks on dropdown year selector elements", () => {
         expect(newStore.getState().timeline.imageDocs![0].date.year).toEqual(2015);
 
         // Check screen's year selected element updates to 2015.
-        const yearSelectedElem = screen.getByRole('menuitem', { name: 'year-selected' });
+        const yearSelectedElem = screen.getByRole('menuitem', { name: 'selected year' });
         expect(yearSelectedElem).toHaveTextContent('2015');
     });
 
@@ -317,11 +317,11 @@ describe("clicks on dropdown year selector elements", () => {
         });
         await waitFor(() => {
             expect(newStore.getState().timeline.yearInit).toEqual(2022);
-            screen.findAllByRole('menuitem', { name: 'year-selected' });
+            screen.findAllByRole('menuitem', { name: 'selected year' });
         });
 
         // Confirm changes.
-        const yearSelectedElem = screen.getByRole('menuitem', { name: 'year-selected' });
+        const yearSelectedElem = screen.getByRole('menuitem', { name: 'selected year' });
         expect(yearSelectedElem).toHaveTextContent('2022');
         expect(newStore.getState().timeline.selected.year).toEqual(2022);
         expect(newStore.getState().timeline.request).toEqual('complete')
@@ -330,15 +330,15 @@ describe("clicks on dropdown year selector elements", () => {
         act(() => {
             jest.advanceTimersByTime(100);
         });
-        await waitFor(() => screen.findAllByRole('menuitemradio', { name: 'year-item' }));
-        const yearElems = screen.getAllByRole('menuitemradio', { name: 'year-item' });
+        await waitFor(() => screen.findAllByRole('menuitemradio', { name: 'year selector option' }));
+        const yearElems = screen.getAllByRole('menuitemradio', { name: 'year selector option' });
 
         // // Get total image count on screen.
         act(() => {
             jest.advanceTimersByTime(50);
         });
-        await waitFor(() => screen.findAllByRole('menuitemradio', { name: 'month-item' }));
-        const monthElems = screen.getAllByRole('menuitemradio', { name: 'month-item' });
+        await waitFor(() => screen.findAllByRole('menuitemradio', { name: 'month selector option' }));
+        const monthElems = screen.getAllByRole('menuitemradio', { name: 'month selector option' });
 
         let allMonthsElem: HTMLElement;
         monthElems.forEach(element => {
@@ -431,15 +431,15 @@ describe("clicks on dropdown year selector elements", () => {
         );
         
         // Wait for year elements to render.
-        await waitFor(() => screen.findAllByRole('menuitemradio', { name: 'year-item' }))
-        const yearElems = screen.getAllByRole('menuitemradio', { name: 'year-item' }); 
+        await waitFor(() => screen.findAllByRole('menuitemradio', { name: 'year selector option' }))
+        const yearElems = screen.getAllByRole('menuitemradio', { name: 'year selector option' }); 
         const yearItems = mockDefaultData.years.length;
         expect(yearElems.length).toEqual(yearItems);
         expect(yearElems[0]).toBeInTheDocument();
 
         // Select a month.
         const monthToSelect: string = 'jun';
-        const monthElems = screen.getAllByRole('menuitemradio', { name: 'month-item' });
+        const monthElems = screen.getAllByRole('menuitemradio', { name: 'month selector option' });
         const monthElemToSelect = monthElems.find(element => 
             element.textContent!.replace(/\d+/, "") === monthToSelect.toUpperCase()) as HTMLElement;
 
@@ -506,14 +506,14 @@ test("resets << timeline.filteredSelectables >> to null", async() => {
     );
     
     // Wait for year elements to render.
-    await waitFor(() => screen.findAllByRole('menuitemradio', { name: 'year-item' }))
-    const yearElems = screen.getAllByRole('menuitemradio', { name: 'year-item' });
+    await waitFor(() => screen.findAllByRole('menuitemradio', { name: 'year selector option' }))
+    const yearElems = screen.getAllByRole('menuitemradio', { name: 'year selector option' });
     const yearItems = mockDefaultData.years.length;
     expect(yearElems.length).toEqual(yearItems);
     expect(yearElems[0]).toBeInTheDocument();
 
     // Get month to click.
-    const monthElems = screen.getAllByRole('menuitemradio', { name: 'month-item' });
+    const monthElems = screen.getAllByRole('menuitemradio', { name: 'month selector option' });
     const monthToSelect = 'jun';
     const monthElemToSelect = monthElems.find(element => 
         element.textContent!.replace(/\d+/, "") === monthToSelect.toUpperCase()) as HTMLElement;
@@ -580,7 +580,7 @@ describe("clicks on month selector elements", () => {
         expect(newStore.getState().timeline.request).toEqual('idle');
 
         // Check for all radios to be false.
-        const monthElems = screen.getAllByRole('menuitemradio', { name: 'month-item' });
+        const monthElems = screen.getAllByRole('menuitemradio', { name: 'month selector option' });
 
         // Select a month.
         const monthToSelect: string = 'jun';
@@ -624,7 +624,7 @@ describe("clicks on month selector elements", () => {
         expect(newStore.getState().timeline.request).toEqual('idle');
 
         // Check for all radios to be false.
-        const monthElems = screen.getAllByRole('menuitemradio', { name: 'month-item' });
+        const monthElems = screen.getAllByRole('menuitemradio', { name: 'month selector option' });
 
         // Select a month.
         const monthToSelect: string = 'jun';

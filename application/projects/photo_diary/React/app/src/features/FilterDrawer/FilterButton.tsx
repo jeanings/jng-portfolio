@@ -49,6 +49,7 @@ const FilterButton: React.FunctionComponent<FilterButtonProps> = (props: FilterB
 
     let selectedInCategory = useAppSelector(state => state.filter[filterCategory]);
     if (!selectedInCategory) {
+        // Assign empty array if null.
         selectedInCategory = [];
     }
 
@@ -112,7 +113,7 @@ const FilterButton: React.FunctionComponent<FilterButtonProps> = (props: FilterB
                     ? ""
                     : "active") }
             role="checkbox"
-            aria-label={ "filter-drawer".concat("-", props.categoryName, "-item") }
+            aria-label={ props.categoryName.concat(" filter option") }
             aria-pressed={ selectedInCategory.includes(selectable) === false
                 ? "false"
                 : "true" }

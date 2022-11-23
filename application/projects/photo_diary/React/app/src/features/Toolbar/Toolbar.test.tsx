@@ -33,6 +33,8 @@ var user = userEvent.setup();
 
 beforeEach(() => {
     mockAxios = new MockAdapter(axios);
+    // Mock scrollTo.
+    window.HTMLElement.prototype.scrollTo = jest.fn();
 });
 
 afterEach(() => {
@@ -112,7 +114,7 @@ test("renders bottom UI buttons", async() => {
 
     await waitFor(() => {
         screen.findByRole('menu', { name: 'toolbar' });
-        screen.findAllByRole('button', { name: 'toolbar-button' });
+        screen.findAllByRole('button');
     });
 
     // Verify toolbar is rendered.
@@ -120,7 +122,7 @@ test("renders bottom UI buttons", async() => {
     expect(toolbar).toBeInTheDocument();
 
     // Verify individual toolbar buttons are rendered.
-    const toolbarButtons = screen.getAllByRole('button', { name: 'toolbar-button' });
+    const toolbarButtons = screen.getAllByRole('button');
     expect(toolbarButtons.length).toEqual(3);
 });
 
@@ -135,7 +137,7 @@ test("clicks on toolbar buttons updates pressed status, style, and switched on/o
 
     await waitFor(() => {
         screen.findByRole('menu', { name: 'toolbar' })
-        screen.findAllByRole('button', { name: 'toolbar-button' })
+        screen.findAllByRole('button')
     });
 
     // Verify toolbar is rendered.
@@ -143,13 +145,11 @@ test("clicks on toolbar buttons updates pressed status, style, and switched on/o
     expect(toolbar).toBeInTheDocument();
 
     // Verify individual toolbar buttons are rendered.
-    const toolbarButtons = screen.getAllByRole('button', { name: 'toolbar-button' });
-    
+    const toolbarButtons = screen.getAllByRole('button');
     expect(toolbarButtons.length).toEqual(3);
 
     // Verify button is not clicked.
-    const buttonToClick = toolbarButtons.filter(button => 
-        button.id === "Toolbar-filter")[0];
+    const buttonToClick = screen.getByRole('button', { name: 'open filter drawer' });
     expect(buttonToClick).toHaveAttribute('aria-pressed', 'false');
     expect(buttonToClick).not.toHaveClass("active");
 
@@ -173,28 +173,23 @@ test("drawer button clicks reveal, hide filter elements", async() => {
 
     await waitFor(() => {
         screen.findByRole('menu', { name: 'toolbar' })
-        screen.findAllByRole('button', { name: 'toolbar-button' })
+        screen.findAllByRole('button')
     });
 
     // Verify toolbar is rendered.
     const toolbar = screen.getByRole('menu', { name: 'toolbar' });
     expect(toolbar).toBeInTheDocument();
 
-    // Verify individual toolbar buttons are rendered.
-    const toolbarButtons = screen.getAllByRole('button', { name: 'toolbar-button' });
-    expect(toolbarButtons.length).toEqual(3);
-
     // Get target button.
-    const toolbarFilterButton: HTMLElement = toolbarButtons.filter(button => 
-        button.id === "Toolbar-filter")[0];
-   
+    const toolbarFilterButton = screen.getByRole('button', { name: 'open filter drawer' });
+
     // Test opening of filter drawer.
     await waitFor(() => user.click(toolbarFilterButton));
     expect(toolbarFilterButton.getAttribute('aria-pressed')).toEqual('true');
     expect(toolbarFilterButton).toHaveClass("active");
 
-    await waitFor(() => screen.findByRole('form', { name: 'filter-drawer' }));
-    const filterDrawerElem = screen.getByRole('form', { name: 'filter-drawer' });
+    await waitFor(() => screen.findByRole('form', { name: 'filters menu' }));
+    const filterDrawerElem = screen.getByRole('form', { name: 'filters menu' });
 
     // Verify filter drawer is shown.
     expect(filterDrawerElem).toHaveClass("show");
@@ -220,14 +215,14 @@ test("clicks on either 'filter drawer' or 'image enlarger' button hides the othe
     );
 
     await waitFor(() => {
-        screen.findByRole('menu', { name: 'toolbar' })
-        screen.findAllByRole('button', { name: 'toolbar-button' })
+        screen.findByRole('menu', { name: 'toolbar' });
+        screen.findAllByRole('button');
     });
 
-    await waitFor(() => screen.findByRole('figure', { name: 'image-enlarger' }));
-    await waitFor(() => screen.findByRole('form', { name: 'filter-drawer' }));
-    const imageEnlargerElem = screen.getByRole('figure', { name: 'image-enlarger' });
-    const filterDrawerElem = screen.getByRole('form', { name: 'filter-drawer' });
+    await waitFor(() => screen.findByRole('tab', { name: 'image enlarger' }));
+    await waitFor(() => screen.findByRole('form', { name: 'filters menu' }));
+    const imageEnlargerElem = screen.getByRole('tab', { name: 'image enlarger' });
+    const filterDrawerElem = screen.getByRole('form', { name: 'filters menu' });
     expect(imageEnlargerElem).toBeInTheDocument();
     expect(filterDrawerElem).toBeInTheDocument();
 
@@ -235,15 +230,10 @@ test("clicks on either 'filter drawer' or 'image enlarger' button hides the othe
     const toolbar = screen.getByRole('menu', { name: 'toolbar' });
     expect(toolbar).toBeInTheDocument();
 
-    // Verify individual toolbar buttons are rendered.
-    const toolbarButtons = screen.getAllByRole('button', { name: 'toolbar-button' });
-    expect(toolbarButtons.length).toEqual(3);
-
     expect(newStore.getState().toolbar.imageEnlarger).toEqual('off');
 
     // Get target button.
-    const imageEnlargerButton: HTMLElement = toolbarButtons.filter(button => 
-        button.id === "Toolbar-imageEnlarger")[0];
+    const imageEnlargerButton = screen.getByRole('button', { name: 'open image enlarger' });
    
     await waitFor(() => user.click(imageEnlargerButton));
 
@@ -255,8 +245,7 @@ test("clicks on either 'filter drawer' or 'image enlarger' button hides the othe
     expect(filterDrawerElem).not.toHaveClass("show");
     
     // Repeat for filter drawer button.
-    const filterDrawerButton: HTMLElement = toolbarButtons.filter(button => 
-        button.id === "Toolbar-filter")[0];
+    const filterDrawerButton = screen.getByRole('button', { name: 'open filter drawer' });
    
     await waitFor(() => user.click(filterDrawerButton));
     
@@ -280,15 +269,12 @@ test("disables image enlarger button if no film strip image clicked", async() =>
 
     await waitFor(() => {
         screen.findByRole('menu', { name: 'toolbar' })
-        screen.findAllByRole('button', { name: 'toolbar-button' })
     });
 
     // Verify << enlargeDoc >> state is null.
     expect(newStore.getState().sideFilmStrip.enlargeDoc).toBeNull();
 
-    const toolbarButtons = screen.getAllByRole('button', { name: 'toolbar-button' });
-    const imageEnlargerButton = toolbarButtons.filter(button => 
-        button.id === "Toolbar-imageEnlarger")[0];  
+    const imageEnlargerButton = screen.getByRole('button', { name: 'open image enlarger' }); 
 
     // Verify image enlarger button is disabled.
     expect(imageEnlargerButton).toHaveClass("unavailable");
@@ -362,12 +348,11 @@ test("bounds button calls mapbox's fitBounds method", async() => {
     });
 
     // Verify individual toolbar buttons are rendered.
-    const toolbarButtons = screen.getAllByRole('button', { name: 'toolbar-button' });
+    const toolbarButtons = screen.getAllByRole('button');
     expect(toolbarButtons.length).toEqual(3);
 
     // Get target button.
-    const toolbarBoundsButton: HTMLElement = toolbarButtons.filter(
-        button => button.getAttribute('id') === "Toolbar-bounds")[0];
+    const toolbarBoundsButton = screen.getByRole('button', { name: 'reset map bounds' });
 
     // Mock dispatch request to fitBounds.
     await waitFor (() => user.click(toolbarBoundsButton));

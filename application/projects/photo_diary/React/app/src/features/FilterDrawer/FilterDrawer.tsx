@@ -150,7 +150,7 @@ const FilterDrawer: React.FunctionComponent = () => {
         // Assign styling through classname.
         filtersActive === true
             ? resetAvailablity = ""
-            : resetAvailablity = "unavailable";
+            : resetAvailablity = " ".concat("unavailable");
 
         return resetAvailablity;
     };
@@ -162,15 +162,13 @@ const FilterDrawer: React.FunctionComponent = () => {
                 +   // Add "show" styling based on clicked state.
                 (toolbarFilterSwitch === 'off'
                         ? ""
-                        : "show") }
+                        : " ".concat("show")) }
             id={ classBase }
             role="form" 
-            aria-label="filter-drawer">
+            aria-label="filters menu">
 
             <div 
-                className={ useMediaQueries(classBase.concat("__", "parameters-container")) }
-                role="group" 
-                aria-label={ "filter-drawer".concat("-", "container") }>
+                className={ useMediaQueries(classBase.concat("__", "parameters-container")) }>
 
                 {/* Generates each filter category and its buttons. */}
                 { createCategory(classNames, "format", formats) }
@@ -184,7 +182,7 @@ const FilterDrawer: React.FunctionComponent = () => {
             <button 
                     className={ useMediaQueries(classBase.concat("__", "reset")) + getResetAvailability() }
                     id="Toolbar__reset"
-                    aria-label="filter-drawer-reset"
+                    aria-label="reset filters"
                     onClick={ onResetClick }>
 
                     <svg xmlns="http://www.w3.org/2000/svg" id="icon-filter-reset" width="24" height="24" viewBox="0 0 24 24">
@@ -215,7 +213,7 @@ function createCategory(classNames: ClassNameTypes, categoryName: string, select
             className={ classNames['parent'] }
             id={ categoryName }
             role="group"
-            aria-label={ "filter-drawer".concat("-", categoryName) }>
+            aria-label={ categoryName.concat(" filter group") }>
 
             <h1 
                 className={ classNames['title']}>
@@ -227,7 +225,7 @@ function createCategory(classNames: ClassNameTypes, categoryName: string, select
             <div 
                 className={ classNames['options'] }
                 role="group" 
-                aria-label={ "filter-drawer".concat("-", categoryName, "-options") }>
+                aria-label={ categoryName.concat(" filter options") }>
                 
                 {/* Generate buttons for all the values in each filter category. */
                     sortedSelectables.map((selectable, index) => (

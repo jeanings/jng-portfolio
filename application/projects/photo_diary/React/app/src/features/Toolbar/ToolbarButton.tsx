@@ -78,16 +78,21 @@ const ToolbarButton: React.FunctionComponent<ToolbarButtonProps> = (props: Toolb
                 (enlargeDoc !== null
                     ? ""
                     : props.name === 'imageEnlarger'
-                        ? "unavailable"
+                        ? " ".concat("unavailable")
                         : "")
                 +   // Add "active" styling based on clicked state.
                 (props.name === 'bounds'
                     ? ""
                     : toolbarState[props.name] === 'off'
                         ? ""
-                        : "active") }
+                        : " ".concat("active")) }
             id={ props.baseClassName.concat("-", props.name) }
-            aria-label={ "toolbar".concat("-", "button") }
+            aria-label={ 
+                props.name === 'filter'
+                    ? "open filter drawer"
+                    : props.name === 'bounds'
+                        ? "reset map bounds"
+                        : "open image enlarger"}
             aria-pressed={ // Change pressed status based on clicked state.  
                 props.name === 'bounds'
                     ? "false"
