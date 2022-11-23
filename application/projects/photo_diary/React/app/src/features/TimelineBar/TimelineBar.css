@@ -68,3 +68,30 @@
         .TimelineBar__year-selected:hover {
             cursor: ns-resize;
         }
+
+
+/* ==================================================================================
+                                Media breakpoints 
+================================================================================== */
+.TimelineBar.port {
+    grid-column: 1 / 5;    /* spacing expl.    year     r-gap  film strip  */
+    grid-template-columns: 6.5rem calc(100vw - 6.5rem - 1rem - 10rem);
+}
+
+/* -------------------------------------------
+                    Mobile
+------------------------------------------- */
+.TimelineBar.mobile.port {
+    grid-column: 1 / -1;
+    grid-template-columns: 6.5rem auto 3.5rem;
+    column-gap: 0;
+    overflow: hidden;
+}
+
+    .TimelineBar__year-selector.mobile.port {
+        grid-column: 1/ -1;
+        grid-row: 2 / -1;
+        flex-direction: row;
+        column-gap: 1rem;
+        overflow-x: auto;
+    }

@@ -28,7 +28,7 @@ const ImageEnlarger: React.FunctionComponent <ImageEnlargerProps> = (props: Imag
         },
         'Format': '',
         'Film': null,
-        'Focal length': '',
+        'FocalLength': '',
         'ISO': null,
         'Camera': '',
         'Lens': '',
@@ -104,7 +104,7 @@ const ImageEnlarger: React.FunctionComponent <ImageEnlargerProps> = (props: Imag
             },
             'Format': imageDoc.format.type + ' ' + imageDoc.format.medium,
             'Film': imageDoc.film,
-            'Focal length': imageDoc.focal_length_35mm + 'mm',
+            'FocalLength': imageDoc.focal_length_35mm + 'mm',
             'ISO': imageDoc.iso,
             'Camera': imageDoc.make + ' ' + imageDoc.model,
             'Lens': imageDoc.lens,
@@ -113,14 +113,12 @@ const ImageEnlarger: React.FunctionComponent <ImageEnlargerProps> = (props: Imag
         };
     }
 
-    // Create englarged image element.
     const enlargedImageElem: JSX.Element = (
         <img 
-            className={ useMediaQueries(props.baseClassName.concat("__", classBase, "__", "image")) }
-            src={ imageSource } 
+            id={ "enlarged-image" }
+            src={ imageSource }
             aria-label="enlarged image"
-            draggable="false"
-        />
+            draggable="false"/>
     );
 
     // Prepare image stats categories for generating elements.
@@ -185,7 +183,9 @@ const ImageEnlarger: React.FunctionComponent <ImageEnlargerProps> = (props: Imag
                         role="figure"
                         aria-label={ categoryName.concat(" metadata") }>
                     
-                        { categoryName.toUpperCase() }
+                        { categoryName === 'FocalLength'
+                            ? 'Focal Length'.toUpperCase()
+                            : categoryName.toUpperCase() }
                     </span>
     
                     {/* Category content. */}
@@ -214,7 +214,7 @@ const ImageEnlarger: React.FunctionComponent <ImageEnlargerProps> = (props: Imag
                                 "-", "name") 
                                 +   // For locator spans
                                 (subcategoryName === 'Loc'
-                                    ? " locator"
+                                    ? " ".concat("locator")
                                     : "") }
                             role="figure"
                             aria-label={ subcategoryName.concat(" metadata") }>
@@ -228,7 +228,7 @@ const ImageEnlarger: React.FunctionComponent <ImageEnlargerProps> = (props: Imag
                                 "-", "value") 
                                 +   // For locator spans
                                 (subcategoryName === 'Loc'
-                                    ? " locator"
+                                    ? " ".concat("locator")
                                     : "") }
                             id={ subcategoryName === 'Loc'
                                 ? "image-enlarger__metadata-locator"
@@ -266,7 +266,7 @@ const ImageEnlarger: React.FunctionComponent <ImageEnlargerProps> = (props: Imag
                 // Add "show" styling based on clicked state. 
                 (toolbarEnlarger === 'off'
                     ? ""
-                    : "show") }
+                    : " ".concat("show")) }
             id="image-enlarger"
             role="tab" 
             aria-label="image enlarger"
@@ -276,7 +276,11 @@ const ImageEnlarger: React.FunctionComponent <ImageEnlargerProps> = (props: Imag
                     ? "false"
                     : "true" }>
             
-            { enlargedImageElem }
+            <div
+                className={ useMediaQueries(props.baseClassName.concat("__", classBase, "__", "image")) }
+                id="enlarged-image-container">   
+                { enlargedImageElem }
+            </div>
 
             { imageInfoElem }
 
@@ -329,7 +333,7 @@ export type ImageInfoType = {
     'DateLoc': DateLocType,
     'Format': string,
     'Film': string | null,
-    'Focal length': string,
+    'FocalLength': string,
     'ISO': number | null,
     'Camera': string,
     'Lens': string,
