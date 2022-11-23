@@ -150,7 +150,7 @@ const FilterDrawer: React.FunctionComponent = () => {
         // Assign styling through classname.
         filtersActive === true
             ? resetAvailablity = ""
-            : resetAvailablity = "unavailable";
+            : resetAvailablity = " ".concat("unavailable");
 
         return resetAvailablity;
     };
@@ -162,7 +162,7 @@ const FilterDrawer: React.FunctionComponent = () => {
                 +   // Add "show" styling based on clicked state.
                 (toolbarFilterSwitch === 'off'
                         ? ""
-                        : "show") }
+                        : " ".concat("show")) }
             id={ classBase }
             role="form" 
             aria-label="filters menu">
