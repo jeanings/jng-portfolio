@@ -75,7 +75,7 @@ const SideFilmStrip: React.FunctionComponent = () => {
                     +   // Add "slide" styling: slides left if mouse hovered on film strip. 
                     (filmStripHovered === false
                         ? ""
-                        : "slide") }
+                        : " ".concat("slide")) }
                 id="image-enlarger-container"
                 role="figure"
                 aria-label="enlarged image with metadata">
@@ -90,7 +90,7 @@ const SideFilmStrip: React.FunctionComponent = () => {
                     +   // Add "expand" styling: reveals second column of images.
                     (filmStripHovered === false
                         ? ""
-                        : "expand") }
+                        : " ".concat("expand")) }
                 id="film-strip"
                 ref={ filmStripRef }
                 role="listbox" 

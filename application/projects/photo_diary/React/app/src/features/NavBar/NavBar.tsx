@@ -64,14 +64,14 @@ const NavBar: React.FC = () => {
                 className={ useMediaQueries(classBase.concat("__", "menu")) 
                     +   // Add styling if toggled
                     (menuToggled === true
-                        ? "toggle"
+                        ? " ".concat("toggle")
                         : "") }
                 role="navigation"
                 aria-label="main site navigation">
                 <ul 
                     className={
                         menuToggled === true
-                            ? "toggle"
+                            ? " ".concat("toggle")
                             : "" }
                     id={ classBase.concat("__", "menu") }
                     role="listbox"
@@ -138,7 +138,7 @@ const NavBar: React.FC = () => {
                     className={ useMediaQueries(classBase.concat("__", "menu-toggle")) 
                         +   // Add styling if toggled
                         (menuToggled === true
-                            ? "toggle"
+                            ? " ".concat("toggle")
                             : "") 
                         +   // Add background matching with resume button
                         (resumeItemHovered === true
@@ -150,14 +150,14 @@ const NavBar: React.FC = () => {
                     <div 
                         className={
                             menuToggled === true
-                                ? "toggle"
+                                ? " ".concat("toggle")
                                 : "" }
                         id={ classBase.concat("__", "menu-toggle", "__", "stroke1") }>
                     </div>
                     <div 
                         className={
                             menuToggled === true
-                                ? "toggle"
+                                ? " ".concat("toggle")
                                 : "" }
                         id={ classBase.concat("__","menu-toggle", "__", "stroke2") }>
                     </div>

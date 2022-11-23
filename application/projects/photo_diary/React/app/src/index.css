@@ -30,8 +30,6 @@
   }
   
   #root {
-    height: 100vh;
+    height: 100vh;    /* 100vh required for desktop view */
     display: grid;
-    grid-template-columns: 100%;
-    grid-template-rows: 3.5rem auto;
   }

@@ -17,3 +17,14 @@
     background-color: var(--colour-background);
     color: var(--colour-text-inactive);
 }
+
+
+/* ==================================================================================
+                                Media breakpoints 
+================================================================================== */
+.App.mobile.port {
+    position: fixed; /* timeline                 gaps  toolbar */
+    grid-template-rows: 7rem calc(100% - 14rem - 2rem) 7rem;
+    row-gap: 1rem;
+    column-gap: 0;
+}
