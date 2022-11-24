@@ -7,7 +7,6 @@ import type { RootState, AppDispatch } from '../app/store';
 import { useMediaQuery } from 'react-responsive';
 
 
-
 /* ----------------------------------------------------------------------
     Use throughout app instead of plain `useDispatch` and `useSelector`
 ---------------------------------------------------------------------- */
@@ -41,7 +40,7 @@ export function useWindowSize() {
         
         // Remove event listener on cleanup
         return () => window.removeEventListener('resize', handleResize);
-    }, [window.innerHeight]);
+    }, []);
 
     return windowSize;
 };
