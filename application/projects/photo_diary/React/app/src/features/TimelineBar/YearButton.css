@@ -1,4 +1,8 @@
 /* Year items in menu drawer */
+.TimelineBar__year-selector li {
+    font-family: 'Barlow Semi Condensed', sans-serif;
+}
+
 .TimelineBar__year-item {
     grid-column: 1;
     grid-row: 1;

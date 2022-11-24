@@ -24,7 +24,7 @@
     font-size: 2.85rem;
     list-style: none;
     overflow: hidden;
-}
+}   
 
     .TimelineBar__year-selector:hover {
         cursor: pointer;
@@ -61,6 +61,7 @@
         color: var(--colour-text-inactive);
         grid-column: 1;
         grid-row: 1;
+        font-family: 'Barlow Semi Condensed', sans-serif;
         text-align: center;
         align-self: center;
     }
