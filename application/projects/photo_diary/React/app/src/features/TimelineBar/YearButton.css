@@ -4,11 +4,8 @@
 }
 
 .TimelineBar__year-item {
-    grid-column: 1;
-    grid-row: 1;
-    text-align: center;
-    align-self: center;
     display: none;
+    align-self: flex-start;
     transition: 350ms all;
 }
 
