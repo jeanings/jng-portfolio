@@ -46,7 +46,8 @@ test("renders all features on initial load", () => {
             <App />
         </Provider>
     );
-
+    
+    expect(screen.getByRole('menubar', { name: 'main site navigation menu' })).toBeInTheDocument();
     expect(screen.getByRole('menu', { name: 'timeline selector' })).toBeInTheDocument();
     expect(screen.getByRole('form', { name: 'filters menu'} )).toBeInTheDocument();
     expect(screen.getByRole('main', { name: 'map'} )).toBeInTheDocument();
