@@ -6,6 +6,7 @@
 .TimelineBar__year-item {
     display: none;
     align-self: flex-start;
+    pointer-events: all;
     transition: 350ms all;
 }
 

@@ -17,6 +17,7 @@
         font-family: 'Barlow Semi Condensed', sans-serif;
         align-self: center;
         cursor: pointer;
+        pointer-events: all;
         transition: 350ms all;
     }
 
