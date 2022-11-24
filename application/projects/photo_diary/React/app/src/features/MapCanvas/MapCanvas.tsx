@@ -2,7 +2,8 @@ import React, { useEffect, useRef } from 'react';
 import {
     useAppDispatch, 
     useAppSelector, 
-    useMediaQueries } from '../../common/hooks';
+    useMediaQueries, 
+    useWindowSize } from '../../common/hooks';
 import { 
     setStyleLoadStatus, 
     setSourceStatus, 
@@ -38,6 +39,12 @@ const MapCanvas: React.FunctionComponent = () => {
     const enlargeDoc = useAppSelector(state => state.sideFilmStrip.enlargeDoc);
     const toolbarImageEnlarger = useAppSelector(state => state.toolbar.imageEnlarger);
     const markerLocator = useAppSelector(state => state.mapCanvas.markerLocator);
+    const windowSize = useWindowSize();
+    // const mediaQuery: Array<string> = useMediaQueries('').split(' ');
+    // const media = { 
+    //     'type': mediaQuery[1] as keyof MediaTypes,
+    //     'orientation': mediaQuery[2] as keyof PaddingTypes
+    // };
     const classBase: string = "MapCanvas";
     // Mapbox variables.
     const MAPBOX_ACCESS_TOKEN = process.env.REACT_APP_MAPBOX;
@@ -51,6 +58,7 @@ const MapCanvas: React.FunctionComponent = () => {
         ? [ [ bounds!.lng[0], bounds!.lat[0] ],     // min bound coords
             [ bounds!.lng[1], bounds!.lat[1] ] ]    // max bound coords
         : [];
+  
 
     /* -------------------------------------------------
         Initialize map and add data source for markers 
@@ -58,6 +66,7 @@ const MapCanvas: React.FunctionComponent = () => {
     ------------------------------------------------- */
     useEffect(() => {
         if (bounds !== null) {
+
             // Initialize map.
             if (map.current === null) {
                 map.current = new mapboxgl.Map({
@@ -66,6 +75,9 @@ const MapCanvas: React.FunctionComponent = () => {
                     style: mapStyle,
                     zoom: 12,
                     bounds: bbox,
+                    fitboundsOptions: {
+                        padding: getMapPaddingOffset('bound', windowSize)
+                    },
                     boxZoom: false,
                     doubleClickZoom: true,
                     dragPan: true,
@@ -120,24 +132,20 @@ const MapCanvas: React.FunctionComponent = () => {
         if (sourceStatus === 'loaded'
             && fitBoundsButton === 'clicked'
             && bounds !== null) {
-                
+            
             // Adjust and zoom map to fit all markers. 
             map.current.fitBounds(
-            bbox,
-            {
-                padding: {
-                    top: 150,
-                    bottom: 150,
-                    left: 250, 
-                    right: 250
-                },
-                linear: false,
-                animate: true,
-                duration: 2500,
-                curve: 1.2,
-                maxZoom: 13
-            });
-
+                bbox,
+                {
+                    padding: getMapPaddingOffset('bound', windowSize),
+                    linear: false,
+                    animate: true,
+                    duration: 2500,
+                    curve: 1.2,
+                    maxZoom: 13
+                }
+            );
+            
             // Reset button state.
             dispatch(handleBoundsButton('idle'));
         }
@@ -158,17 +166,12 @@ const MapCanvas: React.FunctionComponent = () => {
 
             map.current.flyTo({
                 center: markerCoords,
-                padding: {
-                    top: 150,
-                    bottom: 150,
-                    left: 100, 
-                    right: 1000
-                },
+                offset: getMapPaddingOffset('fly', windowSize),
                 linear: false,
                 animate: true,
                 duration: 2500,
-                zoom: 14,
-                maxZoom: 17
+                zoom: 13,
+                maxZoom: 16
             });
 
             // Reset button state.
@@ -184,7 +187,7 @@ const MapCanvas: React.FunctionComponent = () => {
         && markersStatus === 'idle'
         && bounds !== null) {
 
-        // Create new photo marker layer.
+            // Create new photo marker layer.
         map.current.addLayer({
             'id': 'imageMarkers',
             'type': 'symbol',
@@ -274,12 +277,7 @@ const MapCanvas: React.FunctionComponent = () => {
         map.current.fitBounds(
             bbox,
             {
-                padding: {
-                    top: 150,
-                    bottom: 150,
-                    left: 250, 
-                    right: 250
-                },
+                padding: getMapPaddingOffset('bound', windowSize),
                 linear: false,
                 animate: true,
                 duration: 3500,
@@ -302,7 +300,7 @@ const MapCanvas: React.FunctionComponent = () => {
         // Scroll film strip to target image.
         const imageFrame = document.getElementById(markerDocId);
         if (imageFrame) {
-            imageFrame.scrollIntoView({behavior: 'smooth'});
+            imageFrame.scrollIntoView({ behavior: 'smooth' });
         }
 
         const enlargeDocId: string = enlargeDoc !== null    
@@ -389,6 +387,61 @@ const MapCanvas: React.FunctionComponent = () => {
 /* =====================================================================
     Helper functions.
 ===================================================================== */
+/* ----------------------------------------------
+    Get padding/offset for map animate methods,
+    calculated off of window size.
+---------------------------------------------- */
+function getMapPaddingOffset(mode: string, windowSize: { [index: string]: number }) {
+    let padding: PaddingType = {
+        'top': 0,
+        'bottom': 0,
+        'left': 0,
+        'right': 0
+    };
+
+    let offset: Array<number> = [ 0, 0 ];
+    
+    switch(mode) {
+        case 'bound':
+            // Assign different ratios depending on type of screen.
+            let topBoundOffset = windowSize.width > 800 
+                && windowSize.width > windowSize.height
+                    ? windowSize.height * 0.15
+                    : windowSize.height * 0.13;
+            let bottomBoundOffset = windowSize.width > 800 
+                && windowSize.width > windowSize.height
+                    ? windowSize.height * 0.15
+                    : windowSize.height * 0.35;
+
+            let leftBoundOffset = windowSize.width > 800 
+                && windowSize.width > windowSize.height
+                    ? windowSize.width * 0.15
+                    : windowSize.width * 0.12;
+            let rightBoundOffset = windowSize.width > 800
+                && windowSize.width > windowSize.height
+                    ? windowSize.width * 0.15
+                    : windowSize.width * 0.12;
+
+            padding = {
+                'top': topBoundOffset,
+                'bottom': bottomBoundOffset,
+                'left': leftBoundOffset,
+                'right': rightBoundOffset
+            };
+            return padding;
+
+        case 'fly':
+            // Assign different ratios depending on type of screen.
+            let xAxisNegativeOffset = windowSize.width > 800
+                && windowSize.width > windowSize.height
+                    ? windowSize.width * -0.35      // Shifts center point to left of screen.
+                    : 0;
+           
+            offset = [ xAxisNegativeOffset, 0 ];
+            return offset;
+    }
+};
+
 
 /* --------------------------------------------------
     Create svg element for marker cluster leaves.
@@ -481,6 +534,18 @@ function spiderfyClusters(event: any,
             }
         );
     }
+};
+
+
+/* =====================================================================
+    Types.
+===================================================================== */
+export type PaddingType = {
+    [index: string]: number,
+    'top': number,
+    'bottom': number,
+    'left': number,
+    'right': number
 };
 
 
