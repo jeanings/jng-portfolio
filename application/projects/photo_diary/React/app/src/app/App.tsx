@@ -6,6 +6,7 @@ import MapCanvas from '../features/MapCanvas/MapCanvas';
 import SideFilmStrip from '../features/SideFilmStrip/SideFilmStrip';
 import Toolbar from '../features/Toolbar/Toolbar';
 import './App.css';
+import NavBar from '../features/NavBar/NavBar';
 
 export const DEV_MODE = process.env.REACT_APP_DEV_MODE;
 export const apiUrl: string = DEV_MODE === 'True'
@@ -74,6 +75,7 @@ const App: React.FC = () => {
     
     return (
         <div className={ useMediaQueries(classBase) }>
+            <NavBar />
             <TimelineBar />
             <FilterDrawer />
             <MapCanvas />
