@@ -1,0 +1,45 @@
+/* Container for whole month selector */
+.TimelineBar__month-selector {
+    grid-column: 2 / -1;
+    grid-row: 1 / 2;
+    display: grid;
+    grid-template-columns: repeat(13, 1fr);
+    grid-template-rows: 35% 65%;
+    height: 100%;
+    width: 100%;
+}
+
+    /* Container for each month item */
+    .TimelineBar__month-item {
+        grid-row: 1 / -1;
+        text-align: center;
+        font-size: 0.9rem;
+        font-family: 'Barlow Semi Condensed', sans-serif;
+        align-self: center;
+        cursor: pointer;
+        pointer-events: all;
+        transition: 350ms all;
+    }
+
+        .TimelineBar__month-item:hover {
+            color: var(--colour-accent-secondary);
+            transition: 350ms all;
+        }
+
+        .TimelineBar__month-item.active {
+            color: var(--colour-accent-primary);
+            transition: 350ms all;
+        }
+
+
+/* ==================================================================================
+                                Media breakpoints 
+================================================================================== */
+
+/* -------------------------------------------
+                    Mobile
+------------------------------------------- */
+.TimelineBar__month-selector.mobile.port {
+    grid-column: 1 / 3;
+    grid-row: 1 / 2;
+}

@@ -1,17 +1,17 @@
-.Navbar {
-    display: grid;
+.NavBar {
     grid-column: 1 / -1;
-    grid-row: 1 / -1;
+    grid-row: 1 / 2;
+    display: grid;
     grid-template-columns: repeat(4, 25%);
     grid-template-rows: repeat(4, 25%);
     align-items: flex-end;
 }
 
-    .Navbar_menu {
+    .NavBar__menu {
         grid-column: 1 / -1;
         grid-row: 1 / 2;
         display: grid;
-        height: 3rem;
+        height: 3.5rem;
         top: 0;
         position: sticky;
         grid-template-columns: auto 2.5rem;
@@ -24,15 +24,16 @@
         -moz-user-select: none; /* Old versions of Firefox */
         -ms-user-select: none; /* Internet Explorer/Edge */
         transition: all 300ms ease-in-out;
-        z-index: 15;
+        z-index: 2;
     }
 
-        .Navbar_menu.toggle {
-            background: #000000;
+        .NavBar__menu.toggle {
+            background: rgba(0, 0, 0, 0.85);
             transition: all 300ms ease-in-out;
+            z-index: 3;
         }
 
-        #Navbar_menu_list {
+        #NavBar__menu {
             grid-row: 1;
             display: grid;
             width: 100%;
@@ -44,13 +45,13 @@
             transition: opacity 300ms ease-in-out;
         }
 
-            #Navbar_menu_list.toggle {
+            #NavBar__menu.toggle {
                 opacity: 1;
                 pointer-events: all;
                 transition: opacity 300ms ease-in-out;
             }        
 
-            #Navbar_menu_list li {
+            #NavBar__menu li {
                 height: 100%;
                 display: grid;
                 grid-template-columns: auto;
@@ -60,40 +61,42 @@
                 cursor: pointer;
             }
 
-                #Navbar_menu_list li:hover {
-                    background: var(--color-bg);
+                #NavBar__menu li:hover {
+                    background: rgba(255, 255, 255, 0.1);
                     transition: all 300ms ease-in-out;
                 }
 
-                .Navbar_menu_list_name {
+                .NavBar__menu__name {
                     grid-column: 1;
                     grid-row: 1;
                     align-self: center;
                     justify-self: end;
                     font-family: "Grenze", serif;
                     font-size: 1.75rem;
-                    color: var(--color-text);
+                    color: var(--colour-text-active);
                     text-decoration: none;
                     transition: all 300ms ease-in-out;
                     pointer-events: none;
                 }
 
-                    .Navbar_menu_list_name:visited {
-                        color: var(--color-text);
+                    .NavBar__menu__name:visited {
+                        color: var(--colour-text-active);
                     }
 
-                    .ionicon {
+                    /* Link icons */
+                    #NavBar__menu li svg {
                         grid-column: 2;
                         grid-row: 1;
                         width: 1.25rem;
                         justify-self: start;
                         align-self: center;
-                        color: var(--color-text);
+                        color: var(--colour-text-active);
+                        pointer-events: none;
                         transition: all 350ms ease-in-out;
                     }
 
-                #Navbar_menu_list li:hover 
-                    > .Navbar_menu_list_name {
+                #NavBar__menu li:hover 
+                    > .NavBar__menu__name {
                         text-decoration-line: underline;
                         text-decoration-style: solid;
                         animation-name: menu-highlight;
@@ -105,21 +108,22 @@
 
                     @keyframes menu-highlight {
                         0% {
-                            text-decoration-color: var(--color-accent-primary);
+                            text-decoration-color: var(--colour-accent-primary);
                             text-decoration-thickness: 0.06rem;
                         }
                         65% {
-                            text-decoration-color: var(--color-accent-primary);
+                            text-decoration-color: var(--colour-accent-primary);
                             text-decoration-thickness: 0.18rem;
                         }
                         100% {
-                            text-decoration-color: var(--color-accent-secondary);
+                            text-decoration-color: var(--colour-accent-secondary);
                             text-decoration-thickness: 0.30rem;
                         }
                     }
-
-                #Navbar_menu_list li:hover 
-                    > .ionicon {
+                
+                /* Animate icons on menu item hovers */
+                #NavBar__menu li:hover 
+                    > svg {
                         animation-name: icon-highlight;
                         animation-fill-mode: forwards;
                         animation-duration: 350ms;
@@ -130,14 +134,14 @@
                         0% {
                         }
                         65% {
-                            color: var(--color-accent-primary)
+                            color: var(--colour-accent-primary)
                         }
                         100% {
-                            color: var(--color-accent-secondary)
+                            color: var(--colour-accent-secondary)
                         }
                     }
 
-        .Navbar_menu_toggle {
+        .NavBar__menu-toggle {
             grid-column: 2;
             width: 100%;
             height: 100%;
@@ -149,25 +153,25 @@
             cursor: pointer;
             transition: background 300ms ease-in-out;
         }
-
-            .Navbar_menu_toggle.resume-hover {
-                background: var(--color-bg);
-                transition: background 300ms ease-in-out;
+            /* For matching toggle background with resume item on resume item hover */
+            .blend {
+                background: rgba(255, 255, 255, 0.1);
+                transition: all 300ms ease-in-out;
             }
 
-            #Navbar_menu_toggle_stroke1 {
+            #NavBar__menu-toggle__stroke1 {
                 grid-column: 1;
                 grid-row: 1;
                 width: 1.25rem;
                 height: 1.25rem;
-                border-left: var(--color-accent-primary) solid 0.30rem;
+                border-left: var(--colour-accent-primary) solid 0.30rem;
                 border-bottom: transparent solid 0.30rem;
                 transform: rotate(45deg);
                 transition: all 300ms ease-in-out;
                 z-index: 6;
             }
 
-                #Navbar_menu_toggle_stroke1.toggle {
+                #NavBar__menu-toggle__stroke1.toggle {
                     border-bottom: transparent solid 0rem;
                     transform: rotate(135deg);
                     height: 2rem;
@@ -176,19 +180,19 @@
 
                 }
 
-            #Navbar_menu_toggle_stroke2 {
+            #NavBar__menu-toggle__stroke2 {
                 grid-column: 1;
                 grid-row: 1;
                 width: 1.25rem;
                 height: 1.25rem;
-                border-left: var(--color-accent-secondary) solid 0.30rem;
+                border-left: var(--colour-accent-secondary) solid 0.30rem;
                 border-top: transparent solid 0.30rem;
                 transform: rotate(-45deg);
                 transition: all 550ms ease-in-out;
                 z-index: 5;
             }
 
-                #Navbar_menu_toggle_stroke2.toggle {
+                #NavBar__menu-toggle__stroke2.toggle {
                     border-top: transparent solid 0rem;
                     transform: rotate(-135deg);
                     height: 2rem;
@@ -200,10 +204,10 @@
 /* ----------------------------------
             Media queries
 -----------------------------------*/
-@media screen and (orientation: landscape) 
+/* @media screen and (orientation: landscape) 
   and (max-width: 5000px) {
 }
-.Navbar.screen_4k {
+.NavBar.screen_4k {
 }
 
 
@@ -212,7 +216,7 @@
   and (max-width: 2800px) {
    
 }
-.Navbar.screen_1440 {
+.NavBar.screen_1440 {
 }
 
 
@@ -221,7 +225,7 @@
   and (max-width: 2000px) {
 
 }
-.Navbar.screen_1080 {
+.NavBar.screen_1080 {
 }
 
 
@@ -231,12 +235,12 @@
   and (max-width: 1700px) {
 
 }
-.Navbar.portable_hd_land {
+.NavBar.portable_hd_land {
 }
 
 
 
-.Navbar.portable_hd_port {
+.NavBar.portable_hd_port {
 }
 
 
@@ -244,6 +248,6 @@
 @media screen and (orientation: portrait) {
 
 }
-.Navbar.portrait {
+.NavBar.portrait {
 
-}
+} */

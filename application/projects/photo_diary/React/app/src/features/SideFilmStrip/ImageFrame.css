@@ -1,0 +1,28 @@
+.ImageFrame {
+    display: flex;
+    pointer-events: all;
+    user-select: all;
+    cursor: pointer;
+}
+
+    .ImageFrame__image {
+        width: 8rem;
+        height: 8rem;
+        object-fit: cover;
+        border-radius: 0.25rem;
+    }
+
+
+/* ==================================================================================
+                                Media breakpoints 
+================================================================================== */
+
+/* -------------------------------------------
+                    Mobile
+------------------------------------------- */
+.ImageFrame.mobile.port 
+    .ImageFrame__image {
+    width: 11rem;
+    height: 11rem;
+    border-radius: 0.75rem;
+}

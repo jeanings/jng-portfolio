@@ -1,0 +1,16 @@
+/* Year items in menu drawer */
+.TimelineBar__year-selector li {
+    font-family: 'Barlow Semi Condensed', sans-serif;
+}
+
+.TimelineBar__year-item {
+    display: none;
+    align-self: flex-start;
+    pointer-events: all;
+    transition: 350ms all;
+}
+
+    .TimelineBar__year-item:hover {
+        color: var(--colour-accent-secondary);
+        transition: 350ms all;
+    }

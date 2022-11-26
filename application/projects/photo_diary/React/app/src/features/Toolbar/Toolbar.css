@@ -1,0 +1,33 @@
+.Toolbar {
+    grid-column: 1 / -1;
+    grid-row: 3 / -1;
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    grid-template-rows: 100%;
+    z-index: 2;
+    user-select: none;
+    pointer-events: none;
+}
+
+    .Toolbar__button-container {
+        grid-column: 3 / 4;
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        align-self: center;
+        justify-self: center;
+        min-width: 50%;
+        column-gap: 1.5rem;
+    }
+
+
+/* ==================================================================================
+                                Media breakpoints 
+================================================================================== */
+
+/* -------------------------------------------
+                    Mobile
+------------------------------------------- */
+.Toolbar.mobile.port {
+    grid-row: 3 / -1;
+    align-self: flex-start;
+}
