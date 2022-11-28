@@ -11,7 +11,6 @@ import * as serviceWorker from './serviceWorker';
 ReactDOM.render(
     <React.StrictMode>
         <Provider store={store}>
-            <NavBar />
             <App />
         </Provider>
     </React.StrictMode>,

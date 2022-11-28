@@ -1,6 +1,10 @@
 .TimelineBar__month-counter {
     grid-row: 2 / -1;
-    text-align: center;
-    font-size: 1.75rem;
     pointer-events: none;
 }
+
+    .TimelineBar__month-counter span {
+        text-align: center;
+        font-size: 1.75rem;
+        font-family: 'Barlow Semi Condensed', sans-serif;
+    }

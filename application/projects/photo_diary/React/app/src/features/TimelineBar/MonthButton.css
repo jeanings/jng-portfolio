@@ -14,7 +14,10 @@
         grid-row: 1 / -1;
         text-align: center;
         font-size: 0.9rem;
+        font-family: 'Barlow Semi Condensed', sans-serif;
+        align-self: center;
         cursor: pointer;
+        pointer-events: all;
         transition: 350ms all;
     }
 

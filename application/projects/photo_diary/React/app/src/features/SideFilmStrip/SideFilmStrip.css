@@ -2,7 +2,6 @@
     grid-column: 2 / 6;
     grid-row: 2 / -1;
     height: 100%;
-    margin-left: 8rem;
     display: grid;  /* spacing expl.   film strip + expanded */
     grid-template-columns: calc(100% - 20rem) auto;
     grid-template-rows: 100%;
@@ -139,7 +138,6 @@
     grid-row: 2 / 3;
     min-height: 100%;
     position: absolute;
-    margin-left: 0;
     grid-template-columns: 100%;
     grid-template-rows: calc(100% - 14rem) 12rem;
     row-gap: 2rem;
