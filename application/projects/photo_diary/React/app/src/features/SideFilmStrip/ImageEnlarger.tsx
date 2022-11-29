@@ -41,6 +41,9 @@ const ImageEnlarger: React.FunctionComponent <ImageEnlargerProps> = (props: Imag
     ------------------------------------------------------------------- */
     useEffect(() => {
         if (imageDoc !== null) {
+            // Zoom map to marker.
+            dispatch(handleMarkerLocator('clicked'));
+
             // Add class to show panel.
             const payloadToolbarButtons: ToolbarProps = {
                 'filter': 'off',

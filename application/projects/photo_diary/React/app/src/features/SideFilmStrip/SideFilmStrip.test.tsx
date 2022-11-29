@@ -571,3 +571,24 @@ test("flies to map position on gps lock on button click", async() => {
     expect(newStore.getState().mapCanvas.markerLocator).toEqual('clicked');
 });
 
+
+test("flies map to marker position on film strip thumbnail clicks", async() => {
+    const newStore = setupStore(preloadedState);
+        render(
+            <Provider store={newStore}>
+                <SideFilmStrip />
+            </Provider>
+        );
+    
+    // Get thumbnail to click.
+    const idForImageToEnlarge = mockDefaultData.docs[0]._id;
+    const thumbnailElems = screen.getAllByRole('img', { name: 'thumbnail image container' });
+    const thumbnailToClick = thumbnailElems.filter(thumbnail => 
+        thumbnail.id === idForImageToEnlarge)[0];
+
+    await waitFor(() => user.click(thumbnailToClick));
+    expect(newStore.getState().sideFilmStrip.enlargeDoc).not.toBeNull();
+
+    // Verify marker locator state changed.
+    expect(newStore.getState().mapCanvas.markerLocator).toEqual('clicked');
+});
