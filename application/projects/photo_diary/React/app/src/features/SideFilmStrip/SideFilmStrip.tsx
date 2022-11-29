@@ -35,48 +35,17 @@ const SideFilmStrip: React.FunctionComponent = () => {
     }, [imageDocs]);
     
 
-    /* -----------------------------------------------------------
-        Generate image frame elements for array of MongoDB docs.
-    ----------------------------------------------------------- */
+    /* ---------------------------------------------------------------------
+        Generate thumbnail image frame elements for array of MongoDB docs.
+    --------------------------------------------------------------------- */
     let imageFrameElems: Array<JSX.Element> = [];
     
-    // Sort images in descending order.
     if (imageDocs !== null) {
-        let sortedDocs = [...imageDocs];
-        sortedDocs.sort((a, b) => {
-            const idA = a._id;
-            const idB = b._id;
-
-            // Sort using docs' _id, based on insertion time, 
-            // which in turn is based on date taken or filename.
-            switch(true) {
-                case idA < idB:
-                    return 1;
-                case idA > idB:
-                    return -1;
-                default:
-                    return 0;
-            }
-        });
-
-        sortedDocs.map((doc, index) => (
+        imageDocs.map((doc, index) => (
             imageFrameElems.push(
                 createImageFrames(classBase, doc, index)
             )
         ));
-
-    //     filenameSortedDocs.sort((a, b) => 
-    //     Object.entries(a)['_id'] < Object.entries(b)['_id']
-    //         ? -1
-    //         : 1
-    // )
-
-        // Reverse order of collection, with most recent doc on top.
-        // [...imageDocs].reverse().map((imageDoc, index) => (
-        //     imageFrameElems.push(
-        //         createImageFrames(classBase, imageDoc, index)
-        //     )
-        // ));
     }
 
 
