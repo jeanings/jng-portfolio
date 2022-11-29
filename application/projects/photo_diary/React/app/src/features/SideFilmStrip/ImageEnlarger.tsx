@@ -22,10 +22,7 @@ const ImageEnlarger: React.FunctionComponent <ImageEnlargerProps> = (props: Imag
     let imageSource: string = "";
     let imageInfo: ImageInfoType = {
         'Title': null,
-        'DateLoc': {
-            'Date': '',
-            'Loc': locateIconSVG
-        },
+        'Date': '',
         'Format': '',
         'Film': null,
         'FocalLength': '',
@@ -101,10 +98,11 @@ const ImageEnlarger: React.FunctionComponent <ImageEnlargerProps> = (props: Imag
             
         imageInfo = {
             'Title': imageDoc.title,
-            'DateLoc': {
-                'Date': (imageDoc.date.year + '/' + dateMonth + dateDay + '\u00A0 \u00A0 \u00A0' + dateTime).toString(),
-                'Loc': locateIconSVG
-            },
+            'Date': (
+                imageDoc.date.year + '/' + dateMonth + dateDay + 
+                (dateTime !== ''
+                    ? '\u00A0 \u00A0 \u00A0' + dateTime
+                    : '')).toString(),
             'Format': imageDoc.format.type + ' ' + imageDoc.format.medium,
             'Film': imageDoc.film,
             'FocalLength': imageDoc.focal_length_35mm + 'mm',
@@ -166,99 +164,36 @@ const ImageEnlarger: React.FunctionComponent <ImageEnlargerProps> = (props: Imag
     );
 
 
-    /* ------------------------------------------------------------
+    /* -------------------------------------------
         Create elements for each metadata item.
-        Date and marker locator is combined for stylistic reasons,
-        otherwise everything is its own category.
-    ------------------------------------------------------------- */
+    ------------------------------------------- */
     function getCategoryMetadataSpan(
         categoryName: string, 
-        categoryData: string | number | DateLocType | Array<string>) {
+        categoryData: string | number | Array<string>) {
             
         // For all the base metadata items.
-        let metaDataSpan: JSX.Element = <></>;
-        if (categoryName !== 'DateLoc') {
-            metaDataSpan = (
-                <>
-                    {/* Category names. */}
-                    <span
-                        className={ "image-enlarger__metadata".concat("-", "name") }
-                        role="figure"
-                        aria-label={ categoryName.concat(" metadata") }>
-                    
-                        { categoryName === 'FocalLength'
-                            ? 'Focal Length'.toUpperCase()
-                            : categoryName.toUpperCase() }
-                    </span>
-    
-                    {/* Category content. */}
-                    <span
-                        className={ "image-enlarger__metadata".concat("-", "value") }
-                        role="figure"
-                        aria-label={ categoryName.concat(" metadata value")}>
-                        { getCategoryData(categoryName, categoryData) }
-                    </span>
-                </>
-            )
-        }
-        // For the unique date-location element on first row.
-        else {
-            let fragments: { [index: string]: ReactFragment } = {}
-    
-            Object.entries(categoryData).forEach(item => {
-                const subcategoryName = item[0];
-                const subcategoryData = item[1];
-    
-                fragments[subcategoryName] = 
-                    <React.Fragment>
-                        {/* Category names. */}
-                        <span
-                            className={ "image-enlarger__metadata".concat(
-                                "-", "name") 
-                                +   // For locator spans
-                                (subcategoryName === 'Loc'
-                                    ? " ".concat("locator")
-                                    : "") }
-                            role="figure"
-                            aria-label={ subcategoryName.concat(" metadata") }>
-                        
-                            { subcategoryName.toUpperCase() }
-                        </span>
-    
-                        {/* // Category content. */}
-                        <span
-                            className={ "image-enlarger__metadata".concat(
-                                "-", "value") 
-                                +   // For locator spans
-                                (subcategoryName === 'Loc'
-                                    ? " ".concat("locator")
-                                    : "") }
-                            id={ subcategoryName === 'Loc'
-                                ? "image-enlarger__metadata-locator"
-                                : "" }
-                            role={ subcategoryName === 'Loc' 
-                                ? "button"
-                                : "figure" }
-                            aria-label={ subcategoryName === 'Loc' 
-                                ? "locate enlarged image on map"
-                                : subcategoryName.concat(" metadata value") }
-                            onClick={
-                                subcategoryName === 'Loc'
-                                    ? onLocatorClick
-                                    : undefined }>
-    
-                            { getCategoryData(subcategoryName, subcategoryData) }
-                        </span>
-                    </React.Fragment>;            
-            });
-    
-            return (
-                <React.Fragment>
-                    { fragments.Date }
-                    { fragments.Loc }
-                </React.Fragment>
-            );
-        }
+        let metaDataSpan: JSX.Element = (
+            <>
+                {/* Category names. */}
+                <span
+                    className={ "image-enlarger__metadata".concat("-", "name") }
+                    role="figure"
+                    aria-label={ categoryName.concat(" metadata") }>
+                
+                    { categoryName === 'FocalLength'
+                        ? 'Focal Length'.toUpperCase()
+                        : categoryName.toUpperCase() }
+                </span>
+
+                {/* Category content. */}
+                <span
+                    className={ "image-enlarger__metadata".concat("-", "value") }
+                    role="figure"
+                    aria-label={ categoryName.concat(" metadata value")}>
+                    { getCategoryData(categoryName, categoryData) }
+                </span>
+            </>
+        )
         return metaDataSpan;
     }
 
@@ -295,19 +230,19 @@ const ImageEnlarger: React.FunctionComponent <ImageEnlargerProps> = (props: Imag
 /* =====================================================================
     Helper functions.
 ===================================================================== */
-const locateIconSVG = (
-    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
-        <circle cx="12" cy="12" r="4"/>
-        <path d="M13 4.069V2h-2v2.069A8.01 8.01 0 0 0 4.069 11H2v2h2.069A8.008 8.008 0 0 0 11 19.931V22h2v-2.069A8.007 8.007 0 0 0 19.931 13H22v-2h-2.069A8.008 8.008 0 0 0 13 4.069zM12 18c-3.309 0-6-2.691-6-6s2.691-6 6-6 6 2.691 6 6-2.691 6-6 6z"/>
-    </svg>
-);
+// const locateIconSVG = (
+//     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+//         <circle cx="12" cy="12" r="4"/>
+//         <path d="M13 4.069V2h-2v2.069A8.01 8.01 0 0 0 4.069 11H2v2h2.069A8.008 8.008 0 0 0 11 19.931V22h2v-2.069A8.007 8.007 0 0 0 19.931 13H22v-2h-2.069A8.008 8.008 0 0 0 13 4.069zM12 18c-3.309 0-6-2.691-6-6s2.691-6 6-6 6 2.691 6 6-2.691 6-6 6z"/>
+//     </svg>
+// );
 
 
 /* -----------------------------------------
     Process image metadata for displaying.
 ----------------------------------------- */
-function getCategoryData(categoryName: string, categoryData: string | number | DateLocType | Array<string>) {
-    let content: string | number | DateLocType | Array<string> = '';
+function getCategoryData(categoryName: string, categoryData: string | number | Array<string>) {
+    let content: string | number | Array<string> = '';
 
     switch(categoryName) {
         case 'Tags':
@@ -331,9 +266,9 @@ export interface ImageEnlargerProps {
 }
 
 export type ImageInfoType = {
-    [index: string]: string | number | Array<string> | DateLocType | null
+    [index: string]: string | number | Array<string> | null
     'Title': string | null,
-    'DateLoc': DateLocType,
+    'Date': string,
     'Format': string,
     'Film': string | null,
     'FocalLength': string,
@@ -344,10 +279,10 @@ export type ImageInfoType = {
     'Description': string | null
 }
 
-type DateLocType = {
-    'Date': string,
-    'Loc': JSX.Element
-}
+// type DateLocType = {
+//     'Date': string,
+//     'Loc': JSX.Element
+// }
 
 
 export default ImageEnlarger;

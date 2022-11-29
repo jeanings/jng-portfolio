@@ -537,41 +537,6 @@ test("expands film strip on hover and slides image enlarger to the left", async(
 });
 
 
-test("flies to map position on gps lock on button click", async() => {
-    const newStore = setupStore(preloadedState);
-        render(
-            <Provider store={newStore}>
-                <SideFilmStrip />
-            </Provider>
-        );
-    
-    expect(newStore.getState().sideFilmStrip.enlargeDoc).toBeNull();
-    const imageEnlargerElem = screen.getByRole('tab', { name: 'image enlarger' });
-
-    // Verify enlarger panel becomes visible on imageDoc existence.
-    const idForImageToEnlarge = mockDefaultData.docs[0]._id;
-    const thumbnailElems = screen.getAllByRole('img', { name: 'thumbnail image container' });
-    const thumbnailToClick = thumbnailElems.filter(thumbnail => 
-        thumbnail.id === idForImageToEnlarge)[0];
-
-    await waitFor(() => user.click(thumbnailToClick));
-    expect(newStore.getState().sideFilmStrip.enlargeDoc).not.toBeNull();
-    
-    // Verify image enlarger opened.
-    await waitFor(() => {
-        expect(imageEnlargerElem).toHaveAttribute("aria-expanded", 'true');
-        expect(imageEnlargerElem).toHaveClass("show");
-    });
-
-    const markerLocatorButton = screen.getByRole('button', { name: 'locate enlarged image on map' });
-
-    await waitFor(() => user.click(markerLocatorButton));
-
-    // Verify marker locator state change.
-    expect(newStore.getState().mapCanvas.markerLocator).toEqual('clicked');
-});
-
-
 test("flies map to marker position on film strip thumbnail clicks", async() => {
     const newStore = setupStore(preloadedState);
         render(
