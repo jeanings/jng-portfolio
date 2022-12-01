@@ -2,10 +2,14 @@ import React, {
     useEffect, 
     useState, 
     useRef } from 'react';
-import { useAppSelector, useMediaQueries } from '../../common/hooks';
+import { useAppDispatch, useAppSelector, useMediaQueries } from '../../common/hooks';
 import { ImageDocTypes } from '../TimelineBar/timelineSlice';
+import { 
+    handleEnlarger, 
+    handleSlideView, 
+    SideFilmStripProps } from './sideFilmStripSlice';
 import ImageFrame from './ImageFrame';
-import ImageEnlarger from './ImageEnlarger';
+import ImageEnlarger, { getNavSVG } from './ImageEnlarger';
 import './SideFilmStrip.css';
 
 
@@ -15,14 +19,20 @@ import './SideFilmStrip.css';
     and through map markers. 
 ======================================================================= */
 const SideFilmStrip: React.FunctionComponent = () => {
+    const dispatch = useAppDispatch();
     const [ filmStripHovered, setFilmStripHovered ] = useState(false);
+    const [ slideImageIndex, setSlideImageIndex ] = useState<number | null>(null);
     const imageDocs = useAppSelector(state => state.timeline.imageDocs);
+    const imageDoc = useAppSelector(state => state.sideFilmStrip.enlargeDoc);
+    const docIndex = useAppSelector(state => state.sideFilmStrip.docIndex);
+    const slideView = useAppSelector(state => state.sideFilmStrip.slideView);
     const filmStripRef = useRef<HTMLDivElement>(null);
     const classBase: string = "SideFilmStrip";
 
 
     /* -----------------------------------------------------------------------------
         Scroll film strip back to top on imageDoc changes - year/month selections.
+        Reset local state for slide view mode.
     ----------------------------------------------------------------------------- */
     useEffect(() => {
         if (filmStripRef.current) {
@@ -32,7 +42,35 @@ const SideFilmStrip: React.FunctionComponent = () => {
                 behavior: 'smooth'
             });
         }
+        // Reset slide image index.
+        setSlideImageIndex(null);
     }, [imageDocs]);
+
+
+    /* -------------------------------------------------------
+        Reset slide image index when slide view mode closes
+        and dispatch action to change image in enlarger to 
+        the last viewed image in slide view.
+    ------------------------------------------------------- */
+    useEffect(() => {
+        if (imageDocs) {
+            // On slide view exit, change enlarger image 
+            // and reset local slide image index.
+            if (slideView === 'off') {
+                const payloadEnlarger: SideFilmStripProps = {
+                    'enlargeDoc': imageDocs![slideImageIndex as number],    // Triggers image change.
+                    'docIndex': slideImageIndex as number
+                };
+    
+                dispatch(handleEnlarger(payloadEnlarger));
+                setSlideImageIndex(null);
+            }
+            // On slide view open, set local slide image index.
+            else if (slideView === 'on') {
+                setSlideImageIndex(docIndex);
+            }
+        }
+    }, [slideView]);
     
 
     /* ---------------------------------------------------------------------
@@ -48,7 +86,6 @@ const SideFilmStrip: React.FunctionComponent = () => {
         ));
     }
 
-
     /* ------------------------------------------------------
         Handle expand/contract of film strip on hover/touch.
     ------------------------------------------------------ */
@@ -61,53 +98,150 @@ const SideFilmStrip: React.FunctionComponent = () => {
     };
 
 
+    /* ----------------------------------------------------------
+        Generate elements for full-screen slide viewer overlay.
+    ---------------------------------------------------------- */
+    // Create image element for slide view.
+    let imageSource: string = ''
+    if (imageDocs) {
+        imageSource = slideImageIndex !== null
+            ? imageDocs[slideImageIndex as number].url  // Use slide viewer's indexing
+            : imageDoc?.url as string;                  // Else use base index from enlarger.
+    }
+    
+    const enlargedImageElem: JSX.Element = (
+        <img 
+            id="enlarged-image-slide-view"
+            src={ imageSource }
+            aria-label="enlarged image in full screen mode"
+            draggable="false"/>
+    );
+
+    // Create slide image navigation buttons.
+    function createSlideImageNavButton(name: string) {
+        return (
+            <button
+                className={ "slide-mode-overlay__nav-buttons" }
+                id={ "slide-mode".concat("-", "nav", "-", name) }
+                aria-label={ "show".concat(" ", name, " slide image") }
+                onClick={ onSlideViewNavButtonClick }>
+                { getNavSVG[name] }
+            </button>
+        );
+    };
+
+    /* -----------------------------------------
+        Handle previous/next slide image click.
+    ----------------------------------------- */
+    const onSlideViewNavButtonClick = (event: React.SyntheticEvent) => {
+        // Prevent onSlideViewClick from bubbling up.
+        event.stopPropagation()
+
+        // Cycle slide image without changing base imageDoc, avoiding unnecessary
+        // and non-visible changes while in slide view.
+        const button = event.target as HTMLButtonElement;
+        let newSlideIndex: number = slideImageIndex !== null
+            ? slideImageIndex
+            : 0;    // Just a temp value.
+
+        // Set doc index in current slide view mode.
+        if (slideImageIndex !== null && imageDocs) {
+            
+            switch(button.id) {
+                case 'slide-mode-nav-previous':
+                    newSlideIndex = slideImageIndex - 1;
+                    break;
+                case 'slide-mode-nav-next':
+                    newSlideIndex = slideImageIndex + 1;
+                    break;
+            }
+
+            // Allow for previous/next cycling even at end of ranges.
+            newSlideIndex > imageDocs.length - 1
+                ? setSlideImageIndex(0)                         // Cycle back to left end.
+                : newSlideIndex < 0
+                    ? setSlideImageIndex(imageDocs.length - 1)  // Cycle to right end. 
+                    : setSlideImageIndex(newSlideIndex);        // Default case.
+        }
+    };
+
+    /* --------------------------------------
+        Handle closing slide view on click.
+    -------------------------------------- */
+    const onSlideViewClick = (event: React.SyntheticEvent) => {
+        const payloadSlideView = 'off';
+        dispatch(handleSlideView(payloadSlideView));
+    };
+
+
     return (
-        <aside 
-            className={ useMediaQueries(classBase) }
-            id={ classBase }
-            role="main"
-            aria-label="images panel">
+        <>
+            <aside 
+                className={ useMediaQueries(classBase) }
+                id={ classBase }
+                role="main"
+                aria-label="images panel">
 
-            {/* Panel for enlarged image and its stats. */}
-            <div 
-                className={ useMediaQueries(classBase.concat("__", "image-enlarger-container"))
-                    +   // Add "slide" styling: slides left if mouse hovered on film strip. 
-                    (filmStripHovered === false
-                        ? ""
-                        : " ".concat("slide")) }
-                id="image-enlarger-container"
-                role="figure"
-                aria-label="enlarged image with metadata">
+                {/* Panel for enlarged image and its stats. */}
+                <div 
+                    className={ useMediaQueries(classBase.concat("__", "image-enlarger-container"))
+                        +   // Add "slide" styling: slides left if mouse hovered on film strip. 
+                        (filmStripHovered === false
+                            ? ""
+                            : " ".concat("slide")) }
+                    id="image-enlarger-container"
+                    role="figure"
+                    aria-label="enlarged image with metadata">
 
-                <ImageEnlarger 
-                    baseClassName={ classBase }/>
+                    <ImageEnlarger 
+                        baseClassName={ classBase }/>
+                </div>
+
+                {/* "Film strip" showing image collection in columnar form. */}
+                <div 
+                    className={ useMediaQueries(classBase.concat("__", "film-strip")) 
+                        +   // Add "expand" styling: reveals second column of images.
+                        (filmStripHovered === false
+                            ? ""
+                            : " ".concat("expand")) }
+                    id="film-strip"
+                    ref={ filmStripRef }
+                    role="listbox" 
+                    aria-label="images strip"
+                    aria-expanded={ // Set expanded based on hover state. 
+                        filmStripHovered === false
+                            ? "false"
+                            : "true" }
+                    onTouchStart={ onImageHover }
+                    onTouchEnd={ onImageUnhover }
+                    onMouseEnter={ onImageHover }
+                    onMouseLeave={ onImageUnhover }>
+
+                    { /* Image containers for all docs in collection. */
+                        imageFrameElems }
+                </div>
+
+            </aside>
+
+            <div
+                className={ useMediaQueries(classBase.concat("__", "slide-mode-overlay")) 
+                    +   // Show slide view overlay depending on state.
+                    (slideView === 'on'
+                        ? " show"
+                        : " hide") }
+                id="enlarged-image-slide-mode"
+                role="img"
+                aria-label="full screen slide view mode"
+                onClick={ onSlideViewClick }>
+
+                {/* Slide view full screen image. */}
+                { enlargedImageElem }
+
+                {/* Navigation buttons. */}
+                { createSlideImageNavButton('previous') }
+                { createSlideImageNavButton('next') } 
             </div>
-
-            {/* "Film strip" showing image collection in columnar form. */}
-            <div 
-                className={ useMediaQueries(classBase.concat("__", "film-strip")) 
-                    +   // Add "expand" styling: reveals second column of images.
-                    (filmStripHovered === false
-                        ? ""
-                        : " ".concat("expand")) }
-                id="film-strip"
-                ref={ filmStripRef }
-                role="listbox" 
-                aria-label="images strip"
-                aria-expanded={ // Set expanded based on hover state. 
-                    filmStripHovered === false
-                        ? "false"
-                        : "true" }
-                onTouchStart={ onImageHover }
-                onTouchEnd={ onImageUnhover }
-                onMouseEnter={ onImageHover }
-                onMouseLeave={ onImageUnhover }>
-
-                { /* Image containers for all docs in collection. */
-                    imageFrameElems }
-            </div>
-
-        </aside>
+        </>
     );
 }
 
@@ -126,6 +260,7 @@ function createImageFrames(classBase: string, imageDoc: ImageDocTypes, index: nu
         <ImageFrame
             baseClassName={ classBase }
             imageDoc={ imageDoc }
+            docIndex= { index }
             key={ "key".concat("_", classBase, "_", index.toString()) }
         />
     );

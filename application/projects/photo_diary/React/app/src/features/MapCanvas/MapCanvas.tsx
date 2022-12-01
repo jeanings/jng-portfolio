@@ -309,10 +309,15 @@ const MapCanvas: React.FunctionComponent = () => {
 
         // Dispatch new doc ID to enlarger, triggering loading and opening of enlarger.
         if (markerDocId !== enlargeDocId) {
-            const markerImageDoc = imageDocs?.filter(doc => doc._id === markerDocId)[0];
-    
+            // Find index and doc.
+            const docIndex: number = imageDocs!.findIndex(doc => doc._id === markerDocId);
+            const markerImageDoc = imageDocs![docIndex];
+
             if (markerImageDoc) {
-                const payloadImageDoc: SideFilmStripProps['enlargeDoc'] = markerImageDoc;
+                const payloadImageDoc: SideFilmStripProps = {
+                    'enlargeDoc': markerImageDoc,
+                    'docIndex': docIndex
+                };
                 dispatch(handleEnlarger(payloadImageDoc));
             }
         }

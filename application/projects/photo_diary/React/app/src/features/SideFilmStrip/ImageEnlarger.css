@@ -75,6 +75,49 @@
             border: white 2rem solid;
         }
         
+    .enlarged-image__nav-buttons__container {
+        grid-column: 2 / -1;
+        grid-row: 1 / 2;
+        display: grid;
+        grid-template-columns: repeat(4, 2rem);
+        grid-template-rows: 2rem;
+        justify-content: flex-end;
+        pointer-events: auto;
+    }
+        .enlarged-image__nav-buttons {
+            display: flex;
+            opacity: 0.40;
+            background: none;
+            border: none;
+            align-self: center;
+            justify-self: end;
+            cursor: pointer;
+            transition: all 300ms;
+        }  
+            .enlarged-image__nav-buttons:hover {
+                opacity: 1;
+                transition: all 300ms;
+            } 
+
+            #enlarger-previous {
+                grid-column: 1;
+            }
+
+            #enlarger-full-screen {
+                grid-column: 2;
+            }
+
+            #enlarger-next {
+                grid-column: 3;
+            }
+
+            .enlarged-image__nav-buttons svg {
+                width: 1.5rem;
+                height: 1.5rem;
+                fill: var(--colour-text-inactive);
+                pointer-events: none;
+            }
+    
 
     .SideFilmStrip__image-enlarger__metadata {
         grid-column: 1 / 2;
