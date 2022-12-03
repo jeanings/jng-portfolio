@@ -2,12 +2,16 @@ import React, {
     useEffect, 
     useState, 
     useRef } from 'react';
-import { useAppDispatch, useAppSelector, useMediaQueries } from '../../common/hooks';
+import { 
+    useAppDispatch, 
+    useAppSelector, 
+    useMediaQueries } from '../../common/hooks';
 import { ImageDocTypes } from '../TimelineBar/timelineSlice';
 import { 
     handleEnlarger, 
     handleSlideView, 
     SideFilmStripProps } from './sideFilmStripSlice';
+import { handleToolbarButtons, ToolbarProps } from '../Toolbar/toolbarSlice';
 import ImageFrame from './ImageFrame';
 import ImageEnlarger, { getNavSVG } from './ImageEnlarger';
 import './SideFilmStrip.css';
@@ -26,6 +30,7 @@ const SideFilmStrip: React.FunctionComponent = () => {
     const imageDoc = useAppSelector(state => state.sideFilmStrip.enlargeDoc);
     const docIndex = useAppSelector(state => state.sideFilmStrip.docIndex);
     const slideView = useAppSelector(state => state.sideFilmStrip.slideView);
+    const imageEnlarger = useAppSelector(state => state.toolbar.imageEnlarger);
     const filmStripRef = useRef<HTMLDivElement>(null);
     const classBase: string = "SideFilmStrip";
 
@@ -61,17 +66,86 @@ const SideFilmStrip: React.FunctionComponent = () => {
                     'enlargeDoc': imageDocs![slideImageIndex as number],    // Triggers image change.
                     'docIndex': slideImageIndex as number
                 };
-    
                 dispatch(handleEnlarger(payloadEnlarger));
+
+                if (imageEnlarger === 'hidden') {
+                    const payloadToolbar: ToolbarProps = {
+                        'imageEnlarger': 'on'
+                    };
+                    dispatch(handleToolbarButtons(payloadToolbar));
+                }
                 setSlideImageIndex(null);
             }
             // On slide view open, set local slide image index.
             else if (slideView === 'on') {
                 setSlideImageIndex(docIndex);
+                // Set imageEnlarger to intermediate state 'hidden'.
+                const payloadToolbar: ToolbarProps = {
+                    'imageEnlarger': 'hidden'
+                };
+                dispatch(handleToolbarButtons(payloadToolbar));
             }
         }
     }, [slideView]);
     
+
+    /* ---------------------------------------
+        Catch key presses for hotkey events.
+    --------------------------------------- */
+    useEffect(() => {
+        document.addEventListener('keydown', onKeyPress);
+        
+        // Clean up after consuming.
+        return () => {
+            document.removeEventListener('keydown', onKeyPress);
+        } 
+    });
+
+
+    /* ----------------------------------------------
+        Keypress listener (conventional DOM).
+    ---------------------------------------------- */
+    const onKeyPress = (event: KeyboardEvent) => {
+        const keyPress = event;
+
+        // Key listeners.
+        switch(keyPress.key) {
+            case 'Escape':
+                // Close slide viewer.
+                if (slideView === 'on') {
+                    const payloadSlideView: SideFilmStripProps['slideView'] = 'off';
+                    dispatch(handleSlideView(payloadSlideView));
+                }
+                break;
+
+            case 'ArrowLeft':
+                // Slide view nav previous.
+                if (slideView === 'on') {
+                    const slideViewPrevious = document.getElementById("slide-mode-nav-previous") as HTMLElement;
+                    slideViewPrevious.click();
+                }
+                // Base image enlarger nav previous.
+                else if (imageEnlarger === 'on') {
+                    const enlargerPrevious = document.getElementById("enlarger-nav-previous") as HTMLElement;
+                    enlargerPrevious.click();
+                }
+                break;
+
+            case 'ArrowRight':
+                // Slide view nav next.
+                if (slideView === 'on') {
+                    const slideViewNext = document.getElementById("slide-mode-nav-next") as HTMLElement;
+                    slideViewNext.click();
+                }
+                // Base image enlarger nav next.
+                else if (imageEnlarger === 'on') {
+                    const enlargerNext = document.getElementById("enlarger-nav-next") as HTMLElement;
+                    enlargerNext.click();
+                }
+                break;
+        }
+    };
+
 
     /* ---------------------------------------------------------------------
         Generate thumbnail image frame elements for array of MongoDB docs.
@@ -243,7 +317,7 @@ const SideFilmStrip: React.FunctionComponent = () => {
             </div>
         </>
     );
-}
+};
 
 
 /* =====================================================================
@@ -266,7 +340,7 @@ function createImageFrames(classBase: string, imageDoc: ImageDocTypes, index: nu
     );
     
     return imageFrame;
-}
+};
 
 
 export default SideFilmStrip;
