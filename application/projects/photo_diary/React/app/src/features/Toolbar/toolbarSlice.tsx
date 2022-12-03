@@ -16,10 +16,9 @@ const toolbarSlice = createSlice({
     name: 'toolbar',
     initialState,
     reducers: {
-        /* ------------------------------------------------------------------
-            Handles setting clicked image in film strip or map marker to be 
-            shown, enlarged, to the left of film strip panel.
-        ------------------------------------------------------------------ */
+        /* ------------------------------------------------------------------------
+            Handles opened/closed states of filterDrawer and imageEnlarger panels.
+        ------------------------------------------------------------------------ */
         handleToolbarButtons: (state, action: PayloadAction<ToolbarProps>) => {
             const buttonUpdates = action.payload;
             
@@ -36,9 +35,9 @@ const toolbarSlice = createSlice({
     Types.
 ===================================================================== */
 export interface ToolbarProps {
-    [index: string]: 'on' | 'off' | undefined
+    [index: string]: 'on' | 'off' | 'hidden' | undefined
     filter?: 'on' | 'off' ,
-    imageEnlarger?: 'on' | 'off'
+    imageEnlarger?: 'on' | 'off' | 'hidden'
 };
 
 

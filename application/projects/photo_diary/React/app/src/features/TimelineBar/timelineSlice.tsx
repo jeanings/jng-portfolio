@@ -214,7 +214,25 @@ const timelineSlice = createSlice({
                     state.filterSelectables = filterSelectables;
                 }
 
-                state.imageDocs = imageDocs;
+                // Sort docs by descending order.
+                let sortedDocs = [...imageDocs];
+                sortedDocs.sort((a, b) => {
+                    const idA = a._id;
+                    const idB = b._id;
+
+                    // Sort using docs' _id, based on insertion time, 
+                    // which in turn is based on date taken or filename.
+                    switch(true) {
+                        case idA < idB:
+                            return 1;
+                        case idA > idB:
+                            return -1;
+                        default:
+                            return 0;
+                    }
+                });
+
+                state.imageDocs = sortedDocs;
                 state.geojson = geojsonFeatures;
                 state.bounds = bbox;
             })
