@@ -1,4 +1,6 @@
-import React, { useEffect, useRef } from 'react';
+import React, { 
+    useEffect, 
+    useRef } from 'react';
 import {
     useAppDispatch, 
     useAppSelector, 
@@ -20,7 +22,6 @@ import 'mapboxgl-spiderifier/index.css';
 import mapboxgl from 'mapbox-gl'; 
 import 'mapbox-gl/dist/mapbox-gl.css';
 
-
 const MapboxglSpiderfier: any = require('mapboxgl-spiderifier');
 
 /* ================================================================
@@ -40,11 +41,6 @@ const MapCanvas: React.FunctionComponent = () => {
     const toolbarImageEnlarger = useAppSelector(state => state.toolbar.imageEnlarger);
     const markerLocator = useAppSelector(state => state.mapCanvas.markerLocator);
     const windowSize = useWindowSize();
-    // const mediaQuery: Array<string> = useMediaQueries('').split(' ');
-    // const media = { 
-    //     'type': mediaQuery[1] as keyof MediaTypes,
-    //     'orientation': mediaQuery[2] as keyof PaddingTypes
-    // };
     const classBase: string = "MapCanvas";
     // Mapbox variables.
     const MAPBOX_ACCESS_TOKEN = process.env.REACT_APP_MAPBOX;
@@ -309,10 +305,15 @@ const MapCanvas: React.FunctionComponent = () => {
 
         // Dispatch new doc ID to enlarger, triggering loading and opening of enlarger.
         if (markerDocId !== enlargeDocId) {
-            const markerImageDoc = imageDocs?.filter(doc => doc._id === markerDocId)[0];
-    
+            // Find index and doc.
+            const docIndex: number = imageDocs!.findIndex(doc => doc._id === markerDocId);
+            const markerImageDoc = imageDocs![docIndex];
+
             if (markerImageDoc) {
-                const payloadImageDoc: SideFilmStripProps['enlargeDoc'] = markerImageDoc;
+                const payloadImageDoc: SideFilmStripProps = {
+                    'enlargeDoc': markerImageDoc,
+                    'docIndex': docIndex
+                };
                 dispatch(handleEnlarger(payloadImageDoc));
             }
         }
@@ -406,21 +407,21 @@ function getMapPaddingOffset(mode: string, windowSize: { [index: string]: number
             // Assign different ratios depending on type of screen.
             let topBoundOffset = windowSize.width > 800 
                 && windowSize.width > windowSize.height
-                    ? windowSize.height * 0.15
-                    : windowSize.height * 0.13;
+                    ? windowSize.height * 0.15      // Non-mobile, landscape
+                    : windowSize.height * 0.13;     // Mobile or portrait
             let bottomBoundOffset = windowSize.width > 800 
                 && windowSize.width > windowSize.height
-                    ? windowSize.height * 0.15
-                    : windowSize.height * 0.35;
+                    ? windowSize.height * 0.15      // Non-mobile, landscape
+                    : windowSize.height * 0.35;     // Mobile or portrait
 
             let leftBoundOffset = windowSize.width > 800 
                 && windowSize.width > windowSize.height
-                    ? windowSize.width * 0.15
-                    : windowSize.width * 0.12;
+                    ? windowSize.width * 0.10       // Non-mobile, landscape
+                    : windowSize.width * 0.12;      // Mobile or portrait
             let rightBoundOffset = windowSize.width > 800
                 && windowSize.width > windowSize.height
-                    ? windowSize.width * 0.15
-                    : windowSize.width * 0.12;
+                    ? windowSize.width * 0.25       // Non-mobile, landscape
+                    : windowSize.width * 0.12;      // Mobile or portrait
 
             padding = {
                 'top': topBoundOffset,
@@ -432,12 +433,16 @@ function getMapPaddingOffset(mode: string, windowSize: { [index: string]: number
 
         case 'fly':
             // Assign different ratios depending on type of screen.
-            let xAxisNegativeOffset = windowSize.width > 800
+            let xAxisOffset = windowSize.width > 800
                 && windowSize.width > windowSize.height
-                    ? windowSize.width * -0.35      // Shifts center point to left of screen.
+                    ? windowSize.width * -0.25      // Shifts center point to left of screen for landscape
+                    : 0;
+
+            let yAxisOffset = windowSize.width < windowSize.height
+                    ? windowSize.height * 0.10      // Shifts center point to mid-bottom of screen for portrait
                     : 0;
            
-            offset = [ xAxisNegativeOffset, 0 ];
+            offset = [ xAxisOffset, yAxisOffset ];
             return offset;
     }
 };
