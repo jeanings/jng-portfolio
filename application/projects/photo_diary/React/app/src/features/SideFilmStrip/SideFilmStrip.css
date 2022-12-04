@@ -21,6 +21,7 @@
         grid-template-rows: calc(100% - 5.5rem) 5.5rem;
         grid-template-columns: 15rem calc(70% - 16rem);
         justify-content: flex-end;
+        pointer-events: none;
         animation-name: hide-strip-panel;
         animation-duration: 300ms;
         animation-fill-mode: forwards;
@@ -234,12 +235,13 @@
 ================================================================================== */
 .SideFilmStrip.port {
     grid-column: 1 / 6;
-    grid-template-columns: calc(100% - 10rem) auto;
+    grid-template-columns: calc(100% - 12rem) auto;
 }   
     /* --------------------------------------------------
         Disable styling related to 2-column film strip.
     ---------------------------------------------------*/
     .SideFilmStrip__image-enlarger-container.port {
+        grid-template-columns: 15rem calc(100% - 24rem);
         animation-name: none;
     }
     
@@ -256,6 +258,14 @@
     }
 
 /* -------------------------------------------
+                    Tablet
+------------------------------------------- */
+.SideFilmStrip__image-enlarger-container.portable.port {
+    grid-template-columns: 15rem calc(100% - 23rem);
+}
+
+
+/* -------------------------------------------
                     Mobile
 ------------------------------------------- */
 .SideFilmStrip.mobile.port {
@@ -264,7 +274,7 @@
     min-height: 100%;
     position: absolute;
     grid-template-columns: 100%;
-    grid-template-rows: calc(100% - 14rem) 12rem;
+    grid-template-rows: calc(100% - 11rem) 9rem;
     row-gap: 2rem;
 }
     .SideFilmStrip__image-enlarger-container.mobile.port {
@@ -282,3 +292,21 @@
         flex-wrap: nowrap;
         animation-name: none;
     }
+
+.SideFilmStrip__slide-mode-overlay.mobile.port.show {
+    grid-template-rows: 4rem calc(100% - 13rem) 5rem;
+    column-gap: 3rem;
+}
+
+    .SideFilmStrip__slide-mode-overlay.mobile.port.show 
+        .slide-mode-overlay__nav-buttons {
+            width: 5rem;
+            height: 5rem;
+    }
+
+        .SideFilmStrip__slide-mode-overlay.mobile.port.show 
+            .slide-mode-overlay__nav-buttons svg {
+                width: 2.5rem;
+                height: 2.5rem;
+                fill: white;
+        }
