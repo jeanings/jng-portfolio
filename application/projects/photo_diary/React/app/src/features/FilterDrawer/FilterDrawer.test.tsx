@@ -80,7 +80,8 @@ const preloadedState: RootState = {
         markerLocator: 'idle'
     },
     sideFilmStrip: {
-        enlargeDoc: null
+        enlargeDoc: null,
+        docIndex: null
     },
     toolbar: {
         filter: 'off',
@@ -119,7 +120,8 @@ const preloadedStateWithFilter: RootState = {
         markerLocator: 'idle'
     },
     sideFilmStrip: {
-        enlargeDoc: null
+        enlargeDoc: null,
+        docIndex: null
     },
     toolbar: {
         filter: 'off',
