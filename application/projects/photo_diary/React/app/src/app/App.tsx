@@ -5,8 +5,8 @@ import FilterDrawer from '../features/FilterDrawer/FilterDrawer';
 import MapCanvas from '../features/MapCanvas/MapCanvas';
 import SideFilmStrip from '../features/SideFilmStrip/SideFilmStrip';
 import Toolbar from '../features/Toolbar/Toolbar';
-import './App.css';
 import NavBar from '../features/NavBar/NavBar';
+import './App.css';
 
 export const DEV_MODE = process.env.REACT_APP_DEV_MODE;
 export const apiUrl: string = DEV_MODE === 'True'
@@ -16,9 +16,12 @@ export const apiUrl: string = DEV_MODE === 'True'
 /* =====================================================================
     Entry point of application.  Renders the base structure of the app.
 ===================================================================== */
-const App: React.FC = () => {
+const App: React.FunctionComponent = () => {
     const classBase: string = 'App';
 
+    /* ------------------
+        Media queries.
+    ------------------ */
     const root = document.querySelector(":root") as HTMLElement;
     const media = useMediaQueries("root").replace("root ", "");
 
@@ -70,11 +73,12 @@ const App: React.FC = () => {
         case 'screen-4k land':
             root.style.setProperty("--root-font-size", "38px");
             break;
-    }
+    };
 
     
     return (
-        <div className={ useMediaQueries(classBase) }>
+        <div 
+            className={ useMediaQueries(classBase) }>
             <NavBar />
             <TimelineBar />
             <FilterDrawer />
@@ -83,7 +87,7 @@ const App: React.FC = () => {
             <Toolbar />
         </div>
     );
-}
+};
 
 
 export default App;

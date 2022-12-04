@@ -92,7 +92,8 @@ const preloadedState: RootState = {
         markerLocator: 'idle'
     },
     sideFilmStrip: {
-        enlargeDoc: null
+        enlargeDoc: null,
+        docIndex: null
     },
     toolbar: {
         filter: 'off',

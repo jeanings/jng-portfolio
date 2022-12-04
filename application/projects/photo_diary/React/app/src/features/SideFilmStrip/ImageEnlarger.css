@@ -1,11 +1,12 @@
 .SideFilmStrip__image-enlarger {
-    grid-column: 1 / 3;
+    grid-column: 1 / -1;
     grid-row: 1 / 2;
     height: 100%;
     display: grid;  /*          metadata panel*/
-    grid-template-columns: auto 15rem;
+    grid-template-columns: 15rem auto;
     grid-template-rows: 100%;
     column-gap: 1rem;
+    justify-content: flex-end;
     opacity: 0;
     pointer-events: none;
     user-select: none;
@@ -58,9 +59,8 @@
     }
 
     .SideFilmStrip__image-enlarger__image {
-        /* max-width: 41vw; */
-        /* max-height: 82vh; */
-        grid-column: 1 / 2;
+        grid-column: 2 / -1;
+        grid-row: 1 / 2;
         display: flex;
         flex-direction: row-reverse;
         pointer-events: none;
@@ -72,21 +72,63 @@
             max-height: 100%;
             align-self: flex-start;
             object-fit: contain;
+            pointer-events: auto;
             border: white 2rem solid;
         }
         
+    .enlarged-image__nav-buttons__container {
+        grid-column: 2 / -1;
+        grid-row: 1 / 2;
+        display: grid;
+        grid-template-columns: repeat(4, 2rem);
+        grid-template-rows: 2rem;
+        justify-content: flex-end;
+        pointer-events: none;
+    }
+        .enlarged-image__nav-buttons {
+            display: flex;
+            opacity: 0.40;
+            background: none;
+            border: none;
+            align-self: center;
+            justify-self: end;
+            cursor: pointer;
+            pointer-events: auto;
+            transition: all 300ms;
+        }  
+            .enlarged-image__nav-buttons:hover {
+                opacity: 1;
+                transition: all 300ms;
+            } 
+
+            #enlarger-previous {
+                grid-column: 1;
+            }
+
+            #enlarger-full-screen {
+                grid-column: 2;
+            }
+
+            #enlarger-next {
+                grid-column: 3;
+            }
+
+            .enlarged-image__nav-buttons svg {
+                width: 1.5rem;
+                height: 1.5rem;
+                fill: var(--colour-text-inactive);
+                pointer-events: none;
+            }
+    
 
     .SideFilmStrip__image-enlarger__metadata {
-        grid-column: 2 / 3;
+        grid-column: 1 / 2;
+        grid-row: 1 / 2;
         display: flex;
         flex-direction: column;
+        text-align: right;
     }
-        #image-enlarger__DateLoc {
-            display: grid;
-            grid-template-columns: 75% 25%;
-            grid-template-rows: repeat(2, 1fr);
-        }
-
+        
         .SideFilmStrip__image-enlarger__metadata span {
             font-family: 'Barlow Semi Condensed', sans-serif;
         }
@@ -104,144 +146,124 @@
                 display: flex;
                 flex-direction: column;
                 padding-bottom: 1rem;
-            } 
-            
-        #image-enlarger__DateLoc .image-enlarger__metadata-name {
-            grid-row: 1 / 2;
-        }
-
-        #image-enlarger__DateLoc .image-enlarger__metadata-value {
-            grid-row: 2 / -1;
-        }
-
-        .image-enlarger__metadata-name.locator,
-        .image-enlarger__metadata-value.locator {
-            justify-self: center;
-        }
-
-        #image-enlarger__metadata-locator {
-            width: 1.3rem;
-            height: 1.3rem;
-            pointer-events: all;
-            cursor: pointer;
-        }
-
-            #image-enlarger__metadata-locator svg {
-                width: 1.3rem;
-                height: 1.3rem;
-                pointer-events: none;
-                transition: all 350ms;
-                fill: var(--colour-text-inactive);
             }
-    
-                #image-enlarger__metadata-locator:hover > svg {
-                    fill: var(--colour-accent-secondary);
-                }
 
 
 /* ==================================================================================
                                 Media breakpoints 
 ================================================================================== */
 .SideFilmStrip__image-enlarger.port {
-    grid-template-columns: 100%;
+    /* grid-template-columns: 100%; */
     grid-template-rows: 60% 40%;
-    grid-row-gap: 2rem;
 }
 
     .SideFilmStrip__image-enlarger__image.port {
         /* spacing expl.        year     gap      film strip */
         max-width: calc(100vw - 6.5rem - 1.5rem - 10rem);
-        max-height: 52vh;
-        grid-column: 1 / 2;
+        max-height: 100%;
+        grid-column: 2 / -1;
         grid-row: 1 / 2;
-        align-self: flex-end;
+        height: 100%;
+        display: flex;
+        align-items: flex-start;
+        justify-self: flex-start;
+        justify-content: flex-start;
+        align-self: flex-start;
     }
 
+        .SideFilmStrip__image-enlarger__image.port 
+            #enlarged-image {
+            align-self: unset;
+        }
+
     .SideFilmStrip__image-enlarger__metadata.port {
-        /* spacing expl.    year     gaps   film strip */
-        width: calc(100vw - 6.5rem - 3rem - 10rem);
-        height: 80%;
         grid-column: 1 / 2;
-        grid-row: 2 / 3;
-        display: grid;
-        grid-template-columns: 50% 50%;
-        grid-template-rows: auto;
+        grid-row: 1 / 2;
         justify-self: center;
     }
 
-        .SideFilmStrip__image-enlarger__image.port {
-            height: 100%;
-            display: flex;
-            align-items: flex-end;
-            justify-self: flex-start;
-            justify-content: flex-end;
+        .SideFilmStrip__image-enlarger__metadata-category.port .image-enlarger__metadata-name,
+        .SideFilmStrip__image-enlarger__metadata-category.port .image-enlarger__metadata-value {
+            grid-row: unset;
         }
 
-            .SideFilmStrip__image-enlarger__image.port 
-                #enlarged-image {
-                align-self: unset;
+
+/* -------------------------------------------
+                Tablets
+------------------------------------------- */
+.SideFilmStrip__image-enlarger__image.port {
+    /* spacing expl.        year     gap      film strip */
+    max-width: calc(100vw - 6.5rem - 1.5rem - 10rem);
+}
+
+    .SideFilmStrip__image-enlarger__image.portable.port 
+        #enlarged-image {
+        max-width: 100%;
+        max-height: 100%;
+        align-self: flex-start;
+        object-fit: contain;
+        pointer-events: auto;
+        border: white 2rem solid;
+    }
+
+    .SideFilmStrip__image-enlarger__metadata-category.portable.port 
+        .image-enlarger__metadata-name {
+            font-size: 1.2rem;
         }
 
-        #image-enlarger__DateLoc.port {
-            display: grid;
-            grid-template-columns: 100%;
-            grid-template-rows: auto;
-        }
-
-            .SideFilmStrip__image-enlarger__metadata-category.port .image-enlarger__metadata-name,
-            .SideFilmStrip__image-enlarger__metadata-category.port .image-enlarger__metadata-value {
-                grid-row: unset;
-            }
-
-            .SideFilmStrip__image-enlarger__metadata-category.port 
-                .image-enlarger__metadata-name.locator,
-            .SideFilmStrip__image-enlarger__metadata-category.port 
-                .image-enlarger__metadata-value.locator {
-                grid-row: unset;
-                justify-self: flex-start;
-            }
-
-            #image-enlarger__DateLoc.port 
-                .image-enlarger__metadata-name,
-            #image-enlarger__DateLoc.port 
-                .image-enlarger__metadata-value{
-                grid-row: unset;
-            }
+    .SideFilmStrip__image-enlarger__metadata-category.portable.port 
+        .image-enlarger__metadata-value {
+            font-size: 1rem;
+    }
 
 /* -------------------------------------------
                     Mobile
 ------------------------------------------- */
 .SideFilmStrip__image-enlarger.mobile.port {
     grid-template-columns: 100%;
-    grid-template-rows: calc(100% - 3rem) 3rem;
-    row-gap: 1rem;
+    grid-template-rows: 3rem  calc(100% - 3rem);
 }
 
     .SideFilmStrip__image-enlarger__image.mobile.port {
         grid-column: 1 / -1;
-        grid-row: 1 / 2;
+        grid-row: 2 / -1;
         max-width: 95%;
         justify-self: center;
         justify-content: center;
+        align-items: flex-end;
     }
+
+        .enlarged-image__nav-buttons__container.mobile.port {
+            grid-column: 1 / -1;
+            grid-row: 2 / -1;
+            grid-template-columns: repeat(3, 5rem);
+            grid-template-rows: 2rem;
+            justify-content: center;
+        }
+
+        .enlarged-image__nav-buttons__container.mobile.port 
+            .enlarged-image__nav-buttons {
+            justify-self: center;
+        }
 
         .SideFilmStrip__image-enlarger__image.mobile.port 
             #enlarged-image {
-            border: white 1.5rem solid;
+            border: white 2rem solid;
         }
 
     .SideFilmStrip__image-enlarger__metadata.mobile.port {
         width: 100%;
         height: 100%;
+        display: grid;
         grid-column: 1 / -1;
-        grid-row: 2 / -1;
+        grid-row: 1 / 2;
         grid-template-columns: 60% 40%;
         grid-template-rows: 100%;
         justify-self: center;
     }
 
     .SideFilmStrip__image-enlarger__metadata-category.mobile.port span {
-        font-size: 1.6rem;
+        font-size: 1.85rem;
     }
 
     /* Disable categories in mobile */
@@ -252,18 +274,12 @@
     .SideFilmStrip__image-enlarger__metadata.mobile.port 
         #image-enlarger__Format,
     .SideFilmStrip__image-enlarger__metadata.mobile.port 
-        #image-enlarger__DateLoc {
+        #image-enlarger__Date {
         display: flex;
         flex-direction: row;
         justify-content: center;
         column-gap: 1rem;
     }
-
-    .SideFilmStrip__image-enlarger__metadata.mobile.port 
-        #image-enlarger__metadata-locator svg {
-            width: 2.25rem;
-            height: 2.25rem;
-        }
 
     .SideFilmStrip__image-enlarger__metadata-category.mobile.port 
         .image-enlarger__metadata-name {
