@@ -69,38 +69,76 @@ describe('interactions with film strip panel', () => {
     });
 
     
-    it('flies to image marker on clicking image enlarger locator button', () => {
+    it('flies to image marker on clicking thumbnail, prev/next arrow buttons', () => {
+        // Listen to fetch calls to Mapbox.
+        cy.intercept('GET', 'https://api.mapbox.com/**/*')
+            .as('mapboxAPI');
+
         cy.visit('http://localhost:3000/');
-      
+        
+        // Verify initial map load successful.
+        cy.wait('@mapboxAPI')
+            .then((interception) => {
+                expect(interception.response?.statusCode).to.equal(200);
+            });
+
+        // Allow map to transition.
+        cy.wait(2000);
+
         // Click a thumbnail.
         cy.get('[aria-label="images strip"]')
+            .as('imageStrip')
+        cy.get('@imageStrip')
             .children('div')
             .eq(1)
             .click();
 
-        cy.get('[aria-label="Map"]')
-            .as('mapbox');
+        // Verify Mapbox API called to fly to image marker on thumbnail click.
+        cy.wait('@mapboxAPI')
+            .then((interception) => {
+                expect(interception.response?.statusCode).to.equal(200);
+            });
 
-        cy.get('[aria-label="images strip"]')
-            .trigger('mouseleave')
+        // Allow map to transition.
+        cy.wait(2000);
 
-        // Get snapshot of pre-locate view.
-        cy.wait(3000)
+        // Get initial image source.
+        cy.get('[aria-label="enlarged image"')
+            .invoke('attr', 'src')
+            .as('initialImageSrc');
+
+        // Unhover image strip.
+        cy.get('@imageStrip')
+            .trigger('mouseleave');
+
+        cy.wait(500);
+
+        // Click on image nav button, left arrow (previous image).
+        cy.get('[aria-label="show previous image"]')
+            .as('previousArrowButton');
         
-        cy.get('@mapbox')
-            .compareSnapshot('base year-bounded map');
-     
-        // Click on marker locator button.
-        cy.get('[aria-label="locate enlarged image on map"]')
+        cy.get('@previousArrowButton')
             .click();
 
-        // Get snapshot of located view.
-        // cy.wait(6000)
-        // cy.get('@mapbox')
-        //     .compareSnapshot('marker-located map');
+        // Verify Mapbox API called to fly to image marker on nav button click.
+        cy.wait('@mapboxAPI')
+            .then((interception) => {
+                expect(interception.response?.statusCode).to.equal(200);
+            });
 
+        // Allow map to transition.
+        cy.wait(2000);
 
+        // Get current image source.
+        cy.get('[aria-label="enlarged image"')
+            .invoke('attr', 'src')
+            .as('currentImageSrc');
 
-
+        // Verify enlarged image changed.
+        cy.get('@currentImageSrc')
+            .then((currentSrc) => {
+                cy.get('@initialImageSrc')
+                    .then((initSrc) => expect(initSrc).not.to.equal(currentSrc))
+            })
     })
 })
