@@ -21,7 +21,8 @@ describe('interactions with film strip panel', () => {
     });
 
 
-    it('opens image enlarger and displays correct image on film strip thumbnail clicks', () => {
+    it('opens image enlarger, \
+        displays correct image on film strip thumbnail clicks', () => {
         cy.visit('http://localhost:3000/');
 
         // Verify image enlarger is hidden when nothing to "enlarge".
@@ -69,7 +70,8 @@ describe('interactions with film strip panel', () => {
     });
 
     
-    it('flies to image marker on clicking thumbnail, prev/next arrow buttons', () => {
+    it('flies to image marker on clicking thumbnail, \
+        clicking on prev/next arrow buttons', () => {
         // Listen to fetch calls to Mapbox.
         cy.intercept('GET', 'https://api.mapbox.com/**/*')
             .as('mapboxAPI');
@@ -84,7 +86,11 @@ describe('interactions with film strip panel', () => {
 
         // Allow map to transition.
         cy.wait(2000);
+        
 
+        /* -------------------------------------------------------------------------------
+            Image strip -> Mapbox interactions.
+        ------------------------------------------------------------------------------- */
         // Click a thumbnail.
         cy.get('[aria-label="images strip"]')
             .as('imageStrip')
@@ -139,6 +145,122 @@ describe('interactions with film strip panel', () => {
             .then((currentSrc) => {
                 cy.get('@initialImageSrc')
                     .then((initSrc) => expect(initSrc).not.to.equal(currentSrc))
-            })
-    })
+            });
+    });
+
+
+    it('opens slide viewer, \
+        arrow buttons change image without changing base enlarger image, \
+        changes enlarger image to last image viewed in slide viewer and fly map to it', () => {
+        // Listen to fetch calls to Mapbox.
+        cy.intercept('GET', 'https://api.mapbox.com/**/*')
+            .as('mapboxAPI');
+
+        cy.visit('http://localhost:3000/');
+        
+        // Verify initial map load successful.
+        cy.wait('@mapboxAPI')
+            .then((interception) => {
+                expect(interception.response?.statusCode).to.equal(200);
+            });
+
+        // Allow map to transition.
+        cy.wait(2000);
+
+        // Click a thumbnail.
+        cy.get('[aria-label="images strip"]')
+            .as('imageStrip')
+        cy.get('@imageStrip')
+            .children('div')
+            .eq(1)
+            .click();
+
+        // Verify Mapbox API called to fly to image marker on thumbnail click.
+        cy.wait('@mapboxAPI')
+            .then((interception) => {
+                expect(interception.response?.statusCode).to.equal(200);
+            });
+
+        // Allow map to transition.
+        cy.wait(2000);
+
+        // Get initial image source: A.
+        cy.get('[aria-label="enlarged image"')
+            .as('enlargerImage');
+
+        cy.get('@enlargerImage')
+            .invoke('attr', 'src')
+            .as('enlargerImageSrcA');
+
+        // Unhover image strip.
+        cy.get('@imageStrip')
+            .trigger('mouseleave');
+
+        cy.wait(500);
+
+
+        /* -------------------------------------------------------------------------------
+            Full screen (slide viewer) actions.
+        ------------------------------------------------------------------------------- */
+        // Open full screen slide viewer.
+        cy.get('[aria-label="show image full screen"]')
+            .as('fullscreenViewerButton');
+        
+        cy.get('@fullscreenViewerButton')
+            .click();
+
+        cy.get('[aria-label="enlarged image in full screen mode"]')
+            .as('slideImage');
+
+        // Get slide viewer image source: A.
+        cy.get('@slideImage')
+            .invoke('attr', 'src')
+            .as('slideImageSrcA');
+
+        // Get slide mode arrow button to click.
+        cy.get('[aria-label="show next slide image"]')
+            .as('nextSlideButton')
+        
+        cy.get('@nextSlideButton')
+            .click();
+
+        // Verify slide image changed.
+        cy.get('@slideImage')
+            .invoke('attr', 'src')
+            .as('slideImageSrcB');
+
+        cy.get('@slideImageSrcA')
+            .then((slideImageSrcA) => {
+                cy.get('@slideImageSrcB')
+                    .then((slideImageSrcB) => expect(slideImageSrcA).not.to.equal(slideImageSrcB))
+            });
+
+        
+        /* -------------------------------------------------------------------------------
+            Full screen (slide viewer) -> return to image enlarger interactions.
+        ------------------------------------------------------------------------------- */
+        // Close slide viewer.
+        cy.get('@slideImage')
+            .click();
+
+        // Verify Mapbox API called to fly to image marker on thumbnail click.
+        cy.wait('@mapboxAPI')
+            .then((interception) => {
+                expect(interception.response?.statusCode).to.equal(200);
+            });
+
+        // Allow map to transition.
+        cy.wait(2000);
+
+        // Verify enlarged image changed.
+        cy.get('@enlargerImage')
+            .invoke('attr', 'src')
+            .as('enlargerImageSrcB');
+
+        cy.get('@enlargerImageSrcB')
+            .then((enlargerImageSrcB) => {
+                cy.get('@enlargerImageSrcA')
+                    .then((enlargerImageSrcA) => expect(enlargerImageSrcB).not.to.equal(enlargerImageSrcA))
+            });
+    });
 })
