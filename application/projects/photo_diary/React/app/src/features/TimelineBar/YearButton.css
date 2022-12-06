@@ -14,3 +14,8 @@
         color: var(--colour-accent-secondary);
         transition: 350ms all;
     }
+
+    .TimelineBar__year-item.active {
+        color: var(--colour-accent-primary);
+        transition: 350ms all;
+    }

@@ -32,7 +32,7 @@ const MonthButton: React.FunctionComponent<MonthButtonProps> = (props: MonthButt
             className={ useMediaQueries(props.baseClassName.concat("__", props.className)) 
                 +   // Add "active" styling for selected element.
                 (selectedMonth === props.month
-                    ? "active"
+                    ? " ".concat("active")
                     : "") }
             id={ props.className.concat('-', props.month) }
             role="menuitemradio" 
