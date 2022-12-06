@@ -260,6 +260,9 @@ const MapCanvas: React.FunctionComponent = () => {
                     console.error('initBranchLeg: No MongoDB docs to match with Mapbox markers.');
                 }
 
+                // Add docId as id as identifier.
+                leafElem.id = "spider-pin".concat("__", dbDoc._id); 
+
                 // Clicks on leaves same as single markers, film strip clicks. 
                 leafElem.addEventListener('click', () => {
                     if (leafDocId) {
