@@ -118,7 +118,7 @@
         left: calc(50vw - 1.5rem);      /* minus half of button width */
         align-self: flex-end;
         justify-self: center;
-        pointer-events: all;
+        pointer-events: auto;
         cursor: pointer;
     }
 
