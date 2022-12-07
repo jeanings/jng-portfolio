@@ -136,7 +136,7 @@ const MapCanvas: React.FunctionComponent = () => {
                     padding: getMapPaddingOffset('bound', windowSize),
                     linear: false,
                     animate: true,
-                    duration: 2500,
+                    duration: 1500,
                     curve: 1.2,
                     maxZoom: 13
                 }
@@ -165,7 +165,7 @@ const MapCanvas: React.FunctionComponent = () => {
                 offset: getMapPaddingOffset('fly', windowSize),
                 linear: false,
                 animate: true,
-                duration: 2500,
+                duration: 1500,
                 zoom: 13,
                 maxZoom: 16
             });
@@ -260,6 +260,9 @@ const MapCanvas: React.FunctionComponent = () => {
                     console.error('initBranchLeg: No MongoDB docs to match with Mapbox markers.');
                 }
 
+                // Add docId as id as identifier.
+                leafElem.id = "spider-pin".concat("__", dbDoc._id); 
+
                 // Clicks on leaves same as single markers, film strip clicks. 
                 leafElem.addEventListener('click', () => {
                     if (leafDocId) {
@@ -276,7 +279,7 @@ const MapCanvas: React.FunctionComponent = () => {
                 padding: getMapPaddingOffset('bound', windowSize),
                 linear: false,
                 animate: true,
-                duration: 3500,
+                duration: 1500,
                 curve: 1.2,
                 maxZoom: 13
             }

@@ -48,7 +48,7 @@ const YearButton: React.FunctionComponent<YearButtonProps> = (props: YearButtonP
             className={ useMediaQueries(props.baseClassName.concat("__", props.className)) 
                 +   // Add "active" styling if selected.
                 (selectedYear === parseInt(props.year)
-                    ? "active"
+                    ? " ".concat("active")
                     : "" ) }
             id={ props.className.concat("-", props.year) }
             role="menuitemradio" 
