@@ -79,10 +79,11 @@
         grid-column: 2 / -1;
         grid-row: 1 / 2;
         display: grid;
+        height: 2rem;
         grid-template-columns: repeat(4, 2rem);
         grid-template-rows: 2rem;
         justify-content: flex-end;
-        pointer-events: auto;
+        pointer-events: none;
     }
         .enlarged-image__nav-buttons {
             display: flex;
@@ -91,6 +92,7 @@
             border: none;
             align-self: center;
             justify-self: end;
+            pointer-events: auto;
             cursor: pointer;
             transition: all 300ms;
         }  
