@@ -72,7 +72,7 @@
             max-height: 100%;
             align-self: flex-start;
             object-fit: contain;
-            pointer-events: auto;
+            pointer-events: none;
             border: white 2rem solid;
         }
         
