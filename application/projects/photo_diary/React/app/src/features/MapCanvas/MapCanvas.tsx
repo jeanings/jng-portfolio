@@ -47,8 +47,8 @@ const MapCanvas: React.FunctionComponent = () => {
     const mapStyle: string = process.env.REACT_APP_MAPBOX_STYLE as string;
     const mapContainer = useRef(null);
     const map = useRef<mapboxgl.map | null>(null);
-    const markerIconImage: string = 'bxs-image';
-    const markerIconPin: string ='bxs-pin';
+    const markerIconImage: string = 'image-sharp';
+    const markerIconPin: string ='images-sharp';
     const spiderfier = useRef<any | null>(null);
     const bbox: Array<Array<number>> = bounds !== null
         ? [ [ bounds!.lng[0], bounds!.lat[0] ],     // min bound coords
@@ -460,13 +460,15 @@ function getLeafSvgIconElem() {
     const boxHeight: string = '24';
 
     const svgElem: Element = document.createElementNS(xmlns, 'svg');
-    svgElem.setAttributeNS(null, "viewBox", "0 0" + " " + boxWidth + " " + boxHeight);
+    svgElem.setAttributeNS(null, "viewBox", "0 0" + " " + "512" + " " + "512");
     svgElem.setAttributeNS(null, "width", boxWidth);
     svgElem.setAttributeNS(null, "height", boxHeight);
     
     const svgPath = document.createElementNS("http://www.w3.org/2000/svg", "path");
-    svgPath.setAttribute("d", "M19.999 4h-16c-1.103 0-2 .897-2 2v12c0 1.103.897 2 2 2h16c1.103 0 2-.897 2-2V6c0-1.103-.897-2-2-2zm-13.5 3a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3zm5.5 10h-7l4-5 1.5 2 3-4 5.5 7h-7z");
+
+    svgPath.setAttribute("d", "M456 64H56a24 24 0 00-24 24v336a24 24 0 0024 24h400a24 24 0 0024-24V88a24 24 0 00-24-24zm-124.38 64.2a48 48 0 11-43.42 43.42 48 48 0 0143.42-43.42zM76 416a12 12 0 01-12-12v-87.63L192.64 202l96.95 96.75L172.37 416zm372-12a12 12 0 01-12 12H217.63l149.53-149.53L448 333.84z");
     svgPath.setAttribute("fill", "#F0690F");
+    // svgPath.setAttribute("d", "M19.999 4h-16c-1.103 0-2 .897-2 2v12c0 1.103.897 2 2 2h16c1.103 0 2-.897 2-2V6c0-1.103-.897-2-2-2zm-13.5 3a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3zm5.5 10h-7l4-5 1.5 2 3-4 5.5 7h-7z");
 
     svgElem.appendChild(svgPath);
 
