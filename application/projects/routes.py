@@ -21,7 +21,7 @@ projects_bp = Blueprint('projects_bp', __name__,
     template_folder='templates'
 )
 
-if DEBUG_MODE == 'True':
+if DEBUG_MODE == True:
     build_assets(app)
 
 
@@ -33,7 +33,7 @@ MDB_PASS = quote_plus(MONGODB_KEY)
 
 
 # Connection to mongo server.
-client = MongoClient(f'mongodb+srv://{MONGODB_ID}:{MDB_PASS}@portfolio.8frim.mongodb.net/fudousan?retryWrites=true&w=majority')
+client = MongoClient(f'mongodb+srv://{MONGODB_ID}:{MDB_PASS}@portfolio.8frim.mongodb.net/')
 db = client.projectsIndex
 collection_main = db['main']
 collection_sub = db['sub']

@@ -18,7 +18,7 @@ tokaido_bp = Blueprint('tokaido_bp', __name__,
     template_folder='templates'
 )
 
-if DEBUG_MODE == 'True':
+if DEBUG_MODE == True:
     build_assets(app)
 
 
