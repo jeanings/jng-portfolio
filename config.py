@@ -25,7 +25,14 @@ class Config:
     # General Flask
     TESTING = environ.get('TESTING')
     SECRET_KEY = environ.get('SECRET_KEY')
-    FLASK_DEBUG = environ.get('FLASK_DEBUG')
+    FLASK_DEBUG = None
+    # Get actual env debug value.
+    flask_debug_env = environ.get('FLASK_DEBUG')
+    if flask_debug_env.lower() in ('t', 'true', True, '1', 1, 'on'):
+        FLASK_DEBUG = True
+    elif flask_debug_env.lower() in ('f', 'false', False, '0', 0, 'off'):
+        FLASK_DEBUG = False
+
 
     # Database
     # SQLALCHEMY_DATABASE_URI = HEROKU_DATABASE_URL.replace("://", "ql://", 1)
