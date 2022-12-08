@@ -1,4 +1,6 @@
-import React, { useEffect, useRef } from 'react';
+import React, { 
+    useEffect, 
+    useRef } from 'react';
 import {
     useAppDispatch, 
     useAppSelector, 
@@ -20,7 +22,6 @@ import 'mapboxgl-spiderifier/index.css';
 import mapboxgl from 'mapbox-gl'; 
 import 'mapbox-gl/dist/mapbox-gl.css';
 
-
 const MapboxglSpiderfier: any = require('mapboxgl-spiderifier');
 
 /* ================================================================
@@ -40,19 +41,14 @@ const MapCanvas: React.FunctionComponent = () => {
     const toolbarImageEnlarger = useAppSelector(state => state.toolbar.imageEnlarger);
     const markerLocator = useAppSelector(state => state.mapCanvas.markerLocator);
     const windowSize = useWindowSize();
-    // const mediaQuery: Array<string> = useMediaQueries('').split(' ');
-    // const media = { 
-    //     'type': mediaQuery[1] as keyof MediaTypes,
-    //     'orientation': mediaQuery[2] as keyof PaddingTypes
-    // };
     const classBase: string = "MapCanvas";
     // Mapbox variables.
     const MAPBOX_ACCESS_TOKEN = process.env.REACT_APP_MAPBOX;
     const mapStyle: string = process.env.REACT_APP_MAPBOX_STYLE as string;
     const mapContainer = useRef(null);
     const map = useRef<mapboxgl.map | null>(null);
-    const markerIconImage: string = 'bxs-image';
-    const markerIconPin: string ='bxs-pin';
+    const markerIconImage: string = 'image-sharp';
+    const markerIconPin: string ='images-sharp';
     const spiderfier = useRef<any | null>(null);
     const bbox: Array<Array<number>> = bounds !== null
         ? [ [ bounds!.lng[0], bounds!.lat[0] ],     // min bound coords
@@ -140,7 +136,7 @@ const MapCanvas: React.FunctionComponent = () => {
                     padding: getMapPaddingOffset('bound', windowSize),
                     linear: false,
                     animate: true,
-                    duration: 2500,
+                    duration: 1500,
                     curve: 1.2,
                     maxZoom: 13
                 }
@@ -169,7 +165,7 @@ const MapCanvas: React.FunctionComponent = () => {
                 offset: getMapPaddingOffset('fly', windowSize),
                 linear: false,
                 animate: true,
-                duration: 2500,
+                duration: 1500,
                 zoom: 13,
                 maxZoom: 16
             });
@@ -264,6 +260,9 @@ const MapCanvas: React.FunctionComponent = () => {
                     console.error('initBranchLeg: No MongoDB docs to match with Mapbox markers.');
                 }
 
+                // Add docId as id as identifier.
+                leafElem.id = "spider-pin".concat("__", dbDoc._id); 
+
                 // Clicks on leaves same as single markers, film strip clicks. 
                 leafElem.addEventListener('click', () => {
                     if (leafDocId) {
@@ -280,7 +279,7 @@ const MapCanvas: React.FunctionComponent = () => {
                 padding: getMapPaddingOffset('bound', windowSize),
                 linear: false,
                 animate: true,
-                duration: 3500,
+                duration: 1500,
                 curve: 1.2,
                 maxZoom: 13
             }
@@ -309,10 +308,15 @@ const MapCanvas: React.FunctionComponent = () => {
 
         // Dispatch new doc ID to enlarger, triggering loading and opening of enlarger.
         if (markerDocId !== enlargeDocId) {
-            const markerImageDoc = imageDocs?.filter(doc => doc._id === markerDocId)[0];
-    
+            // Find index and doc.
+            const docIndex: number = imageDocs!.findIndex(doc => doc._id === markerDocId);
+            const markerImageDoc = imageDocs![docIndex];
+
             if (markerImageDoc) {
-                const payloadImageDoc: SideFilmStripProps['enlargeDoc'] = markerImageDoc;
+                const payloadImageDoc: SideFilmStripProps = {
+                    'enlargeDoc': markerImageDoc,
+                    'docIndex': docIndex
+                };
                 dispatch(handleEnlarger(payloadImageDoc));
             }
         }
@@ -406,21 +410,21 @@ function getMapPaddingOffset(mode: string, windowSize: { [index: string]: number
             // Assign different ratios depending on type of screen.
             let topBoundOffset = windowSize.width > 800 
                 && windowSize.width > windowSize.height
-                    ? windowSize.height * 0.15
-                    : windowSize.height * 0.13;
+                    ? windowSize.height * 0.15      // Non-mobile, landscape
+                    : windowSize.height * 0.13;     // Mobile or portrait
             let bottomBoundOffset = windowSize.width > 800 
                 && windowSize.width > windowSize.height
-                    ? windowSize.height * 0.15
-                    : windowSize.height * 0.35;
+                    ? windowSize.height * 0.15      // Non-mobile, landscape
+                    : windowSize.height * 0.35;     // Mobile or portrait
 
             let leftBoundOffset = windowSize.width > 800 
                 && windowSize.width > windowSize.height
-                    ? windowSize.width * 0.15
-                    : windowSize.width * 0.12;
+                    ? windowSize.width * 0.10       // Non-mobile, landscape
+                    : windowSize.width * 0.12;      // Mobile or portrait
             let rightBoundOffset = windowSize.width > 800
                 && windowSize.width > windowSize.height
-                    ? windowSize.width * 0.15
-                    : windowSize.width * 0.12;
+                    ? windowSize.width * 0.25       // Non-mobile, landscape
+                    : windowSize.width * 0.12;      // Mobile or portrait
 
             padding = {
                 'top': topBoundOffset,
@@ -432,12 +436,16 @@ function getMapPaddingOffset(mode: string, windowSize: { [index: string]: number
 
         case 'fly':
             // Assign different ratios depending on type of screen.
-            let xAxisNegativeOffset = windowSize.width > 800
+            let xAxisOffset = windowSize.width > 800
                 && windowSize.width > windowSize.height
-                    ? windowSize.width * -0.35      // Shifts center point to left of screen.
+                    ? windowSize.width * -0.25      // Shifts center point to left of screen for landscape
+                    : 0;
+
+            let yAxisOffset = windowSize.width < windowSize.height
+                    ? windowSize.height * 0.10      // Shifts center point to mid-bottom of screen for portrait
                     : 0;
            
-            offset = [ xAxisNegativeOffset, 0 ];
+            offset = [ xAxisOffset, yAxisOffset ];
             return offset;
     }
 };
@@ -452,13 +460,15 @@ function getLeafSvgIconElem() {
     const boxHeight: string = '24';
 
     const svgElem: Element = document.createElementNS(xmlns, 'svg');
-    svgElem.setAttributeNS(null, "viewBox", "0 0" + " " + boxWidth + " " + boxHeight);
+    svgElem.setAttributeNS(null, "viewBox", "0 0" + " " + "512" + " " + "512");
     svgElem.setAttributeNS(null, "width", boxWidth);
     svgElem.setAttributeNS(null, "height", boxHeight);
     
     const svgPath = document.createElementNS("http://www.w3.org/2000/svg", "path");
-    svgPath.setAttribute("d", "M19.999 4h-16c-1.103 0-2 .897-2 2v12c0 1.103.897 2 2 2h16c1.103 0 2-.897 2-2V6c0-1.103-.897-2-2-2zm-13.5 3a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3zm5.5 10h-7l4-5 1.5 2 3-4 5.5 7h-7z");
+
+    svgPath.setAttribute("d", "M456 64H56a24 24 0 00-24 24v336a24 24 0 0024 24h400a24 24 0 0024-24V88a24 24 0 00-24-24zm-124.38 64.2a48 48 0 11-43.42 43.42 48 48 0 0143.42-43.42zM76 416a12 12 0 01-12-12v-87.63L192.64 202l96.95 96.75L172.37 416zm372-12a12 12 0 01-12 12H217.63l149.53-149.53L448 333.84z");
     svgPath.setAttribute("fill", "#F0690F");
+    // svgPath.setAttribute("d", "M19.999 4h-16c-1.103 0-2 .897-2 2v12c0 1.103.897 2 2 2h16c1.103 0 2-.897 2-2V6c0-1.103-.897-2-2-2zm-13.5 3a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3zm5.5 10h-7l4-5 1.5 2 3-4 5.5 7h-7z");
 
     svgElem.appendChild(svgPath);
 

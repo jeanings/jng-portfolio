@@ -31,7 +31,11 @@
     "production": [
       ">0.2%",
       "not dead",
-      "not op_mini all"
+      "not op_mini all",
+      "not ie 11",
+      "not chrome < 51",
+      "not safari < 10",
+      "not android < 51"
     ],
     "development": [
       "last 1 chrome version",
@@ -51,6 +55,8 @@
     "@types/node": "^18.11.0",
     "axios-mock-adapter": "^1.21.2",
     "babel-jest": "^28.1.0",
+    "cypress": "^11.2.0",
+    "cypress-visual-regression": "^1.7.0",
     "identity-obj-proxy": "^3.0.0",
     "jest": "^28.1.0",
     "jest-environment-jsdom": "^28.1.0",

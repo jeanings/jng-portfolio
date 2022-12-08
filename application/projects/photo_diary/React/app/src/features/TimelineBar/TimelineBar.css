@@ -29,14 +29,14 @@
     overflow-y: auto;
 }
 
-    .TimelineBar__year-selector:hover {
+    .TimelineBar__year-selector.dropdown {
         cursor: pointer;
         overflow-y: auto;
         overflow-x: hidden;
     }
      
         /* Hovering on year selector extends list of years */
-        .TimelineBar__year-selector:hover
+        .TimelineBar__year-selector.dropdown
         > .TimelineBar__year-item {
             cursor: pointer;
             display: inline-block;
@@ -88,7 +88,7 @@
         color: var(--colour-text-inactive);
         font-family: 'Barlow Semi Condensed', sans-serif;
         align-self: flex-start;
-        pointer-events: all;
+        pointer-events: auto;
     }
 
         .TimelineBar__year-selected:hover {
