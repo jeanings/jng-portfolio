@@ -141,8 +141,7 @@ h4 {
                 
                 #resume_section_projects .resume_section_item {
                     display: grid;
-                    /* grid-template-columns: 100%; */
-                    grid-template-rows: 10mm 10mm auto;
+                    grid-template-rows: 10mm 15mm auto;
                 }
 
                 #resume_section_additional .resume_section_item {
@@ -184,48 +183,65 @@ h4 {
                         .resume_section_item_header_links {
                             grid-column: 1 / -1;
                             grid-row: 2 / 3;
-                            display: grid;
-                            align-self: end;
+                            display: flex;
+                            align-self: center;
                             z-index: 2;
                         }
 
                             #resume_selection_item_header_links_url {
-                                font-size: 3.25mm;
+                                font-size: 3.3mm;
                                 font-family: 'Space Mono', monospace;
                             }
 
                         .resume_section_item_header_location {
                             grid-column: 1 / -1;
                             grid-row: 1 / 2;
+                            display: flex;
                             text-align: end;
                             align-self: center;
+                            justify-self: flex-end;
                         }
 
                         .resume_section_item_header_date {
                             grid-column: 1 / -1;
                             grid-row: 2 / -1;
+                            display: flex;
                             text-align: end;
-                            align-self: end;
+                            align-self: center;
+                            justify-self: flex-end;
                         }
 
                         
 
                     .resume_section_item_stack {
-                        display: grid;
                         grid-column: 1 / 2;
                         grid-row: 2 / 3;
-                        font-size: 3.25mm;
+                        display: grid;
+                        grid-template-columns: 100%;
+                        grid-template-rows: repeat(3, 1fr);
+                        font-size: 3.3mm;
                     }
 
                         .resume_section_item_stack ul {
-                            display: flex;
-                            column-gap: 8mm;
+                            display: grid;
+                            grid-template-columns: 25mm auto;
+                            grid-template-rows: 100%;
                             font-family: 'Space Mono', monospace;
                         }
-
-                        .resume_section_item_stack li {
-                            list-style: none;
-                        }
+                            
+                            .resume_section_item_stack_name {
+                                display: flex;
+                                justify-self: flex-start;
+                            }
+                            
+                            .resume_section_item_stack_container {
+                                grid-column: 2 / -1;
+                                display: flex;
+                                column-gap: 8mm;
+                            }
+                                .resume_section_item_stack li {
+                                    list-style: none;
+                                }
 
                     .resume_section_item_list {
                         grid-column: 1 / -1;
@@ -251,7 +267,7 @@ h4 {
                             list-style-type: circle;
                             list-style-position: inside;
                             font-size: 3.75mm;
-                            line-height: 4.75mm;
+                            line-height: 5.75mm;
                         }
 
                         #resume_section_item_list_language-level li {
