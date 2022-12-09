@@ -48,59 +48,62 @@
     <div class="resume_sections">
         <div class="resume_section" id="resume_section_projects">
             <h2 class="resume_section_name">
-                selected project
+                selected projects
             </h2>
+            {%- for project in proj -%}
+                {%- for id in project -%}
 
-            <div class="resume_section_item">
-                <div class="resume_section_item_header">
-                    <h3 class="resume_section_item_header_name">
-                        {{ proj.title }}
-                    </h3>
-    
-                    <div class="resume_section_item_header_links">
-                        <a id="resume_selection_item_header_links_url" 
-                            href="{{ proj.url }}">
-                            {{ proj.url }}
-                        </a>
+                    <div class="resume_section_item">
+                        <div class="resume_section_item_header">
+                            <h3 class="resume_section_item_header_name">
+                                {{ id }}
+                            </h3>
+            
+                            <div class="resume_section_item_header_links">
+                                <a id="resume_selection_item_header_links_url" 
+                                    href="{{ project[id].url }}">
+                                    {{ project[id].url }}
+                                </a>
+                            </div>
+
+                            <h4 class="resume_section_item_header_location">
+                                {{ project[id].location }}
+                            </h4>
+
+                            <h4 class="resume_section_item_header_date">
+                                {{ project[id].date }}
+                            </h4>
+
+                        </div>
+
+                        <div class="resume_section_item_stack">
+                            <ul class="resume_section_item_stack_backend">
+                                {%- for tech in project[id].stack.backend -%}
+                                    <li class="resume_section_item_stack_backend_item">
+                                        {{ tech }}
+                                    </li>
+                                {%- endfor -%}
+                            </ul>
+
+                            <ul class="resume_section_item_stack_frontend">
+                                {%- for tech in project[id].stack.frontend -%}
+                                    <li class="resume_section_item_stack_frontend_item">
+                                        {{ tech }}
+                                    </li>
+                                {%- endfor -%}
+                            </ul>
+                        </div>
+                        
+                        <ul class="resume_section_item_list">
+                            {%- for item in project[id].description -%}
+                                <li class="resume_section_item_list_item">
+                                    {{ item }}
+                                </li>
+                            {%- endfor -%}
+                        </ul>
                     </div>
-
-                    <h4 class="resume_section_item_header_location">
-                        {{ proj.location }}
-                    </h4>
-
-                    <h4 class="resume_section_item_header_date">
-                        {{ proj.date }}
-                    </h4>
-
-                </div>
-
-                <div class="resume_section_item_stack">
-                    <ul class="resume_section_item_stack_backend">
-                        {%- for tech in proj.stack.backend -%}
-                            <li class="resume_section_item_stack_backend_item">
-                                {{ tech }}
-                            </li>
-                        {%- endfor -%}
-                    </ul>
-
-                    <ul class="resume_section_item_stack_frontend">
-                        {%- for tech in proj.stack.frontend -%}
-                            <li class="resume_section_item_stack_frontend_item">
-                                {{ tech }}
-                            </li>
-                        {%- endfor -%}
-                    </ul>
-                </div>
-                
-                <ul class="resume_section_item_list">
-                    {%- for item in proj.description -%}
-                        <li class="resume_section_item_list_item">
-                            {{ item }}
-                        </li>
-                    {%- endfor -%}
-                </ul>
-            </div>
-
+                {%- endfor -%}
+            {%- endfor -%}
         </div>
         
 
@@ -150,32 +153,32 @@
             {%- for job in exp -%}
                 {%- for id in job -%}
 
-                <div class="resume_section_item">
-                    <div class="resume_section_item_header">
-                        <h3 class="resume_section_item_header_name">
-                            {{ id }}
-                        </h3>
-                        <h4 class="resume_section_item_header_title">
-                            {{ job[id].title }}
-                        </h4>
+                    <div class="resume_section_item">
+                        <div class="resume_section_item_header">
+                            <h3 class="resume_section_item_header_name">
+                                {{ id }}
+                            </h3>
+                            <h4 class="resume_section_item_header_title">
+                                {{ job[id].title }}
+                            </h4>
 
-                        <h4 class="resume_section_item_header_location">
-                            {{ job[id].location }}
-                        </h4>
-                        <h4 class="resume_section_item_header_date">
-                            {{ job[id].date }}
-                        </h4>
+                            <h4 class="resume_section_item_header_location">
+                                {{ job[id].location }}
+                            </h4>
+                            <h4 class="resume_section_item_header_date">
+                                {{ job[id].date }}
+                            </h4>
+                        </div>
+
+                        <ul class="resume_section_item_list">
+                            {%- for line in job[id].description -%}
+                                <li class="resume_section_item_list_item">
+                                    {{ line }}
+                                </li>
+                            {%- endfor -%}
+                        </ul>
+
                     </div>
-
-                    <ul class="resume_section_item_list">
-                        {%- for line in job[id].description -%}
-                            <li class="resume_section_item_list_item">
-                                {{ line }}
-                            </li>
-                        {%- endfor -%}
-                    </ul>
-
-                </div>
                 {%- endfor -%}
             {%- endfor -%}
         </div>
