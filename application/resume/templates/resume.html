@@ -48,127 +48,114 @@
     <div class="resume_sections">
         <div class="resume_section" id="resume_section_projects">
             <h2 class="resume_section_name">
-                selected project
+                full stack development
             </h2>
-
-            <div class="resume_section_item">
-                <div class="resume_section_item_header">
-                    <h3 class="resume_section_item_header_name">
-                        {{ proj.title }}
-                    </h3>
-    
-                    <div class="resume_section_item_header_links">
-                        <a id="resume_selection_item_header_links_url" 
-                            href="{{ proj.url }}">
-                            {{ proj.url }}
-                        </a>
-                    </div>
-
-                    <h4 class="resume_section_item_header_location">
-                        {{ proj.location }}
-                    </h4>
-
-                    <h4 class="resume_section_item_header_date">
-                        {{ proj.date }}
-                    </h4>
-
-                </div>
-
-                <div class="resume_section_item_stack">
-                    <ul class="resume_section_item_stack_backend">
-                        {%- for tech in proj.stack.backend -%}
-                            <li class="resume_section_item_stack_backend_item">
-                                {{ tech }}
-                            </li>
-                        {%- endfor -%}
-                    </ul>
-
-                    <ul class="resume_section_item_stack_frontend">
-                        {%- for tech in proj.stack.frontend -%}
-                            <li class="resume_section_item_stack_frontend_item">
-                                {{ tech }}
-                            </li>
-                        {%- endfor -%}
-                    </ul>
-                </div>
-                
-                <ul class="resume_section_item_list">
-                    {%- for item in proj.description -%}
-                        <li class="resume_section_item_list_item">
-                            {{ item }}
-                        </li>
-                    {%- endfor -%}
-                </ul>
-            </div>
-
-        </div>
+            {%- for project in selected_projects -%}
+                <div class="resume_section_item">
+                    <div class="resume_section_item_header">
+                        <h3 class="resume_section_item_header_name">
+                            {{ project.title }}
+                        </h3>
         
-
-        <div class="resume_section" id="resume_section_education">
-            <h2 class="resume_section_name">
-                education
-            </h2>
-            {%- for institute in edu -%}
-                {%- for id in institute -%}
-
-                    <div class="resume_section_item">
-                        <div class="resume_section_item_header">
-                            <h3 class="resume_section_item_header_name">
-                                {{ id }}
-                            </h3>
-
-                            <h4 class="resume_section_item_header_title">
-                                {{ institute[id].title }}
-                            </h4>
-
-                            <h4 class="resume_section_item_header_location">
-                                {{ institute[id].location }}
-                            </h4>
-                            <h4 class="resume_section_item_header_date">
-                                {{ institute[id].date }}
-                            </h4>
+                        <div class="resume_section_item_header_links">
+                            <a id="resume_selection_item_header_links_url" 
+                                href="{{ project.url }}">
+                                {{ project.url }}
+                            </a>
                         </div>
 
-                        <ul class="resume_section_item_list">
-                            {%- for line in institute[id].description -%}
-                                <li class="resume_section_item_list_item">
-                                    {{ line }}
-                                </li>
-                            {%- endfor -%}
-                        </ul>
-                
+                        <h4 class="resume_section_item_header_location">
+                            {{ project.location }}
+                        </h4>
+
+                        <h4 class="resume_section_item_header_date">
+                            {{ project.date }}
+                        </h4>
+
                     </div>
-                {%- endfor -%}
+
+                    <div class="resume_section_item_stack">
+                        <ul class="resume_section_item_stack_backend">
+                            <span class="resume_section_item_stack_name">
+                                BACK-END
+                            </span>
+
+                            <div class="resume_section_item_stack_container">
+                                {%- for tech in project.stack.backend -%}
+                                    <li class="resume_section_item_stack_backend_item">
+                                        {{ tech }}
+                                    </li>
+                                {%- endfor -%}
+                            </div>
+                        </ul>
+
+                        <ul class="resume_section_item_stack_frontend">
+                            <span class="resume_section_item_stack_name">
+                                FRONT-END
+                            </span>
+
+                            <div class="resume_section_item_stack_container">
+                                {%- for tech in project.stack.frontend -%}
+                                    <li class="resume_section_item_stack_frontend_item">
+                                        {{ tech }}
+                                    </li>
+                                {%- endfor -%}
+                            </div>
+                        </ul>
+
+                        <ul class="resume_section_item_stack_tool">
+                            <span class="resume_section_item_stack_name">
+                                TOOLS
+                            </span>
+
+                            <div class="resume_section_item_stack_container">
+                                {%- for tech in project.stack.tools -%}
+                                    <li class="resume_section_item_stack_tool_item">
+                                        {{ tech }}
+                                    </li>
+                                {%- endfor -%}
+                            </div>
+                        </ul>
+                    </div>
+                    
+                    <ul class="resume_section_item_list">
+                        {%- for item in project.description -%}
+                            <li class="resume_section_item_list_item">
+                                {{ item }}
+                            </li>
+                        {%- endfor -%}
+                    </ul>
+                </div>
             {%- endfor -%}
         </div>
-
+        
 
         <div class="resume_section" id="resume_section_experience">
             <h2 class="resume_section_name">
                 experience
             </h2>
-            {%- for job in exp -%}
-                {%- for id in job -%}
+            {%- for job in experience -%}
+                {%- for company in job -%}
 
                 <div class="resume_section_item">
                     <div class="resume_section_item_header">
                         <h3 class="resume_section_item_header_name">
-                            {{ id }}
+                            {{ company }}
                         </h3>
                         <h4 class="resume_section_item_header_title">
-                            {{ job[id].title }}
+                            {{ job[company].title }}
                         </h4>
 
                         <h4 class="resume_section_item_header_location">
-                            {{ job[id].location }}
+                            {{ job[company].location }}
                         </h4>
                         <h4 class="resume_section_item_header_date">
-                            {{ job[id].date }}
+                            {{ job[company].date }}
                         </h4>
                     </div>
 
                     <ul class="resume_section_item_list">
-                        {%- for line in job[id].description -%}
+                        {%- for line in job[company].description -%}
                             <li class="resume_section_item_list_item">
                                 {{ line }}
                             </li>
@@ -176,6 +163,45 @@
                     </ul>
 
                 </div>
+                {%- endfor -%}
+            {%- endfor -%}
+        </div>
+
+
+        <div class="resume_section" id="resume_section_education">
+            <h2 class="resume_section_name">
+                education
+            </h2>
+            {%- for institute in education -%}
+                {%- for name in institute -%}
+
+                    <div class="resume_section_item">
+                        <div class="resume_section_item_header">
+                            <h3 class="resume_section_item_header_name">
+                                {{ name }}
+                            </h3>
+
+                            <h4 class="resume_section_item_header_title">
+                                {{ institute[name].title }}
+                            </h4>
+
+                            <h4 class="resume_section_item_header_location">
+                                {{ institute[name].location }}
+                            </h4>
+                            <h4 class="resume_section_item_header_date">
+                                {{ institute[name].date }}
+                            </h4>
+                        </div>
+
+                        <ul class="resume_section_item_list">
+                            {%- for line in institute[name].description -%}
+                                <li class="resume_section_item_list_item">
+                                    {{ line }}
+                                </li>
+                            {%- endfor -%}
+                        </ul>
+                
+                    </div>
                 {%- endfor -%}
             {%- endfor -%}
         </div>
@@ -194,15 +220,15 @@
                 </div>
 
                 <ul class="resume_section_item_list" id="resume_section_item_list_language-name">
-                    {%- for lang in info.languages -%}
+                    {%- for language in additional_info.languages -%}
                         <li class="resume_section_item_list_item">
-                            {{ lang }}
+                            {{ language }}
                         </li>
                     {%- endfor -%}
                 </ul>
 
                 <ul class="resume_section_item_list" id="resume_section_item_list_language-level">
-                    {%- for lang, level in info.languages.items() -%}
+                    {%- for language, level in additional_info.languages.items() -%}
                         <li class="resume_section_item_list_item">
                             {{ level }}
                         </li>
@@ -218,7 +244,7 @@
                 </div>
 
                 <ul class="resume_section_item_list">
-                    {%- for hobby in info.hobby -%}
+                    {%- for hobby in additional_info.hobby -%}
                         <li class="resume_section_item_list_item">
                             {{ hobby }}
                         </li>
@@ -228,8 +254,6 @@
 
         </div>
     </div>
-
-  
 
 </section>
 {% endblock %}
