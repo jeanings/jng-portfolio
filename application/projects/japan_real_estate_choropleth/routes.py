@@ -15,7 +15,7 @@ japan_real_estate_choropleth_bp = Blueprint('japan_real_estate_choropleth_bp', _
     template_folder='templates'
 )
 
-if DEBUG_MODE == 'True':
+if DEBUG_MODE == True:
     build_assets(app)
 
 
