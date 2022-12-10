@@ -113,11 +113,9 @@ const TimelineBar: React.FunctionComponent = () => {
         Handle dropdown of year selector on hover/touch.
     ------------------------------------------------------ */
     const onYearSelectorHover = (event: React.SyntheticEvent) => {
-        setYearSelectorHovered(true);
-    };
-
-    const onYearSelectorUnhover = (event: React.SyntheticEvent) => {
-        setYearSelectorHovered(false);
+        yearSelectorHovered === false
+            ? setYearSelectorHovered(true)
+            : setYearSelectorHovered(false)
     };
 
 
@@ -135,10 +133,8 @@ const TimelineBar: React.FunctionComponent = () => {
                         : " ".concat("dropdown"))}
                 role="menubar"
                 aria-label="year selector"
-                onTouchStart={ onYearSelectorHover }
-                onTouchEnd={ onYearSelectorUnhover }
                 onMouseEnter={ onYearSelectorHover }
-                onMouseLeave={ onYearSelectorUnhover }>
+                onMouseLeave={ onYearSelectorHover }>
 
                 <div 
                     className={ useMediaQueries(classBase.concat("__", "year-selected")) }

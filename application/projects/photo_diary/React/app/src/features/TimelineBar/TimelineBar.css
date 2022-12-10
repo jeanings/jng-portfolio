@@ -122,5 +122,5 @@
         column-gap: 1rem;
         overflow-x: auto;
         overflow-y: hidden;
-        pointer-events: all;
+        pointer-events: auto;
     }

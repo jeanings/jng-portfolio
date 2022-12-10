@@ -34,38 +34,35 @@ MDB_PASS = quote_plus(MONGODB_KEY)
 
 
 # Connection to mongo server.
-client = MongoClient(f'mongodb+srv://{MONGODB_ID}:{MDB_PASS}@portfolio.8frim.mongodb.net/fudousan?retryWrites=true&w=majority')
+client = MongoClient(f'mongodb+srv://{MONGODB_ID}:{MDB_PASS}@portfolio.8frim.mongodb.net/')
 db = client.resume
-collection = db['2021']
+collection = db['web']
 
 
 # Resume route.
 @resume_bp.route('/resume', methods=['GET'])
 @resume_bp.route('/resume/', methods=['GET'])
 def resume():
-    cv = []
-    proj, edu, exp, info = {}, {}, {}, {}
+    selected_projects, education, experience, additional_info = {}, {}, {}, {}
 
     for section in collection.find():
-        cv.append(section)
         for key in section.keys():
-            if key == 'selectedProject':
-                proj = section[key]
+            if key == 'selectedProjects':
+                selected_projects = section[key]
             elif key == 'education':
-                edu = section[key]
+                education = section[key]
             elif key == 'experience':
-                exp = section[key]
+                experience = section[key]
             elif key == 'additionalInfo':
-                info = section[key]
+                additional_info = section[key]
 
 
     return render_template('resume.html', 
         title="Résumé  ——  jeanings.space",
-        cv=cv,
-        proj=proj,
-        edu=edu,
-        exp=exp,
-        info=info
+        selected_projects=selected_projects,
+        education=education,
+        experience=experience,
+        additional_info=additional_info
     )
 
 
