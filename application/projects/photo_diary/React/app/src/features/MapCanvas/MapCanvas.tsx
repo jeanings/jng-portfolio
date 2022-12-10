@@ -77,8 +77,10 @@ const MapCanvas: React.FunctionComponent = () => {
                     boxZoom: false,
                     doubleClickZoom: true,
                     dragPan: true,
-                    dragRotate: false
+                    dragRotate: false,
                 });
+
+                map.current.addControl(new mapboxgl.NavigationControl(), 'bottom-left');
 
                 // Set map loading status.
                 map.current.on('load', () => {
