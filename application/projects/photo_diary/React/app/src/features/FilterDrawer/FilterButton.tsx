@@ -114,7 +114,7 @@ const FilterButton: React.FunctionComponent<FilterButtonProps> = (props: FilterB
                     : " ".concat('active')) }
             role="checkbox"
             aria-label={ props.categoryName.concat(" filter option") }
-            aria-pressed={ selectedInCategory.includes(selectable) === false
+            aria-checked={ selectedInCategory.includes(selectable) === false
                 ? "false"
                 : "true" }
             onClick={ onFilterClick }>

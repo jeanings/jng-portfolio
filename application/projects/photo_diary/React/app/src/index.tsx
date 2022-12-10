@@ -3,7 +3,6 @@ import ReactDOM from 'react-dom';
 import { Provider } from 'react-redux';
 import './index.css';
 import App from './app/App';
-import NavBar from './features/NavBar/NavBar';
 import { store } from './app/store';
 import * as serviceWorker from './serviceWorker';
 
