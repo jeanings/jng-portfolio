@@ -200,9 +200,9 @@ describe("on filter button clicks", () => {
             // Verify correct number of filter buttons rendered.
             const filterButtons = screen.getAllByRole('checkbox', { name: group.ariaLabel});
     
-            // Verify filter button to not be pressed.
+            // Verify filter button to not be checked.
             const filterButtonToClick: HTMLElement = filterButtons[0];
-            expect(filterButtonToClick.getAttribute('aria-pressed')).toEqual('false');
+            expect(filterButtonToClick.getAttribute('aria-checked')).toEqual('false');
 
             let filterButtonText;
             // Parse text as in switch cases.
@@ -230,7 +230,7 @@ describe("on filter button clicks", () => {
 
             // Wait for onClick.
             await waitFor(() => user.click(filterButtonToClick));
-            await waitFor(() => expect(filterButtonToClick.getAttribute('aria-pressed')).toEqual('true'));
+            await waitFor(() => expect(filterButtonToClick.getAttribute('aria-checked')).toEqual('true'));
             
             // ----------------- Same logic as in switch cases of FilterButton START -----------------
             // Verify text of selected element matches newly added array element.
@@ -313,21 +313,21 @@ describe("on filter button clicks", () => {
             }
             // ----------------- Same logic as in switch cases of FilterButton END -----------------
 
-            // Mock pressed status. 
-            filterButtonToClick.setAttribute('aria-pressed', 'true');
+            // Mock checked status. 
+            filterButtonToClick.setAttribute('aria-checked', 'true');
 
             await waitFor (() => {
                 newStore.dispatch(addFilter({ [stateKey]: filterButtonText }));
-                expect(filterButtonToClick.getAttribute('aria-pressed')).toEqual('true');
+                expect(filterButtonToClick.getAttribute('aria-checked')).toEqual('true');
                 expect(newStore.getState().filter[stateKey]).toContain(filterButtonText);
             });
 
-            // Simulate click on "pressed" filter button.
+            // Simulate click on "checked" filter button.
             await waitFor(() => user.click(filterButtonToClick));
 
             // Verify filter is removed from state.
             await waitFor(() => {
-                expect(filterButtonToClick.getAttribute('aria-pressed')).toEqual('false');
+                expect(filterButtonToClick.getAttribute('aria-checked')).toEqual('false');
                 expect(newStore.getState().filter[stateKey]).not.toContain(filterButtonText);
             });
         });
@@ -360,7 +360,7 @@ describe("on filter button clicks", () => {
             Object.values(buttonsCategory).includes(button.textContent as string));
 
         for (let button of filterButtonsToClick) {
-            button.setAttribute('aria-pressed', 'true');
+            button.setAttribute('aria-checked', 'true');
             let filterName = button.textContent as string;
             let filterType = '';
 
@@ -409,7 +409,7 @@ describe("on filter button clicks", () => {
         let filterButtonToClick = filterButtons.filter(button => 
             Object.values(buttonsCategory).includes(button.textContent as string))[0];
         
-        filterButtonToClick.setAttribute('aria-pressed', 'true');
+        filterButtonToClick.setAttribute('aria-checked', 'true');
         let filterType = Object.keys(buttonsCategory)[0];
         let filterName = Object.values(buttonsCategory)[0];        
         let payload = { [filterType]: filterName };
@@ -616,7 +616,7 @@ test("fetches year's data when going from filters activated to deactivated", asy
     const filterState = newStore.getState().filter;
     expect(filterState.film?.length).not.toEqual(0);
 
-    // Mock-set aria-pressed and styling.
+    // Mock-set aria-checked and styling.
     const filterElems = screen.getAllByRole('checkbox', { name: 'film filter option' });
     const filterElemsClicked: Array<HTMLElement> = [];
     
@@ -631,17 +631,17 @@ test("fetches year's data when going from filters activated to deactivated", asy
 
     expect(filterElemsClicked.length).toEqual(2);
     for (let elemsClicked of filterElemsClicked) {
-        elemsClicked.setAttribute('aria-pressed', 'true');
+        elemsClicked.setAttribute('aria-checked', 'true');
         elemsClicked.classList.add("active");
     }
 
     // Click-deactivate filters.
     await waitFor(() => user.click(filterElemsClicked[0]));
-    expect(filterElemsClicked[0]).toHaveAttribute('aria-pressed', 'false');
+    expect(filterElemsClicked[0]).toHaveAttribute('aria-checked', 'false');
     expect(newStore.getState().filter.film!.length).toEqual(1);
 
     await waitFor(() => user.click(filterElemsClicked[1]));
-    expect(filterElemsClicked[1]).toHaveAttribute('aria-pressed', 'false');
+    expect(filterElemsClicked[1]).toHaveAttribute('aria-checked', 'false');
     expect(newStore.getState().filter.film!.length).toEqual(0);
 
 
