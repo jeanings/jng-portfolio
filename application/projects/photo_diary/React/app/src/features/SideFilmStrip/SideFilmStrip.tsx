@@ -164,11 +164,9 @@ const SideFilmStrip: React.FunctionComponent = () => {
         Handle expand/contract of film strip on hover/touch.
     ------------------------------------------------------ */
     const onImageHover = (event: React.SyntheticEvent) => {
-        setFilmStripHovered(true);
-    };
-
-    const onImageUnhover = (event: React.SyntheticEvent) => {
-        setFilmStripHovered(false);
+        filmStripHovered === false
+            ? setFilmStripHovered(true)
+            : setFilmStripHovered(false);
     };
 
 
@@ -286,10 +284,8 @@ const SideFilmStrip: React.FunctionComponent = () => {
                         filmStripHovered === false
                             ? "false"
                             : "true" }
-                    onTouchStart={ onImageHover }
-                    onTouchEnd={ onImageUnhover }
                     onMouseEnter={ onImageHover }
-                    onMouseLeave={ onImageUnhover }>
+                    onMouseLeave={ onImageHover }>
 
                     { /* Image containers for all docs in collection. */
                         imageFrameElems }
