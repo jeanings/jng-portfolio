@@ -162,15 +162,40 @@ const MapCanvas: React.FunctionComponent = () => {
                 enlargeDoc.gps.lng, enlargeDoc.gps.lat
             ]; 
 
-            map.current.flyTo({
-                center: markerCoords,
-                offset: getMapPaddingOffset('fly', windowSize),
-                linear: false,
-                animate: true,
-                duration: 1500,
-                zoom: 13,
-                maxZoom: 16
-            });
+            // Scroll film strip to target image.
+            const imageFrame = document.getElementById(enlargeDoc._id);
+            if (imageFrame) {
+                imageFrame.scrollIntoView({ behavior: 'smooth' });
+            }
+
+            // Get current zoom level and only flyTo that zoom if lower value.
+            // Eliminates cases where clicks on neighbouring markers while 
+            // navigating using the map would kick into lower level zoom.
+            let currentZoomLevel: number = map.current.getZoom();
+            const toZoomLevel: number = 13;
+
+            if (currentZoomLevel < toZoomLevel) {
+                map.current.flyTo({
+                    center: markerCoords,
+                    offset: getMapPaddingOffset('fly', windowSize),
+                    linear: false,
+                    animate: true,
+                    duration: 1500,
+                    zoom: toZoomLevel,
+                    maxZoom: 16
+                });
+            }
+            else {
+                map.current.flyTo({
+                    center: markerCoords,
+                    offset: getMapPaddingOffset('fly', windowSize),
+                    linear: false,
+                    animate: true,
+                    duration: 1500,
+                    zoom: currentZoomLevel,
+                    maxZoom: 16
+                });
+            }
 
             // Reset button state.
             dispatch(handleMarkerLocator('idle'));
