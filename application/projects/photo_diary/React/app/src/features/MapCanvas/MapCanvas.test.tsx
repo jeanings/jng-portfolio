@@ -39,6 +39,8 @@ beforeEach(() => {
 
 afterEach(() => {
     mockAxios.reset();
+    jest.clearAllMocks(); 
+    jest.resetAllMocks(); 
     cleanup;
 });
 
@@ -102,27 +104,19 @@ const preloadedState: RootState = {
 /* -------------------------------------------------
     Mocked Mapbox.
 ------------------------------------------------- */
-jest.mock('mapbox-gl', () => ({
-    Map: jest.fn(),
-    Popup: jest.fn(),
-}));
-  
-mapboxgl.Map.prototype = {
-    on: jest.fn(),
-    off: jest.fn(),
-    remove: jest.fn(),
-    getCanvas: jest.fn(),
-    addSource: jest.fn(),
-    addLayer: jest.fn(),
-    getSource: jest.fn(),
-    getLayer: jest.fn(),
-    removeSource: jest.fn(),
-    removeLayer: jest.fn(),
-};
+jest.mock('mapbox-gl');
 
-mapboxgl.Popup.prototype = {
-    remove: jest.fn(),
-};
+// Mocked Mapbox methods.
+const mockMapOn = jest.fn();
+const mockMapGetCanvas = jest.fn();
+const mockMapAddSource = jest.fn();
+const mockMapGetSource = jest.fn();
+const mockMapRemoveSource = jest.fn();
+const mockMapAddLayer = jest.fn();
+const mockMapGetLayer = jest.fn();
+const mockMapRemoveLayer = jest.fn();
+const mockMapFitBounds = jest.fn();
+
 
 
 /* ================================================
@@ -138,15 +132,24 @@ test("initializes map on rendering", async() => {
         .onGet(apiUrl, { params: { 'year': 'default' } })
         .replyOnce(200, mockDefaultData)
     
-    // Mocked Mapbox methods.
-    const mockMapOn = jest.fn();
-
-    jest.spyOn(mapboxgl, "Map")
+    // Spied Mapbox methods.
+    // const spyMapOn = jest.spyOn(mapbox, 'Map')
+    const mapbox = require('mapbox-gl');
+    jest.spyOn(mapbox, 'Map')
         .mockImplementation(() => {
             return {
-                on: mockMapOn
+                on: mockMapOn,
+                getCanvas: mockMapGetCanvas,
+                addSource: mockMapAddSource,
+                addLayer: mockMapAddLayer,
+                getSource: mockMapGetSource,
+                getLayer: mockMapGetLayer,
+                removeSource: mockMapRemoveSource,
+                removeLayer: mockMapRemoveLayer,
+                fitBounds: mockMapFitBounds,
+                addControl: jest.fn()
             }
-        })
+        });
     /* --------------------------------------------------------
         Mocks                                            end
     -------------------------------------------------------- */
@@ -180,27 +183,23 @@ test("adds new data source on new fetches", async() => {
         .onGet(apiUrl, { params: { 'year': 'default' } })
         .replyOnce(200, mockDefaultData)
 
-    // Mocked Mapbox methods.
-    const mockMapOn = jest.fn();
-    const mockMapAddSource = jest.fn();
-    const mockMapGetSource = jest.fn();
-    const mockMapRemoveSource = jest.fn();
-    const mockMapAddLayer = jest.fn();
-    const mockMapGetLayer = jest.fn();
-    const mockMapRemoveLayer = jest.fn();
-
-    jest.spyOn(mapboxgl, 'Map')
+    // Spied Mapbox methods.
+    const mapbox = require('mapbox-gl');
+    jest.spyOn(mapbox, 'Map')
         .mockImplementation(() => {
             return {
                 on: mockMapOn,
+                getCanvas: mockMapGetCanvas,
                 addSource: mockMapAddSource,
-                getSource: mockMapGetSource,
-                removeSource: mockMapRemoveSource,
                 addLayer: mockMapAddLayer,
+                getSource: mockMapGetSource,
                 getLayer: mockMapGetLayer,
-                removeLayer: mockMapRemoveLayer
+                removeSource: mockMapRemoveSource,
+                removeLayer: mockMapRemoveLayer,
+                fitBounds: mockMapFitBounds,
+                addControl: jest.fn()
             }
-        })
+        });
 
     // Mocked React functions.
     const useDispatchSpy = jest.spyOn(reactRedux, 'useDispatch');
@@ -253,24 +252,22 @@ test("adds marker layer and fits map to bounds", async() => {
         .replyOnce(200, mockDefaultData)
 
     // Mocked Mapbox methods.
-    const mockMapOn = jest.fn();
-    const mockMapAddSource = jest.fn();
-    const mockMapGetSource = jest.fn();
-    const mockMapAddLayer = jest.fn();
-    const mockMapGetLayer = jest.fn();
-    const mockMapFitBounds = jest.fn();
-
-    jest.spyOn(mapboxgl, 'Map')
+    const mapbox = require('mapbox-gl');
+    jest.spyOn(mapbox, 'Map')
         .mockImplementation(() => {
             return {
                 on: mockMapOn,
+                getCanvas: mockMapGetCanvas,
                 addSource: mockMapAddSource,
-                getSource: mockMapGetSource,
                 addLayer: mockMapAddLayer,
+                getSource: mockMapGetSource,
                 getLayer: mockMapGetLayer,
-                fitBounds: mockMapFitBounds
+                removeSource: mockMapRemoveSource,
+                removeLayer: mockMapRemoveLayer,
+                fitBounds: mockMapFitBounds,
+                addControl: jest.fn()
             }
-        })
+        });
 
     // Mocked React functions.
     const useDispatchSpy = jest.spyOn(reactRedux, 'useDispatch');
@@ -329,28 +326,22 @@ test("replaces previous layer and source on new data fetches", async() => {
         .replyOnce(200, mock2015Data)
 
     // Mocked Mapbox methods.
-    const mockMapOn = jest.fn();
-    const mockMapAddSource = jest.fn();
-    const mockMapGetSource = jest.fn();
-    const mockMapRemoveSource = jest.fn();
-    const mockMapAddLayer = jest.fn();
-    const mockMapGetLayer = jest.fn();
-    const mockMapRemoveLayer = jest.fn();
-    const mockMapFitBounds = jest.fn();
-
-    jest.spyOn(mapboxgl, 'Map')
+    const mapbox = require('mapbox-gl');
+    jest.spyOn(mapbox, 'Map')
         .mockImplementation(() => {
             return {
                 on: mockMapOn,
+                getCanvas: mockMapGetCanvas,
                 addSource: mockMapAddSource,
-                getSource: mockMapGetSource,
-                removeSource: mockMapRemoveSource,
                 addLayer: mockMapAddLayer,
+                getSource: mockMapGetSource,
                 getLayer: mockMapGetLayer,
+                removeSource: mockMapRemoveSource,
                 removeLayer: mockMapRemoveLayer,
-                fitBounds: mockMapFitBounds
+                fitBounds: mockMapFitBounds,
+                addControl: jest.fn()
             }
-        })
+        });
 
     mockMapGetLayer.mockReturnValue('some-layer');
     mockMapGetSource.mockReturnValue('some-source');
@@ -431,14 +422,22 @@ test("does not initialize map on unsuccessful fetch", async() => {
         .replyOnce(404, [])
     
     // Mocked Mapbox methods.
-    const mockMapOn = jest.fn();
-
-    jest.spyOn(mapboxgl, "Map")
+    const mapbox = require('mapbox-gl');
+    jest.spyOn(mapbox, 'Map')
         .mockImplementation(() => {
             return {
-                on: mockMapOn
+                on: mockMapOn,
+                getCanvas: mockMapGetCanvas,
+                addSource: mockMapAddSource,
+                addLayer: mockMapAddLayer,
+                getSource: mockMapGetSource,
+                getLayer: mockMapGetLayer,
+                removeSource: mockMapRemoveSource,
+                removeLayer: mockMapRemoveLayer,
+                fitBounds: mockMapFitBounds,
+                addControl: jest.fn()
             }
-        })
+        });
 
     // Mocked React functions.
     const useDispatchSpy = jest.spyOn(reactRedux, 'useDispatch');
