@@ -146,6 +146,10 @@ describe('interactions with mapbox (markers)', () => {
         cy.get('@thumbnailToShow')
             .should('not.be.visible');
 
+        // Unhover image strip.
+        cy.get('@imageStrip')
+            .trigger('mouseleave');
+
         // Click on marker.
         cy.get('@markerToClick')
             .click();
