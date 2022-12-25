@@ -4,10 +4,9 @@
 
 from flask import Flask, make_response, render_template
 from flask_cors import CORS, cross_origin
-from flask_sqlalchemy import SQLAlchemy
 from config import Config
-
-db = SQLAlchemy()
+# from flask_sqlalchemy import SQLAlchemy
+# db = SQLAlchemy()
 
 
 def error_404(e):
@@ -20,7 +19,7 @@ def create_app():
     """ Initiate Flask application factory. """
     app = Flask(__name__)
     app.config.from_object(Config)
-    db.init_app(app)
+    # db.init_app(app)
     CORS(app)
 
 
@@ -35,7 +34,7 @@ def create_app():
         from .projects.japan_real_estate_dashboard import routes as japan_real_estate_dashboard
         from .projects.photo_diary import routes as photo_diary
 
-        db.create_all()
+        # db.create_all()
 
         app.register_blueprint(index.index_bp)
         app.register_blueprint(resume.resume_bp)

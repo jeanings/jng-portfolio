@@ -22,7 +22,7 @@
 ------------------------------------------- */
 .ImageFrame.mobile.port 
     .ImageFrame__image {
-    width: 11rem;
-    height: 11rem;
+    width: 8rem;
+    height: 8rem;
     border-radius: 0.75rem;
 }

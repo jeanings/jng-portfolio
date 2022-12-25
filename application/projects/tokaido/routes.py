@@ -4,9 +4,10 @@
 
 from flask import Blueprint, render_template
 from flask import current_app as app
-from flask_sqlalchemy import SQLAlchemy
 from .assets import build_assets
-from application.models import db, Journal
+import requests
+# from flask_sqlalchemy import SQLAlchemy
+# from application.models import db, Journal
 
 DEBUG_MODE = app.config['FLASK_DEBUG']
 
@@ -17,7 +18,7 @@ tokaido_bp = Blueprint('tokaido_bp', __name__,
     template_folder='templates'
 )
 
-if DEBUG_MODE == 'True':
+if DEBUG_MODE == True:
     build_assets(app)
 
 
@@ -26,17 +27,30 @@ if DEBUG_MODE == 'True':
 @tokaido_bp.route('/tokaido-urban-hike/', methods=['GET'])  
 def tokaido_urban_hike():
     """ 
-    Dynamically generate each journal entry, pulling info from database. 
+    Generate each journal entry.
     """
+
+    # Get data from external JSON.
+    json_url = 'https://storage.googleapis.com/jn-portfolio/projects/tokaido/data/journal.json'
+    try:
+        response = requests.get(json_url)
+        read_json = response.json()
+    except response.ConnectionError:
+       return "Connection error in fetching journal data."
     
+    data = read_json
     day_entries = []
     cumulative_dist = []
     total_dist = 545.68
 
-    for i in range(0, 27):
-        day_entry = Journal.query.filter_by(day=i).first()
+    for index in range(0, len(data['journalEntries'])):
+        # Get entries in ascending order.
+        day_entry = [entry for entry in data['journalEntries'] if entry['day'] == index][0]
+        # Compile entries in correct order.
         day_entries.append(day_entry)
-        dist = float(day_entry.distance_percent_cum)
+
+        # Calculate distances.
+        dist = float(day_entry['distancePercentCum'])
         cumulative = total_dist - (total_dist * 0.01 * dist)
         cumulative_dist.append("{:.2f}".format(cumulative))
 

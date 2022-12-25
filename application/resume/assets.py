@@ -15,7 +15,7 @@ def build_assets(app):
     Environment.debug = False
 
     # Miniaturize if not in debug mode.
-    if DEBUG_MODE == 'False':
+    if DEBUG_MODE == False:
         css_min = 'cssmin'
         js_min = 'jsmin'
     else:
@@ -39,7 +39,7 @@ def build_assets(app):
     assets.register('resume_css', css_bundle)
     assets.register('resume_js', js_bundle)
 
-    if DEBUG_MODE == 'True':
+    if DEBUG_MODE == True:
         css_bundle.build()
         js_bundle.build()
         

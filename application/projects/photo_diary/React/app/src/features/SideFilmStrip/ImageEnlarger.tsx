@@ -270,7 +270,7 @@ const ImageEnlarger: React.FunctionComponent <ImageEnlargerProps> = (props: Imag
             </>
         )
         return metaDataSpan;
-    }
+    };
 
     
     return (
@@ -310,7 +310,7 @@ const ImageEnlarger: React.FunctionComponent <ImageEnlargerProps> = (props: Imag
 
         </div>
     );
-}
+};
 
 
 /* =====================================================================
@@ -355,10 +355,10 @@ function getCategoryData(categoryName: string, categoryData: string | number | A
             break;
         default:
             content = categoryData;
-    }
+    };
 
     return content;
-}
+};
 
 
 /* =====================================================================
@@ -367,7 +367,7 @@ function getCategoryData(categoryName: string, categoryData: string | number | A
 export interface ImageEnlargerProps {
     [index: string]: string,
     'baseClassName': string
-}
+};
 
 export type ImageInfoType = {
     [index: string]: string | number | Array<string> | null
@@ -381,7 +381,7 @@ export type ImageInfoType = {
     'Lens': string,
     'Tags': Array<string>,
     'Description': string | null
-}
+};
 
 
 export default ImageEnlarger;

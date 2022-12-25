@@ -1,4 +1,6 @@
-import React, { useEffect } from 'react';
+import React, { 
+    useEffect,
+    useState } from 'react';
 import { 
     useAppDispatch, 
     useAppSelector, 
@@ -21,6 +23,7 @@ import './TimelineBar.css';
 ===============================================================*/
 const TimelineBar: React.FunctionComponent = () => {
     const dispatch = useAppDispatch();
+    const [ yearSelectorHovered, setYearSelectorHovered ] = useState(false);
     const initYear = useAppSelector(state => state.timeline.yearInit);
     const initFetch: boolean = useAppSelector(state => state.timeline.request) === 'initialized'
         ? true
@@ -106,6 +109,16 @@ const TimelineBar: React.FunctionComponent = () => {
     ));
 
 
+    /* ------------------------------------------------------
+        Handle dropdown of year selector on hover/touch.
+    ------------------------------------------------------ */
+    const onYearSelectorHover = (event: React.SyntheticEvent) => {
+        yearSelectorHovered === false
+            ? setYearSelectorHovered(true)
+            : setYearSelectorHovered(false)
+    };
+
+
     return (
         <div 
             className={ useMediaQueries(classBase) }
@@ -113,9 +126,15 @@ const TimelineBar: React.FunctionComponent = () => {
             aria-label="timeline selector">
             
             <div 
-                className={ useMediaQueries(classBase.concat("__", "year-selector")) }
+                className={ useMediaQueries(classBase.concat("__", "year-selector")) 
+                    +   // Add "dropdown" styling on hover
+                    (yearSelectorHovered === false
+                        ? ""
+                        : " ".concat("dropdown"))}
                 role="menubar"
-                aria-label="year selector">
+                aria-label="year selector"
+                onMouseEnter={ onYearSelectorHover }
+                onMouseLeave={ onYearSelectorHover }>
 
                 <div 
                     className={ useMediaQueries(classBase.concat("__", "year-selected")) }
