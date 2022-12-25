@@ -147,7 +147,7 @@ test("displays image collection in side strip panel", async() => {
 });
 
 
-test("clicks on images in film strip dispatches action", async() => {
+test("clicks on images in film strip changes film frame styling, dispatches action", async() => {
     const newStore = setupStore(preloadedState);
         render(
             <Provider store={newStore}>
@@ -175,11 +175,13 @@ test("clicks on images in film strip dispatches action", async() => {
 
     // Get image to click on.
     const imageToClick = imageFrameElems[0];
+    expect(imageToClick.firstChild).not.toHaveClass("selected");
 
     await waitFor(() => user.click(imageToClick));
 
     // Verify clicked image state updated.
     expect(newStore.getState().sideFilmStrip.enlargeDoc).not.toBeNull();
+    expect(imageToClick.firstChild).toHaveClass("selected");
 });
 
 

@@ -87,6 +87,16 @@ const SideFilmStrip: React.FunctionComponent = () => {
             }
         }
     }, [slideView]);
+
+
+    /* -------------------------------------------------------
+        Keep film strip expanded when image enlarger opened.
+    ------------------------------------------------------- */
+    useEffect(() => {
+        imageEnlarger === 'on'
+            ? setFilmStripHovered(true)
+            : setFilmStripHovered(false);
+    }, [imageEnlarger])
     
 
     /* ---------------------------------------
@@ -166,7 +176,9 @@ const SideFilmStrip: React.FunctionComponent = () => {
     const onImageHover = (event: React.SyntheticEvent) => {
         filmStripHovered === false
             ? setFilmStripHovered(true)
-            : setFilmStripHovered(false);
+            : imageEnlarger === 'on'
+                ? setFilmStripHovered(true)
+                : setFilmStripHovered(false);
     };
 
 
