@@ -32,3 +32,8 @@
     height: 8rem;
     border-radius: 0.75rem;
 }
+
+    .ImageFrame.mobile.port 
+        .ImageFrame__image.selected {
+        border-radius: 4rem;
+    }
