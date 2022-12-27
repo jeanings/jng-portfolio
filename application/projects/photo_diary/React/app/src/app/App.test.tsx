@@ -36,6 +36,9 @@ test("renders all features on initial load", () => {
 
     // Mock scrollTo.
     window.HTMLElement.prototype.scrollTo = jest.fn();
+
+    // Mock IntersectionObserver.
+    window.IntersectionObserver = jest.fn();
     /* --------------------------------------------------------
         Mocks                                            end
     -------------------------------------------------------- */

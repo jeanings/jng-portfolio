@@ -31,15 +31,40 @@ const MapboxglSpiderfier: any = require('mapboxgl-spiderifier');
 var mockAxios = new MockAdapter(axios);
 var user = userEvent.setup();
 
+
+
 beforeEach(() => {
     mockAxios = new MockAdapter(axios);
+
     // Mock scrollTo.
     window.HTMLElement.prototype.scrollTo = jest.fn();
+
+    // Mock IntersectionObserver.
+    class IntersectionObserverStub {
+        // Stub methods.
+        root() {}
+        takeRecords() {}
+        observe() {}
+        disconnect() {}
+    };
+
+    jest.doMock('intersectionObserverMock', () => 
+        IntersectionObserverStub, 
+        { virtual: true }
+    );
+
+    window.IntersectionObserver = jest.requireMock('intersectionObserverMock');
+
+    jest.spyOn(window.IntersectionObserver.prototype, 'observe')
+        .mockImplementation(() => {
+            return jest.fn();
+        });
 });
 
 afterEach(() => {
     mockAxios.reset();
     jest.clearAllMocks();
+    jest.restoreAllMocks();
     cleanup;
 });
 
@@ -144,6 +169,36 @@ test("displays image collection in side strip panel", async() => {
     await waitFor(() => screen.findAllByRole('img', { name: 'thumbnail image container' }));
     const imageFrameElems = screen.getAllByRole('img', { name: 'thumbnail image container' });
     expect(imageFrameElems.length).toEqual(imageDocs!.length);
+});
+
+
+test("changes on selected image (sideFilmStrip.enlargeDoc state) calls IntersectionObserver API", async() => {
+    const newStore = setupStore(preloadedState);
+        render(
+            <Provider store={newStore}>
+                <SideFilmStrip />
+            </Provider>
+        );
+    
+    // Wait for render.
+    await waitFor(() => screen.findByRole('main', { name: 'images panel' }));
+    const filmStripElem = screen.getByRole('main', { name: 'images panel' });
+    expect(filmStripElem).toBeInTheDocument();
+
+    await waitFor(() => screen.findAllByRole('img', { name: 'thumbnail image container' }));
+    const imageFrameElems = screen.getAllByRole('img', { name: 'thumbnail image container' });
+    
+    // Verify empty state.
+    expect(newStore.getState().sideFilmStrip.enlargeDoc).toBeNull();
+    await waitFor(() => expect(window.IntersectionObserver.prototype.observe).not.toHaveBeenCalled());
+
+    // Get image to click on.
+    const imageToClick = imageFrameElems[0];
+    expect(imageToClick.firstChild).not.toHaveClass("selected");
+
+    await waitFor(() => user.click(imageToClick));
+
+    await waitFor(() => expect(window.IntersectionObserver.prototype.observe).toHaveBeenCalledTimes(1));
 });
 
 
@@ -371,6 +426,7 @@ test("opens image enlarger (if closed) if same image clicked on", async() => {
         thumbnail.id === idForImageToEnlarge)[0];
 
     await waitFor(() => user.click(thumbnailToClick));
+
     expect(newStore.getState().sideFilmStrip.enlargeDoc).not.toBeNull();
     
     await waitFor(() => {
@@ -441,6 +497,7 @@ test("closes image enlarger on year or month selection", async() => {
     await waitFor(() => user.click(thumbnailToClick));
 
     // Verify enlarger opened.
+
     await waitFor(() => {
         expect(imageEnlargerElem).toHaveAttribute("aria-expanded", 'true');
         expect(imageEnlargerElem).toHaveClass("show");
@@ -475,6 +532,7 @@ test("expands film strip on hover and slides image enlarger to the left", async(
         thumbnail.id === idForImageToEnlarge)[0];
 
     await waitFor(() => user.click(thumbnailToClick));
+
     expect(newStore.getState().sideFilmStrip.enlargeDoc).not.toBeNull();
     
     await waitFor(() => {
@@ -531,6 +589,7 @@ test("flies map to marker position on film strip thumbnail clicks", async() => {
         thumbnail.id === idForImageToEnlarge)[0];
 
     await waitFor(() => user.click(thumbnailToClick));
+
     expect(newStore.getState().sideFilmStrip.enlargeDoc).not.toBeNull();
 
     // Verify marker locator state changed.
@@ -553,6 +612,7 @@ test("cycles through images on prev/next button clicks", async() => {
         thumbnail.id === idForImageToEnlarge)[0];
 
     await waitFor(() => user.click(thumbnailToClick));
+
     expect(newStore.getState().sideFilmStrip.enlargeDoc).not.toBeNull();
 
     const prevImageButton = screen.getByRole('button', { name: 'show previous image' });
