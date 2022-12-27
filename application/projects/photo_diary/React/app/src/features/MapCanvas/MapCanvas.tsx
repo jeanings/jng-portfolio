@@ -167,12 +167,6 @@ const MapCanvas: React.FunctionComponent = () => {
                 enlargeDoc.gps.lng, enlargeDoc.gps.lat
             ]; 
 
-            // Scroll film strip to target image.
-            const imageFrame = document.getElementById(enlargeDoc._id);
-            if (imageFrame) {
-                imageFrame.scrollIntoView({ behavior: 'smooth' });
-            }
-
             // Get current zoom level and only flyTo that zoom if lower value.
             // Eliminates cases where clicks on neighbouring markers while 
             // navigating using the map would kick into lower level zoom.
@@ -325,12 +319,6 @@ const MapCanvas: React.FunctionComponent = () => {
         film strip to clicked marker image.
     ---------------------------------------------------------------------------- */
     function handleImageMarkerClicks(markerDocId: string) {
-        // Scroll film strip to target image.
-        const imageFrame = document.getElementById(markerDocId);
-        if (imageFrame) {
-            imageFrame.scrollIntoView({ behavior: 'smooth' });
-        }
-
         const enlargeDocId: string = enlargeDoc !== null    
             ? enlargeDoc._id
             : '';
