@@ -22,7 +22,8 @@ describe('interactions with film strip panel', () => {
 
 
     it('opens image enlarger, \
-        displays correct image on film strip thumbnail clicks', () => {
+        displays correct image on film strip thumbnail clicks, \
+        changes styling on selected image in film strip', () => {
         cy.visit('http://localhost:3000/');
 
         // Verify image enlarger is hidden when nothing to "enlarge".
@@ -56,6 +57,12 @@ describe('interactions with film strip panel', () => {
         cy.get('[aria-label="enlarged image"]')
             .invoke('attr', 'src')
             .as('enlargedImageSrc');
+
+        // Verify thumbnail stying changed.
+        cy.get('@thumbnailToClick')
+            .children('img')
+            .eq(0)
+            .should('have.class', "selected");
 
         // Verify thumbnail shows enlarged version.
         cy.get('@thumbnailClickedSrc')

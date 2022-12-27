@@ -26,12 +26,14 @@ const SideFilmStrip: React.FunctionComponent = () => {
     const dispatch = useAppDispatch();
     const [ filmStripHovered, setFilmStripHovered ] = useState(false);
     const [ slideImageIndex, setSlideImageIndex ] = useState<number | null>(null);
+    const [ imageViewableInFilmStrip, setImageViewableInFilmStrip ] = useState(true);
     const imageDocs = useAppSelector(state => state.timeline.imageDocs);
     const imageDoc = useAppSelector(state => state.sideFilmStrip.enlargeDoc);
     const docIndex = useAppSelector(state => state.sideFilmStrip.docIndex);
     const slideView = useAppSelector(state => state.sideFilmStrip.slideView);
     const imageEnlarger = useAppSelector(state => state.toolbar.imageEnlarger);
     const filmStripRef = useRef<HTMLDivElement>(null);
+    const filmStripObserverRef = useRef<IntersectionObserver | null>(null);
     const classBase: string = "SideFilmStrip";
 
 
@@ -97,6 +99,43 @@ const SideFilmStrip: React.FunctionComponent = () => {
             ? setFilmStripHovered(true)
             : setFilmStripHovered(false);
     }, [imageEnlarger])
+
+
+    /* -----------------------------------------------------------------
+        On image selection, scroll film strip to image if not in view.
+    ----------------------------------------------------------------- */
+    useEffect(() => {
+        // Set up observer for film strip element.
+        if (filmStripObserverRef.current === null) {
+            const observerOptions = {
+                root: filmStripRef.current,
+                threshold: 0.75
+            };
+
+            const observerCallback = (entries: Array<IntersectionObserverEntry>) => {
+                const [entry] = entries;
+                // Trigger scroll into view depending if selected frame in viewport.
+                setImageViewableInFilmStrip(entry.isIntersecting);
+
+                // CLean up observer.
+                filmStripObserverRef.current?.disconnect();
+            };
+
+            filmStripObserverRef.current = new IntersectionObserver(observerCallback, observerOptions);
+        }
+
+        // Observe clicked image frame and determine if scrolling is needed.
+        if (filmStripRef.current && imageDoc) {
+            const imageFrame = document.getElementById(imageDoc._id) as HTMLElement;
+
+            // Set observer.
+            filmStripObserverRef.current.observe(imageFrame);
+            
+            if (imageViewableInFilmStrip === false) {
+                imageFrame.scrollIntoView({ behavior: 'smooth' });
+            }
+        }
+    }, [imageDoc, imageViewableInFilmStrip])
     
 
     /* ---------------------------------------
