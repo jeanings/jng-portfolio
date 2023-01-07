@@ -1,8 +1,11 @@
-import React, { useEffect, useRef } from 'react';
+import React, { 
+    useEffect, 
+    useRef } from 'react';
 import {
     useAppDispatch, 
     useAppSelector, 
-    useMediaQueries } from '../../common/hooks';
+    useMediaQueries, 
+    useWindowSize } from '../../common/hooks';
 import { 
     setStyleLoadStatus, 
     setSourceStatus, 
@@ -13,12 +16,12 @@ import {
 import { ImageDocTypes } from '../TimelineBar/timelineSlice';
 import { handleEnlarger, SideFilmStripProps } from '../SideFilmStrip/sideFilmStripSlice';
 import { handleToolbarButtons, ToolbarProps } from '../Toolbar/toolbarSlice';
+import { FeatureCollection } from 'geojson';
 import './MapCanvas.css';
 import 'mapboxgl-spiderifier/index.css';
 // @ts-ignore
-import mapboxgl from 'mapbox-gl'; 
+import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
-
 
 const MapboxglSpiderfier: any = require('mapboxgl-spiderifier');
 
@@ -38,19 +41,21 @@ const MapCanvas: React.FunctionComponent = () => {
     const enlargeDoc = useAppSelector(state => state.sideFilmStrip.enlargeDoc);
     const toolbarImageEnlarger = useAppSelector(state => state.toolbar.imageEnlarger);
     const markerLocator = useAppSelector(state => state.mapCanvas.markerLocator);
+    const windowSize = useWindowSize();
     const classBase: string = "MapCanvas";
     // Mapbox variables.
     const MAPBOX_ACCESS_TOKEN = process.env.REACT_APP_MAPBOX;
     const mapStyle: string = process.env.REACT_APP_MAPBOX_STYLE as string;
-    const mapContainer = useRef(null);
-    const map = useRef<mapboxgl.map | null>(null);
-    const markerIconImage: string = 'bxs-image';
-    const markerIconPin: string ='bxs-pin';
+    const mapContainer = useRef<HTMLDivElement | null>(null);
+    const map = useRef<mapboxgl.Map | null>(null);
+    const markerIconImage: string = 'image-sharp';
+    const markerIconPin: string ='images-sharp';
     const spiderfier = useRef<any | null>(null);
     const bbox: Array<Array<number>> = bounds !== null
         ? [ [ bounds!.lng[0], bounds!.lat[0] ],     // min bound coords
             [ bounds!.lng[1], bounds!.lat[1] ] ]    // max bound coords
         : [];
+  
 
     /* -------------------------------------------------
         Initialize map and add data source for markers 
@@ -62,23 +67,31 @@ const MapCanvas: React.FunctionComponent = () => {
             if (map.current === null) {
                 map.current = new mapboxgl.Map({
                     accessToken: MAPBOX_ACCESS_TOKEN,
-                    container: mapContainer.current,
+                    container: mapContainer.current as HTMLDivElement,
                     style: mapStyle,
                     zoom: 12,
-                    bounds: bbox,
+                    bounds: bbox as mapboxgl.LngLatBoundsLike,
+                    fitBoundsOptions: {
+                        padding: getMapPaddingOffset('bound', windowSize) as mapboxgl.PaddingOptions
+                    },
                     boxZoom: false,
                     doubleClickZoom: true,
                     dragPan: true,
-                    dragRotate: false
+                    dragRotate: false,
                 });
+            }
 
-                // Set map loading status.
+            if (map.current && styleLoaded === false) {
+                // Set loaded status and add controls once map initialized.
                 map.current.on('load', () => {
                     dispatch(setStyleLoadStatus(true));
                 });
+
+                // Add map zoom controls.
+                map.current.addControl(new mapboxgl.NavigationControl(), 'bottom-left');
             }
             // Add or refresh marker source.
-            else if (styleLoaded === true) {
+            else if (map.current && styleLoaded === true) {
                 // Reset spiderfy ref.
                 if (spiderfier.current) {
                     spiderfier.current.unspiderfy();
@@ -100,7 +113,7 @@ const MapCanvas: React.FunctionComponent = () => {
                 // Add new set of data.
                 map.current.addSource('imageSource', {
                     'type': 'geojson',
-                    'data': geojson,
+                    'data': geojson as FeatureCollection,
                     'cluster': true,
                     'clusterRadius': 45,
                     'clusterMaxZoom': 15
@@ -110,7 +123,7 @@ const MapCanvas: React.FunctionComponent = () => {
                 dispatch(setSourceStatus('loaded'));
             }
         }
-    }, [bounds, styleLoaded]);
+    }, [bounds, styleLoaded, map.current]);
 
     
     /* -------------------------------------------------
@@ -119,25 +132,22 @@ const MapCanvas: React.FunctionComponent = () => {
     useEffect(() => {
         if (sourceStatus === 'loaded'
             && fitBoundsButton === 'clicked'
-            && bounds !== null) {
-                
+            && bounds !== null
+            && map.current) {
+            
             // Adjust and zoom map to fit all markers. 
             map.current.fitBounds(
-            bbox,
-            {
-                padding: {
-                    top: 150,
-                    bottom: 150,
-                    left: 250, 
-                    right: 250
-                },
-                linear: false,
-                animate: true,
-                duration: 2500,
-                curve: 1.2,
-                maxZoom: 13
-            });
-
+                bbox as mapboxgl.LngLatBoundsLike,
+                {
+                    padding: getMapPaddingOffset('bound', windowSize) as mapboxgl.PaddingOptions,
+                    linear: false,
+                    animate: true,
+                    duration: 1500,
+                    curve: 1.2,
+                    maxZoom: 13
+                }
+            );
+            
             // Reset button state.
             dispatch(handleBoundsButton('idle'));
         }
@@ -150,26 +160,37 @@ const MapCanvas: React.FunctionComponent = () => {
     useEffect(() => {
         if (sourceStatus === 'loaded'
             && markerLocator === 'clicked'
-            && enlargeDoc !== null) {
+            && enlargeDoc !== null
+            && map.current) {
             // Fly map to marker with offset to the left for image enlarger.
             const markerCoords: Array<number> = [
                 enlargeDoc.gps.lng, enlargeDoc.gps.lat
             ]; 
 
-            map.current.flyTo({
-                center: markerCoords,
-                padding: {
-                    top: 150,
-                    bottom: 150,
-                    left: 100, 
-                    right: 1000
-                },
-                linear: false,
-                animate: true,
-                duration: 2500,
-                zoom: 14,
-                maxZoom: 17
-            });
+            // Get current zoom level and only flyTo that zoom if lower value.
+            // Eliminates cases where clicks on neighbouring markers while 
+            // navigating using the map would kick into lower level zoom.
+            let currentZoomLevel: number = map.current.getZoom();
+            const toZoomLevel: number = 13;
+
+            if (currentZoomLevel < toZoomLevel) {
+                map.current.flyTo({
+                    center: markerCoords as mapboxgl.LngLatLike,
+                    offset: getMapPaddingOffset('fly', windowSize) as mapboxgl.PointLike,
+                    animate: true,
+                    duration: 1500,
+                    zoom: toZoomLevel,
+                });
+            }
+            else {
+                map.current.flyTo({
+                    center: markerCoords as mapboxgl.LngLatLike,
+                    offset: getMapPaddingOffset('fly', windowSize) as mapboxgl.PointLike,
+                    animate: true,
+                    duration: 1500,
+                    zoom: currentZoomLevel,
+                });
+            }
 
             // Reset button state.
             dispatch(handleMarkerLocator('idle'));
@@ -182,9 +203,10 @@ const MapCanvas: React.FunctionComponent = () => {
     ------------------------------------------- */
     if (sourceStatus === 'loaded'
         && markersStatus === 'idle'
-        && bounds !== null) {
+        && bounds !== null
+        && map.current) {
 
-        // Create new photo marker layer.
+            // Create new photo marker layer.
         map.current.addLayer({
             'id': 'imageMarkers',
             'type': 'symbol',
@@ -261,6 +283,9 @@ const MapCanvas: React.FunctionComponent = () => {
                     console.error('initBranchLeg: No MongoDB docs to match with Mapbox markers.');
                 }
 
+                // Add docId as id as identifier.
+                leafElem.id = "spider-pin".concat("__", dbDoc._id); 
+
                 // Clicks on leaves same as single markers, film strip clicks. 
                 leafElem.addEventListener('click', () => {
                     if (leafDocId) {
@@ -272,17 +297,12 @@ const MapCanvas: React.FunctionComponent = () => {
 
         // Adjust and zoom map to fit all markers. 
         map.current.fitBounds(
-            bbox,
+            bbox as mapboxgl.LngLatBoundsLike,
             {
-                padding: {
-                    top: 150,
-                    bottom: 150,
-                    left: 250, 
-                    right: 250
-                },
+                padding: getMapPaddingOffset('bound', windowSize) as mapboxgl.PaddingOptions,
                 linear: false,
                 animate: true,
-                duration: 3500,
+                duration: 1500,
                 curve: 1.2,
                 maxZoom: 13
             }
@@ -299,22 +319,21 @@ const MapCanvas: React.FunctionComponent = () => {
         film strip to clicked marker image.
     ---------------------------------------------------------------------------- */
     function handleImageMarkerClicks(markerDocId: string) {
-        // Scroll film strip to target image.
-        const imageFrame = document.getElementById(markerDocId);
-        if (imageFrame) {
-            imageFrame.scrollIntoView({behavior: 'smooth'});
-        }
-
         const enlargeDocId: string = enlargeDoc !== null    
             ? enlargeDoc._id
             : '';
 
         // Dispatch new doc ID to enlarger, triggering loading and opening of enlarger.
         if (markerDocId !== enlargeDocId) {
-            const markerImageDoc = imageDocs?.filter(doc => doc._id === markerDocId)[0];
-    
+            // Find index and doc.
+            const docIndex: number = imageDocs!.findIndex(doc => doc._id === markerDocId);
+            const markerImageDoc = imageDocs![docIndex];
+
             if (markerImageDoc) {
-                const payloadImageDoc: SideFilmStripProps['enlargeDoc'] = markerImageDoc;
+                const payloadImageDoc: SideFilmStripProps = {
+                    'enlargeDoc': markerImageDoc,
+                    'docIndex': docIndex
+                };
                 dispatch(handleEnlarger(payloadImageDoc));
             }
         }
@@ -335,13 +354,15 @@ const MapCanvas: React.FunctionComponent = () => {
     /* --------------------------------- 
         Handle various marker events.
     --------------------------------- */
-    if (markersStatus === 'loaded' && spiderfier.current !== null) {
+    if (markersStatus === 'loaded' 
+        && spiderfier.current !== null
+        && map.current) {
         // Change cursor when hovering over image markers.
         map.current.on('mouseenter', 'imageMarkers', () => 
-            map.current.getCanvas().style.cursor = 'pointer'
+            map.current!.getCanvas().style.cursor = 'pointer'
         );
         map.current.on('mouseleave', 'imageMarkers', () => 
-            map.current.getCanvas().style.cursor = ''
+            map.current!.getCanvas().style.cursor = ''
         );
 
         // Clicks on single image markers
@@ -356,10 +377,10 @@ const MapCanvas: React.FunctionComponent = () => {
 
         // Change cursor when hovering over image clusters.
         map.current.on('mouseenter', 'imageMarkersClusters', () => 
-            map.current.getCanvas().style.cursor = 'pointer'
+            map.current!.getCanvas().style.cursor = 'pointer'
         );
         map.current.on('mouseleave', 'imageMarkersClusters', () =>
-            map.current.getCanvas().style.cursor = ''
+            map.current!.getCanvas().style.cursor = ''
         );
         
         // Explode marker cluster into individual markers.
@@ -389,6 +410,65 @@ const MapCanvas: React.FunctionComponent = () => {
 /* =====================================================================
     Helper functions.
 ===================================================================== */
+/* ----------------------------------------------
+    Get padding/offset for map animate methods,
+    calculated off of window size.
+---------------------------------------------- */
+function getMapPaddingOffset(mode: string, windowSize: { [index: string]: number }) {
+    let padding: PaddingType = {
+        'top': 0,
+        'bottom': 0,
+        'left': 0,
+        'right': 0
+    };
+
+    let offset: Array<number> = [ 0, 0 ];
+    
+    switch(mode) {
+        case 'bound':
+            // Assign different ratios depending on type of screen.
+            let topBoundOffset = windowSize.width > 800 
+                && windowSize.width > windowSize.height
+                    ? windowSize.height * 0.15      // Non-mobile, landscape
+                    : windowSize.height * 0.13;     // Mobile or portrait
+            let bottomBoundOffset = windowSize.width > 800 
+                && windowSize.width > windowSize.height
+                    ? windowSize.height * 0.15      // Non-mobile, landscape
+                    : windowSize.height * 0.35;     // Mobile or portrait
+
+            let leftBoundOffset = windowSize.width > 800 
+                && windowSize.width > windowSize.height
+                    ? windowSize.width * 0.10       // Non-mobile, landscape
+                    : windowSize.width * 0.12;      // Mobile or portrait
+            let rightBoundOffset = windowSize.width > 800
+                && windowSize.width > windowSize.height
+                    ? windowSize.width * 0.25       // Non-mobile, landscape
+                    : windowSize.width * 0.12;      // Mobile or portrait
+
+            padding = {
+                'top': topBoundOffset,
+                'bottom': bottomBoundOffset,
+                'left': leftBoundOffset,
+                'right': rightBoundOffset
+            };
+            return padding;
+
+        case 'fly':
+            // Assign different ratios depending on type of screen.
+            let xAxisOffset = windowSize.width > 800
+                && windowSize.width > windowSize.height
+                    ? windowSize.width * -0.25      // Shifts center point to left of screen for landscape
+                    : 0;
+
+            let yAxisOffset = windowSize.width < windowSize.height
+                    ? windowSize.height * 0.10      // Shifts center point to mid-bottom of screen for portrait
+                    : 0;
+           
+            offset = [ xAxisOffset, yAxisOffset ];
+            return offset;
+    }
+};
+
 
 /* --------------------------------------------------
     Create svg element for marker cluster leaves.
@@ -399,13 +479,15 @@ function getLeafSvgIconElem() {
     const boxHeight: string = '24';
 
     const svgElem: Element = document.createElementNS(xmlns, 'svg');
-    svgElem.setAttributeNS(null, "viewBox", "0 0" + " " + boxWidth + " " + boxHeight);
+    svgElem.setAttributeNS(null, "viewBox", "0 0" + " " + "512" + " " + "512");
     svgElem.setAttributeNS(null, "width", boxWidth);
     svgElem.setAttributeNS(null, "height", boxHeight);
     
     const svgPath = document.createElementNS("http://www.w3.org/2000/svg", "path");
-    svgPath.setAttribute("d", "M19.999 4h-16c-1.103 0-2 .897-2 2v12c0 1.103.897 2 2 2h16c1.103 0 2-.897 2-2V6c0-1.103-.897-2-2-2zm-13.5 3a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3zm5.5 10h-7l4-5 1.5 2 3-4 5.5 7h-7z");
+
+    svgPath.setAttribute("d", "M456 64H56a24 24 0 00-24 24v336a24 24 0 0024 24h400a24 24 0 0024-24V88a24 24 0 00-24-24zm-124.38 64.2a48 48 0 11-43.42 43.42 48 48 0 0143.42-43.42zM76 416a12 12 0 01-12-12v-87.63L192.64 202l96.95 96.75L172.37 416zm372-12a12 12 0 01-12 12H217.63l149.53-149.53L448 333.84z");
     svgPath.setAttribute("fill", "#F0690F");
+    // svgPath.setAttribute("d", "M19.999 4h-16c-1.103 0-2 .897-2 2v12c0 1.103.897 2 2 2h16c1.103 0 2-.897 2-2V6c0-1.103-.897-2-2-2zm-13.5 3a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3zm5.5 10h-7l4-5 1.5 2 3-4 5.5 7h-7z");
 
     svgElem.appendChild(svgPath);
 
@@ -481,6 +563,18 @@ function spiderfyClusters(event: any,
             }
         );
     }
+};
+
+
+/* =====================================================================
+    Types.
+===================================================================== */
+export type PaddingType = {
+    [index: string]: number,
+    'top': number,
+    'bottom': number,
+    'left': number,
+    'right': number
 };
 
 

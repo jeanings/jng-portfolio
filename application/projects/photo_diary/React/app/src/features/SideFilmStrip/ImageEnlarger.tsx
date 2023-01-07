@@ -1,10 +1,14 @@
-import React, { ReactFragment, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { 
     useAppDispatch, 
     useAppSelector, 
     useMediaQueries } from '../../common/hooks';
 import { handleToolbarButtons, ToolbarProps } from '../Toolbar/toolbarSlice';
 import { handleMarkerLocator } from '../MapCanvas/mapCanvasSlice';
+import { 
+    handleEnlarger, 
+    handleSlideView, 
+    SideFilmStripProps } from './sideFilmStripSlice';
 import './ImageEnlarger.css';
 
 
@@ -15,20 +19,19 @@ import './ImageEnlarger.css';
 const ImageEnlarger: React.FunctionComponent <ImageEnlargerProps> = (props: ImageEnlargerProps) => {
     const dispatch = useAppDispatch();
     const imageDoc = useAppSelector(state => state.sideFilmStrip.enlargeDoc);
+    const docIndex = useAppSelector(state => state.sideFilmStrip.docIndex);
     const toolbarEnlarger = useAppSelector(state => state.toolbar.imageEnlarger);
     const timelineSelected = useAppSelector(state => state.timeline.selected);
+    const imageDocs = useAppSelector(state => state.timeline.imageDocs);
     const classBase: string = "image-enlarger";
     
-    let imageSource: string = "";
+    let imageSource: string = '';
     let imageInfo: ImageInfoType = {
         'Title': null,
-        'DateLoc': {
-            'Date': '',
-            'Loc': locateIconSVG
-        },
+        'Date': '',
         'Format': '',
         'Film': null,
-        'Focal length': '',
+        'FocalLength': '',
         'ISO': null,
         'Camera': '',
         'Lens': '',
@@ -41,6 +44,9 @@ const ImageEnlarger: React.FunctionComponent <ImageEnlargerProps> = (props: Imag
     ------------------------------------------------------------------- */
     useEffect(() => {
         if (imageDoc !== null) {
+            // Zoom map to marker.
+            dispatch(handleMarkerLocator('clicked'));
+
             // Add class to show panel.
             const payloadToolbarButtons: ToolbarProps = {
                 'filter': 'off',
@@ -62,21 +68,15 @@ const ImageEnlarger: React.FunctionComponent <ImageEnlargerProps> = (props: Imag
         Year or month selection triggers image enlarger panel to close.
     ----------------------------------------------------------------- */
     useEffect(() => {
-        if (toolbarEnlarger === 'on') {
-            const payloadToolbarButtons: ToolbarProps = {
-                'imageEnlarger': 'off'
-            };
-            dispatch(handleToolbarButtons(payloadToolbarButtons));
-        }
+        // Reset image enlarger state.
+        const payloadEnlarger: SideFilmStripProps = {
+            'enlargeDoc': null,
+            'docIndex': null
+        };
+
+        dispatch(handleEnlarger(payloadEnlarger));
     }, [timelineSelected]);
 
-
-    /* --------------------------------
-        Handles clicks on GPS locator 
-    -------------------------------- */
-    const onLocatorClick = (event: React.SyntheticEvent) => {
-        dispatch(handleMarkerLocator('clicked'));
-    };
 
     /* ------------------------------------------------------------------
         Prepare object for image info taken from << enlargeDoc >> state.
@@ -98,13 +98,14 @@ const ImageEnlarger: React.FunctionComponent <ImageEnlargerProps> = (props: Imag
             
         imageInfo = {
             'Title': imageDoc.title,
-            'DateLoc': {
-                'Date': (imageDoc.date.year + '/' + dateMonth + dateDay + '\u00A0 \u00A0 \u00A0' + dateTime).toString(),
-                'Loc': locateIconSVG
-            },
+            'Date': (
+                imageDoc.date.year + '/' + dateMonth + dateDay + 
+                (dateTime !== ''
+                    ? '\u00A0 \u00A0 \u00A0' + dateTime
+                    : '')).toString(),
             'Format': imageDoc.format.type + ' ' + imageDoc.format.medium,
             'Film': imageDoc.film,
-            'Focal length': imageDoc.focal_length_35mm + 'mm',
+            'FocalLength': imageDoc.focal_length_35mm + 'mm',
             'ISO': imageDoc.iso,
             'Camera': imageDoc.make + ' ' + imageDoc.model,
             'Lens': imageDoc.lens,
@@ -113,16 +114,90 @@ const ImageEnlarger: React.FunctionComponent <ImageEnlargerProps> = (props: Imag
         };
     }
 
-    // Create englarged image element.
     const enlargedImageElem: JSX.Element = (
         <img 
-            className={ useMediaQueries(props.baseClassName.concat("__", classBase, "__", "image")) }
-            src={ imageSource } 
+            id={ "enlarged-image" }
+            src={ imageSource }
             aria-label="enlarged image"
-        />
+            draggable="false"/>
     );
 
-    // Prepare image stats categories for generating elements.
+    // Create image navigation buttons.
+    function createImageNavButton(name: string) {
+        let clickFunction;
+        let ariaLabel: string = '';
+        let svgKey: string = '';
+
+        switch(name) {
+            case 'full-screen':
+                clickFunction = onEnlargerFullScreenClick;
+                ariaLabel = "show image full screen";
+                svgKey = "fullScreen"
+                break;
+            
+            default:
+                clickFunction = onEnlargerNavButtonClicks;
+                ariaLabel = "show".concat(" ", name, " image");
+                svgKey = name;
+        }
+    
+        return (
+            <button
+                className={ "enlarged-image__nav-buttons" }
+                id={ "enlarger".concat("-", "nav", "-", name) }
+                aria-label={ ariaLabel }
+                onClick={ clickFunction }>
+                { getNavSVG[svgKey] }
+            </button>
+        );
+    };
+
+    /* -------------------------------------------------
+        Handles clicks on enlarger navigation buttons. 
+    ------------------------------------------------- */
+    const onEnlargerNavButtonClicks = (event: React.SyntheticEvent) => {
+        const button = event.target as HTMLButtonElement;
+        const currentDocIndex = docIndex as number;
+        let changeDocIndexTo: number = currentDocIndex;
+
+        switch(button.id) {
+            case 'enlarger-nav-previous':
+                changeDocIndexTo = currentDocIndex - 1;
+                break;
+            case 'enlarger-nav-next':
+                changeDocIndexTo = currentDocIndex + 1;
+                break;
+        }
+
+        if (imageDocs) {
+            // Allow for previous/next cycling even at end of ranges.
+            let newDocIndex: number = changeDocIndexTo > imageDocs.length - 1
+                ? 0                          // Cycle back to left end.
+                : changeDocIndexTo < 0
+                    ? imageDocs.length - 1   // Cycle to right end. 
+                    : changeDocIndexTo;      // Default case.
+            
+            const payloadEnlarger: SideFilmStripProps = {
+                'enlargeDoc': imageDocs[newDocIndex],  // Triggers image change.
+                'docIndex': newDocIndex
+            };
+
+            dispatch(handleEnlarger(payloadEnlarger));
+        }
+    };
+
+    /* ---------------------------------------------
+        Handles clicks to open "slide-mode" viewer
+    --------------------------------------------- */
+    const onEnlargerFullScreenClick = (event: React.SyntheticEvent) => {
+        const payloadSlideView = 'on';
+        dispatch(handleSlideView(payloadSlideView)); 
+    };
+
+
+    /* ----------------------------------------------------------
+        Prepare image stats categories for generating elements.
+    ---------------------------------------------------------- */
     let infoElems: Array<JSX.Element> = [];
     const infoElemsClassName = useMediaQueries(
         props.baseClassName.concat("__", classBase, "__", "metadata", "-", "category"));
@@ -164,91 +239,38 @@ const ImageEnlarger: React.FunctionComponent <ImageEnlargerProps> = (props: Imag
     );
 
 
-    /* ------------------------------------------------------------
+    /* -------------------------------------------
         Create elements for each metadata item.
-        Date and marker locator is combined for stylistic reasons,
-        otherwise everything is its own category.
-    ------------------------------------------------------------- */
+    ------------------------------------------- */
     function getCategoryMetadataSpan(
         categoryName: string, 
-        categoryData: string | number | DateLocType | Array<string>) {
+        categoryData: string | number | Array<string>) {
             
         // For all the base metadata items.
-        let metaDataSpan: JSX.Element = <></>;
-        if (categoryName !== 'DateLoc') {
-            metaDataSpan = (
-                <>
-                    {/* Category names. */}
-                    <span
-                        className={ "image-enlarger__metadata".concat("-", "name") }
-                        role="figure"
-                        aria-label={ categoryName.concat(" metadata") }>
-                    
-                        { categoryName.toUpperCase() }
-                    </span>
-    
-                    {/* Category content. */}
-                    <span
-                        className={ "image-enlarger__metadata".concat("-", "value") }
-                        role="figure"
-                        aria-label={ categoryName.concat(" metadata value")}>
-                        { getCategoryData(categoryName, categoryData) }
-                    </span>
-                </>
-            )
-        }
-        // For the unique date-location element on first row.
-        else {
-            let fragments: { [index: string]: ReactFragment } = {}
-    
-            Object.entries(categoryData).forEach(item => {
-                const subcategoryName = item[0];
-                const subcategoryData = item[1];
-    
-                fragments[subcategoryName] = 
-                    <React.Fragment>
-                        {/* Category names. */}
-                        <span
-                            className={ "image-enlarger__metadata".concat(
-                                "-", "name") }
-                            role="figure"
-                            aria-label={ subcategoryName.concat(" metadata") }>
-                        
-                            { subcategoryName.toUpperCase() }
-                        </span>
-    
-                        {/* // Category content. */}
-                        <span
-                            className={ "image-enlarger__metadata".concat(
-                                "-", "value") }
-                            id={ subcategoryName === 'Loc'
-                                ? "image-enlarger__metadata-locator"
-                                : "" }
-                            role={ subcategoryName === 'Loc' 
-                                ? "button"
-                                : "figure" }
-                            aria-label={ subcategoryName === 'Loc' 
-                                ? "locate enlarged image on map"
-                                : subcategoryName.concat(" metadata value") }
-                            onClick={
-                                subcategoryName === 'Loc'
-                                    ? onLocatorClick
-                                    : undefined }>
-    
-                            { getCategoryData(subcategoryName, subcategoryData) }
-                        </span>
-                    </React.Fragment>;            
-            });
-    
-            return (
-                <React.Fragment>
-                    { fragments.Date }
-                    { fragments.Loc }
-                </React.Fragment>
-            );
-        }
+        let metaDataSpan: JSX.Element = (
+            <>
+                {/* Category names. */}
+                <span
+                    className={ "image-enlarger__metadata".concat("-", "name") }
+                    role="figure"
+                    aria-label={ categoryName.concat(" metadata") }>
+                
+                    { categoryName === 'FocalLength'
+                        ? 'Focal Length'.toUpperCase()
+                        : categoryName.toUpperCase() }
+                </span>
+
+                {/* Category content. */}
+                <span
+                    className={ "image-enlarger__metadata".concat("-", "value") }
+                    role="figure"
+                    aria-label={ categoryName.concat(" metadata value")}>
+                    { getCategoryData(categoryName, categoryData) }
+                </span>
+            </>
+        )
         return metaDataSpan;
-    }
+    };
 
     
     return (
@@ -257,7 +279,7 @@ const ImageEnlarger: React.FunctionComponent <ImageEnlargerProps> = (props: Imag
                 // Add "show" styling based on clicked state. 
                 (toolbarEnlarger === 'off'
                     ? ""
-                    : "show") }
+                    : " ".concat("show")) }
             id="image-enlarger"
             role="tab" 
             aria-label="image enlarger"
@@ -267,31 +289,64 @@ const ImageEnlarger: React.FunctionComponent <ImageEnlargerProps> = (props: Imag
                     ? "false"
                     : "true" }>
             
-            { enlargedImageElem }
-
             { imageInfoElem }
+
+            <div
+                className={ useMediaQueries(props.baseClassName.concat("__", classBase, "__", "image")) }
+                id="enlarged-image-container">
+                {/* Regular enlarged image. */}
+                { enlargedImageElem }
+            </div>
+
+            <div
+                className={ useMediaQueries("enlarged-image__nav-buttons__container") }
+                role="navigation"
+                aria-label="image enlarger navigation tools">
+                {/* Buttons on top border of image. */}
+                { createImageNavButton('previous') }
+                { createImageNavButton('full-screen') }
+                { createImageNavButton('next') }
+            </div>
 
         </div>
     );
-}
+};
 
 
 /* =====================================================================
     Helper functions.
 ===================================================================== */
-const locateIconSVG = (
-    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
-        <circle cx="12" cy="12" r="4"/>
-        <path d="M13 4.069V2h-2v2.069A8.01 8.01 0 0 0 4.069 11H2v2h2.069A8.008 8.008 0 0 0 11 19.931V22h2v-2.069A8.007 8.007 0 0 0 19.931 13H22v-2h-2.069A8.008 8.008 0 0 0 13 4.069zM12 18c-3.309 0-6-2.691-6-6s2.691-6 6-6 6 2.691 6 6-2.691 6-6 6z"/>
-    </svg>
-);
+
+/* -------------------------------------
+    SVGs for image navigation buttons.
+------------------------------------- */
+export const getNavSVG: { [index: string]: React.SVGProps<SVGSVGElement> } = {
+    'previous': (
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+            <path d="M18.464 2.114a.998.998 0 0 0-1.033.063l-13 9a1.003 1.003 0 0 0 0 1.645l13 9A1 1 0 0 0 19 21V3a1 1 0 0 0-.536-.886zM17 19.091 6.757 12 17 4.909v14.182z">
+            </path>
+        </svg>
+    ),
+    'next': (
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+            <path d="M5.536 21.886a1.004 1.004 0 0 0 1.033-.064l13-9a1 1 0 0 0 0-1.644l-13-9A.998.998 0 0 0 5 3v18a1 1 0 0 0 .536.886zM7 4.909 17.243 12 7 19.091V4.909z">
+            </path>
+        </svg>
+    ),
+    'fullScreen': (
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+            <path d="M5 5h5V3H3v7h2zm5 14H5v-5H3v7h7zm11-5h-2v5h-5v2h7zm-2-4h2V3h-7v2h5z">
+            </path>
+        </svg>
+    )
+};
 
 
 /* -----------------------------------------
     Process image metadata for displaying.
 ----------------------------------------- */
-function getCategoryData(categoryName: string, categoryData: string | number | DateLocType | Array<string>) {
-    let content: string | number | DateLocType | Array<string> = '';
+function getCategoryData(categoryName: string, categoryData: string | number | Array<string>) {
+    let content: string | number | Array<string> = '';
 
     switch(categoryName) {
         case 'Tags':
@@ -300,10 +355,10 @@ function getCategoryData(categoryName: string, categoryData: string | number | D
             break;
         default:
             content = categoryData;
-    }
+    };
 
     return content;
-}
+};
 
 
 /* =====================================================================
@@ -312,26 +367,21 @@ function getCategoryData(categoryName: string, categoryData: string | number | D
 export interface ImageEnlargerProps {
     [index: string]: string,
     'baseClassName': string
-}
+};
 
 export type ImageInfoType = {
-    [index: string]: string | number | Array<string> | DateLocType | null
+    [index: string]: string | number | Array<string> | null
     'Title': string | null,
-    'DateLoc': DateLocType,
+    'Date': string,
     'Format': string,
     'Film': string | null,
-    'Focal length': string,
+    'FocalLength': string,
     'ISO': number | null,
     'Camera': string,
     'Lens': string,
     'Tags': Array<string>,
     'Description': string | null
-}
-
-type DateLocType = {
-    'Date': string,
-    'Loc': JSX.Element
-}
+};
 
 
 export default ImageEnlarger;

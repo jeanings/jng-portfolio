@@ -23,7 +23,10 @@ const ImageFrame: React.FunctionComponent <ImageFrameProps> = (props: ImageFrame
     --------------------------------------------------------------- */
     const onImageClick = (event: React.SyntheticEvent) => {
         if (props.imageDoc !== enlargeDoc) {
-            const payloadImageDoc: SideFilmStripProps['enlargeDoc'] = props.imageDoc;
+            const payloadImageDoc: SideFilmStripProps = {
+                'enlargeDoc': props.imageDoc,
+                'docIndex': props.docIndex
+            };
             dispatch(handleEnlarger(payloadImageDoc));
         }
         else if (props.imageDoc === enlargeDoc) {
@@ -49,7 +52,11 @@ const ImageFrame: React.FunctionComponent <ImageFrameProps> = (props: ImageFrame
             onClick={ onImageClick }>
 
             <img 
-                className={ useMediaQueries(classBase.concat("__", "image")) }
+                className={ useMediaQueries(classBase.concat("__", "image")) 
+                    +   // Add class styling to indicate selected state
+                    (enlargeDoc?._id === props.imageDoc._id
+                        ? " ".concat("selected")
+                        : "") }
                 src={ props.imageDoc.url_thumb }
                 aria-label="thumbnail image"
                 draggable="false"
@@ -64,9 +71,10 @@ const ImageFrame: React.FunctionComponent <ImageFrameProps> = (props: ImageFrame
     Types.
 ===================================================================== */
 export interface ImageFrameProps {
-    [index: string]: string | ImageDocTypes
+    [index: string]: string | ImageDocTypes | number
     'baseClassName': string,
-    'imageDoc': ImageDocTypes
+    'imageDoc': ImageDocTypes,
+    'docIndex': number
 };
 
 

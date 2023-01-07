@@ -1,14 +1,21 @@
 /* Year items in menu drawer */
+.TimelineBar__year-selector li {
+    font-family: 'Barlow Semi Condensed', sans-serif;
+}
+
 .TimelineBar__year-item {
-    grid-column: 1;
-    grid-row: 1;
-    text-align: center;
-    align-self: center;
     display: none;
+    align-self: flex-start;
+    pointer-events: all;
     transition: 350ms all;
 }
 
     .TimelineBar__year-item:hover {
         color: var(--colour-accent-secondary);
+        transition: 350ms all;
+    }
+
+    .TimelineBar__year-item.active {
+        color: var(--colour-accent-primary);
         transition: 350ms all;
     }
