@@ -5,33 +5,22 @@ import {
     useAppDispatch, 
     useAppSelector, 
     useMediaQueries } from '../../common/hooks';
-import { 
-    fetchImagesData, 
-    handleInitStatus, 
-    ImageDocsRequestProps,
-    TimelineMonthTypes } from '../../features/TimelineBar/timelineSlice';
+import { fetchImagesData, ImageDocsRequestProps } from '../../features/TimelineBar/timelineSlice';
 import YearButton from './YearButton';
 import MonthButton from './MonthButton';
-import { getFilterStateStatus } from '../FilterDrawer/FilterDrawer';
 import './TimelineBar.css';
 
 
 /* ==============================================================
     A main component - container for the date selector up top.
-    Entry point for requesting initial images data from API,
-    and subsequent fetches on year and month queries.
+    Entry point for fetching initial images data from API.
 ===============================================================*/
 const TimelineBar: React.FunctionComponent = () => {
     const dispatch = useAppDispatch();
-    const [ yearSelectorHovered, setYearSelectorHovered ] = useState(false);
-    const initYear = useAppSelector(state => state.timeline.yearInit);
-    const initFetch: boolean = useAppSelector(state => state.timeline.request) === 'initialized'
-        ? true
-        : false;
+    const [ isYearSelectorHovered, setYearSelectorHovered ] = useState(false);
+    const initYear = useAppSelector(state => state.timeline.initYear);
     const collectionYears = useAppSelector(state => state.timeline.years);
     const selectedYear = useAppSelector(state => state.timeline.selected.year);
-    const selectedMonth = useAppSelector(state => state.timeline.selected.month);
-    const filterState = useAppSelector(state => state.filter);
     const classBase: string = "TimelineBar";
 
     /* ------------------------------------------
@@ -48,45 +37,10 @@ const TimelineBar: React.FunctionComponent = () => {
     }, []);
 
 
-    /* --------------------------------------------------------
-        Handles all the main non-filtered fetches related to 
-        << selected.year >> and << selected.month >>.
-        The handler for year and month item clicks, triggered
-        by the above mentioned states.
-    --------------------------------------------------------- */
-    useEffect(() => {
-        const filterStatus = getFilterStateStatus(filterState);
-        // Only handle fetch calls if filters are off.
-        // Otherwise let FilterDrawer useEffect handle fetches.
-        if (filterStatus === 'off') {
-            // For all regular cases after initialization.
-            if (initYear !== null && initFetch === false ) {    // initFetch keeps from re-rendering. 
-                let payload: ImageDocsRequestProps = { 'year': selectedYear as number };
-
-                switch (selectedMonth) {
-                    case ('all'):
-                        // For 'all' default cases, ie year selects.
-                        break;
-                    default:
-                        // For month selected cases.
-                        const month = getNumericalMonth(selectedMonth as TimelineMonthTypes);
-                        payload['month'] = month;
-                };
-                dispatch(fetchImagesData(payload));
-            }
-            // Set request status after initialization..
-            else if (initYear !== null) {
-                const payloadInitStatus = 'complete';
-                dispatch(handleInitStatus(payloadInitStatus));
-            }
-        }
-    }, [selectedYear, selectedMonth, filterState])
-
-
     // Build list of selectable years, based on collections in db.
     let selectableYears: Array<string> = [];
     let yearElems: Array<JSX.Element> = [];
-    selectableYears = collectionYears as Array<string>
+    selectableYears = collectionYears as Array<string>;
 
     if (selectableYears) {
         [...selectableYears].reverse().map((year, index) => (
@@ -113,9 +67,9 @@ const TimelineBar: React.FunctionComponent = () => {
         Handle dropdown of year selector on hover/touch.
     ------------------------------------------------------ */
     const onYearSelectorHover = (event: React.SyntheticEvent) => {
-        yearSelectorHovered === false
+        isYearSelectorHovered === false
             ? setYearSelectorHovered(true)
-            : setYearSelectorHovered(false)
+            : setYearSelectorHovered(false);
     };
 
 
@@ -128,7 +82,7 @@ const TimelineBar: React.FunctionComponent = () => {
             <div 
                 className={ useMediaQueries(classBase.concat("__", "year-selector")) 
                     +   // Add "dropdown" styling on hover
-                    (yearSelectorHovered === false
+                    (isYearSelectorHovered === false
                         ? ""
                         : " ".concat("dropdown"))}
                 role="menubar"
@@ -201,23 +155,6 @@ function createMonthButton(month: string, index: number, classBase: string) {
     );
 
     return monthButton;
-};
-
-
-/* -----------------------------------
-    Month to numerical month mapper.
------------------------------------ */
-export function getNumericalMonth(month: string) {
-    const monthToNum: { [key: string]: number } = {
-        'jan': 1, 'feb': 2, 'mar': 3,
-        'apr': 4, 'may': 5, 'jun': 6,
-        'jul': 7, 'aug': 8, 'sep': 9,
-        'oct': 10, 'nov': 11, 'dec': 12
-    };
-
-    const monthNum: number = monthToNum[month];
-
-    return monthNum
 };
 
 

@@ -50,9 +50,9 @@ afterEach(() => {
 ------------------------------------------------- */
 const preloadedState: RootState = {
     timeline: {
-        request: 'complete',
+        responseStatus: 'successful',
         query: { year: 2022 },
-        yearInit: 2022,
+        initYear: 2022,
         selected: { year: 2022, month: 'all' },
         years: mockDefaultData.years,
         counter: {

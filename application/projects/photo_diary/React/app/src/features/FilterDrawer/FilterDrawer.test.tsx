@@ -38,9 +38,9 @@ afterEach(() => {
 ------------------------------------------------- */
 const preloadedState: RootState = {
     timeline: {
-        request: 'complete',
+        responseStatus: 'successful',
         query: { year: 2022 },
-        yearInit: 2022,
+        initYear: 2022,
         selected: { year: 2022, month: 'all' },
         years: mockDefaultData.years,
         counter: {
@@ -91,9 +91,9 @@ const preloadedState: RootState = {
 
 const preloadedStateWithFilter: RootState = {
     timeline: {
-        request: 'complete',
+        responseStatus: 'successful',
         query: { year: 2022, tags: [ "Kodak_Gold_200", "Fujifilm_Superia_X-TRA_400" ] },
-        yearInit: 2022,
+        initYear: 2022,
         selected: { year: 2022, month: 'all' },
         years: mockDefaultData.years,
         counter: preloadedState.timeline.counter,

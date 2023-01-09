@@ -5,7 +5,10 @@ import {
     useMediaQueries } from '../../common/hooks';
 import { getFilterStateStatus } from '../FilterDrawer/FilterDrawer';
 import { clearFilters } from '../FilterDrawer/filterDrawerSlice';
-import { handleYearSelect } from './timelineSlice';
+import { 
+    handleYearSelect, 
+    fetchImagesData,
+    ImageDocsRequestProps } from './timelineSlice';
 import './YearButton.css';
 
 
@@ -19,26 +22,30 @@ const YearButton: React.FunctionComponent<YearButtonProps> = (props: YearButtonP
     const selectedYear = useAppSelector(state => state.timeline.selected.year);
     const filterState = useAppSelector(state => state.filter);
 
-
-    /* -------------------------------------------------------
-        Clicks on year selector items will dispatch action to
-        update << timeline.selected.year >>.
-        Fetches handled by useEffect in TimelineBar.
-    ------------------------------------------------------- */
+    /* ------------------------------------------------------------------------------
+        Clicks on year selector items will dispatch action to update 
+        << timeline.selected.year >>.  Fetches handled by useEffect in TimelineBar.
+    ------------------------------------------------------------------------------ */
     const onYearSelect = (event: React.SyntheticEvent) => {
-        // Dispatch selected year to reducer.
         const payloadYearSelected: number = parseInt(props.year);
         const filterStatus = getFilterStateStatus(filterState);
 
         if (filterStatus === 'on') {
+            // Update selected year.
             // << year >> dispatch with filters 'on' won't trigger fetch.
             dispatch(handleYearSelect(payloadYearSelected));
             // clearFilters has fetch attached via useEffect in FilterDrawer.
             dispatch(clearFilters("RESET TO INIT STATE"));
         }
         else {
-            // Dispatch year update, fetch handled in TimelineBar.
+            // Update selected year.
             dispatch(handleYearSelect(payloadYearSelected));
+
+            // Dispatch fetch request for newly selected year.
+            let payloadFetchYear: ImageDocsRequestProps = { 
+                'year': payloadYearSelected
+            };
+            dispatch(fetchImagesData(payloadFetchYear));
         }
     };
     

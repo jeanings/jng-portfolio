@@ -3,7 +3,11 @@ import {
     useAppDispatch, 
     useAppSelector,
     useMediaQueries } from '../../common/hooks';
-import { handleMonthSelect } from './timelineSlice';
+import { 
+    handleMonthSelect,
+    fetchImagesData,
+    ImageDocsRequestProps,
+    TimelineMonthTypes } from './timelineSlice';
 import MonthCounter from './MonthCounter';
 import './MonthButton.css';
 
@@ -14,16 +18,28 @@ import './MonthButton.css';
 ============================================================= */
 const MonthButton: React.FunctionComponent<MonthButtonProps> = (props: MonthButtonProps) => {
     const dispatch = useAppDispatch();
+    const selectedYear = useAppSelector(state => state.timeline.selected.year);
     const selectedMonth = useAppSelector(state => state.timeline.selected.month);
 
-    
     /* -------------------------------------------------------------
         Clicks on month selector items will update selected month, 
-        triggering a useEffect fetch dispatch in component.
+        dispatch fetch request for selected year and month.
     ------------------------------------------------------------- */
     const onMonthSelect = (event: React.SyntheticEvent) => {
+        // Update selected month.
         const payloadMonthSelected: string = props.month;
         dispatch(handleMonthSelect(payloadMonthSelected));
+
+        // Dispatch fetch request for newly selected month.
+        // Prepare fetch payload.
+        let payloadFetchMonth: ImageDocsRequestProps = { 
+            'year': selectedYear as number
+        };
+        // month value in fetch request needs to be numerical.
+        const month = getNumericalMonth(props.month as TimelineMonthTypes);
+        payloadFetchMonth['month'] = month;
+
+        dispatch(fetchImagesData(payloadFetchMonth));
     };
   
     
@@ -72,8 +88,24 @@ function createMonthCounter(month: string, classBase: string, index: number) {
     );
 
     return monthCounter;
-}
+};
 
+
+/* -----------------------------------
+    Month to numerical month mapper.
+----------------------------------- */
+export function getNumericalMonth(month: string) {
+    const monthToNum: { [key: string]: number } = {
+        'jan': 1, 'feb': 2, 'mar': 3,
+        'apr': 4, 'may': 5, 'jun': 6,
+        'jul': 7, 'aug': 8, 'sep': 9,
+        'oct': 10, 'nov': 11, 'dec': 12
+    };
+
+    const monthNum: number = monthToNum[month];
+
+    return monthNum;
+};
 
 /* =====================================================================
     Types.

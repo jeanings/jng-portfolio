@@ -11,7 +11,7 @@ import {
     ImageDocFormatTypes,
     TimelineMonthTypes, 
     FilterableTypes } from '../TimelineBar/timelineSlice';
-import { getNumericalMonth } from '../TimelineBar/TimelineBar';
+import { getNumericalMonth } from '../TimelineBar/MonthButton';
 import './FilterDrawer.css';
 
 
