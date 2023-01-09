@@ -3,8 +3,6 @@ import {
     useAppDispatch, 
     useAppSelector, 
     useMediaQueries } from '../../common/hooks';
-import { getFilterStateStatus } from '../FilterDrawer/FilterDrawer';
-import { clearFilters } from '../FilterDrawer/filterDrawerSlice';
 import { 
     handleYearSelect, 
     fetchImagesData,
@@ -12,41 +10,29 @@ import {
 import './YearButton.css';
 
 
-/* =============================================================
-    Button constructor for dropdown menu of year items.
-    Clicks will dispatch fetch request to async thunk,
-    getting new image data for the clicked year. 
-============================================================= */
+/* =============================================================================
+    Button constructor for dropdown menu of year items.  Clicks will dispatch 
+    fetch request to async thunk, getting new image data for the clicked year. 
+============================================================================= */
 const YearButton: React.FunctionComponent<YearButtonProps> = (props: YearButtonProps) => {
     const dispatch = useAppDispatch();
     const selectedYear = useAppSelector(state => state.timeline.selected.year);
-    const filterState = useAppSelector(state => state.filter);
 
-    /* ------------------------------------------------------------------------------
-        Clicks on year selector items will dispatch action to update 
-        << timeline.selected.year >>.  Fetches handled by useEffect in TimelineBar.
-    ------------------------------------------------------------------------------ */
+    /* -------------------------------------------------------------------------
+        Clicks on year selector items will update << timeline.selected.year >>
+        and fetch data for clicked year. 
+    ------------------------------------------------------------------------- */
     const onYearSelect = (event: React.SyntheticEvent) => {
         const payloadYearSelected: number = parseInt(props.year);
-        const filterStatus = getFilterStateStatus(filterState);
 
-        if (filterStatus === 'on') {
-            // Update selected year.
-            // << year >> dispatch with filters 'on' won't trigger fetch.
-            dispatch(handleYearSelect(payloadYearSelected));
-            // clearFilters has fetch attached via useEffect in FilterDrawer.
-            dispatch(clearFilters("RESET TO INIT STATE"));
-        }
-        else {
-            // Update selected year.
-            dispatch(handleYearSelect(payloadYearSelected));
+        // Update selected year.
+        dispatch(handleYearSelect(payloadYearSelected));
 
-            // Dispatch fetch request for newly selected year.
-            let payloadFetchYear: ImageDocsRequestProps = { 
-                'year': payloadYearSelected
-            };
-            dispatch(fetchImagesData(payloadFetchYear));
-        }
+        // Dispatch fetch request for newly selected year.
+        let payloadFetchYear: ImageDocsRequestProps = { 
+            'year': payloadYearSelected
+        };
+        dispatch(fetchImagesData(payloadFetchYear));
     };
     
 
