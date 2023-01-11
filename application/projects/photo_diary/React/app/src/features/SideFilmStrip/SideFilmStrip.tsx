@@ -26,7 +26,8 @@ const SideFilmStrip: React.FunctionComponent = () => {
     const dispatch = useAppDispatch();
     const [ filmStripHovered, setFilmStripHovered ] = useState(false);
     const [ slideImageIndex, setSlideImageIndex ] = useState<number | null>(null);
-    const [ imageViewableInFilmStrip, setImageViewableInFilmStrip ] = useState(true);
+    const [ isImageViewableInFilmStrip, setIsImageViewableInFilmStrip ] = useState(true);
+    const isLoaded = useAppSelector(state => state.timeline.responseStatus);
     const imageDocs = useAppSelector(state => state.timeline.imageDocs);
     const imageDoc = useAppSelector(state => state.sideFilmStrip.enlargeDoc);
     const docIndex = useAppSelector(state => state.sideFilmStrip.docIndex);
@@ -115,7 +116,7 @@ const SideFilmStrip: React.FunctionComponent = () => {
             const observerCallback = (entries: Array<IntersectionObserverEntry>) => {
                 const [entry] = entries;
                 // Trigger scroll into view depending if selected frame in viewport.
-                setImageViewableInFilmStrip(entry.isIntersecting);
+                setIsImageViewableInFilmStrip(entry.isIntersecting);
 
                 // CLean up observer.
                 filmStripObserverRef.current?.disconnect();
@@ -131,11 +132,11 @@ const SideFilmStrip: React.FunctionComponent = () => {
             // Set observer.
             filmStripObserverRef.current.observe(imageFrame);
             
-            if (imageViewableInFilmStrip === false) {
+            if (isImageViewableInFilmStrip === false) {
                 imageFrame.scrollIntoView({ behavior: 'smooth' });
             }
         }
-    }, [imageDoc, imageViewableInFilmStrip])
+    }, [imageDoc, isImageViewableInFilmStrip])
     
 
     /* ---------------------------------------
@@ -300,7 +301,11 @@ const SideFilmStrip: React.FunctionComponent = () => {
     return (
         <>
             <aside 
-                className={ useMediaQueries(classBase) }
+                className={ useMediaQueries(classBase) 
+                    +   // Add styling for loading: hidden if initial fetch not loaded
+                    (isLoaded === 'uninitialized'
+                        ? " ".concat("loading")
+                        : "") }
                 id={ classBase }
                 role="main"
                 aria-label="images panel">
