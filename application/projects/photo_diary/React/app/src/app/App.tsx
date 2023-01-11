@@ -1,5 +1,5 @@
 import React from 'react';
-import { useMediaQueries } from '../common/hooks';
+import { useAppSelector, useMediaQueries } from '../common/hooks';
 import TimelineBar from '../features/TimelineBar/TimelineBar';
 import FilterDrawer from '../features/FilterDrawer/FilterDrawer';
 import MapCanvas from '../features/MapCanvas/MapCanvas';
@@ -17,6 +17,7 @@ export const apiUrl: string = DEV_MODE === 'True'
     Entry point of application.  Renders the base structure of the app.
 ===================================================================== */
 const App: React.FunctionComponent = () => {
+    const isLoaded = useAppSelector(state => state.timeline.responseStatus);
     const classBase: string = 'App';
 
     /* ------------------
@@ -78,7 +79,11 @@ const App: React.FunctionComponent = () => {
     
     return (
         <div 
-            className={ useMediaQueries(classBase) }>
+            className={ useMediaQueries(classBase) 
+                +   // Add styling for loading: hidden if initial fetch not loaded 
+                (isLoaded === 'uninitialized'
+                    ? " ".concat("loading")
+                    : "") }>
             <NavBar />
             <TimelineBar />
             <FilterDrawer />

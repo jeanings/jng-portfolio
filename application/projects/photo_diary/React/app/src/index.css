@@ -32,4 +32,5 @@
   #root {
     height: 100vh;    /* 100vh required for desktop view */
     display: grid;
+    background-color: #000000;
   }
