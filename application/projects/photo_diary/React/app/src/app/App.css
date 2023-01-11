@@ -17,7 +17,24 @@
     background-color: var(--colour-background);
     color: var(--colour-text-inactive);
     overflow: hidden;
+    animation-name: fetch-loaded;
+    animation-duration: 2500ms;
+    animation-fill-mode: forwards;
+    animation-timing-function: cubic-bezier(0.4, 0, 1, 1);
 }
+    @keyframes fetch-loaded {
+        0% {
+            opacity: 0;
+        }
+
+        100% {
+            opacity: 1;
+        }
+    }
+
+    .App.loading {
+        opacity: 0;
+    }
 
 
 /* ==================================================================================

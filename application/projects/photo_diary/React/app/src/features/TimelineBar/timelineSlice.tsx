@@ -89,9 +89,9 @@ export const fetchDocs = (apiUrl: string, request: ImageDocsRequestProps) => {
 ------------------------------------------ */
 // State for initial render.
 const initialState: TimelineProps = {
-    request: 'idle',
+    responseStatus: 'uninitialized',
     query: null,
-    yearInit: null,
+    initYear: null,
     selected: {
         year: null,
         month: 'all'
@@ -125,9 +125,9 @@ const timelineSlice = createSlice({
         /* -------------------------------------------------
             Handles setting request after app initialized.
         ------------------------------------------------- */
-        handleInitStatus: (state, action) => {
-            const status = action.payload;
-            state.request = status;
+        handleResponseStatus: (state, action) => {
+            const responseStatus = action.payload;
+            state.responseStatus = responseStatus;
         },
         /* ----------------------------------------------------------
             Handles year selection for style, attribute updates.
@@ -183,16 +183,16 @@ const timelineSlice = createSlice({
                 state.query = args;
 
                 // Assigning year-related states on init.
-                if (state.yearInit === null) {
-                    const yearInit: number = args.year !== 'default'
+                if (state.initYear === null) {
+                    const initYear: number = args.year !== 'default'
                         ? args.year                     // Sets to year of fetch request
                         : imageDocs[0].date.year        // Sets to year of image docs if 'default'
-                    state.yearInit = yearInit;
-                    state.selected.year = yearInit;
-                    state.request = 'initialized';
+                    state.initYear = initYear;
+                    state.selected.year = initYear;
+                    state.responseStatus = 'initialized';
                 }
                 else {
-                    state.request = 'complete';
+                    state.responseStatus = 'successful';
                 }
     
                 // Assign list of years in the collection.
@@ -241,7 +241,7 @@ const timelineSlice = createSlice({
             --------------------------------------- */
             .addMatcher(isRejectedAction, (state, action) => {
                 // MongoDB image data action rejected.
-                state.request = 'error';
+                state.responseStatus = 'error';
             })
     },
 });
@@ -252,9 +252,9 @@ const timelineSlice = createSlice({
 ===================================================================== */
 export interface TimelineProps {
     [index: string]: string | any,
-    'request': 'idle' | 'pending' | 'initialized' | 'complete' | 'error',
+    'responseStatus': 'uninitialized' | 'initialized' | 'pending' | 'successful' | 'error',
     'query': ImageDocsRequestProps | null,
-    'yearInit': number | null,
+    'initYear': number | null,
     'selected': {
         'year': number | null,
         'month': string | null
@@ -395,5 +395,5 @@ export const {
     handleYearSelect, 
     handleMonthSelect, 
     handleMonthCounter,
-    handleInitStatus } = actions;
+    handleResponseStatus } = actions;
 export default reducer;

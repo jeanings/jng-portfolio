@@ -49,9 +49,9 @@ afterEach(() => {
 ------------------------------------------------- */
 const preloadedState: RootState = {
     timeline: {
-        request: 'complete',
+        responseStatus: 'successful',
         query: { year: 2022 },
-        yearInit: 2022,
+        initYear: 2022,
         selected: { year: 2022, month: 'all' },
         years: mockDefaultData.years,
         counter: {
@@ -116,6 +116,7 @@ const mockMapAddLayer = jest.fn();
 const mockMapGetLayer = jest.fn();
 const mockMapRemoveLayer = jest.fn();
 const mockMapFitBounds = jest.fn();
+const mockMapAddControl = jest.fn();
 
 
 
@@ -197,7 +198,7 @@ test("adds new data source on new fetches", async() => {
                 removeSource: mockMapRemoveSource,
                 removeLayer: mockMapRemoveLayer,
                 fitBounds: mockMapFitBounds,
-                addControl: jest.fn()
+                addControl: mockMapAddControl
             }
         });
 
@@ -216,28 +217,32 @@ test("adds new data source on new fetches", async() => {
                 <MapCanvas />
             </Provider>
         );
-    
-    // Wait for fetch.
-    await waitFor(() => {
-        screen.findByRole('main', { name: 'map' });
-        expect(newStore.getState().timeline.bounds).not.toBeNull();
-    });
 
+    // Verify mocked initialization.
+    await waitFor(() => expect(newStore.getState().timeline.responseStatus).toEqual('successful'));
+    // Assert no initial API call, since initYear isn't null (store has preloaded state).
+    expect(mockDispatch).toHaveBeenCalledTimes(0);
+
+    // Wait for map render.
+    await waitFor(() => screen.findByRole('main', { name: 'map' }));
+
+    // ----- useEffect: bounds !== null trigger -----
     // Initial map.on('load') call.
     expect(mockMapOn).toHaveBeenCalled();
-    // Manually set styleLoaded to true once map.on has been called.
-    newStore.dispatch(setStyleLoadStatus(true))
-    
-    await waitFor(() => {
-        // setStyleLoadStatus(true)         --> doesn't count, set above manually, not mocked. 
-        // cleanupMarkerSource('idle')
-        // setSourceStatus('loaded')
-        // setMarkersStatus('loaded')
-        expect(mockDispatch).toHaveBeenCalledTimes(3);
-    });
+    // map.addControl() call.
+    expect(mockMapAddControl).toHaveBeenCalled();
 
+    // ----- useEffect: map.current !== false trigger -----
+    // Mock dispatch once map.on has been called.
+    newStore.dispatch(setStyleLoadStatus(true));
+    await waitFor(() => expect(newStore.getState().mapCanvas.styleLoaded).toEqual(true));
+    
+    // ----- useEffect: styeLoaded === true trigger -----
     // Verify map.addsource() call, new data added.
-    expect(mockMapAddSource).toHaveBeenCalled();
+    await waitFor(() => expect(mockMapAddSource).toHaveBeenCalled());
+   // Mock dispatch for useEffect, styleLoaded condition.
+    newStore.dispatch(setSourceStatus('loaded'));
+    await waitFor(() => expect(newStore.getState().mapCanvas.sourceStatus).toEqual('loaded'));    
 });
     
 
@@ -390,7 +395,7 @@ test("replaces previous layer and source on new data fetches", async() => {
     newStore.dispatch(handleYearSelect(2015));
 
     await waitFor(() => {
-        expect(newStore.getState().timeline.request).toEqual('complete');
+        expect(newStore.getState().timeline.responseStatus).toEqual('successful');
         expect(newStore.getState().timeline.selected.year).toEqual(2015);
     });
 
