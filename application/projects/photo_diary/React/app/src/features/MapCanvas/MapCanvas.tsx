@@ -48,6 +48,7 @@ const MapCanvas: React.FunctionComponent = () => {
     const mapStyle: string = process.env.REACT_APP_MAPBOX_STYLE as string;
     const mapContainer = useRef<HTMLDivElement | null>(null);
     const map = useRef<mapboxgl.Map | null>(null);
+    const mapControl = useRef<mapboxgl.IControl>(new mapboxgl.NavigationControl());
     const markerIconImage: string = 'image-sharp';
     const markerIconPin: string ='images-sharp';
     const spiderfier = useRef<any | null>(null);
@@ -56,11 +57,9 @@ const MapCanvas: React.FunctionComponent = () => {
             [ bounds!.lng[1], bounds!.lat[1] ] ]    // max bound coords
         : [];
   
-
-    /* -------------------------------------------------
-        Initialize map and add data source for markers 
-        once data is loaded into state.
-    ------------------------------------------------- */
+    /* ----------------------------------------------------
+        Initialize map once data is successfully fetched.
+    ---------------------------------------------------- */
     useEffect(() => {
         if (bounds !== null) {
             // Initialize map.
@@ -80,52 +79,89 @@ const MapCanvas: React.FunctionComponent = () => {
                     dragRotate: false,
                 });
             }
+        }
+    }, [bounds, map.current]);
 
-            if (map.current && styleLoaded === false) {
-                // Set loaded status and add controls once map initialized.
-                map.current.on('load', () => {
-                    dispatch(setStyleLoadStatus(true));
-                });
-
-                // Add map zoom controls.
-                map.current.addControl(new mapboxgl.NavigationControl(), 'bottom-left');
-            }
-            // Add or refresh marker source.
-            else if (map.current && styleLoaded === true) {
-                // Reset spiderfy ref.
-                if (spiderfier.current) {
-                    spiderfier.current.unspiderfy();
-                    spiderfier.current = null;
-                }
-
-                // Remove previous marker counter layer.
-                removeMapLayerSource(map, 'layer', 'imageMarkersCounter');
-                // Remove previous markers clusters layer.
-                removeMapLayerSource(map, 'layer', 'imageMarkersClusters');
-                // Remove previous marker layer.
-                removeMapLayerSource(map, 'layer', 'imageMarkers');
-                // Remove previous source data.
-                removeMapLayerSource(map, 'source', 'imageSource');
-
-                // Update map state so layer-adding effect triggers later.
-                dispatch(cleanupMarkerSource('idle'));
-                
-                // Add new set of data.
-                map.current.addSource('imageSource', {
-                    'type': 'geojson',
-                    'data': geojson as FeatureCollection,
-                    'cluster': true,
-                    'clusterRadius': 45,
-                    'clusterMaxZoom': 15
-                });
     
-                // Set 'loaded' state to trigger addLayers.
-                dispatch(setSourceStatus('loaded'));
+    /* ----------------------------------------------------------------------
+        Once map initialized and data fetched, add data source for markers.
+    ---------------------------------------------------------------------- */
+    useEffect(() => {
+        // Set loaded status and add controls once map initialized.
+        if (bounds !== null && map.current && styleLoaded === false) {
+            map.current.on('load', () => {
+                dispatch(setStyleLoadStatus(true));
+            });
+        }
+    }, [styleLoaded, bounds, map.current]);
+
+
+    /* --------------------------------------------------------------------
+        On new data fetches (bounds updated), refresh marker data source.
+    -------------------------------------------------------------------- */
+    useEffect(() => {
+        // Add or refresh marker source.
+        if (bounds !== null && map.current && styleLoaded === true) {
+            // Reset spiderfy ref.
+            if (spiderfier.current) {
+                spiderfier.current.unspiderfy();
+                spiderfier.current = null;
+            }
+
+            // Remove previous marker counter layer.
+            removeMapLayerSource(map, 'layer', 'imageMarkersCounter');
+            // Remove previous markers clusters layer.
+            removeMapLayerSource(map, 'layer', 'imageMarkersClusters');
+            // Remove previous marker layer.
+            removeMapLayerSource(map, 'layer', 'imageMarkers');
+            // Remove previous source data.
+            removeMapLayerSource(map, 'source', 'imageSource');
+
+            // Update map state so layer-adding effect triggers later.
+            dispatch(cleanupMarkerSource('idle'));
+            
+            // Add new set of data.
+            map.current.addSource('imageSource', {
+                'type': 'geojson',
+                'data': geojson as FeatureCollection,
+                'cluster': true,
+                'clusterRadius': 45,
+                'clusterMaxZoom': 15
+            });
+
+            // Set 'loaded' state to trigger addLayers.
+            dispatch(setSourceStatus('loaded'));
+        }        
+    }, [bounds, styleLoaded, map.current])
+
+
+    /* ------------------------------------------------------------
+        Add map zoom controls to bottom left corner on loaded map.
+    ------------------------------------------------------------ */
+    useEffect(() => {
+        if (map.current && styleLoaded === true) {
+            // Only add controls for larger, non-mobile screens.
+            const controlAdded: boolean = map.current.hasControl(mapControl.current);
+            const shouldAddControls: boolean = windowSize.width >= 800
+                && windowSize.width > windowSize.height
+                    ? true
+                    : false;
+
+            // Add map zoom controls.
+            if (shouldAddControls === true) {
+                if (controlAdded === false) {
+                    map.current.addControl(mapControl.current, 'bottom-left');
+                }
+            }
+            else {
+                if (controlAdded === true) {
+                    map.current.removeControl(mapControl.current);
+                }
             }
         }
-    }, [bounds, styleLoaded, map.current]);
+    }, [styleLoaded, windowSize, mapControl.current, map.current])
 
-    
+
     /* -------------------------------------------------
         Map bounds-fitter for toolbar bounds button.
     ------------------------------------------------- */
@@ -427,20 +463,20 @@ function getMapPaddingOffset(mode: string, windowSize: { [index: string]: number
     switch(mode) {
         case 'bound':
             // Assign different ratios depending on type of screen.
-            let topBoundOffset = windowSize.width > 800 
+            let topBoundOffset = windowSize.width >= 800 
                 && windowSize.width > windowSize.height
                     ? windowSize.height * 0.15      // Non-mobile, landscape
                     : windowSize.height * 0.13;     // Mobile or portrait
-            let bottomBoundOffset = windowSize.width > 800 
+            let bottomBoundOffset = windowSize.width >= 800 
                 && windowSize.width > windowSize.height
                     ? windowSize.height * 0.15      // Non-mobile, landscape
                     : windowSize.height * 0.35;     // Mobile or portrait
 
-            let leftBoundOffset = windowSize.width > 800 
+            let leftBoundOffset = windowSize.width >= 800 
                 && windowSize.width > windowSize.height
                     ? windowSize.width * 0.10       // Non-mobile, landscape
                     : windowSize.width * 0.12;      // Mobile or portrait
-            let rightBoundOffset = windowSize.width > 800
+            let rightBoundOffset = windowSize.width >= 800
                 && windowSize.width > windowSize.height
                     ? windowSize.width * 0.25       // Non-mobile, landscape
                     : windowSize.width * 0.12;      // Mobile or portrait
@@ -461,7 +497,7 @@ function getMapPaddingOffset(mode: string, windowSize: { [index: string]: number
                     : 0;
 
             let yAxisOffset = windowSize.width < windowSize.height
-                    ? windowSize.height * 0.10      // Shifts center point to mid-bottom of screen for portrait
+                    ? windowSize.height * -0.25      // Shifts center point to mid-bottom of screen for portrait
                     : 0;
            
             offset = [ xAxisOffset, yAxisOffset ];

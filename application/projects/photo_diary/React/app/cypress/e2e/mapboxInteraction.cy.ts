@@ -150,6 +150,8 @@ describe('interactions with mapbox (markers)', () => {
         cy.get('@imageStrip')
             .trigger('mouseleave');
 
+        cy.wait(300);
+
         // Click on marker.
         cy.get('@markerToClick')
             .click();
@@ -162,6 +164,9 @@ describe('interactions with mapbox (markers)', () => {
 
         // Allow map to transition.
         cy.wait(2000);
+
+        // Allow film strip to transition.
+        cy.wait(500);
 
         // Verify film strip scrolled to thumbnail of marker/image.
         cy.get('@thumbnailToShow')

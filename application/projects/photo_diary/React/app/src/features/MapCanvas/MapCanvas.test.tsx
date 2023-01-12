@@ -117,7 +117,8 @@ const mockMapGetLayer = jest.fn();
 const mockMapRemoveLayer = jest.fn();
 const mockMapFitBounds = jest.fn();
 const mockMapAddControl = jest.fn();
-
+const mockMapRemoveControl = jest.fn();
+const mockMapHasControl = jest.fn();
 
 
 /* ================================================
@@ -148,7 +149,9 @@ test("initializes map on rendering", async() => {
                 removeSource: mockMapRemoveSource,
                 removeLayer: mockMapRemoveLayer,
                 fitBounds: mockMapFitBounds,
-                addControl: jest.fn()
+                addControl: mockMapAddControl,
+                removeControl: mockMapRemoveControl,
+                hasControl: mockMapHasControl
             }
         });
     /* --------------------------------------------------------
@@ -174,7 +177,7 @@ test("initializes map on rendering", async() => {
 });
 
 
-test("adds new data source on new fetches", async() => {
+test("adds new data source on new fetches and adds zoom controls", async() => {
     /* --------------------------------------------------------
         Mocks                                          start
     -------------------------------------------------------- */
@@ -198,14 +201,20 @@ test("adds new data source on new fetches", async() => {
                 removeSource: mockMapRemoveSource,
                 removeLayer: mockMapRemoveLayer,
                 fitBounds: mockMapFitBounds,
-                addControl: mockMapAddControl
+                addControl: mockMapAddControl,
+                removeControl: mockMapRemoveControl,
+                hasControl: jest.fn().mockReturnValue(false)
             }
         });
-
+        
     // Mocked React functions.
     const useDispatchSpy = jest.spyOn(reactRedux, 'useDispatch');
     const mockDispatch = jest.fn();
     useDispatchSpy.mockReturnValue(mockDispatch);
+
+    // Set viewport size.
+    global.innerWidth = 1920;
+    global.innerHeight = 1080;
     /* --------------------------------------------------------
         Mocks                                            end
     -------------------------------------------------------- */
@@ -226,21 +235,21 @@ test("adds new data source on new fetches", async() => {
     // Wait for map render.
     await waitFor(() => screen.findByRole('main', { name: 'map' }));
 
-    // ----- useEffect: bounds !== null trigger -----
+    // ----- useEffect: bounds !== null -----
     // Initial map.on('load') call.
     expect(mockMapOn).toHaveBeenCalled();
-    // map.addControl() call.
-    expect(mockMapAddControl).toHaveBeenCalled();
 
-    // ----- useEffect: map.current !== false trigger -----
+    // ----- useEffect: map.current !== false -----
     // Mock dispatch once map.on has been called.
     newStore.dispatch(setStyleLoadStatus(true));
     await waitFor(() => expect(newStore.getState().mapCanvas.styleLoaded).toEqual(true));
     
-    // ----- useEffect: styeLoaded === true trigger -----
+    // ----- useEffect: styeLoaded === true -----
+    // map.addControl() call.
+    await waitFor(() => expect(mockMapAddControl).toHaveBeenCalled());
     // Verify map.addsource() call, new data added.
     await waitFor(() => expect(mockMapAddSource).toHaveBeenCalled());
-   // Mock dispatch for useEffect, styleLoaded condition.
+    // Mock dispatch for useEffect, styleLoaded condition.
     newStore.dispatch(setSourceStatus('loaded'));
     await waitFor(() => expect(newStore.getState().mapCanvas.sourceStatus).toEqual('loaded'));    
 });
@@ -270,7 +279,9 @@ test("adds marker layer and fits map to bounds", async() => {
                 removeSource: mockMapRemoveSource,
                 removeLayer: mockMapRemoveLayer,
                 fitBounds: mockMapFitBounds,
-                addControl: jest.fn()
+                addControl: mockMapAddControl,
+                removeControl: mockMapRemoveControl,
+                hasControl: mockMapHasControl
             }
         });
 
@@ -344,7 +355,9 @@ test("replaces previous layer and source on new data fetches", async() => {
                 removeSource: mockMapRemoveSource,
                 removeLayer: mockMapRemoveLayer,
                 fitBounds: mockMapFitBounds,
-                addControl: jest.fn()
+                addControl: mockMapAddControl,
+                removeControl: mockMapRemoveControl,
+                hasControl: mockMapHasControl
             }
         });
 
@@ -440,7 +453,9 @@ test("does not initialize map on unsuccessful fetch", async() => {
                 removeSource: mockMapRemoveSource,
                 removeLayer: mockMapRemoveLayer,
                 fitBounds: mockMapFitBounds,
-                addControl: jest.fn()
+                addControl: mockMapAddControl,
+                removeControl: mockMapRemoveControl,
+                hasControl: mockMapHasControl
             }
         });
 
