@@ -3,7 +3,11 @@ import {
     useAppDispatch, 
     useAppSelector,
     useMediaQueries } from '../../common/hooks';
-import { handleMonthSelect } from './timelineSlice';
+import { 
+    handleMonthSelect,
+    fetchImagesData,
+    ImageDocsRequestProps,
+    TimelineMonthTypes } from './timelineSlice';
 import MonthCounter from './MonthCounter';
 import './MonthButton.css';
 
@@ -14,16 +18,26 @@ import './MonthButton.css';
 ============================================================= */
 const MonthButton: React.FunctionComponent<MonthButtonProps> = (props: MonthButtonProps) => {
     const dispatch = useAppDispatch();
-    const selectedMonth = useAppSelector(state => state.timeline.selected.month);
+    const selectedTimeline = useAppSelector(state => state.timeline.selected);
 
-    
-    /* -------------------------------------------------------------
-        Clicks on month selector items will update selected month, 
-        triggering a useEffect fetch dispatch in component.
-    ------------------------------------------------------------- */
+    /* ---------------------------------------------------------------------------
+        Clicks on month selector items will update << timeline.selected.month >>
+        and dispatch fetch request for selected year and month.
+    --------------------------------------------------------------------------- */
     const onMonthSelect = (event: React.SyntheticEvent) => {
+        // Update selected month.
         const payloadMonthSelected: string = props.month;
         dispatch(handleMonthSelect(payloadMonthSelected));
+
+        // Prepare fetch payload.
+        let payloadFetchMonth: ImageDocsRequestProps = { 
+            'year': selectedTimeline.year as number
+        };
+        // month value in fetch request needs to be numerical.
+        const month = getNumericalMonth(props.month as TimelineMonthTypes);
+        payloadFetchMonth['month'] = month;
+
+        dispatch(fetchImagesData(payloadFetchMonth));
     };
   
     
@@ -31,14 +45,14 @@ const MonthButton: React.FunctionComponent<MonthButtonProps> = (props: MonthButt
         <div 
             className={ useMediaQueries(props.baseClassName.concat("__", props.className)) 
                 +   // Add "active" styling for selected element.
-                (selectedMonth === props.month
-                    ? "active"
+                (selectedTimeline.month === props.month
+                    ? " ".concat("active")
                     : "") }
             id={ props.className.concat('-', props.month) }
             role="menuitemradio" 
             aria-label={ "month selector option" }
             aria-checked={// Changed pressed state based on selected element.
-                selectedMonth === props.month 
+                selectedTimeline.month === props.month 
                     ? "true"
                     : "false" }
             onClick={ onMonthSelect }>
@@ -72,8 +86,24 @@ function createMonthCounter(month: string, classBase: string, index: number) {
     );
 
     return monthCounter;
-}
+};
 
+
+/* -----------------------------------
+    Month to numerical month mapper.
+----------------------------------- */
+export function getNumericalMonth(month: string) {
+    const monthToNum: { [key: string]: number } = {
+        'jan': 1, 'feb': 2, 'mar': 3,
+        'apr': 4, 'may': 5, 'jun': 6,
+        'jul': 7, 'aug': 8, 'sep': 9,
+        'oct': 10, 'nov': 11, 'dec': 12
+    };
+
+    const monthNum: number = monthToNum[month];
+
+    return monthNum;
+};
 
 /* =====================================================================
     Types.

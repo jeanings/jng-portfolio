@@ -72,7 +72,7 @@
             max-height: 100%;
             align-self: flex-start;
             object-fit: contain;
-            pointer-events: auto;
+            pointer-events: none;
             border: white 2rem solid;
         }
         
@@ -80,6 +80,7 @@
         grid-column: 2 / -1;
         grid-row: 1 / 2;
         display: grid;
+        height: 2rem;
         grid-template-columns: repeat(4, 2rem);
         grid-template-rows: 2rem;
         justify-content: flex-end;
@@ -92,6 +93,7 @@
             border: none;
             align-self: center;
             justify-self: end;
+            pointer-events: auto;
             cursor: pointer;
             pointer-events: auto;
             transition: all 300ms;

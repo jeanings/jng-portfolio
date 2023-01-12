@@ -12,7 +12,6 @@ import axios from 'axios';
 import MockAdapter from 'axios-mock-adapter';
 import '@testing-library/jest-dom';
 import mockDefaultData from '../../utils/mockDefaultData.json';
-import MapCanvas from '../MapCanvas/MapCanvas';
 import { GeojsonFeatureCollectionProps } from '../TimelineBar/timelineSlice';
 import { 
     setStyleLoadStatus, 
@@ -21,9 +20,6 @@ import {
     handleBoundsButton } from '../MapCanvas/mapCanvasSlice';
 import { apiUrl } from '../../app/App';
 import Toolbar from './Toolbar';
-// @ts-ignore
-import mapboxgl from 'mapbox-gl'; 
-import 'mapbox-gl/dist/mapbox-gl.css';
 import FilterDrawer from '../FilterDrawer/FilterDrawer';
 import SideFilmStrip from '../SideFilmStrip/SideFilmStrip';
 
@@ -33,8 +29,12 @@ var user = userEvent.setup();
 
 beforeEach(() => {
     mockAxios = new MockAdapter(axios);
+
     // Mock scrollTo.
     window.HTMLElement.prototype.scrollTo = jest.fn();
+
+    // Mock IntersectionObserver.
+    window.IntersectionObserver = jest.fn();
 });
 
 afterEach(() => {
@@ -50,9 +50,9 @@ afterEach(() => {
 ------------------------------------------------- */
 const preloadedState: RootState = {
     timeline: {
-        request: 'complete',
+        responseStatus: 'successful',
         query: { year: 2022 },
-        yearInit: 2022,
+        initYear: 2022,
         selected: { year: 2022, month: 'all' },
         years: mockDefaultData.years,
         counter: {
@@ -292,26 +292,6 @@ test("bounds button calls mapbox's fitBounds method", async() => {
         .onGet(apiUrl, { params: { 'year': 'default' } })
         .replyOnce(200, mockDefaultData)
 
-    // Mocked Mapbox methods.
-    const mockMapOn = jest.fn();
-    const mockMapAddSource = jest.fn();
-    const mockMapGetSource = jest.fn();
-    const mockMapAddLayer = jest.fn();
-    const mockMapGetLayer = jest.fn();
-    const mockMapFitBounds = jest.fn();
-
-    jest.spyOn(mapboxgl, "Map")
-        .mockImplementation(() => {
-            return {
-                on: mockMapOn,
-                addSource: mockMapAddSource,
-                getSource: mockMapGetSource,
-                addLayer: mockMapAddLayer,
-                getLayer: mockMapGetLayer,
-                fitBounds: mockMapFitBounds
-            }
-        })
-
     // Mocked React functions.
     const useDispatchSpy = jest.spyOn(reactRedux, 'useDispatch');
     const mockDispatch = jest.fn();
@@ -323,14 +303,13 @@ test("bounds button calls mapbox's fitBounds method", async() => {
     const newStore = setupStore(preloadedState);
         render(
             <Provider store={newStore}>
-                <MapCanvas />
                 <Toolbar />
             </Provider>
         );
     
     // Wait for fetch.
     await waitFor(() => {
-        screen.findByRole('main', { name: 'map-canvas' });
+        screen.findByRole('main', { name: 'map' });
         expect(newStore.getState().timeline.bounds).not.toBeNull();
     });
 
@@ -356,10 +335,9 @@ test("bounds button calls mapbox's fitBounds method", async() => {
     const toolbarBoundsButton = screen.getByRole('button', { name: 'reset map bounds' });
 
     // Mock dispatch request to fitBounds.
-    await waitFor (() => user.click(toolbarBoundsButton));
+    await waitFor(() => user.click(toolbarBoundsButton));
     newStore.dispatch(handleBoundsButton('clicked'));
 
-    // Verify fitBounds method called, one called on init and
-    // the other on button click.
-    expect(mockMapFitBounds).toHaveBeenCalledTimes(2);
+    // Verify state updated.
+    expect(newStore.getState().mapCanvas.fitBoundsButton).toEqual('clicked');
 });

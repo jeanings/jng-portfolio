@@ -21,7 +21,7 @@ projects_bp = Blueprint('projects_bp', __name__,
     template_folder='templates'
 )
 
-if DEBUG_MODE == 'True':
+if DEBUG_MODE == True:
     build_assets(app)
 
 
@@ -33,7 +33,7 @@ MDB_PASS = quote_plus(MONGODB_KEY)
 
 
 # Connection to mongo server.
-client = MongoClient(f'mongodb+srv://{MONGODB_ID}:{MDB_PASS}@portfolio.8frim.mongodb.net/fudousan?retryWrites=true&w=majority')
+client = MongoClient(f'mongodb+srv://{MONGODB_ID}:{MDB_PASS}@portfolio.8frim.mongodb.net/')
 db = client.projectsIndex
 collection_main = db['main']
 collection_sub = db['sub']
@@ -52,8 +52,31 @@ def projects():
     for sub_project in collection_sub.find():
         sub_projects.append(sub_project) 
 
+    # Get distinct array of years.
+    years_query = list(collection_main.aggregate([
+        {
+            '$project': {
+                'years': { 
+                    '$objectToArray': '$year' 
+                }
+            }
+        },
+        {
+            '$unwind': '$years'
+        },
+        {
+            '$group': {
+                '_id': 0,
+                'keys': { '$addToSet': '$years.k' }
+            }
+        }
+    ]))
+
+    years = years_query[0]['keys']
+
     return render_template("projects.html", 
         title="Some personal projects  ——  jeanings.space",
+        years=years,
         main_projects=main_projects,
         sub_projects=sub_projects,
         main_colours=main_colours['mainColours'],
