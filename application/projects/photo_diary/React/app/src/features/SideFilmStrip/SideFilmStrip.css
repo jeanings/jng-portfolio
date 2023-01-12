@@ -292,7 +292,7 @@
     min-height: 100%;
     position: absolute;
     grid-template-columns: 100%;
-    grid-template-rows: calc(100% - 11rem) 9rem;
+    grid-template-rows: calc(100% - 12rem) 9rem;
     row-gap: 2.5rem;
 }
     .SideFilmStrip__image-enlarger-container.mobile.port {
