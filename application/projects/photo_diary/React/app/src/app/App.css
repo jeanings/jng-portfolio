@@ -41,8 +41,8 @@
                                 Media breakpoints 
 ================================================================================== */
 .App.mobile.port {
-    position: fixed; /* timeline                 gaps  toolbar */
-    grid-template-rows: 7rem calc(100% - 12rem - 2rem) 5rem;
-    row-gap: 1rem;
+    position: fixed; /* timeline                toolbar */
+    grid-template-rows: 7rem calc(100% - 12rem) 5rem;
+    row-gap: 0;
     column-gap: 0;
 }

@@ -497,7 +497,7 @@ function getMapPaddingOffset(mode: string, windowSize: { [index: string]: number
                     : 0;
 
             let yAxisOffset = windowSize.width < windowSize.height
-                    ? windowSize.height * 0.10      // Shifts center point to mid-bottom of screen for portrait
+                    ? windowSize.height * -0.25      // Shifts center point to mid-bottom of screen for portrait
                     : 0;
            
             offset = [ xAxisOffset, yAxisOffset ];
