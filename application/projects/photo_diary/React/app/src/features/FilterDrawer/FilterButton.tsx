@@ -97,7 +97,7 @@ const FilterButton: React.FunctionComponent<FilterButtonProps> = (props: FilterB
         // returns object structured as { year: 2022, film: 'Kodak Gold 200' } etc. 
         let payloadFilteredQuery = getPayloadForFilteredQuery(filterState, selectedTimeline);
 
-        // Update << filter >> state.
+        // Prepare payload for updating << filter >> state.
         let payloadFilter: FilterPayloadType = {
             [filterCategory]: selectable
         };
@@ -115,17 +115,20 @@ const FilterButton: React.FunctionComponent<FilterButtonProps> = (props: FilterB
             dispatch(removeFilter(payloadFilter));
         }
 
-        // Update payload for clicked filter.
-        // For non-empty filtered category.
+        // Re-assign category key to match backend's.
+        filterCategory = categoryKeysCamelToHyphen(filterCategory);
+
+        // Update payload for fetching for clicked filter.
+        // Add to existing actively filtered category.
         if (Object.keys(payloadFilteredQuery).includes(filterCategory)) {
             const updatedFilteredCategory: Array<FilterPayloadType> = clickAction === 'add'
                 ? [...payloadFilteredQuery[filterCategory], selectable]     // add clicked filter
                 : payloadFilteredQuery[filterCategory].filter(              // remove clicked filter
                     (filteredItem: string | number) => filteredItem !== selectable);
                         
-            payloadFilteredQuery[filterCategory] = updatedFilteredCategory;            
+            payloadFilteredQuery[filterCategory] = updatedFilteredCategory;
         }
-        // For empty filtered category. 
+        // Create new filter parameter object. 
         else {
             // By default, must be clickAction 'add'.
             payloadFilteredQuery[filterCategory] = [selectable]
@@ -135,7 +138,7 @@ const FilterButton: React.FunctionComponent<FilterButtonProps> = (props: FilterB
         if (payloadFilteredQuery[filterCategory].length === 0) {
             delete payloadFilteredQuery[filterCategory];
         }
-        
+
         dispatch(fetchImagesData(payloadFilteredQuery));
     };
 
@@ -162,6 +165,68 @@ const FilterButton: React.FunctionComponent<FilterButtonProps> = (props: FilterB
         </button>
     );
 }
+
+/* =====================================================================
+    Helper functions.
+===================================================================== */
+
+/* --------------------------------------------------------------------
+    Convert parameter keys from camel case to hyphenated for backend. 
+-------------------------------------------------------------------- */
+function categoryKeysCamelToHyphen(filterCategory: string) {
+    const upperCaseIndices: Array<number> = [];
+    let hyphenatedCategoryKey: string = filterCategory;
+    let processedStringParts: Array<string> = [];
+
+    // Find all upper case characters in key string.
+    for (let charIndex = 0; charIndex < filterCategory.length; charIndex++) {
+        // Get index of upper case characters.
+        if (filterCategory.charAt(charIndex) === filterCategory.charAt(charIndex).toUpperCase()) {
+            upperCaseIndices.push(charIndex);
+        }
+    }
+
+    // Break out early if hyphenating not needed.
+    if (upperCaseIndices.length === 0) {
+        return filterCategory;
+    }
+
+    // Loop through the upper case indices to get all replacement string parts.
+    for (let index = 0; index < upperCaseIndices.length; index++) {
+        let left: number;
+        let right: number;
+
+        switch(index === 0) {
+            // Example with 'formatMediumType' with [6, 12]
+            case true:
+                left = 0;                           //  [0] -> | formatMediumType
+                right = upperCaseIndices[index];    //  [6] -> format | MediumType
+                break;
+            case false:
+                left = upperCaseIndices[index];     //  [6] -> format | MediumType
+                right = upperCaseIndices[index + 1] !== undefined
+                    ? upperCaseIndices[index + 1]   //  [12] -> formatMedium | Type
+                    : filterCategory.length;        //  formatMediumType |
+                break;
+        }
+
+        processedStringParts.push(
+            filterCategory.slice(left, right).toLowerCase(),
+        );
+        
+        // Add the rightmost part on final iteration.
+        if (index === upperCaseIndices.length - 1) {
+            processedStringParts.push(
+                filterCategory.slice(right, filterCategory.length).toLowerCase()
+            );
+        }        
+    }
+
+    hyphenatedCategoryKey = processedStringParts.join("-");
+    
+    return hyphenatedCategoryKey;
+};
+
 
 
 /* =====================================================================

@@ -190,6 +190,24 @@ describe("on filter button clicks", () => {
 
     filterCategories.forEach(group => {
         test("adds selected filter to existing array in state", async() => {
+            /* --------------------------------------------------------
+                Mocks                                          start
+            -------------------------------------------------------- */
+            // Mocked Axios calls.
+            mockAxios = new MockAdapter(axios);
+            mockAxios
+                .onGet(apiUrl, { params: { 'year': 'default' } })
+                .replyOnce(200, mock2022Data)
+                .onGet(apiUrl, { params: { 'year': 2022, 'format-medium': 'film' } })
+                .replyOnce(200, mock2022Data)
+                .onGet(apiUrl, { params: { 'year': 2022, 'format-type': '35mm' } })
+                .replyOnce(200, mock2022Data)
+                .onGet(apiUrl, { params: { 'year': 2022, 'focal-length': '50' } })
+                .replyOnce(200, mock2022Data)
+            /* --------------------------------------------------------
+                Mocks                                            end
+            -------------------------------------------------------- */
+
             const newStore = setupStore(preloadedState);
             render(
                 <Provider store={newStore}>
@@ -231,17 +249,18 @@ describe("on filter button clicks", () => {
             // Wait for onClick.
             await waitFor(() => user.click(filterButtonToClick));
             await waitFor(() => expect(filterButtonToClick.getAttribute('aria-checked')).toEqual('true'));
-            
+
+
             // ----------------- Same logic as in switch cases of FilterButton START -----------------
             // Verify text of selected element matches newly added array element.
             if (group.category === 'format') {
                 if (filterButtonText === 'film' || filterButtonText === 'digital') {
-                    expect(newStore.getState().filter[group.category.concat('Medium')])
-                        .toContain(filterButtonText);
+                    expect(newStore.getState().filter[group.category.concat('Medium')]).toContain(filterButtonText);
+                    expect(newStore.getState().timeline.query).toHaveProperty('format-medium');
                 }
                 else {
-                    expect(newStore.getState().filter[group.category.concat('Type')])
-                        .toContain(filterButtonText);
+                    expect(newStore.getState().filter[group.category.concat('Type')]).toContain(filterButtonText);
+                    expect(newStore.getState().timeline.query).toHaveProperty('format-type');
                 }
             }
             else if (group.category === 'camera') {
@@ -255,13 +274,16 @@ describe("on filter button clicks", () => {
                     camera = camera.concat(' ', modelString).trim()
                 );
             }
+            else if (group.category === 'focalLength') {
+                expect(newStore.getState().timeline.query).toHaveProperty('focal-length');
+            }
             else {
                 expect(newStore.getState().filter[group.category]).toContain(filterButtonText);
             }
             // ----------------- Same logic as in switch cases of FilterButton END -----------------
         });
 
-
+   
         test("removes selected filter from existing array in state", async() => {
             const newStore = setupStore(preloadedState);
             render(
