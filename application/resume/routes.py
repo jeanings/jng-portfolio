@@ -43,26 +43,26 @@ collection = db['web']
 @resume_bp.route('/resume', methods=['GET'])
 @resume_bp.route('/resume/', methods=['GET'])
 def resume():
-    selected_projects, education, experience, additional_info = {}, {}, {}, {}
+    selected_projects, skills, education, experience = {}, {}, {}, {}
 
     for section in collection.find():
         for key in section.keys():
             if key == 'selectedProjects':
                 selected_projects = section[key]
+            elif key == 'skills':
+                skills = section[key]
             elif key == 'education':
                 education = section[key]
             elif key == 'experience':
                 experience = section[key]
-            elif key == 'additionalInfo':
-                additional_info = section[key]
 
 
     return render_template('resume.html', 
         title="Résumé  ——  jeanings.space",
         selected_projects=selected_projects,
+        skills=skills,
         education=education,
-        experience=experience,
-        additional_info=additional_info
+        experience=experience
     )
 
 

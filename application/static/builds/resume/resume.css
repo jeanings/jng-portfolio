@@ -3,7 +3,7 @@ body {
     --color-accent-primary: rgb(187, 199, 21);
     --color-accent-secondary: rgb(42, 184, 124);
     --color-text: #cdcdcd;
-    --text-accent-primary: rgb(36, 147, 175);
+    --text-accent-primary: rgb(16, 106, 210);
     background: var(--color-bg);
     font-family: 'Raleway', sans-serif;
     color: #000000;
@@ -25,7 +25,7 @@ h1, h2, h3, h4 {
 }
 
 h2 {
-    font-size: 7mm;
+    font-size: 5.5mm;
 }
 
 h3 {
@@ -66,7 +66,7 @@ h4 {
         grid-row: 2;
         justify-self: center;
         grid-template-columns: 100%;
-        grid-template-rows: 11.5% auto;
+        grid-template-rows: 25mm auto;
         padding: 10mm 15mm 10mm 15mm;
     }
 
@@ -80,8 +80,9 @@ h4 {
 
             #resume_header_name {
                 grid-row: 1 / 2;
-                font-size: 12mm;
+                font-size: 10mm;
                 color: var(--text-accent-primary);
+                font-weight: 400;
             }
 
             .resume_header_contact {
@@ -141,21 +142,8 @@ h4 {
                 
                 #resume_section_projects .resume_section_item {
                     display: grid;
-                    grid-template-rows: 10mm 15mm auto;
+                    grid-template-rows: 10mm 6mm;
                 }
-
-                #resume_section_additional .resume_section_item {
-                    grid-template-columns: 30% auto;
-                    grid-template-rows: 6mm auto;
-                }
-
-                    #resume_section_item_languages {
-                        grid-column: 1 / 2;
-                    }
-
-                    #resume_section_item_hobbies {
-                        grid-column: 2 / -1;
-                    }
 
                     .resume_section_item_header {
                         grid-column: 1 / -1;
@@ -165,35 +153,35 @@ h4 {
                         grid-template-rows: 65% 35%;
                     }
     
-                    #resume_section_item_hobbies .resume_section_item_header {
-                        grid-column: 1 / -1;
-                    }
-
                         .resume_section_item_header_name {
                             grid-column: 1 / 2;
                             grid-row: 1 / 2;
                             color: var(--text-accent-primary);
+                            font-weight: 400;
+                            align-self: center;
                         }
 
                         .resume_section_item_header_title {
                             grid-column: 1 / 2;
                             grid-row: 2 / -1;
+                            font-style: italic;
+                            font-weight: 400;
                         }
 
                         .resume_section_item_header_links {
                             grid-column: 1 / -1;
                             grid-row: 2 / 3;
                             display: flex;
-                            align-self: center;
+                            align-self: baseline;
                             z-index: 2;
                         }
 
                             #resume_selection_item_header_links_url {
-                                font-size: 3.3mm;
+                                font-size: 3.6mm;
                                 font-family: 'Space Mono', monospace;
                             }
 
-                        .resume_section_item_header_location {
+                        .resume_section_item_header_date {
                             grid-column: 1 / -1;
                             grid-row: 1 / 2;
                             display: flex;
@@ -202,31 +190,42 @@ h4 {
                             justify-self: flex-end;
                         }
 
-                        .resume_section_item_header_date {
+                        .resume_section_item_header_location {
                             grid-column: 1 / -1;
                             grid-row: 2 / -1;
                             display: flex;
                             text-align: end;
-                            align-self: center;
+                            align-self: baseline;
                             justify-self: flex-end;
+                        }                        
+
+                    .resume_section_item_summary {
+                        grid-row: 2 / 3;
+                        display: flex;
+                        align-items: flex-end;
+                        font-size: 4mm;
+                    }
+
+                        .resume_section_item_summary_objectives {
+                            font-style: italic;
+                            font-weight: 400;
                         }
 
-                        
-
-                    .resume_section_item_stack {
+                    #resume_section_skills .resume_section_item {
                         grid-column: 1 / 2;
-                        grid-row: 2 / 3;
+                        grid-row: 3 / 4;
                         display: grid;
                         grid-template-columns: 100%;
                         grid-template-rows: repeat(3, 1fr);
-                        font-size: 3.3mm;
+                        row-gap: 1.5mm;
+                        font-size: 3.75mm;
                     }
 
-                        .resume_section_item_stack ul {
+                        .resume_section_item_stack {
                             display: grid;
                             grid-template-columns: 25mm auto;
                             grid-template-rows: 100%;
-                            font-family: 'Space Mono', monospace;
+                            /* font-family: 'Space Mono', monospace; */
                         }
                             
                             .resume_section_item_stack_name {
@@ -237,7 +236,7 @@ h4 {
                             .resume_section_item_stack_container {
                                 grid-column: 2 / -1;
                                 display: flex;
-                                column-gap: 8mm;
+                                column-gap: 6mm;
                             }
                                 .resume_section_item_stack li {
                                     list-style: none;
@@ -250,7 +249,7 @@ h4 {
 
                     #resume_section_projects .resume_section_item_list {
                         grid-column: 1 / -1;
-                        grid-row: 3 / -1;
+                        grid-row: 4 / -1;
                     }
 
                     #resume_section_item_list_language-name {
