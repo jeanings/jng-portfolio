@@ -56,21 +56,20 @@ describe("on initial renders", () => {
             </Provider>
         );
         
-        // Confirm initial << timeline.request >> state.
-        expect(newStore.getState().timeline.request).toEqual('idle');
+        // Confirm initialization fetch.
+        expect(newStore.getState().timeline.responseStatus).toEqual('uninitialized');
         
         // Wait for async thunk to handle response.
-        await waitFor(() => {
-            // Year selected element should update to most current (default) year.
-            expect(newStore.getState().timeline.yearInit).toEqual(2022);
-            screen.getByRole('menuitem', { name: 'selected year' });
-            const yearSelectedElem = screen.getByRole('menuitem', { name: 'selected year' });
-            expect(yearSelectedElem).toHaveTextContent('2022');
-        });
+        // Year selected element should update to most current (default) year.
+        await waitFor(() => expect(newStore.getState().timeline.initYear).toEqual(2022));
+        expect(newStore.getState().timeline.responseStatus).toEqual('initialized');
+   
+        screen.getByRole('menuitem', { name: 'selected year' });
+        const yearSelectedElem = screen.getByRole('menuitem', { name: 'selected year' });
+        expect(yearSelectedElem).toHaveTextContent('2022');
 
         // States should update to default fetch values.
         expect(newStore.getState().timeline.selected.year).toEqual(2022);
-        expect(newStore.getState().timeline.request).toEqual('complete');
     });
 
 
@@ -109,9 +108,9 @@ describe("on initial renders", () => {
             </Provider>
         );
 
-        // API succesfully called and populated list of selectable years.
+        // Initial API called successfully and populated list of selectable years.
         await waitFor(() => {
-            expect(newStore.getState().timeline.request).toEqual('complete');
+            expect(newStore.getState().timeline.responseStatus).toEqual('initialized');
         });
 
         // Verify correct number of year items to render.
@@ -174,10 +173,10 @@ test("catches fetch request errors", async() => {
     );
 
     await waitFor(() => {
-        // << timeline.yearInit >> state remains null if fetch unsuccessful.
-        expect(newStore.getState().timeline.yearInit).toBeFalsy;
-        // << timeline.request >> state changed to 'error' instead of 'idle' or 'complete'.
-        expect(newStore.getState().timeline.request).toEqual('error');
+        // << timeline.initYear >> state remains null if fetch unsuccessful.
+        expect(newStore.getState().timeline.initYear).toBeFalsy;
+        // << timeline.responseStatus >> state changed to 'error' instead of 'initialized' or 'successful'.
+        expect(newStore.getState().timeline.responseStatus).toEqual('error');
     });
 });
 
@@ -254,9 +253,6 @@ describe("clicks on dropdown year selector elements", () => {
                 <TimelineBar />
             </Provider>
         );
-        
-        // Confirm initial << timeline.request >> state.
-        expect(newStore.getState().timeline.request).toEqual('idle');
 
         // Wait for initial fetch to render year selector items.
         await waitFor(() => screen.findAllByRole('menuitemradio', { name: 'year selector option' }));
@@ -269,7 +265,7 @@ describe("clicks on dropdown year selector elements", () => {
         await waitFor(() => {
             // Clicked element gets checked value and state is updated.
             expect(yearSelectElem).toHaveAttribute('aria-checked', 'true');
-            expect(newStore.getState().timeline.request).toEqual('complete');
+            expect(newStore.getState().timeline.responseStatus).toEqual('successful');
         });
 
         // Verify that new image doc has same date year metadata as clicked year.
@@ -309,14 +305,15 @@ describe("clicks on dropdown year selector elements", () => {
             );
         });
 
-        expect(newStore.getState().timeline.request).toEqual('idle');
+        // Confirm initialization fetch.
+        expect(newStore.getState().timeline.responseStatus).toEqual('uninitialized');
+        await waitFor(() => expect(newStore.getState().timeline.responseStatus).toEqual('initialized'));
 
-        // Confirm initial << timeline.request >> state.
         act(() => {
             jest.advanceTimersByTime(50);
         });
         await waitFor(() => {
-            expect(newStore.getState().timeline.yearInit).toEqual(2022);
+            expect(newStore.getState().timeline.initYear).toEqual(2022);
             screen.findAllByRole('menuitem', { name: 'selected year' });
         });
 
@@ -324,7 +321,7 @@ describe("clicks on dropdown year selector elements", () => {
         const yearSelectedElem = screen.getByRole('menuitem', { name: 'selected year' });
         expect(yearSelectedElem).toHaveTextContent('2022');
         expect(newStore.getState().timeline.selected.year).toEqual(2022);
-        expect(newStore.getState().timeline.request).toEqual('complete')
+        expect(newStore.getState().timeline.responseStatus).toEqual('initialized');
 
         // Wait for initial fetch to render year selector items.
         act(() => {
@@ -576,8 +573,9 @@ describe("clicks on month selector elements", () => {
             </Provider>
         );
         
-        // Confirm initial << timeline.request >> state.
-        expect(newStore.getState().timeline.request).toEqual('idle');
+        // Confirm initialization fetch.
+        expect(newStore.getState().timeline.responseStatus).toEqual('uninitialized');
+        await waitFor(() => expect(newStore.getState().timeline.responseStatus).toEqual('initialized'));
 
         // Check for all radios to be false.
         const monthElems = screen.getAllByRole('menuitemradio', { name: 'month selector option' });
@@ -619,9 +617,10 @@ describe("clicks on month selector elements", () => {
                 <TimelineBar />
             </Provider>
         );
-        
-        // Confirm initial << timeline.request >> state.
-        expect(newStore.getState().timeline.request).toEqual('idle');
+
+        // Confirm initialization fetch.
+        expect(newStore.getState().timeline.responseStatus).toEqual('uninitialized');
+        await waitFor(() => expect(newStore.getState().timeline.responseStatus).toEqual('initialized'));
 
         // Check for all radios to be false.
         const monthElems = screen.getAllByRole('menuitemradio', { name: 'month selector option' });

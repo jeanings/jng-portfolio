@@ -26,12 +26,15 @@ const SideFilmStrip: React.FunctionComponent = () => {
     const dispatch = useAppDispatch();
     const [ filmStripHovered, setFilmStripHovered ] = useState(false);
     const [ slideImageIndex, setSlideImageIndex ] = useState<number | null>(null);
+    const [ isImageViewableInFilmStrip, setIsImageViewableInFilmStrip ] = useState(true);
+    const isLoaded = useAppSelector(state => state.timeline.responseStatus);
     const imageDocs = useAppSelector(state => state.timeline.imageDocs);
     const imageDoc = useAppSelector(state => state.sideFilmStrip.enlargeDoc);
     const docIndex = useAppSelector(state => state.sideFilmStrip.docIndex);
     const slideView = useAppSelector(state => state.sideFilmStrip.slideView);
     const imageEnlarger = useAppSelector(state => state.toolbar.imageEnlarger);
     const filmStripRef = useRef<HTMLDivElement>(null);
+    const filmStripObserverRef = useRef<IntersectionObserver | null>(null);
     const classBase: string = "SideFilmStrip";
 
 
@@ -87,6 +90,53 @@ const SideFilmStrip: React.FunctionComponent = () => {
             }
         }
     }, [slideView]);
+
+
+    /* -------------------------------------------------------
+        Keep film strip expanded when image enlarger opened.
+    ------------------------------------------------------- */
+    useEffect(() => {
+        imageEnlarger === 'on'
+            ? setFilmStripHovered(true)
+            : setFilmStripHovered(false);
+    }, [imageEnlarger])
+
+
+    /* -----------------------------------------------------------------
+        On image selection, scroll film strip to image if not in view.
+    ----------------------------------------------------------------- */
+    useEffect(() => {
+        // Set up observer for film strip element.
+        if (filmStripObserverRef.current === null) {
+            const observerOptions = {
+                root: filmStripRef.current,
+                threshold: 0.75
+            };
+
+            const observerCallback = (entries: Array<IntersectionObserverEntry>) => {
+                const [entry] = entries;
+                // Trigger scroll into view depending if selected frame in viewport.
+                setIsImageViewableInFilmStrip(entry.isIntersecting);
+
+                // CLean up observer.
+                filmStripObserverRef.current?.disconnect();
+            };
+
+            filmStripObserverRef.current = new IntersectionObserver(observerCallback, observerOptions);
+        }
+
+        // Observe clicked image frame and determine if scrolling is needed.
+        if (filmStripRef.current && imageDoc) {
+            const imageFrame = document.getElementById(imageDoc._id) as HTMLElement;
+
+            // Set observer.
+            filmStripObserverRef.current.observe(imageFrame);
+            
+            if (isImageViewableInFilmStrip === false) {
+                imageFrame.scrollIntoView({ behavior: 'smooth' });
+            }
+        }
+    }, [imageDoc, isImageViewableInFilmStrip])
     
 
     /* ---------------------------------------
@@ -164,11 +214,11 @@ const SideFilmStrip: React.FunctionComponent = () => {
         Handle expand/contract of film strip on hover/touch.
     ------------------------------------------------------ */
     const onImageHover = (event: React.SyntheticEvent) => {
-        setFilmStripHovered(true);
-    };
-
-    const onImageUnhover = (event: React.SyntheticEvent) => {
-        setFilmStripHovered(false);
+        filmStripHovered === false
+            ? setFilmStripHovered(true)
+            : imageEnlarger === 'on'
+                ? setFilmStripHovered(true)
+                : setFilmStripHovered(false);
     };
 
 
@@ -251,7 +301,11 @@ const SideFilmStrip: React.FunctionComponent = () => {
     return (
         <>
             <aside 
-                className={ useMediaQueries(classBase) }
+                className={ useMediaQueries(classBase) 
+                    +   // Add styling for loading: hidden if initial fetch not loaded
+                    (isLoaded === 'uninitialized'
+                        ? " ".concat("loading")
+                        : "") }
                 id={ classBase }
                 role="main"
                 aria-label="images panel">
@@ -286,10 +340,8 @@ const SideFilmStrip: React.FunctionComponent = () => {
                         filmStripHovered === false
                             ? "false"
                             : "true" }
-                    onTouchStart={ onImageHover }
-                    onTouchEnd={ onImageUnhover }
                     onMouseEnter={ onImageHover }
-                    onMouseLeave={ onImageUnhover }>
+                    onMouseLeave={ onImageHover }>
 
                     { /* Image containers for all docs in collection. */
                         imageFrameElems }

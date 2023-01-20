@@ -40,7 +40,7 @@ const MonthCounter: React.FunctionComponent<MonthCounterProps> = (props: MonthCo
                 dispatch(handleMonthCounter(payloadUpdatePrevCounter));
             }
         }, 2000)
-    }, [countCurrent])
+    }, [countCurrent, props.month])
 
 
     // Create rolling counter component.

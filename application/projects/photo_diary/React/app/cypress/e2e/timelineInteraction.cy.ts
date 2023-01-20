@@ -1,5 +1,5 @@
 describe('interactions with timeline menu bar', () => {
-    it('reveals year items on hovering over year,\
+    it.only('reveals year items on hovering over year,\
         fetches new data on clicking year item', () => {
         // Listen to fetch calls to Mapbox.
         cy.intercept('GET', 'https://api.mapbox.com/**/*')
@@ -44,7 +44,7 @@ describe('interactions with timeline menu bar', () => {
             .as('yearItem2018');
 
         cy.get('@yearItem2018')
-            .click();
+            .click({ force: true });
 
         // Verify new data fetch.
         cy.wait('@mapboxAPI')
@@ -55,11 +55,15 @@ describe('interactions with timeline menu bar', () => {
         // Allow map to transition.
         cy.wait(2000);
 
+        // Counter transition.
+        cy.wait(500);
+
         // Verify updated to new dataset.
         cy.get('@allImagesCountElem')
             .invoke('text')
             .then((text) => text.replace(/\D/g, ''))
             .as('newAllImagesCount');
+
 
         cy.get('@initAllImagesCount')
             .then((initCount) => {

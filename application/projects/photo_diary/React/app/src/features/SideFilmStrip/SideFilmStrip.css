@@ -9,8 +9,26 @@
     overflow: hidden;
     pointer-events: none;
     user-select: none;
+    animation-name: fetch-loaded;
+    animation-duration: 2000ms;
+    animation-fill-mode: forwards;
+    animation-timing-function: cubic-bezier(0.4, 0, 1, 1);
     z-index: 2;
 }
+
+    @keyframes fetch-loaded {
+        0% {
+            opacity: 0;
+        }
+
+        100% {
+            opacity: 1;
+        }
+    }
+
+    .SideFilmStrip.loading {
+        opacity: 0;
+    }
 
     .SideFilmStrip__image-enlarger-container {
         grid-column: 1 / 2;
@@ -274,15 +292,15 @@
     min-height: 100%;
     position: absolute;
     grid-template-columns: 100%;
-    grid-template-rows: calc(100% - 11rem) 9rem;
-    row-gap: 2rem;
+    grid-template-rows: calc(100% - 12rem) 9rem;
+    row-gap: 2.5rem;
 }
     .SideFilmStrip__image-enlarger-container.mobile.port {
         max-height: 60%;
         grid-template-columns: unset;
         grid-template-rows: 100%;
         justify-content: center;
-        align-self: flex-start;
+        align-self: flex-end;
     }
 
     .SideFilmStrip__film-strip.mobile.port {

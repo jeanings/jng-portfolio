@@ -16,10 +16,11 @@ import {
 import { ImageDocTypes } from '../TimelineBar/timelineSlice';
 import { handleEnlarger, SideFilmStripProps } from '../SideFilmStrip/sideFilmStripSlice';
 import { handleToolbarButtons, ToolbarProps } from '../Toolbar/toolbarSlice';
+import { FeatureCollection } from 'geojson';
 import './MapCanvas.css';
 import 'mapboxgl-spiderifier/index.css';
 // @ts-ignore
-import mapboxgl from 'mapbox-gl'; 
+import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
 
 const MapboxglSpiderfier: any = require('mapboxgl-spiderifier');
@@ -45,8 +46,9 @@ const MapCanvas: React.FunctionComponent = () => {
     // Mapbox variables.
     const MAPBOX_ACCESS_TOKEN = process.env.REACT_APP_MAPBOX;
     const mapStyle: string = process.env.REACT_APP_MAPBOX_STYLE as string;
-    const mapContainer = useRef(null);
-    const map = useRef<mapboxgl.map | null>(null);
+    const mapContainer = useRef<HTMLDivElement | null>(null);
+    const map = useRef<mapboxgl.Map | null>(null);
+    const mapControl = useRef<mapboxgl.IControl>(new mapboxgl.NavigationControl());
     const markerIconImage: string = 'image-sharp';
     const markerIconPin: string ='images-sharp';
     const spiderfier = useRef<any | null>(null);
@@ -55,85 +57,125 @@ const MapCanvas: React.FunctionComponent = () => {
             [ bounds!.lng[1], bounds!.lat[1] ] ]    // max bound coords
         : [];
   
-
-    /* -------------------------------------------------
-        Initialize map and add data source for markers 
-        once data is loaded into state.
-    ------------------------------------------------- */
+    /* ----------------------------------------------------
+        Initialize map once data is successfully fetched.
+    ---------------------------------------------------- */
     useEffect(() => {
         if (bounds !== null) {
-
             // Initialize map.
             if (map.current === null) {
                 map.current = new mapboxgl.Map({
                     accessToken: MAPBOX_ACCESS_TOKEN,
-                    container: mapContainer.current,
+                    container: mapContainer.current as HTMLDivElement,
                     style: mapStyle,
                     zoom: 12,
-                    bounds: bbox,
-                    fitboundsOptions: {
-                        padding: getMapPaddingOffset('bound', windowSize)
+                    bounds: bbox as mapboxgl.LngLatBoundsLike,
+                    fitBoundsOptions: {
+                        padding: getMapPaddingOffset('bound', windowSize) as mapboxgl.PaddingOptions
                     },
                     boxZoom: false,
                     doubleClickZoom: true,
                     dragPan: true,
-                    dragRotate: false
+                    dragRotate: false,
                 });
-
-                // Set map loading status.
-                map.current.on('load', () => {
-                    dispatch(setStyleLoadStatus(true));
-                });
-            }
-            // Add or refresh marker source.
-            else if (styleLoaded === true) {
-                // Reset spiderfy ref.
-                if (spiderfier.current) {
-                    spiderfier.current.unspiderfy();
-                    spiderfier.current = null;
-                }
-
-                // Remove previous marker counter layer.
-                removeMapLayerSource(map, 'layer', 'imageMarkersCounter');
-                // Remove previous markers clusters layer.
-                removeMapLayerSource(map, 'layer', 'imageMarkersClusters');
-                // Remove previous marker layer.
-                removeMapLayerSource(map, 'layer', 'imageMarkers');
-                // Remove previous source data.
-                removeMapLayerSource(map, 'source', 'imageSource');
-
-                // Update map state so layer-adding effect triggers later.
-                dispatch(cleanupMarkerSource('idle'));
-                
-                // Add new set of data.
-                map.current.addSource('imageSource', {
-                    'type': 'geojson',
-                    'data': geojson,
-                    'cluster': true,
-                    'clusterRadius': 45,
-                    'clusterMaxZoom': 15
-                });
-    
-                // Set 'loaded' state to trigger addLayers.
-                dispatch(setSourceStatus('loaded'));
             }
         }
-    }, [bounds, styleLoaded]);
+    }, [bounds, map.current]);
 
     
+    /* ----------------------------------------------------------------------
+        Once map initialized and data fetched, add data source for markers.
+    ---------------------------------------------------------------------- */
+    useEffect(() => {
+        // Set loaded status and add controls once map initialized.
+        if (bounds !== null && map.current && styleLoaded === false) {
+            map.current.on('load', () => {
+                dispatch(setStyleLoadStatus(true));
+            });
+        }
+    }, [styleLoaded, bounds, map.current]);
+
+
+    /* --------------------------------------------------------------------
+        On new data fetches (bounds updated), refresh marker data source.
+    -------------------------------------------------------------------- */
+    useEffect(() => {
+        // Add or refresh marker source.
+        if (bounds !== null && map.current && styleLoaded === true) {
+            // Reset spiderfy ref.
+            if (spiderfier.current) {
+                spiderfier.current.unspiderfy();
+                spiderfier.current = null;
+            }
+
+            // Remove previous marker counter layer.
+            removeMapLayerSource(map, 'layer', 'imageMarkersCounter');
+            // Remove previous markers clusters layer.
+            removeMapLayerSource(map, 'layer', 'imageMarkersClusters');
+            // Remove previous marker layer.
+            removeMapLayerSource(map, 'layer', 'imageMarkers');
+            // Remove previous source data.
+            removeMapLayerSource(map, 'source', 'imageSource');
+
+            // Update map state so layer-adding effect triggers later.
+            dispatch(cleanupMarkerSource('idle'));
+            
+            // Add new set of data.
+            map.current.addSource('imageSource', {
+                'type': 'geojson',
+                'data': geojson as FeatureCollection,
+                'cluster': true,
+                'clusterRadius': 45,
+                'clusterMaxZoom': 15
+            });
+
+            // Set 'loaded' state to trigger addLayers.
+            dispatch(setSourceStatus('loaded'));
+        }        
+    }, [bounds, styleLoaded, map.current])
+
+
+    /* ------------------------------------------------------------
+        Add map zoom controls to bottom left corner on loaded map.
+    ------------------------------------------------------------ */
+    useEffect(() => {
+        if (map.current && styleLoaded === true) {
+            // Only add controls for larger, non-mobile screens.
+            const controlAdded: boolean = map.current.hasControl(mapControl.current);
+            const shouldAddControls: boolean = windowSize.width >= 800
+                && windowSize.width > windowSize.height
+                    ? true
+                    : false;
+
+            // Add map zoom controls.
+            if (shouldAddControls === true) {
+                if (controlAdded === false) {
+                    map.current.addControl(mapControl.current, 'bottom-left');
+                }
+            }
+            else {
+                if (controlAdded === true) {
+                    map.current.removeControl(mapControl.current);
+                }
+            }
+        }
+    }, [styleLoaded, windowSize, mapControl.current, map.current])
+
+
     /* -------------------------------------------------
         Map bounds-fitter for toolbar bounds button.
     ------------------------------------------------- */
     useEffect(() => {
         if (sourceStatus === 'loaded'
             && fitBoundsButton === 'clicked'
-            && bounds !== null) {
+            && bounds !== null
+            && map.current) {
             
             // Adjust and zoom map to fit all markers. 
             map.current.fitBounds(
-                bbox,
+                bbox as mapboxgl.LngLatBoundsLike,
                 {
-                    padding: getMapPaddingOffset('bound', windowSize),
+                    padding: getMapPaddingOffset('bound', windowSize) as mapboxgl.PaddingOptions,
                     linear: false,
                     animate: true,
                     duration: 1500,
@@ -154,21 +196,37 @@ const MapCanvas: React.FunctionComponent = () => {
     useEffect(() => {
         if (sourceStatus === 'loaded'
             && markerLocator === 'clicked'
-            && enlargeDoc !== null) {
+            && enlargeDoc !== null
+            && map.current) {
             // Fly map to marker with offset to the left for image enlarger.
             const markerCoords: Array<number> = [
                 enlargeDoc.gps.lng, enlargeDoc.gps.lat
             ]; 
 
-            map.current.flyTo({
-                center: markerCoords,
-                offset: getMapPaddingOffset('fly', windowSize),
-                linear: false,
-                animate: true,
-                duration: 1500,
-                zoom: 13,
-                maxZoom: 16
-            });
+            // Get current zoom level and only flyTo that zoom if lower value.
+            // Eliminates cases where clicks on neighbouring markers while 
+            // navigating using the map would kick into lower level zoom.
+            let currentZoomLevel: number = map.current.getZoom();
+            const toZoomLevel: number = 13;
+
+            if (currentZoomLevel < toZoomLevel) {
+                map.current.flyTo({
+                    center: markerCoords as mapboxgl.LngLatLike,
+                    offset: getMapPaddingOffset('fly', windowSize) as mapboxgl.PointLike,
+                    animate: true,
+                    duration: 1500,
+                    zoom: toZoomLevel,
+                });
+            }
+            else {
+                map.current.flyTo({
+                    center: markerCoords as mapboxgl.LngLatLike,
+                    offset: getMapPaddingOffset('fly', windowSize) as mapboxgl.PointLike,
+                    animate: true,
+                    duration: 1500,
+                    zoom: currentZoomLevel,
+                });
+            }
 
             // Reset button state.
             dispatch(handleMarkerLocator('idle'));
@@ -181,7 +239,8 @@ const MapCanvas: React.FunctionComponent = () => {
     ------------------------------------------- */
     if (sourceStatus === 'loaded'
         && markersStatus === 'idle'
-        && bounds !== null) {
+        && bounds !== null
+        && map.current) {
 
             // Create new photo marker layer.
         map.current.addLayer({
@@ -274,9 +333,9 @@ const MapCanvas: React.FunctionComponent = () => {
 
         // Adjust and zoom map to fit all markers. 
         map.current.fitBounds(
-            bbox,
+            bbox as mapboxgl.LngLatBoundsLike,
             {
-                padding: getMapPaddingOffset('bound', windowSize),
+                padding: getMapPaddingOffset('bound', windowSize) as mapboxgl.PaddingOptions,
                 linear: false,
                 animate: true,
                 duration: 1500,
@@ -296,12 +355,6 @@ const MapCanvas: React.FunctionComponent = () => {
         film strip to clicked marker image.
     ---------------------------------------------------------------------------- */
     function handleImageMarkerClicks(markerDocId: string) {
-        // Scroll film strip to target image.
-        const imageFrame = document.getElementById(markerDocId);
-        if (imageFrame) {
-            imageFrame.scrollIntoView({ behavior: 'smooth' });
-        }
-
         const enlargeDocId: string = enlargeDoc !== null    
             ? enlargeDoc._id
             : '';
@@ -337,13 +390,15 @@ const MapCanvas: React.FunctionComponent = () => {
     /* --------------------------------- 
         Handle various marker events.
     --------------------------------- */
-    if (markersStatus === 'loaded' && spiderfier.current !== null) {
+    if (markersStatus === 'loaded' 
+        && spiderfier.current !== null
+        && map.current) {
         // Change cursor when hovering over image markers.
         map.current.on('mouseenter', 'imageMarkers', () => 
-            map.current.getCanvas().style.cursor = 'pointer'
+            map.current!.getCanvas().style.cursor = 'pointer'
         );
         map.current.on('mouseleave', 'imageMarkers', () => 
-            map.current.getCanvas().style.cursor = ''
+            map.current!.getCanvas().style.cursor = ''
         );
 
         // Clicks on single image markers
@@ -358,10 +413,10 @@ const MapCanvas: React.FunctionComponent = () => {
 
         // Change cursor when hovering over image clusters.
         map.current.on('mouseenter', 'imageMarkersClusters', () => 
-            map.current.getCanvas().style.cursor = 'pointer'
+            map.current!.getCanvas().style.cursor = 'pointer'
         );
         map.current.on('mouseleave', 'imageMarkersClusters', () =>
-            map.current.getCanvas().style.cursor = ''
+            map.current!.getCanvas().style.cursor = ''
         );
         
         // Explode marker cluster into individual markers.
@@ -408,20 +463,20 @@ function getMapPaddingOffset(mode: string, windowSize: { [index: string]: number
     switch(mode) {
         case 'bound':
             // Assign different ratios depending on type of screen.
-            let topBoundOffset = windowSize.width > 800 
+            let topBoundOffset = windowSize.width >= 800 
                 && windowSize.width > windowSize.height
                     ? windowSize.height * 0.15      // Non-mobile, landscape
                     : windowSize.height * 0.13;     // Mobile or portrait
-            let bottomBoundOffset = windowSize.width > 800 
+            let bottomBoundOffset = windowSize.width >= 800 
                 && windowSize.width > windowSize.height
                     ? windowSize.height * 0.15      // Non-mobile, landscape
                     : windowSize.height * 0.35;     // Mobile or portrait
 
-            let leftBoundOffset = windowSize.width > 800 
+            let leftBoundOffset = windowSize.width >= 800 
                 && windowSize.width > windowSize.height
                     ? windowSize.width * 0.10       // Non-mobile, landscape
                     : windowSize.width * 0.12;      // Mobile or portrait
-            let rightBoundOffset = windowSize.width > 800
+            let rightBoundOffset = windowSize.width >= 800
                 && windowSize.width > windowSize.height
                     ? windowSize.width * 0.25       // Non-mobile, landscape
                     : windowSize.width * 0.12;      // Mobile or portrait
@@ -442,7 +497,7 @@ function getMapPaddingOffset(mode: string, windowSize: { [index: string]: number
                     : 0;
 
             let yAxisOffset = windowSize.width < windowSize.height
-                    ? windowSize.height * 0.10      // Shifts center point to mid-bottom of screen for portrait
+                    ? windowSize.height * -0.25      // Shifts center point to mid-bottom of screen for portrait
                     : 0;
            
             offset = [ xAxisOffset, yAxisOffset ];

@@ -6,29 +6,25 @@ import {
 import FilterButton from './FilterButton';
 import { clearFilters } from './filterDrawerSlice';
 import {
-    fetchImagesData, 
     ImageDocsRequestProps, 
     ImageDocFormatTypes,
+    TimelineProps,
     TimelineMonthTypes, 
-    FilterableTypes } from '../TimelineBar/timelineSlice';
-import { getNumericalMonth } from '../TimelineBar/TimelineBar';
+    FilterableTypes, 
+    fetchImagesData} from '../TimelineBar/timelineSlice';
+import { getNumericalMonth } from '../TimelineBar/MonthButton';
 import './FilterDrawer.css';
 
 
-/* ====================================================================
+/* =====================================================================
     A main component - container for filtering options.
-    Renders all the filter options available in the set of image data,
-    as well as handling filtered query fetches.
-==================================================================== */
+    Renders all the filter options available in the set of image data.
+===================================================================== */
 const FilterDrawer: React.FunctionComponent = () => {
     const dispatch = useAppDispatch();
-    const filterables = useAppSelector(state => state.timeline.filterSelectables);
-    const initFetch: boolean = useAppSelector(state => state.timeline.request) === 'initialized'
-        ? true
-        : false;
-    const selectedYear = useAppSelector(state => state.timeline.selected.year);
-    const selectedMonth = useAppSelector(state => state.timeline.selected.month);
     const filterState = useAppSelector(state => state.filter);
+    const filterables = useAppSelector(state => state.timeline.filterSelectables);
+    const selectedTimeline = useAppSelector(state => state.timeline.selected);
     const toolbarFilterSwitch = useAppSelector(state => state.toolbar.filter);
     const classBase: string = "FilterDrawer";
     const classNames: ClassNameTypes = {
@@ -38,68 +34,14 @@ const FilterDrawer: React.FunctionComponent = () => {
         'base': classBase
     };
 
-    /* ----------------------------------------------------------------------
-        Changes to << filter >> state will dispatch filtered fetch request.
-        Image counters will update but filterable items will not change,
-        as those are fixed to the selected year.
-    ---------------------------------------------------------------------- */
+    /* -------------------------------------------------
+        Clear all filters on selected timeline changes. 
+    ------------------------------------------------- */
     useEffect(() => {
-        if (selectedYear !== null  && initFetch === false) {
-            let filterQueries: ImageDocsRequestProps= {
-                'year': selectedYear as number
-            }
-        
-            // Add month if selected.
-            if (selectedMonth !== 'all') {
-                filterQueries['month'] = getNumericalMonth(selectedMonth as TimelineMonthTypes);
-            }
-
-            // Get status of filters.
-            const filterStatus = getFilterStateStatus(filterState);
-
-            // Only dispatch fetch query if filters activated.
-            if (filterStatus === 'on') {
-                // Assign correct string for keys.
-                for (let category in filterState) {
-                    if (filterState[category]!.length > 0) {
-                        switch(category) {
-                            case 'formatMedium':
-                                filterQueries['format-medium'] = filterState[category] as Array<ImageDocFormatTypes['medium']>
-                                break;
-                            case 'formatType': 
-                                filterQueries['format-type'] = filterState[category] as Array<ImageDocFormatTypes['type']>
-                                break;
-                            case 'film':
-                                filterQueries['film'] = filterState[category] as Array<string>
-                                break;
-                            case 'camera':
-                                filterQueries['camera'] = filterState[category]
-                                break;
-                            case 'lens':
-                                filterQueries['lens'] = filterState[category]
-                                break;
-                            case 'focalLength':
-                                filterQueries['focal-length'] = filterState[category] as Array<number>
-                                break;
-                            case 'tags':
-                                filterQueries['tags'] = filterState[category]
-                                break;
-                        }
-                    }
-                }
-                dispatch(fetchImagesData(filterQueries));
-            }
+        if (selectedTimeline.year) {
+            dispatch(clearFilters("RESET TO INIT STATE"));
         }
-    }, [filterState]);
-
-
-    /* --------------------------------------------------------
-        Handle button for resetting of filter state.
-        Clears << filter >> and triggers fetch via useEffect.
-    -------------------------------------------------------- */
-    const onResetClick = (event: React.SyntheticEvent) => {
-        dispatch(clearFilters("RESET TO INIT STATE"));
-    };
+    }, [selectedTimeline]);
 
 
     // Prep fetched data for the filter groups.
@@ -126,7 +68,27 @@ const FilterDrawer: React.FunctionComponent = () => {
             : filterables!.formatMedium
         : [];
 
-    
+
+    /* --------------------------------------------------------
+        Handle button for resetting of filter state.
+        Clears << filter >> and triggers fetch via useEffect.
+    -------------------------------------------------------- */
+    const onResetClick = (event: React.SyntheticEvent) => {
+        dispatch(clearFilters("RESET TO INIT STATE"));
+
+        // "Return" to unfiltered data state by fetching for selected timeline.
+        const payloadFetchBaseTimeline: ImageDocsRequestProps = {
+            'year': selectedTimeline.year as number
+        };
+
+        if (selectedTimeline.month !== 'all') {
+            payloadFetchBaseTimeline['month'] = getNumericalMonth(selectedTimeline.month as TimelineMonthTypes);
+        }
+
+        dispatch(fetchImagesData(payloadFetchBaseTimeline));
+    };
+
+
     /* ---------------------------------------------------------
         Gets add-on to class name for greying out reset button
         when no filters are selected.
@@ -242,18 +204,70 @@ function createCategory(classNames: ClassNameTypes, categoryName: string, select
 }
 
 
+/* ---------------------------------------------
+    Builds fetch payload for filtered queries.
+--------------------------------------------- */
+export function getPayloadForFilteredQuery(filterState: FilterableTypes, selectedTimeline: TimelineProps['selected']) {
+    // Start with year parameter as base.
+    let filteredQuery: ImageDocsRequestProps= {
+        'year': selectedTimeline.year as number
+    };
+
+    // Add month if selected.
+    if (selectedTimeline.month !== 'all') {
+        filteredQuery['month'] = getNumericalMonth(selectedTimeline.month as TimelineMonthTypes);
+    }
+
+    const isFiltered = getFilterStateStatus(filterState);
+
+    // Assign correct string for keys.
+    if (isFiltered) {
+        for (let category in filterState) {
+            if (filterState[category]!.length > 0) {
+                switch(category) {
+                    case 'formatMedium':
+                        filteredQuery['format-medium'] = filterState[category] as Array<ImageDocFormatTypes['medium']>
+                        break;
+                    case 'formatType': 
+                        filteredQuery['format-type'] = filterState[category] as Array<ImageDocFormatTypes['type']>
+                        break;
+                    case 'film':
+                        filteredQuery['film'] = filterState[category] as Array<string>
+                        break;
+                    case 'camera':
+                        filteredQuery['camera'] = filterState[category]
+                        break;
+                    case 'lens':
+                        filteredQuery['lens'] = filterState[category]
+                        break;
+                    case 'focalLength':
+                        filteredQuery['focal-length'] = filterState[category] as Array<number>
+                        break;
+                    case 'tags':
+                        filteredQuery['tags'] = filterState[category]
+                        break;
+                }
+            }
+        }
+    }
+    
+
+    return filteredQuery;
+};
+
+
 /* ------------------------------------------
     Get de/activated status of << filter >>
 ------------------------------------------ */
 export function getFilterStateStatus(filterState: FilterableTypes) {
-    let filterStatus: string = 'off';
+    let filteredStatus: boolean = false;
     for (let category in filterState) {
         if (filterState[category]!.length > 0) {
-            filterStatus = 'on';
+            filteredStatus = true;
             break;
         }
     }
-    return filterStatus;
+    return filteredStatus;
 }
 
 

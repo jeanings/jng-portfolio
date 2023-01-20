@@ -48,7 +48,7 @@ const mapCanvasSlice = createSlice({
             state.markersStatus = markersStatus;
         },
         /* ------------------------------------------------------------
-            Handles resetting both marker and source status to 'idle.
+            Handles resetting both marker and source status to 'idle'.
             Affects marker layer adding effect.
         ------------------------------------------------------------ */
         cleanupMarkerSource: (state, action: PayloadAction<MapStatusProps['markersStatus']>) => {
