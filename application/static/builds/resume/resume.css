@@ -90,7 +90,7 @@ h4 {
                 display: flex;
                 column-gap: 5mm;
                 flex-direction: row;
-                font-size: 3mm;
+                font-size: 3.5mm;
                 align-items: center;
             }
                 .resume_header_contact_item {
@@ -111,7 +111,7 @@ h4 {
             
             #resume_header_location {
                 grid-row: 3 / -1;
-                font-size: 2.5mm;
+                font-size: 3mm;
                 align-self: flex-start;
             }
 
@@ -177,7 +177,7 @@ h4 {
                         }
 
                             #resume_selection_item_header_links_url {
-                                font-size: 3.6mm;
+                                font-size: 3.75mm;
                                 font-family: 'Space Mono', monospace;
                             }
 
@@ -236,7 +236,7 @@ h4 {
                             .resume_section_item_stack_container {
                                 grid-column: 2 / -1;
                                 display: flex;
-                                column-gap: 6mm;
+                                column-gap: 5mm;
                             }
                                 .resume_section_item_stack li {
                                     list-style: none;

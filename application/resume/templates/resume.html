@@ -46,6 +46,32 @@
 
     
     <div class="resume_sections">
+
+        <div class="resume_section" id="resume_section_skills">
+            <h2 class="resume_section_name">
+                SKILLS
+            </h2>
+            <div class="resume_section_item">
+                {%- for item in skills -%}
+                    {%- for skill_type in item -%}
+                        <ul class="resume_section_item_stack">
+                            <span class="resume_section_item_stack_name">
+                                {{ skill_type }}
+                            </span>
+
+                            <div class="resume_section_item_stack_container">
+                                {%- for list_item in item[skill_type] -%}
+                                    <li class="resume_section_item_stack_backend_item">
+                                        {{ list_item }}
+                                    </li>
+                                {%- endfor -%}
+                            </div>
+                        </ul>
+                    {%- endfor -%}
+                {%- endfor -%}
+            </div>
+        </div>
+
         <div class="resume_section" id="resume_section_projects">
             <h2 class="resume_section_name">
                 FULL STACK PROJECTS
@@ -86,41 +112,12 @@
             {%- endfor -%}
         </div>
         
-
-        <div class="resume_section" id="resume_section_skills">
-            <h2 class="resume_section_name">
-                SKILLS
-            </h2>
-
-            <div class="resume_section_item">
-                {%- for item in skills -%}
-                    {%- for skill_type in item -%}
-                        <ul class="resume_section_item_stack">
-                            <span class="resume_section_item_stack_name">
-                                {{ skill_type }}
-                            </span>
-
-                            <div class="resume_section_item_stack_container">
-                                {%- for list_item in item[skill_type] -%}
-                                    <li class="resume_section_item_stack_backend_item">
-                                        {{ list_item }}
-                                    </li>
-                                {%- endfor -%}
-                            </div>
-                        </ul>
-                    {%- endfor -%}
-                {%- endfor -%}
-            </div>
-
-        </div>
-
         <div class="resume_section" id="resume_section_education">
             <h2 class="resume_section_name">
                 EDUCATION
             </h2>
             {%- for institute in education -%}
                 {%- for name in institute -%}
-
                     <div class="resume_section_item">
                         <div class="resume_section_item_header">
                             <h3 class="resume_section_item_header_name">
@@ -138,7 +135,6 @@
                             <h4 class="resume_section_item_header_location">
                                 {{ institute[name].location }}
                             </h4>
-                            
                         </div>
 
                         <ul class="resume_section_item_list">
@@ -160,7 +156,6 @@
             </h2>
             {%- for job in experience -%}
                 {%- for company in job -%}
-
                     <div class="resume_section_item">
                         <div class="resume_section_item_header">
                             <h3 class="resume_section_item_header_name">
@@ -177,7 +172,6 @@
                             <h4 class="resume_section_item_header_location">
                                 {{ job[company].location }}
                             </h4>
-                            
                         </div>
 
                         <ul class="resume_section_item_list">
@@ -187,7 +181,6 @@
                                 </li>
                             {%- endfor -%}
                         </ul>
-
                     </div>
                 {%- endfor -%}
             {%- endfor -%}
