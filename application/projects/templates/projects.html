@@ -54,27 +54,6 @@
         <div 
             class="Projects__description__stats"
             id="stats-container">
-            <!-- <div 
-                class="Projects__description__stats__item"
-                id="stats-url">
-                <div 
-                    class="Projects__description__stats__item__label">
-                    URL
-                </div>
-                <div 
-                    class="Projects__description__stats__item__text" 
-                    id="stats-url-text">
-                    {%- for language in projects[0].url -%}
-                        <a 
-                            href="{{ projects[0].url[language] }}" 
-                            target="_blank">
-                            {{ language }}
-                            {{ projects[0].url[language] }}
-                            </a>
-                        
-                    {%- endfor -%}
-                </div>
-            </div> -->
                 
             <div 
                 class="Projects__description__stats__item">
@@ -136,6 +115,23 @@
                 </div>
             </div>
             
+        </div>
+
+        <div
+            class="Projects__description__access"
+            id="access-links">
+            {%- for language in projects[0].url -%}
+                {%- for name, url in language.items() -%}
+                    <button
+                        class="access__button">
+                        <a 
+                            href="{{ url }}" 
+                            target="_blank">
+                            Open <span class="access__button__language">({{ name }})</span>
+                        </a>
+                    </button>
+                {%- endfor -%}
+            {%- endfor -%}
         </div>
     </div>
 

@@ -1,24 +1,43 @@
-const projectSelectorElements = document.getElementsByClassName("Projects__selector__button__image");
+/* -------------------------------------------------------
+	Button consctructor for stack and project URL items.
+------------------------------------------------------- */
+class ProjectsButton {
+	constructor(buttonType, nameUrlPair) {
+		const [ name, url ] = Object.entries(nameUrlPair)[0];
+		this.name = name;
+		this.url = url;
+		this.buttonType = buttonType;
+		this.className = buttonType + "__button";
+	}
 
+	create() {
+		let innerHtml = "";
 
-/* ---------------------------------------
-	Button consctructor for stack items.
---------------------------------------- */
-function createStackItemButton(categoryItem) {
-	const [ categoryItemName, categoryItemUrl ] = Object.entries(categoryItem)[0];
+		switch (this.buttonType) {
+			case 'stack':
+				innerHtml = this.name;
+				break;
+			case 'access':
+				innerHtml = `Open 
+					<span class="${this.className + '__language'}">
+						(${this.name})
+					</span>
+				`;
+		}
 
-	// Set up child anchor element.
-	itemAnchor = document.createElement("a");
-	itemAnchor.setAttribute("href", categoryItemUrl);
-	itemAnchor.setAttribute("target", "_blank");
-	itemAnchor.innerHTML = categoryItemName;
+		// Set up child anchor element.
+		const itemAnchor = document.createElement("a");
+		itemAnchor.setAttribute("href", this.url);
+		itemAnchor.setAttribute("target", "_blank");
+		itemAnchor.innerHTML = innerHtml;
 
-	// Set up parent button element.
-	itemButton = document.createElement("button");
-	itemButton.setAttribute("class", "stack__button");
-	itemButton.appendChild(itemAnchor);
+		// Set up parent button element.
+		const itemButton = document.createElement("button");
+		itemButton.setAttribute("class", this.className);
+		itemButton.appendChild(itemAnchor);
 
-	return itemButton;
+		return itemButton;
+	}
 };
 
 
@@ -42,7 +61,6 @@ function renderUpdates(projectId) {
 			container.removeChild(container.firstChild);
 		}
 	};
-
 
 	// Get clicked project through projectId.
 	let project;
@@ -96,8 +114,10 @@ function renderUpdates(projectId) {
 		const stackCategoryItemButtons = [];
 
 		Object.values(newStack[stackCategory]).forEach(categoryItem => {
-			const categoryItemButton = createStackItemButton(categoryItem);
-			stackCategoryItemButtons.push(categoryItemButton);
+			const categoryItemButton = new ProjectsButton('stack', categoryItem); 
+			stackCategoryItemButtons.push(
+				categoryItemButton.create()
+			);
 		});
 		
 		// Add all items in category to new button elements object.
@@ -112,6 +132,23 @@ function renderUpdates(projectId) {
 		Object.values(newStackButtonElements[stackCategory]).forEach(button => {
 			containerToEdit.appendChild(button);
 		});
+	}
+
+	// Update live project link buttons.
+	const accessLinksContainer = document.getElementById("access-links");
+	removeAllButtons(accessLinksContainer);
+
+	let newProjectAccessButtons = [];
+
+	Object.values(project.url).forEach(projectAccessItem => {
+		const projectAccessButton = new ProjectsButton('access', projectAccessItem);
+		newProjectAccessButtons.push(
+			projectAccessButton.create()
+		);
+	});  
+
+	for (let accessButton of newProjectAccessButtons) {
+		accessLinksContainer.appendChild(accessButton);
 	}
 };
 
@@ -129,6 +166,9 @@ function handleProjectSelectorClick(event) {
 /* ------------------------------------------------------
 	Add click listeners to project selector thumbnails.
 ------------------------------------------------------ */
+const projectSelectorElements = document.getElementsByClassName("Projects__selector__button__image");
 for(let projectSelector of projectSelectorElements) {
 	projectSelector.addEventListener('click', handleProjectSelectorClick, false);
 };
+
+
