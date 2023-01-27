@@ -81,6 +81,21 @@ function renderUpdates(projectId) {
 	objectives.innerHTML = project.objectives;
 	description.innerHTML = project.description;
 
+	let projectColour;
+	try {
+		if (colours && projects) {
+			const reversedProjects = [...projects].reverse();
+			const projectIndex = reversedProjects.indexOf(project);
+			projectColour = colours[projectIndex];
+		}
+	} catch (error) {
+		console.error(error);
+		// global variable 'projects' wasn't set correctly through jinja template,
+		// or is undefined due to back-end issues.
+	}
+
+	titleSeparatorBar.style.borderColor = projectColour;
+
 	// Update video variables and reload container.
 	demoVideo.setAttribute('poster', project.thumb);
 	demoVideoSrc.setAttribute('src', project.demo);
