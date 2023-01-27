@@ -99,6 +99,7 @@ function renderUpdates(projectId) {
 	// Update video variables and reload container.
 	demoVideo.setAttribute('poster', project.thumb);
 	demoVideoSrc.setAttribute('src', project.demo);
+	demoVideoSrc.setAttribute('data-project-id', project._id);
 	demoVideo.load();
 	
 	// Update stack item buttons.
@@ -175,7 +176,12 @@ function renderUpdates(projectId) {
 ------------------------------------------------------------- */
 function handleProjectSelectorClick(event) {
 	const projectId = event.target.dataset.projectId;
-	renderUpdates(projectId);
+	const demoVideoSrc = document.getElementById("demo-video-src");
+	const currentProjectId = demoVideoSrc.dataset.projectId;
+
+	if (projectId !== currentProjectId) {
+		renderUpdates(projectId);
+	}
 };
 
 
