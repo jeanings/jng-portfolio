@@ -1,15 +1,29 @@
-// window.onload = function() {
-// 	/* ------------------------
-// 		Loader for main page.
-// 	------------------------ */
-	
-// };
-
-
 const projectSelectorElements = document.getElementsByClassName("Projects__selector__button__image");
 
+
+/* ---------------------------------------
+	Button consctructor for stack items.
+--------------------------------------- */
+function createStackItemButton(categoryItem) {
+	const [ categoryItemName, categoryItemUrl ] = Object.entries(categoryItem)[0];
+
+	// Set up child anchor element.
+	itemAnchor = document.createElement("a");
+	itemAnchor.setAttribute("href", categoryItemUrl);
+	itemAnchor.setAttribute("target", "_blank");
+	itemAnchor.innerHTML = categoryItemName;
+
+	// Set up parent button element.
+	itemButton = document.createElement("button");
+	itemButton.setAttribute("class", "stack__button");
+	itemButton.appendChild(itemAnchor);
+
+	return itemButton;
+};
+
+
 /* ---------------------------------------------------
-	Updates UI elements
+	Updates UI elements with new project properties.
 --------------------------------------------------- */
 function renderUpdates(projectId) {
 	const year = document.getElementById("title-project-year");
@@ -19,6 +33,16 @@ function renderUpdates(projectId) {
 	const description = document.getElementById("content-description");
 	const demoVideo = document.getElementById("demo-video");
 	const demoVideoSrc = document.getElementById("demo-video-src");
+
+	/* -----------------------------------------------
+		Removes all child nodes from parent element.
+	----------------------------------------------- */
+	function removeAllButtons(container) {
+		while (container.firstChild) {
+			container.removeChild(container.firstChild);
+		}
+	};
+
 
 	// Get clicked project through projectId.
 	let project;
@@ -42,30 +66,53 @@ function renderUpdates(projectId) {
 	demoVideo.setAttribute('poster', project.thumb);
 	demoVideoSrc.setAttribute('src', project.demo);
 	demoVideo.load();
+	
+	// Update stack item buttons.
+	const backendButtonsContainer = document.getElementById("stats-stack-backend");
+	const frontendButtonsContainer = document.getElementById("stats-stack-frontend");
+	const toolsButtonsContainer = document.getElementById("stats-stack-tools");
 
+	const buttonsContainers = [
+		backendButtonsContainer, 
+		frontendButtonsContainer, 
+		toolsButtonsContainer
+	];
 
+	// Remove all current child nodes (buttons) of stack item containers.
+	for (let buttonContainer of buttonsContainers) {
+		removeAllButtons(buttonContainer);
+	}
 
-	// const backEndButtons = [];
-	// projectDoc.stack.backend.forEach(item => {
-	// 	[stackItemName, stackItemUrl] = Object.entries(item)[0];
-	// 	let stackButton = createStackItemButton(stackItemName, stackItemUrl);
-	// 	backEndButtons.push(stackButton);
-	// });
+	const newStack = {
+		"stats-stack-backend": project.stack.backend,
+		"stats-stack-frontend": project.stack.frontend,
+		"stats-stack-tools": project.stack.tools
+	};
 
-	// const frontEndButtons = [];
-	// projectDoc.stack.frontend.forEach(item => {
-	// 	[stackItemName, stackItemUrl] = Object.entries(item)[0];
-	// 	let stackButton = createStackItemButton(stackItemName, stackItemUrl);
-	// 	frontEndButtons.push(stackButton);
-	// });
+	let newStackButtonElements = {};
 
-	// const toolsButtons = [];
-	// projectDoc.stack.tools.forEach(item => {
-	// 	[stackItemName, stackItemUrl] = Object.entries(item)[0];
-	// 	let stackButton = createStackItemButton(stackItemName, stackItemUrl);
-	// 	toolsButtons.push(stackButton);
-	// });
+	// Create new stack item buttons.
+	for (let stackCategory in newStack) {
+		const stackCategoryItemButtons = [];
 
+		Object.values(newStack[stackCategory]).forEach(categoryItem => {
+			const categoryItemButton = createStackItemButton(categoryItem);
+			stackCategoryItemButtons.push(categoryItemButton);
+		});
+		
+		// Add all items in category to new button elements object.
+		newStackButtonElements[stackCategory] = stackCategoryItemButtons;
+	}
+
+	// Add new stack buttons to DOM.
+	for (let stackCategory in newStackButtonElements) {
+		let containerToEdit = buttonsContainers.filter(
+			buttonsContainer => buttonsContainer.id === stackCategory)[0];
+
+		Object.values(newStackButtonElements[stackCategory]).forEach(button => {
+			containerToEdit.appendChild(button);
+		});
+	}
 };
 
 
@@ -74,7 +121,7 @@ function renderUpdates(projectId) {
 	Passes target project ID to resumeUpdates to be processed.
 ------------------------------------------------------------- */
 function handleProjectSelectorClick(event) {
-	const projectId = event.target.dataset.projectId
+	const projectId = event.target.dataset.projectId;
 	renderUpdates(projectId);
 };
 
