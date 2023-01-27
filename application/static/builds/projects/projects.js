@@ -18,11 +18,12 @@ class ProjectsButton {
 				innerHtml = this.name;
 				break;
 			case 'access':
-				innerHtml = `Open 
-					<span class="${this.className + '__language'}">
-						(${this.name})
-					</span>
-				`;
+				const buttonText = this.name === 'English'
+					? "OPEN"
+					: "アクセス";
+
+				innerHtml = buttonText;
+				break;
 		}
 
 		// Set up child anchor element.

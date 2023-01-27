@@ -127,7 +127,11 @@
                         <a 
                             href="{{ url }}" 
                             target="_blank">
-                            Open <span class="access__button__language">({{ name }})</span>
+                            {% if name == 'English' %}
+                                OPEN
+                            {% elif name == '日本語' %}
+                                アクセス
+                            {% endif %}
                         </a>
                     </button>
                 {%- endfor -%}
