@@ -101,7 +101,7 @@ function renderUpdates(projectId) {
 	}
 
 	if (selectorOverlay) {
-		selectorOverlay.style.background = rgbAccent.replace(", 1.0)", ", 0.6)");
+		selectorOverlay.style.background = rgbAccent.replace(", 1.0)", ", 0.4)");
 		projectThumb.style.opacity = opacityForActiveThumb;
 	}
 

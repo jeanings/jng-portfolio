@@ -31,27 +31,6 @@
         </div>
                 
         <div 
-            class="Projects__description__content" 
-            id="content-container">
-            <div 
-                class="Projects__description__content__item">
-                <span>Objectives</span>
-                <span
-                    id="content-objectives">
-                    {{ projects[0].objectives }}
-                </span>
-            </div>
-            <div 
-                class="Projects__description__content__item">
-                <span>Description</span>
-                <span
-                    id="content-description">
-                    {{ projects[0].description }}
-                </span>
-            </div>
-        </div>
-
-        <div 
             class="Projects__description__stats"
             id="stats-container">
                 
@@ -117,6 +96,29 @@
             
         </div>
 
+
+        <div 
+            class="Projects__description__content" 
+            id="content-container">
+            <div 
+                class="Projects__description__content__item">
+                <span>Objectives</span>
+                <span
+                    id="content-objectives">
+                    {{ projects[0].objectives }}
+                </span>
+            </div>
+            <div 
+                class="Projects__description__content__item">
+                <span>Description</span>
+                <span
+                    id="content-description">
+                    {{ projects[0].description }}
+                </span>
+            </div>
+        </div>
+
+
         <div
             class="Projects__description__access"
             id="access-links">
@@ -176,7 +178,7 @@
                     <div
                         class="Projects__selector__button__image__overlay"
                         data-project-id="{{ project._id }}"
-                        style="background: rgb({{ project.rgb }}, 0.6);">
+                        style="background: rgb({{ project.rgb }}, 0.4);">
                         <img
                             class="Projects__selector__button__image" 
                             src="{{ project.thumb }}"
