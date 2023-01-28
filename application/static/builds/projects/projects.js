@@ -53,6 +53,7 @@ function renderUpdates(projectId) {
 	const description = document.getElementById("content-description");
 	const demoVideo = document.getElementById("demo-video");
 	const demoVideoSrc = document.getElementById("demo-video-src");
+	const previousProjectId = demoVideoSrc.dataset.projectId;
 
 	/* -----------------------------------------------
 		Removes all child nodes from parent element.
@@ -76,25 +77,33 @@ function renderUpdates(projectId) {
 	}
 
 	// Update text elements with new entries from clicked project.
+	const rgbAccent = `rgb(${project.rgb}, 1.0)`;
 	year.innerHTML = project.year;
 	title.innerHTML = project.title;
 	objectives.innerHTML = project.objectives;
 	description.innerHTML = project.description;
+	titleSeparatorBar.style.borderColor = rgbAccent;
 
-	let projectColour;
-	try {
-		if (colours && projects) {
-			const reversedProjects = [...projects].reverse();
-			const projectIndex = reversedProjects.indexOf(project);
-			projectColour = colours[projectIndex];
-		}
-	} catch (error) {
-		console.error(error);
-		// global variable 'projects' wasn't set correctly through jinja template,
-		// or is undefined due to back-end issues.
+	// Update selector overlays, thumbs.
+	const opacityForActiveThumb = 0.25;
+	const opacityForInactiveThumb = 1.0;
+	const selectorOverlays = document.getElementsByClassName("Projects__selector__button__image__overlay");
+	const selectorOverlay = Array.from(selectorOverlays).filter(overlay => 
+		overlay.dataset.projectId === projectId)[0];
+	const previousSelectorOverlay = Array.from(selectorOverlays).filter(overlay => 
+		overlay.dataset.projectId === previousProjectId)[0];
+	const projectThumb = document.getElementById(projectId);
+	const previousProjectThumb = document.getElementById(previousProjectId);
+	
+	if (previousSelectorOverlay) {
+		previousSelectorOverlay.style.background = "none";
+		previousProjectThumb.style.opacity = opacityForInactiveThumb;
 	}
 
-	titleSeparatorBar.style.borderColor = projectColour;
+	if (selectorOverlay) {
+		selectorOverlay.style.background = rgbAccent.replace(", 1.0)", ", 0.6)");
+		projectThumb.style.opacity = opacityForActiveThumb;
+	}
 
 	// Update video variables and reload container.
 	demoVideo.setAttribute('poster', project.thumb);

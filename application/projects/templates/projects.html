@@ -27,7 +27,7 @@
 
         <div 
             id="title-separator" 
-            style="border-color: {{ colours[projects|length - 1] }};">
+            style="border-color: rgb({{ projects[0].rgb }}, 1.0);">
         </div>
                 
         <div 
@@ -167,10 +167,23 @@
         <div
             class="Projects__selector__container">
             {%- for project in projects -%}
-                <img
-                    class="Projects__selector__button__image" 
-                    src="{{ project.thumb }}"
-                    data-project-id="{{ project._id }}">
+
+                {% if project._id == projects[0]._id %}
+                    {% set opacity = 0.25 %}
+                {% else %}
+                    {% set opacity = 1.00 %}
+                {% endif %}
+                    <div
+                        class="Projects__selector__button__image__overlay"
+                        data-project-id="{{ project._id }}"
+                        style="background: rgb({{ project.rgb }}, 0.6);">
+                        <img
+                            class="Projects__selector__button__image" 
+                            src="{{ project.thumb }}"
+                            id="{{ project._id }}"
+                            data-project-id="{{ project._id }}"
+                            style="opacity: {{ opacity }};">
+                    </div>
             {%- endfor -%}
         </div>
     </div>

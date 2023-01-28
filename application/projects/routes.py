@@ -10,7 +10,6 @@ from pathlib import Path
 from dotenv import load_dotenv
 from pymongo import MongoClient
 from urllib.parse import quote_plus
-from .tools.colour_sets import main_colours
 
 DEBUG_MODE = app.config['FLASK_DEBUG']
 
@@ -48,6 +47,5 @@ def projects():
 
     return render_template("projects.html", 
         title="Some personal projects  ——  jeanings.space",
-        projects=projects,
-        colours=main_colours['mainColours'],
+        projects=projects
     )

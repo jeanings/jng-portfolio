@@ -238,9 +238,14 @@ body {
             /* grid-template-rows: 100%; */
         }
 
+            .Projects__selector__button__image__overlay {
+                background: none;
+                border-radius: 0.35rem;
+            }
+
             .Projects__selector__button__image {
+                display: block;
                 width: 15rem;
-                border: 1px transparent solid;
                 border-radius: 0.35rem;
                 cursor: pointer;
             }
