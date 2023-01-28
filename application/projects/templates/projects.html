@@ -11,134 +11,140 @@
         class="Projects__description"
         role="main"
         aria-label="project description">
+        <div
+            id="projects-description-top">
 
-        <div 
+            <div 
             class="Projects__description__title" 
             id="title-container">
-            <div 
-                id="title-project-year">
-                {{ projects[0].year }}
-            </div>
-            <div 
-                id="title-text">
-                {{ projects[0].title }}
-            </div>
-        </div>
-
-        <div 
-            id="title-separator" 
-            style="border-color: rgb({{ projects[0].rgb }}, 1.0);">
-        </div>
-                
-        <div 
-            class="Projects__description__stats"
-            id="stats-container">
-                
-            <div 
-                class="Projects__description__stats__item">
-                Back-end
-                <div
-                    id="stats-stack-backend">
-                    {%- for item in projects[0].stack.backend -%}
-                        {%- for name, url in item.items() -%}
-                            <button
-                                class="stack__button">
-                                <a 
-                                    href="{{ url }}" 
-                                    target="_blank">
-                                    {{ name }}
-                                </a>
-                            </button>
-                        {%- endfor -%}
-                    {%- endfor -%}
-                </div>
-            </div>
-
-            <div 
-                class="Projects__description__stats__item">
-                Front-end
                 <div 
-                    id="stats-stack-frontend">
-                    {%- for item in projects[0].stack.frontend -%}
-                        {%- for name, url in item.items() -%}
-                            <button
-                                class="stack__button">
-                                <a 
-                                    href="{{ url }}" 
-                                    target="_blank">
-                                    {{ name }}
-                                </a>
-                            </button>
-                        {%- endfor -%}
-                    {%- endfor -%}
+                    id="title-project-year">
+                    {{ projects[0].year }}
                 </div>
-            </div>
-
-            <div 
-                class="Projects__description__stats__item">
-                Tools
                 <div 
-                    id="stats-stack-tools">
-                    {%- for item in projects[0].stack.tools -%}
-                        {%- for name, url in item.items() -%}
-                            <button
-                                class="stack__button">
-                                <a 
-                                    href="{{ url }}" 
-                                    target="_blank">
-                                    {{ name }}
-                                </a>
-                            </button>
-                        {%- endfor -%}
-                    {%- endfor -%}
+                    id="title-text">
+                    {{ projects[0].title }}
                 </div>
             </div>
-            
+
+            <div 
+                id="title-separator" 
+                style="border-color: rgb({{ projects[0].rgb }}, 1.0);">
+            </div>
+                    
+            <div 
+                class="Projects__description__stats"
+                id="stats-container">
+                    
+                <div 
+                    class="Projects__description__stats__item">
+                    Back-end
+                    <div
+                        id="stats-stack-backend">
+                        {%- for item in projects[0].stack.backend -%}
+                            {%- for name, url in item.items() -%}
+                                <button
+                                    class="stack__button">
+                                    <a 
+                                        href="{{ url }}" 
+                                        target="_blank">
+                                        {{ name }}
+                                    </a>
+                                </button>
+                            {%- endfor -%}
+                        {%- endfor -%}
+                    </div>
+                </div>
+
+                <div 
+                    class="Projects__description__stats__item">
+                    Front-end
+                    <div 
+                        id="stats-stack-frontend">
+                        {%- for item in projects[0].stack.frontend -%}
+                            {%- for name, url in item.items() -%}
+                                <button
+                                    class="stack__button">
+                                    <a 
+                                        href="{{ url }}" 
+                                        target="_blank">
+                                        {{ name }}
+                                    </a>
+                                </button>
+                            {%- endfor -%}
+                        {%- endfor -%}
+                    </div>
+                </div>
+
+                <div 
+                    class="Projects__description__stats__item">
+                    Tools
+                    <div 
+                        id="stats-stack-tools">
+                        {%- for item in projects[0].stack.tools -%}
+                            {%- for name, url in item.items() -%}
+                                <button
+                                    class="stack__button">
+                                    <a 
+                                        href="{{ url }}" 
+                                        target="_blank">
+                                        {{ name }}
+                                    </a>
+                                </button>
+                            {%- endfor -%}
+                        {%- endfor -%}
+                    </div>
+                </div>
+
+                <div 
+                    class="Projects__description__content" 
+                    id="content-container">
+                    <div 
+                        class="Projects__description__content__item">
+                        <span>Objectives</span>
+                        <span
+                            id="content-objectives">
+                            {{ projects[0].objectives }}
+                        </span>
+                    </div>
+                    <div 
+                        class="Projects__description__content__item">
+                        <span>Description</span>
+                        <span
+                            id="content-description">
+                            {{ projects[0].description }}
+                        </span>
+                    </div>
+                </div>  
+                
+            </div>
         </div>
 
-
-        <div 
-            class="Projects__description__content" 
-            id="content-container">
-            <div 
-                class="Projects__description__content__item">
-                <span>Objectives</span>
-                <span
-                    id="content-objectives">
-                    {{ projects[0].objectives }}
-                </span>
-            </div>
-            <div 
-                class="Projects__description__content__item">
-                <span>Description</span>
-                <span
-                    id="content-description">
-                    {{ projects[0].description }}
-                </span>
-            </div>
-        </div>
-
-
+        
         <div
-            class="Projects__description__access"
-            id="access-links">
-            {%- for language in projects[0].url -%}
-                {%- for name, url in language.items() -%}
-                    <button
-                        class="access__button">
-                        <a 
-                            href="{{ url }}" 
-                            target="_blank">
-                            {% if name == 'English' %}
-                                OPEN
-                            {% elif name == '日本語' %}
-                                アクセス
-                            {% endif %}
-                        </a>
-                    </button>
+            id="projects-description-bottom">
+            <div
+                class="Projects__description__access"
+                id="access-links">
+                {%- for language in projects[0].url -%}
+                    {%- for name, url in language.items() -%}
+                        <button
+                            class="access__button">
+                            <a 
+                                href="{{ url }}" 
+                                target="_blank">
+                                {% if name == 'English' %}
+                                    OPEN
+                                {% elif name == '日本語' %}
+                                    アクセス
+                                {% endif %}
+                            </a>
+                        </button>
+                    {%- endfor -%}
                 {%- endfor -%}
-            {%- endfor -%}
+            </div>
         </div>
+
     </div>
 
 
@@ -165,7 +171,7 @@
         class="Projects__selector"
         role="menubar"
         aria-label="projects selector">
-    
+
         <div
             class="Projects__selector__container">
             {%- for project in projects -%}
@@ -188,6 +194,25 @@
                     </div>
             {%- endfor -%}
         </div>
+
+        <button
+            class="Projects__selector__scroller"
+            id="scroller-left">
+            <svg xmlns="http://www.w3.org/2000/svg" class="Projects__selector__scroller__icon" viewBox="0 0 512 512">
+                <path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="32" d="M112 352l-64-64 64-64"/>
+                <path d="M64 288h294c58.76 0 106-49.33 106-108v-20" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="32"/>
+            </svg>
+        </button>
+
+        <button
+            class="Projects__selector__scroller"
+            id="scroller-right">
+            <svg xmlns="http://www.w3.org/2000/svg" class="Projects__selector__scroller__icon" viewBox="0 0 512 512">
+                <path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="32" d="M400 160l64 64-64 64"/>
+                <path d="M448 224H154c-58.76 0-106 49.33-106 108v20" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="32"/>
+            </svg>
+        </button>
+
     </div>
 </section>
 {% endblock %}

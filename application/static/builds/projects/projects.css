@@ -62,12 +62,11 @@ body {
 .Projects {
     grid-column: 1;
     grid-row: 1;
-    padding-top: 15vh;
+    padding-top: 10vh;
     padding-left: 6rem;
     padding-right: 6rem;
     padding-bottom: 10vh;
     display: grid;
-    row-gap: 2.5rem;
     grid-template-columns: 50% 50%;
     grid-template-rows: 70% 30%;
     font-family: 'Grenze';
@@ -94,69 +93,66 @@ body {
 
     .Projects__description {
         grid-column: 1 / 2;
-        grid-row: 1 / 2;
+        grid-row: 1 / -1;
         display: grid;
-        grid-template-columns: 100%;
-        grid-auto-rows: max-content;
-        row-gap: 1rem;
-        transition: all 700ms ease-in-out;
-        overflow-x: hidden;
+        grid-template-rows: auto;
     }
-            
-        .Projects__description__title {
+        
+        #projects-description-top {
             grid-row: 1 / 2;
-            height: 5rem;
             display: grid;
-            grid-template-rows: 2rem auto;
-        }
-
-            #title-project-year {
-                display: flex;
-                align-items: flex-end;
-                font-size: 1.5rem;
-                animation-name: fade-in;
-                animation-duration: 500ms;
-                animation-timing-function: ease-in-out;
-                animation-fill-mode: forwards;
-            }
-
-            #title-text {
-                font-size: 2rem;
-                animation-name: fade-in;
-                animation-duration: 500ms;
-                animation-timing-function: ease-in-out;
-                animation-fill-mode: forwards;
-            }
-        
-        #title-separator {
-            grid-row: 2 / 3;
-            border-width: 0.4rem;
-            border-style: solid;
-            border-color: var(--color-bg);
-            transition: all 1000ms ease-in-out;
-        }
-
-        
-
-        .Projects__description__stats {
-            grid-row: 3 / 4;
-            display: grid;
-            row-gap: 0.25rem;
-        }
-
-        .Projects__description__content {
-            grid-row: 4 / 5;
-            display: grid;
-            grid-auto-rows: auto;
+            grid-auto-rows: max-content;
             row-gap: 1rem;
+            padding-top: 2rem;
+            transition: all 700ms ease-in-out;
+            overflow-x: hidden;
         }
 
-        .Projects__description__access {
-            display: flex;
-            column-gap: 2.5rem;
-            padding-top: 2.5rem;
-            justify-content: center;
-        }
+            .Projects__description__title {
+                grid-row: 1 / 2;
+                height: 5rem;
+                display: grid;
+                grid-template-rows: 2rem auto;
+            }
+
+                #title-project-year {
+                    display: flex;
+                    align-items: flex-end;
+                    font-size: 1.5rem;
+                    animation-name: fade-in;
+                    animation-duration: 500ms;
+                    animation-timing-function: ease-in-out;
+                    animation-fill-mode: forwards;
+                }
+
+                #title-text {
+                    font-size: 2rem;
+                    animation-name: fade-in;
+                    animation-duration: 500ms;
+                    animation-timing-function: ease-in-out;
+                    animation-fill-mode: forwards;
+                }
+            
+            #title-separator {
+                grid-row: 2 / 3;
+                border-width: 0.4rem;
+                border-style: solid;
+                border-color: var(--color-bg);
+                transition: all 1000ms ease-in-out;
+            }
+
+            .Projects__description__stats {
+                grid-row: 3 / 4;
+                display: grid;
+                row-gap: 0.5rem;
+            }
+
+            .Projects__description__content {
+                grid-row: 4 / 5;
+                display: grid;
+                grid-auto-rows: auto;
+                row-gap: 1rem;
+            }
 
             .Projects__description__content__item,
             .Projects__description__stats__item {
@@ -173,7 +169,18 @@ body {
             #stats-stack-frontend,
             #stats-stack-tools {
                 display: flex;
-                column-gap: 0.25rem;
+                column-gap: 0.5rem;
+            }
+
+        #projects-description-bottom {
+            grid-row: 2 / 3;
+            align-self: flex-start;
+        }
+
+            .Projects__description__access {
+                display: flex;
+                column-gap: 2.5rem;
+                justify-content: center;
             }
 
             .stack__button,
@@ -237,9 +244,11 @@ body {
     .Projects__demo {
         grid-column: 2 / 3;
         grid-row: 1 / 2;
-        padding: 1rem;
         display: flex;
-        justify-content: flex-end;
+        height: 85%;
+        border-radius: 0.35rem;
+        justify-content: center;
+        align-self: center;
         animation-name: fade-in;
         animation-duration: 500ms;
         animation-timing-function: ease-in-out;
@@ -247,24 +256,60 @@ body {
     }
 
         #demo-video {
-            border: 1px transparent solid;
-            border-radius: 0.35rem;
+            border-radius: inherit;
+            display: inline-block;
         }
 
     
     .Projects__selector {
         grid-column: 2 / -1;
         grid-row: 2 / -1;
-        width: calc(15rem * 3 + 1rem * 5);      /* images x 3 + gap x 5 */
-        padding: 1rem 1rem 1rem 2rem;
+        display: grid;
+        grid-template-columns: 50% 50%;
+        grid-template-rows: calc(100% - 1.75rem*2) 1.75rem 1.75rem;
+        padding: 0 2.25rem 0 2.25rem;
+        width: calc(15rem*3 + 1rem*2 + 2rem*2.25);      /* images x 3 + gap x 2 + buttons x 2 */
+        column-gap: 0.5rem;
         justify-self: center;
-        overflow-x: hidden;
-        overflow-y: hidden;
+        align-self: baseline;
     }
-        
+        .Projects__selector__scroller {
+            background: none;
+            border: none;
+            color: var(--color-text);
+            display: flex;
+            align-self: center;
+            width: 5rem;
+        }
+
+            #scroller-left {
+                grid-column: 1 / 2;
+                grid-row: 3 / -1;
+                justify-self: flex-end;
+                flex-direction: row-reverse;
+            }
+
+            #scroller-right {
+                grid-column: 2 / 3;
+                grid-row: 2 / 3;
+                justify-self: flex-start;
+                flex-direction: row;
+            }
+
+            .Projects__selector__scroller__icon {
+                display: inline-block;
+                width: 2.5rem;
+                height: 100%;
+            }
+
         .Projects__selector__container {
+            grid-column: 1 / -1;
+            grid-row: 1 / 2;
             display: flex;
             column-gap: 1rem;
+            overflow: hidden;
+            align-items: flex-start;
+            padding-bottom: 1rem;
         }
 
             .Projects__selector__button__image__overlay {
