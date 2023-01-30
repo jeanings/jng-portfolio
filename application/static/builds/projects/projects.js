@@ -198,8 +198,167 @@ function handleProjectSelectorClick(event) {
 	Add click listeners to project selector thumbnails.
 ------------------------------------------------------ */
 const projectSelectorElements = document.getElementsByClassName("Projects__selector__button__image");
-for(let projectSelector of projectSelectorElements) {
+for (let projectSelector of projectSelectorElements) {
 	projectSelector.addEventListener('click', handleProjectSelectorClick, false);
 };
+
+
+/* ------------------------------------------------------
+	Checks if project is currently visible in viewport.
+	Scrolls to element if not visible.
+------------------------------------------------------ */
+function checkProjectThumbVisibility(projectThumbElement) {
+	return new Promise(resolve => {
+		const projectsSelectorContainer = document.getElementsByClassName("Projects__selector__container")[0];
+
+		// Set up intersection observer.
+		const observerOptions = {
+			root: projectsSelectorContainer,
+			threshold: 0.90
+		};
+
+		const observerCallback = (observerEntries) => {
+			const [observerEntry] = observerEntries;
+			
+			resolve({ [projectThumbElement.id]: observerEntry.isIntersecting });
+
+			// CLean up observer.
+			projectThumbObserver.disconnect();
+		};
+
+		const projectThumbObserver = new IntersectionObserver(observerCallback, observerOptions);
+
+		// Observe target element.
+		projectThumbObserver.observe(projectThumbElement);
+	});
+};
+
+
+/* -------------------------------------------------------------
+	Handles project scroller clicks.
+	Uses initial thumbnail visibility state and updates it
+	on scroller clicks. 
+------------------------------------------------------------- */
+function handleProjectScrollerClick(event) {
+	if (thumbsIndexLeftId && thumbsIndexRightId && projects) {
+		// Determine what project to scroll to, how to update left/right indices.
+		const scrollDirection = event.target.id;
+		const leftMostThumb = projects.filter(project => project._id === thumbsIndexLeftId)[0];
+		const rightMostThumb = projects.filter(project => project._id === thumbsIndexRightId)[0];
+		const leftThumbIndex = projects.indexOf(leftMostThumb);
+		const rightThumbIndex = projects.indexOf(rightMostThumb);
+		let newLeftThumbIndex = 0;
+		let newRightThumbIndex = 0;
+		let pivot = 0;
+		let scrollIndex = 0;
+
+		switch(scrollDirection) {
+			case "scroller-right":
+				if (rightThumbIndex === projects.length - 1) {
+					return;
+				}
+				
+				pivot = 1;
+				break;
+
+			case "scroller-left":
+				if (leftThumbIndex === 0) {
+					return;
+				}
+
+				pivot = -1;
+				break;
+		};
+
+		// Update indices based on pivot.
+		newLeftThumbIndex = leftThumbIndex + pivot;
+		newRightThumbIndex = rightThumbIndex + pivot;
+
+		// Update un/available arrow styling.
+		const leftScroller = document.getElementById("scroller-left");
+		const rightscroller = document.getElementById("scroller-right");
+		newLeftThumbIndex === 0
+			? leftScroller.classList.add("unavailable")
+			: leftScroller.classList.remove("unavailable");
+
+		newRightThumbIndex === projects.length - 1
+			? rightscroller.classList.add("unavailable")
+			: rightscroller.classList.remove("unavailable");
+		
+		// Scroll in direction of clicked arrow.
+		scrollIndex = pivot > 0
+			? newRightThumbIndex
+			: newLeftThumbIndex;
+
+		const thumbIdToShow = projects[scrollIndex]._id;
+		const thumbToShow = document.getElementById(thumbIdToShow);
+		thumbToShow.scrollIntoView({ behavior: 'smooth' });
+
+		// Update global visible thumbs edge indices.
+		thumbsIndexLeftId = projects[newLeftThumbIndex]._id;
+		thumbsIndexRightId = projects[newRightThumbIndex]._id;
+	}
+};
+
+
+/* ------------------------------------------------------
+	Add click listeners to project selector nav arrows.
+------------------------------------------------------ */
+const projectSelectorScrollerElements = document.getElementsByClassName("Projects__selector__scroller");
+for (let scrollerElement of projectSelectorScrollerElements) {
+	scrollerElement.addEventListener('click', handleProjectScrollerClick, false);
+};
+
+
+
+// On initialization, check projects thumbnail visibility.
+const thumbs = document.getElementsByClassName("Projects__selector__button__image");
+let thumbsIndexLeftId;
+let thumbsIndexRightId;
+let thumbsVisibility = {};
+let thumbVisibilityPromises = [];
+
+// Assign array of promises to check visibility of each thumbnail.
+if (thumbs.length > 0) {
+	for (let thumb of thumbs) {
+		thumbVisibilityPromises.push(checkProjectThumbVisibility(thumb));
+	}
+}
+
+Promise.all(thumbVisibilityPromises)
+	.then(results => {
+		thumbsVisibility = results;
+
+		// Use initial promise results to assign left/right edge indices of visible project thumbs.
+		let trueCounts = 0;
+		let falseCounts = 0;
+
+		for (let thumb = 0; thumb < thumbsVisibility.length; thumb++) {
+			// Keep track of delineation between true/false to determine the edges.
+			Object.values(thumbsVisibility[thumb])[0] === true
+				? trueCounts++
+				: falseCounts++; 
+
+			// Left edge.
+			if (trueCounts === 1) {
+				thumbsIndexLeftId = Object.keys(thumbsVisibility[thumb])[0];
+			}
+
+			// Right edge.
+			// Case [ F T T T F ]	iteration ending on a false.
+			if (trueCounts !== 0
+				&& falseCounts > 0
+				&& thumb !== thumbsVisibility.length - 1) {
+					thumbsIndexRightId = Object.keys(thumbsVisibility[thumb - 1])[0];
+					break;
+			}
+			// Case [ F F T T T ]	iteration ending on a true.
+			else if (falseCounts > 0 
+				&& trueCounts > 0 
+				&& thumb === thumbsVisibility.length - 1) {
+					thumbsIndexRightId = Object.keys(thumbsVisibility[thumb])[0];
+			}
+		}
+	});
 
 

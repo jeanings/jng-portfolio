@@ -189,6 +189,7 @@
                             class="Projects__selector__button__image" 
                             src="{{ project.thumb }}"
                             id="{{ project._id }}"
+                            draggable="false"
                             data-project-id="{{ project._id }}"
                             style="opacity: {{ opacity }};">
                     </div>
@@ -196,7 +197,7 @@
         </div>
 
         <button
-            class="Projects__selector__scroller"
+            class="Projects__selector__scroller unavailable"
             id="scroller-left">
             <svg xmlns="http://www.w3.org/2000/svg" class="Projects__selector__scroller__icon" viewBox="0 0 512 512">
                 <path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="32" d="M112 352l-64-64 64-64"/>
