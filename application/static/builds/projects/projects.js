@@ -45,7 +45,7 @@ class ProjectsButton {
 /* ---------------------------------------------------
 	Updates UI elements with new project properties.
 --------------------------------------------------- */
-function renderUpdates(projectId) {
+function renderUpdates(clickedProjectId) {
 	const year = document.getElementById("title-project-year");
 	const title = document.getElementById("title-text");
 	const titleSeparatorBar = document.getElementById("title-separator");
@@ -53,10 +53,20 @@ function renderUpdates(projectId) {
 	const description = document.getElementById("content-description");
 	const demoVideo = document.getElementById("demo-video");
 	const demoVideoSrc = document.getElementById("demo-video-src");
-	const previousProjectId = demoVideoSrc.dataset.projectId;
+	const displayedProjectId = demoVideoSrc.dataset.projectId;
+
 
 	/* -----------------------------------------------
-		Removes all child nodes from parent element.
+		Run button removing/creating promises.
+	----------------------------------------------- */
+	async function runDelayedPromises(promisesArray) {
+		for (let promise = 0; promise < promisesArray.length; promise++) {
+			await promisesArray[promise]();
+		}
+	};
+
+	/* -----------------------------------------------
+		Removes all child buttons.
 	----------------------------------------------- */
 	function removeAllButtons(container) {
 		while (container.firstChild) {
@@ -65,10 +75,12 @@ function renderUpdates(projectId) {
 	};
 
 	// Get clicked project through projectId.
-	let project;
+	let clickedProject;
+	let displayedProject;
 	try {
 		if (projects) {
-			project = projects.filter(entry => entry._id === projectId)[0];
+			clickedProject = projects.filter(project => project._id === clickedProjectId)[0];
+			displayedProject = projects.filter(project => project._id === displayedProjectId)[0];
 		}
 	} catch (error) {
 		console.error(error);
@@ -77,96 +89,184 @@ function renderUpdates(projectId) {
 	}
 
 	// Update text elements with new entries from clicked project.
-	const rgbAccent = `rgb(${project.rgb}, 1.0)`;
-	year.innerHTML = project.year;
-	title.innerHTML = project.title;
-	objectives.innerHTML = project.objectives;
-	description.innerHTML = project.description;
+	const rgbAccent = `rgb(${clickedProject.rgb}, 1.0)`;
+	year.innerHTML = clickedProject.year;
+	title.innerHTML = clickedProject.title;
+	objectives.innerHTML = clickedProject.objectives;
+	description.innerHTML = clickedProject.description;
 	titleSeparatorBar.style.borderColor = rgbAccent;
 
 	// Update selector overlays, thumbs.
 	const opacityForActiveThumb = 0.25;
 	const opacityForInactiveThumb = 1.0;
 	const selectorOverlays = document.getElementsByClassName("Projects__selector__button__image__overlay");
-	const selectorOverlay = Array.from(selectorOverlays).filter(overlay => 
-		overlay.dataset.projectId === projectId)[0];
-	const previousSelectorOverlay = Array.from(selectorOverlays).filter(overlay => 
-		overlay.dataset.projectId === previousProjectId)[0];
-	const projectThumb = document.getElementById(projectId);
-	const previousProjectThumb = document.getElementById(previousProjectId);
+	const clickedSelectorOverlay = Array.from(selectorOverlays).filter(overlay => 
+		overlay.dataset.projectId === clickedProjectId)[0];
+	const displayedSelectorOverlay = Array.from(selectorOverlays).filter(overlay => 
+		overlay.dataset.projectId === displayedProjectId)[0];
+	const clickedProjectThumb = document.getElementById(clickedProjectId);
+	const displayedProjectThumb = document.getElementById(displayedProjectId);
 	
-	if (previousSelectorOverlay) {
-		previousSelectorOverlay.style.background = "none";
-		previousProjectThumb.style.opacity = opacityForInactiveThumb;
+	if (displayedSelectorOverlay) {
+		displayedSelectorOverlay.style.background = "none";
+		displayedProjectThumb.style.opacity = opacityForInactiveThumb;
 	}
 
-	if (selectorOverlay) {
-		selectorOverlay.style.background = rgbAccent.replace(", 1.0)", ", 0.4)");
-		projectThumb.style.opacity = opacityForActiveThumb;
+	if (clickedSelectorOverlay) {
+		clickedSelectorOverlay.style.background = rgbAccent.replace(", 1.0)", ", 0.4)");
+		clickedProjectThumb.style.opacity = opacityForActiveThumb;
 	}
 
 	// Update video variables and reload container.
-	demoVideo.setAttribute('poster', project.thumb);
-	demoVideoSrc.setAttribute('src', project.demo);
-	demoVideoSrc.setAttribute('data-project-id', project._id);
+	demoVideo.setAttribute('poster', clickedProject.thumb);
+	demoVideoSrc.setAttribute('src', clickedProject.demo);
+	demoVideoSrc.setAttribute('data-project-id', clickedProject._id);
 	demoVideo.load();
 	
 	// Update stack item buttons.
+	const displayedStack = {
+		"stats-stack-backend": displayedProject.stack.backend,
+		"stats-stack-frontend": displayedProject.stack.frontend,
+		"stats-stack-tools": displayedProject.stack.tools
+	};
+
+	const newStack = {
+		"stats-stack-backend": clickedProject.stack.backend,
+		"stats-stack-frontend": clickedProject.stack.frontend,
+		"stats-stack-tools": clickedProject.stack.tools
+	};
+
+	// Compare between displayed/clicked.
+	// Objects in 'displayed' are primed for removal.
+	// Objects in 'new' are primed for creation.
+	let addRemoveItems = {
+		'displayedStack': {
+			'backend': [],
+			'frontend': [],
+			'tools': []
+		},
+		'newStack': {
+			'backend': [],
+			'frontend': [],
+			'tools': []
+		}
+	};
+
+	for (let stack in addRemoveItems) {
+		let compareForRef = {};
+		let compareAgainstRef = {};
+
+		switch (stack) {
+			case 'displayedStack':
+				compareForRef = displayedStack;
+				compareAgainstRef = newStack;
+				break;
+			case 'newStack':
+				compareForRef = newStack;
+				compareAgainstRef = displayedStack;
+				break;
+		}
+
+		for (let stackCategory in addRemoveItems[stack]) {
+			// Compare for.
+			const stackA = Object.values(compareForRef["stats-stack-" + stackCategory]);
+			const flattenedStackA = Object.assign({}, ...stackA);
+			const stackAKeys = Object.keys(flattenedStackA);
+			// Compare against.
+			const stackB = Object.values(compareAgainstRef["stats-stack-" + stackCategory]);
+			const flattenedStackB = Object.assign({}, ...stackB);
+			const stackBKeys = Object.keys(flattenedStackB);
+
+			// Get items that aren't in second array.
+			let difference = stackAKeys.filter(key => !stackBKeys.includes(key));			
+			addRemoveItems[stack][stackCategory] = difference;
+		}
+	}
+	
 	const backendButtonsContainer = document.getElementById("stats-stack-backend");
 	const frontendButtonsContainer = document.getElementById("stats-stack-frontend");
 	const toolsButtonsContainer = document.getElementById("stats-stack-tools");
-
-	const buttonsContainers = [
-		backendButtonsContainer, 
-		frontendButtonsContainer, 
-		toolsButtonsContainer
-	];
-
-	// Remove all current child nodes (buttons) of stack item containers.
-	for (let buttonContainer of buttonsContainers) {
-		removeAllButtons(buttonContainer);
-	}
-
-	const newStack = {
-		"stats-stack-backend": project.stack.backend,
-		"stats-stack-frontend": project.stack.frontend,
-		"stats-stack-tools": project.stack.tools
+	const buttonsContainers = {
+		'backend': backendButtonsContainer, 
+		'frontend': frontendButtonsContainer,
+		'tools': toolsButtonsContainer
 	};
+	
+	// Add or remove buttons according to addRemoveItems.
+	const delayedDeletionPromises = [];
+	const delayedInsertionPromises = [];
+	const delayMS = 175;
 
-	let newStackButtonElements = {};
+	// Create button deletion promises.
+	for (let category in buttonsContainers) {
+		// Check for removal if buttons exist in stack category.
+		if (buttonsContainers[category].children) {
+			Array.from(buttonsContainers[category].children).forEach(button => {
+				const categoryItem = button.innerText;
+				// Remove buttons.
+				if (addRemoveItems.displayedStack[category].includes(categoryItem)) {
+					const delayedDeletion = function() {
+						return new Promise(resolve => {
+							setTimeout(() => {
+								buttonsContainers[category].removeChild(button);
+								resolve(true);
+							}, delayMS);
+						});
+					};
 
-	// Create new stack item buttons.
-	for (let stackCategory in newStack) {
-		const stackCategoryItemButtons = [];
+					delayedDeletionPromises.push(delayedDeletion);
+				}
+			});
+		}
+	}
 
-		Object.values(newStack[stackCategory]).forEach(categoryItem => {
-			const categoryItemButton = new ProjectsButton('stack', categoryItem); 
-			stackCategoryItemButtons.push(
-				categoryItemButton.create()
-			);
-		});
+	// Sequentially delete buttons, then sequentially add buttons.
+	runDelayedPromises(delayedDeletionPromises)
+		.then(() => {
+			// Create button insertion promises.
+			for (let category in buttonsContainers) {
+				// Create promises to add buttons.
+				const itemsToAdd = addRemoveItems.newStack[category];
+				const newCategoryItems = Object.values(newStack["stats-stack-" + category]);
+				if (newCategoryItems) {
+					for (let newCategoryItem of newCategoryItems) {
+						const newItemPairName = Object.keys(newCategoryItem)[0];
+						// Identify item to be added.
+						if (itemsToAdd.includes(newItemPairName)) {
+							// Insert new button in "correct (preferred)" order.
+							const delayedInsertion = function() {
+								return new Promise(resolve => {
+									setTimeout(() => {
+										const categoryItemButton = new ProjectsButton('stack', newCategoryItem);
+										const categoryItemButtonElement = categoryItemButton.create();
+					
+										// Get item order within updated category.
+										const itemOrder = newCategoryItems.indexOf(newCategoryItem);
+										const referenceNode = buttonsContainers[category].children[itemOrder];
+
+										buttonsContainers[category].insertBefore(categoryItemButtonElement, referenceNode);
+										resolve(true);
+									}, delayMS);
+								});
+							};
 		
-		// Add all items in category to new button elements object.
-		newStackButtonElements[stackCategory] = stackCategoryItemButtons;
-	}
+							delayedInsertionPromises.push(delayedInsertion);
+						}
+					}
+				}
+			}
 
-	// Add new stack buttons to DOM.
-	for (let stackCategory in newStackButtonElements) {
-		let containerToEdit = buttonsContainers.filter(
-			buttonsContainer => buttonsContainer.id === stackCategory)[0];
-
-		Object.values(newStackButtonElements[stackCategory]).forEach(button => {
-			containerToEdit.appendChild(button);
+			// Add buttons.
+			runDelayedPromises(delayedInsertionPromises);
 		});
-	}
-
+	
 	// Update live project link buttons.
 	const accessLinksContainer = document.getElementById("access-links");
 	removeAllButtons(accessLinksContainer);
 
 	let newProjectAccessButtons = [];
 
-	Object.values(project.url).forEach(projectAccessItem => {
+	Object.values(clickedProject.url).forEach(projectAccessItem => {
 		const projectAccessButton = new ProjectsButton('access', projectAccessItem);
 		newProjectAccessButtons.push(
 			projectAccessButton.create()
@@ -184,12 +284,12 @@ function renderUpdates(projectId) {
 	Passes target project ID to resumeUpdates to be processed.
 ------------------------------------------------------------- */
 function handleProjectSelectorClick(event) {
-	const projectId = event.target.dataset.projectId;
+	const clickedProjectId = event.target.dataset.projectId;
 	const demoVideoSrc = document.getElementById("demo-video-src");
 	const currentProjectId = demoVideoSrc.dataset.projectId;
 
-	if (projectId !== currentProjectId) {
-		renderUpdates(projectId);
+	if (clickedProjectId !== currentProjectId) {
+		renderUpdates(clickedProjectId);
 	}
 };
 
