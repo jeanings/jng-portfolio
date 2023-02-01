@@ -6,7 +6,21 @@
     and (max-width: 5000px) {
     
     :root {
-        --root-font-size: 38px;
+        --root-font-size: 34px;
+    }
+}
+
+
+/* ----------------------------------------------------------------- */
+/*            Landscape view - 2560x1600 plus, high-res              */
+/* ----------------------------------------------------------------- */
+@media screen and (orientation: landscape) 
+    /* and (-webkit-min-device-pixel-ratio: 1.5)  */
+    and (max-width: 2800px)
+    and (min-height: 1600px) {
+
+    :root {
+        --root-font-size: 21px;
     }
 }
 
@@ -19,8 +33,9 @@
     and (max-width: 2800px) {
 
     :root {
-        --root-font-size: 24px;
+        --root-font-size: 21px;
     }
+
 }
 
 
@@ -42,10 +57,10 @@
 /* ----------------------------------------------------------------- */
 @media screen and (orientation: landscape) 
     /* and (-webkit-min-device-pixel-ratio: 1.5) */
-    and (max-width: 1800px) {
+    and (max-width: 1700px) {
 
     :root {
-        --root-font-size: 15px;
+        --root-font-size: 14px;
     }
 }
 
@@ -55,10 +70,23 @@
 /* ----------------------------------------------------------------- */
 @media screen and (orientation: landscape) 
     /* and (-webkit-min-device-pixel-ratio: 1.5) */
-    and (max-width: 1600px) {
+    and (max-width: 1500px) {
 
     :root {
-        --root-font-size: 14px;
+        --root-font-size: 13px;
+    }
+}
+
+
+/* ----------------------------------------------------------------- */
+/*                Landscape view - tablets, notebooks                */
+/* ----------------------------------------------------------------- */
+@media screen and (orientation: landscape) 
+    /* and (-webkit-min-device-pixel-ratio: 1.5) */
+    and (max-width: 1350px) {
+
+    :root {
+        --root-font-size: 12px;
     }
 }
 

@@ -99,6 +99,7 @@ function renderUpdates(clickedProjectId) {
 	objectives.innerHTML = clickedProject.objectives;
 	description.innerHTML = clickedProject.description;
 	titleSeparatorBar.style.borderColor = rgbAccent;
+	titleSeparatorBar.style.background = rgbAccent;
 
 	// Update selector overlays, thumbs.
 	const opacityForActiveThumb = 0.25;
