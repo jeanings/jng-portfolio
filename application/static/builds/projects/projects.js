@@ -47,6 +47,8 @@ class ProjectsButton {
 --------------------------------------------------- */
 function renderUpdates(clickedProjectId) {
 	const year = document.getElementById("title-project-year");
+	const gitUrl = document.getElementById("title-project-git-url");
+	const gitIcon = document.getElementById("title-project-git-icon");
 	const title = document.getElementById("title-text");
 	const titleSeparatorBar = document.getElementById("title-separator");
 	const objectives = document.getElementById("content-objectives");
@@ -91,6 +93,8 @@ function renderUpdates(clickedProjectId) {
 	// Update text elements with new entries from clicked project.
 	const rgbAccent = `rgb(${clickedProject.rgb}, 1.0)`;
 	year.innerHTML = clickedProject.year;
+	gitUrl.href = clickedProject.git;
+	gitIcon.style.fill = rgbAccent;
 	title.innerHTML = clickedProject.title;
 	objectives.innerHTML = clickedProject.objectives;
 	description.innerHTML = clickedProject.description;

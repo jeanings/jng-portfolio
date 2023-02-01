@@ -110,15 +110,38 @@ body {
                 grid-template-rows: 2rem auto;
             }
 
-                #title-project-year {
+                #title-project-year-git {
                     display: flex;
-                    align-items: flex-end;
+                    column-gap: 0.25rem;
                     font-size: 1.5rem;
                     animation-name: fade-in;
                     animation-duration: 500ms;
                     animation-timing-function: ease-in-out;
                     animation-fill-mode: forwards;
                 }
+
+                    #title-project-year {
+                        display: flex;
+                        align-self: center;
+                    }
+
+                    #title-project-git {
+                        display: flex;
+                        align-self: baseline;
+                    }
+
+                    #title-project-git a:hover {
+                        background: none;
+                    }
+
+                        #title-project-git-url {
+                            width: 1.25rem;
+                        }
+
+                        #title-project-git-icon {
+                            fill: var(--color-bg);
+                            transition: all 1000ms ease-in-out;
+                        }
 
                 #title-text {
                     font-size: 2rem;
