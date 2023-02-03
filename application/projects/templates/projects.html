@@ -54,7 +54,10 @@
                     
                 <div 
                     class="Projects__description__stats__item">
-                    Back-end
+                    <span
+                        class="Projects__description__stats__title">
+                        Back-end
+                    </span> 
                     <div
                         id="stats-stack-backend">
                         {%- for item in projects[0].stack.backend -%}
@@ -74,7 +77,10 @@
 
                 <div 
                     class="Projects__description__stats__item">
-                    Front-end
+                    <span
+                        class="Projects__description__stats__title">
+                        Front-end
+                    </span>
                     <div 
                         id="stats-stack-frontend">
                         {%- for item in projects[0].stack.frontend -%}
@@ -94,7 +100,10 @@
 
                 <div 
                     class="Projects__description__stats__item">
-                    Tools
+                    <span
+                        class="Projects__description__stats__title">
+                        Tools
+                    </span>
                     <div 
                         id="stats-stack-tools">
                         {%- for item in projects[0].stack.tools -%}
@@ -116,16 +125,24 @@
                     class="Projects__description__content" 
                     id="content-container">
                     <div 
-                        class="Projects__description__content__item">
-                        <span>Objectives</span>
+                        class="Projects__description__content__item"
+                        id="project-objectives">
+                        <span
+                            id="content-objectives-title">
+                            Objectives
+                        </span>
                         <span
                             id="content-objectives">
                             {{ projects[0].objectives }}
                         </span>
                     </div>
                     <div 
-                        class="Projects__description__content__item">
-                        <span>Description</span>
+                        class="Projects__description__content__item"
+                        id="project-description">
+                        <span
+                            id="content-description-title">
+                            Description
+                        </span>
                         <span
                             id="content-description">
                             {{ projects[0].description }}

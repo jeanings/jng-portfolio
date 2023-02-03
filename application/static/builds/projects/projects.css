@@ -70,7 +70,7 @@ body {
     align-self: center;
     grid-template-columns: 50% 50%;
     grid-template-rows: 70% 30%;
-    row-gap: 2rem;
+    row-gap: 1rem;
     font-family: 'Grenze';
     font-size: 1.35rem;
     color: var(--color-text);
@@ -96,16 +96,18 @@ body {
     .Projects__description {
         grid-column: 1 / 2;
         grid-row: 1 / -1;
+        height: calc(100% - 0.5rem*2);     /* stack gaps x3 - stack top padding */
+        padding-right: 2rem;
         display: grid;
         grid-template-rows: 70% 30%;
+        row-gap: 1rem;
     }
         
         #projects-description-top {
             grid-row: 1 / 2;
-            display: grid;  /* title border            title   gaps     border   content gaps */
-            /* grid-template-rows: 5rem 0.8rem calc(100% - 5rem - 1rem*2 - 0.8rem - 0.5rem*4); */
-            grid-template-rows: 5rem 0.8rem;
-            row-gap: 1rem;
+            display: grid;
+            grid-template-rows: 5rem 1rem;
+            row-gap: 0.5rem;
             height: 100%;
             align-content: flex-end;
             transition: all 700ms ease-in-out;
@@ -162,7 +164,7 @@ body {
             
             #title-separator {
                 grid-row: 2 / 3;
-                border-width: 0.4rem;
+                border-width: 0.5rem;
                 border-style: solid;
                 border-color: var(--color-bg);
                 background: var(--color-bg);
@@ -172,7 +174,7 @@ body {
             .Projects__description__stats {
                 grid-row: 3 / 4;
                 display: flex;
-                padding-top: 1rem;
+                padding-top: 0.5rem;
                 row-gap: 0.5rem;
                 flex-direction: column;
             }
@@ -182,7 +184,6 @@ body {
                 display: grid;
                 grid-auto-rows: auto;
                 row-gap: 1rem;
-                padding-right: 2rem;
             }
 
             .Projects__description__content__item,
@@ -196,9 +197,14 @@ body {
                 animation-fill-mode: forwards;
             }
 
+            .Projects__description__stats__title {
+                grid-column: 1 / 2;
+            }
+
             #stats-stack-backend,
             #stats-stack-frontend,
             #stats-stack-tools {
+                grid-column: 2 / -1;
                 height: 2rem;
                 display: flex;
                 column-gap: 0.5rem;
@@ -207,7 +213,7 @@ body {
         #projects-description-bottom {
             grid-row: 2 / 3;
             align-self: flex-start;
-            padding-top: 3.5rem;
+            padding-top: 3rem;
         }
 
             .Projects__description__access {
@@ -282,7 +288,7 @@ body {
         border-radius: 0.35rem;
         padding-top: 1rem;
         flex-wrap: wrap;
-        justify-content: center;
+        justify-content: flex-end;
         align-content: flex-end;
         animation-name: fade-in;
         animation-duration: 500ms;
@@ -293,8 +299,7 @@ body {
         #demo-video {
             border-radius: inherit;
             display: inline-block;
-            min-width: 85%;
-            max-width: 90%;
+            width: calc(16rem*3 + 1rem*2);      /* matches selector grid width */
         }
 
     
@@ -304,10 +309,8 @@ body {
         display: grid;
         grid-template-columns: 50% 50%;
         grid-template-rows: calc(100% - 1.75rem*2) 1.75rem 1.75rem;
-        padding-left: 2.25rem;
-        padding-right: 2.25rem;
-        width: calc(15rem*3 + 1rem*2 + 2.25rem*2);      /* images x 3 + gap x 2 + buttons x 2 */
-        justify-self: center;
+        width: calc(16rem*3 + 1rem*2);      /* images x3 + gap x2 */
+        justify-self: flex-end;
         align-self: baseline;
     }
         .Projects__selector__scroller {
@@ -371,7 +374,7 @@ body {
             .Projects__selector__button__image {
                 display: block;
                 opacity: 1.0;
-                width: 15rem;
+                width: 16rem;
                 border-radius: 0.35rem;
                 cursor: pointer;
                 transition: all 300ms ease-in-out;
