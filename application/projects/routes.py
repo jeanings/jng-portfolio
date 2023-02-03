@@ -10,7 +10,6 @@ from pathlib import Path
 from dotenv import load_dotenv
 from pymongo import MongoClient
 from urllib.parse import quote_plus
-from .tools.colour_sets import main_colours, sub_colours 
 
 DEBUG_MODE = app.config['FLASK_DEBUG']
 
@@ -35,49 +34,18 @@ MDB_PASS = quote_plus(MONGODB_KEY)
 # Connection to mongo server.
 client = MongoClient(f'mongodb+srv://{MONGODB_ID}:{MDB_PASS}@portfolio.8frim.mongodb.net/')
 db = client.projectsIndex
-collection_main = db['main']
-collection_sub = db['sub']
+collection = db['main']
 
 
 # Projects route.
 @projects_bp.route("/projects", methods=['GET'])
 @projects_bp.route("/projects/", methods=['GET'])
 def projects():
-    main_projects = []
-    sub_projects = []
-
-    for main_project in collection_main.find():
-        main_projects.append(main_project)
-
-    for sub_project in collection_sub.find():
-        sub_projects.append(sub_project) 
-
-    # Get distinct array of years.
-    years_query = list(collection_main.aggregate([
-        {
-            '$project': {
-                'years': { 
-                    '$objectToArray': '$year' 
-                }
-            }
-        },
-        {
-            '$unwind': '$years'
-        },
-        {
-            '$group': {
-                '_id': 0,
-                'keys': { '$addToSet': '$years.k' }
-            }
-        }
-    ]))
-
-    years = years_query[0]['keys']
+    # Get project docs in reverse chronological order.
+    docs = list(collection.find({}))
+    projects = sorted(docs, key=lambda doc: doc['project_id'], reverse=True)
 
     return render_template("projects.html", 
         title="Some personal projects  ——  jeanings.space",
-        years=years,
-        main_projects=main_projects,
-        sub_projects=sub_projects,
-        main_colours=main_colours['mainColours'],
+        projects=projects
     )

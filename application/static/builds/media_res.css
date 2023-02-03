@@ -6,7 +6,21 @@
     and (max-width: 5000px) {
     
     :root {
-        --root-font-size: 38px;
+        --root-font-size: 34px;
+    }
+}
+
+
+/* ----------------------------------------------------------------- */
+/*            Landscape view - 2560x1600 plus, high-res              */
+/* ----------------------------------------------------------------- */
+@media screen and (orientation: landscape) 
+    /* and (-webkit-min-device-pixel-ratio: 1.5)  */
+    and (max-width: 2800px)
+    and (min-height: 1600px) {
+
+    :root {
+        --root-font-size: 21px;
     }
 }
 
@@ -19,7 +33,21 @@
     and (max-width: 2800px) {
 
     :root {
-        --root-font-size: 24px;
+        --root-font-size: 21px;
+    }
+
+}
+
+
+/* ----------------------------------------------------------------- */
+/*            Landscape view - 1920x1080 standard                    */
+/* ----------------------------------------------------------------- */
+@media screen and (orientation: landscape) 
+    /* and (-webkit-min-device-pixel-ratio: 1.5)  */
+    and (max-width: 2400px) {
+
+    :root {
+        --root-font-size: 18px;
     }
 }
 
@@ -42,10 +70,23 @@
 /* ----------------------------------------------------------------- */
 @media screen and (orientation: landscape) 
     /* and (-webkit-min-device-pixel-ratio: 1.5) */
-    and (max-width: 1800px) {
+    and (max-width: 1850px) {
 
     :root {
         --root-font-size: 15px;
+    }
+}
+
+
+/* ----------------------------------------------------------------- */
+/*                Landscape view - under 1920x1080                   */
+/* ----------------------------------------------------------------- */
+@media screen and (orientation: landscape) 
+    /* and (-webkit-min-device-pixel-ratio: 1.5) */
+    and (max-width: 1650px) {
+
+    :root {
+        --root-font-size: 14px;
     }
 }
 
@@ -55,10 +96,23 @@
 /* ----------------------------------------------------------------- */
 @media screen and (orientation: landscape) 
     /* and (-webkit-min-device-pixel-ratio: 1.5) */
-    and (max-width: 1600px) {
+    and (max-width: 1500px) {
 
     :root {
-        --root-font-size: 14px;
+        --root-font-size: 13px;
+    }
+}
+
+
+/* ----------------------------------------------------------------- */
+/*                Landscape view - tablets, notebooks                */
+/* ----------------------------------------------------------------- */
+@media screen and (orientation: landscape) 
+    /* and (-webkit-min-device-pixel-ratio: 1.5) */
+    and (max-width: 1350px) {
+
+    :root {
+        --root-font-size: 12px;
     }
 }
 
@@ -77,9 +131,122 @@
 
 
 /* ----------------------------------------------------------------- */
-/*                      Portrait view - general                      */
+/*                Landscape view - mobile devices                    */
 /* ----------------------------------------------------------------- */
-@media screen and (orientation: portrait) {
+@media screen and (orientation: landscape) 
+    /* and (-webkit-min-device-pixel-ratio: 1.5) */
+    and (max-width: 1100px) {
+
+    :root {
+        --root-font-size: 11px;
+    }
+}
+
+
+/* ----------------------------------------------------------------- */
+/*                Landscape view - mobile devices                    */
+/* ----------------------------------------------------------------- */
+@media screen and (orientation: landscape) 
+    /* and (-webkit-min-device-pixel-ratio: 1.5) */
+    and (max-width: 1000px) {
+
+    :root {
+        --root-font-size: 10px;
+    }
+}
+
+
+/* ----------------------------------------------------------------- */
+/*                Landscape view - mobile devices                    */
+/* ----------------------------------------------------------------- */
+@media screen and (orientation: landscape) 
+    /* and (-webkit-min-device-pixel-ratio: 1.5) */
+    and (max-width: 900px) {
+
+    :root {
+        --root-font-size: 9px;
+    }
+}
+
+
+/* ----------------------------------------------------------------- */
+/*                Landscape view - mobile devices                    */
+/* ----------------------------------------------------------------- */
+@media screen and (orientation: landscape) 
+    /* and (-webkit-min-device-pixel-ratio: 1.5) */
+    and (max-width: 750px) {
+
+    :root {
+        --root-font-size: 8px;
+    }
+}
+
+
+/* ----------------------------------------------------------------- */
+/*                Landscape view - mobile devices                    */
+/* ----------------------------------------------------------------- */
+@media screen and (orientation: landscape) 
+    /* and (-webkit-min-device-pixel-ratio: 1.5) */
+    and (max-width: 600px) {
+
+    :root {
+        --root-font-size: 7px;
+    }
+}
+
+
+
+
+
+
+/* ----------------------------------------------------------------- */
+/*            Portrait view - 3840x2160, high-res                    */
+/* ----------------------------------------------------------------- */
+@media screen and (orientation: portrait) 
+    /* and (-webkit-min-device-pixel-ratio: 1.5)  */
+    and (max-height: 5000px) {
+    
+    :root {
+        --root-font-size: 34px;
+    }
+}
+
+
+/* ----------------------------------------------------------------- */
+/*            Portrait view - 2560x1600 plus, high-res               */
+/* ----------------------------------------------------------------- */
+@media screen and (orientation: portrait) 
+    /* and (-webkit-min-device-pixel-ratio: 1.5)  */
+    and (min-width: 1600px)
+    and (max-height: 2800px) {
+
+    :root {
+        --root-font-size: 21px;
+    }
+}
+
+
+/* ----------------------------------------------------------------- */
+/*              Portrait view - 2560x1440 plus, high-res             */
+/* ----------------------------------------------------------------- */
+@media screen and (orientation: portrait) 
+    /* and (-webkit-min-device-pixel-ratio: 1.5)  */
+    and (max-height : 2800px) {
+
+    :root {
+        --root-font-size: 21px;
+    }
+
+}
+
+
+/* ----------------------------------------------------------------- */
+/*            Portrait view - 1920x1080 standard                     */
+/* ----------------------------------------------------------------- */
+@media screen and (orientation: portrait) 
+    /* and (-webkit-min-device-pixel-ratio: 1.5)  */
+    and (max-height: 2000px) {
+
     :root {
         --root-font-size: 16px;
     }
@@ -87,10 +254,11 @@
 
 
 /* ----------------------------------------------------------------- */
-/*               Portrait view - non-mobile screens                  */
+/*            Portrait view - under 1920x1080                        */
 /* ----------------------------------------------------------------- */
-@media screen and (orientation: portrait)
-    and (max-width: 1200px) {
+@media screen and (orientation: portrait) 
+    /* and (-webkit-min-device-pixel-ratio: 1.5) */
+    and (max-height: 1700px) {
 
     :root {
         --root-font-size: 14px;
@@ -99,10 +267,11 @@
 
 
 /* ----------------------------------------------------------------- */
-/*               Portrait view - tablets                             */
+/*            Portrait view - tablets, notebooks                     */
 /* ----------------------------------------------------------------- */
-@media screen and (orientation: portrait)
-    and (max-width: 900px) {
+@media screen and (orientation: portrait) 
+    /* and (-webkit-min-device-pixel-ratio: 1.5) */
+    and (max-height: 1500px) {
 
     :root {
         --root-font-size: 13px;
@@ -111,13 +280,52 @@
 
 
 /* ----------------------------------------------------------------- */
-/*                 Portrait view - mobile devices                    */
+/*            Portrait view - tablets, notebooks                     */
 /* ----------------------------------------------------------------- */
 @media screen and (orientation: portrait) 
-    and (-webkit-min-device-pixel-ratio: 1.5) 
-    and (max-width: 600px) {
+    /* and (-webkit-min-device-pixel-ratio: 1.5) */
+    and (max-height: 1350px) {
 
     :root {
         --root-font-size: 12px;
+    }
+}
+
+
+/* ----------------------------------------------------------------- */
+/*            Portrait view -  mobile devices                        */
+/* ----------------------------------------------------------------- */
+@media screen and (orientation: portrait) 
+    /* and (-webkit-min-device-pixel-ratio: 1.5) */
+    and (max-height: 1200px) {
+
+    :root {
+        --root-font-size: 12px;
+    }
+}
+
+
+/* ----------------------------------------------------------------- */
+/*            Portrait view -  mobile devices                        */
+/* ----------------------------------------------------------------- */
+@media screen and (orientation: portrait) 
+    /* and (-webkit-min-device-pixel-ratio: 1.5) */
+    and (max-height: 1100px) {
+
+    :root {
+        --root-font-size: 11px;
+    }
+}
+
+
+/* ----------------------------------------------------------------- */
+/*            Portrait view -  mobile devices                        */
+/* ----------------------------------------------------------------- */
+@media screen and (orientation: portrait) 
+    /* and (-webkit-min-device-pixel-ratio: 1.5) */
+    and (max-height: 1000px) {
+
+    :root {
+        --root-font-size: 10px;
     }
 }

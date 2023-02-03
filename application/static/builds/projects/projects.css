@@ -6,23 +6,36 @@
     color: var(--color-bg);
 }
 
+html {
+    height: 100%;
+}
+
 body {
     --color-bg: #312c2b;
     --color-accent-primary: rgb(187, 199, 21);
     --color-accent-secondary: rgb(42, 184, 124);
     --color-text: #cdcdcd;
-    --color-gridlines-major: #cdcdcd60;
-    --color-gridlines-minor: #cdcdcd40;
-    --sub-proj-border-width: 0.3rem;
-    --sub-proj-border-width-hover: 0.5rem;
-    --main-proj-border-width: 0.5rem;
-    --main-proj-border-width-hover: 0.8rem;
-
+    --color-faded: #cdcdcd40;
     background: var(--color-bg);
+    height: 100%;
+}
+
+@keyframes fade-in {
+    0% {
+        opacity: 0;
+    }
+
+    100% {
+        opacity: 1;
+    }
 }
 
 .container {        /* during initial loading screen */
-    display: none
+    /* display: none */
+    height: 100%;
+    display: grid;
+    grid-template-columns: 100%;
+    grid-template-rows: 100%;
 }
     .container.fade {
         animation-name: container-fade-in;
@@ -45,448 +58,324 @@ body {
         grid-template-rows: 100%;
     }
 
-        .projects {
-            grid-column: 1;
-            grid-row: 1;
-            padding-top: 4rem;
-            padding-left: 6rem;
-            padding-right: 6rem;
-            padding-bottom: 3rem;
+
+.Projects {
+    grid-column: 1;
+    grid-row: 1;
+    padding-top: 6rem;
+    padding-left: 6rem;
+    padding-right: 6rem;
+    padding-bottom: 8rem;
+    display: grid;
+    align-self: center;
+    grid-template-columns: 50% 50%;
+    grid-template-rows: 70% 30%;
+    row-gap: 1rem;
+    font-family: 'Grenze';
+    font-size: 1.35rem;
+    color: var(--color-text);
+}
+    
+    .Projects a {
+        color: var(--color-text);
+        text-decoration: none;
+        cursor: pointer;
+        transition: all 500ms;
+    }
+    
+    .Projects a:visited {
+        color: var(--color-text);
+    }
+
+    .Projects a:hover {
+        background: var(--color-text);
+        color: var(--color-bg);
+        transition: all 500ms;
+    }
+
+    .Projects__description {
+        grid-column: 1 / 2;
+        grid-row: 1 / -1;
+        height: calc(100% - 0.5rem*2);     /* stack gaps x3 - stack top padding */
+        padding-right: 2rem;
+        display: grid;
+        grid-template-rows: 70% 30%;
+        row-gap: 1rem;
+    }
+        
+        #projects-description-top {
+            grid-row: 1 / 2;
             display: grid;
-            grid-template-columns: 100%;
-            grid-template-rows: 18% 82%;
-            row-gap: 3rem;
+            grid-template-rows: 5rem 1rem;
+            row-gap: 0.5rem;
+            height: 100%;
+            align-content: flex-end;
+            transition: all 700ms ease-in-out;
+            overflow-x: hidden;
         }
 
-            .projects_timeline {
-                grid-column: 1;
+            .Projects__description__title {
                 grid-row: 1 / 2;
+                height: 5rem;
                 display: grid;
-                grid-template-columns: 100%;
-                grid-template-rows: 100%;
-                overflow-x: auto;
-                user-select: none;
+                grid-template-rows: 2rem auto;
             }
-                /* Content scrollbar */
-                .projects_timeline::-webkit-scrollbar {
-                    height: 0.65rem;
-                }
-                /* Scroll track above thumb */
-                .projects_timeline::-webkit-scrollbar-track-piece {
-                    background-color: var(--background);
-                }
-                /* Scroll track below thumb */
-                .projects_timeline::-webkit-scrollbar-track {
-                    background-color: var(--background);
-                }
-                /* Scroll direction buttons */
-                .projects_timeline::-webkit-scrollbar-button {
-                    display: none;
-                }
-                /* Scroll "pong" bar */
-                .projects_timeline::-webkit-scrollbar-thumb {
-                    background-color: var(--color-gridlines-minor);
-                    border-radius: 0.30rem;
-                }
-                .projects_timeline::-webkit-scrollbar-thumb:hover {
-                    background-color: var(--color-gridlines-major);
+
+                #title-project-year-git {
+                    display: flex;
+                    column-gap: 0.25rem;
+                    font-size: 1.5rem;
+                    animation-name: fade-in;
+                    animation-duration: 500ms;
+                    animation-timing-function: ease-in-out;
+                    animation-fill-mode: forwards;
                 }
 
-                .projects_timeline_grid {
-                    display: grid;
-                    column-gap: 1.5rem;
-                    grid-template-columns: auto;
-                    grid-template-rows: 100%;
-                    width: 150vw;
-                    padding-left: 0.5rem;
-                    padding-right: 0.5rem;
-                    overflow-x: auto;
-                }
-
-                    .projects_timeline_grid_labels {
-                        grid-column: 1 / -1;
-                        grid-row: 1 / 2;
-                        display: grid;
-                        grid-template-columns: 6% 94%;
-                        grid-template-rows: 100%;
-                        user-select: none;
-                    }
-
-                        .projects_timeline_grid_labels_track {
-                            grid-column: 2 / -1;
-                            grid-row: 1;
-                            display: grid;
-                            grid-template-columns: repeat(4, 1fr);
-                            grid-template-rows: 100%;
-                        }
-
-                            .projects_timeline_grid_labels_track_months {
-                                margin-left: -1rem;
-                                font-family: 'Grenze';
-                                font-size: 1rem;
-                                color: var(--color-text);
-                                align-self: center;
-                                writing-mode: vertical-rl;
-                                transform: rotate(180deg);
-                            }
-
-                    .projects_timeline_grid_year {
-                        grid-row: 1;
-                        display: grid;
-                        grid-template-columns: 6% 94%;
-                        grid-template-rows: 2.5rem 5rem;   /* Dictates height of grid's rows */
-                    }
-
-                  
-                #projects_timeline_grid_year_2019 {
-                    grid-column: 1 / 2;
-                }
-
-                #projects_timeline_grid_year_2020 {
-                    grid-column: 2 / 3;
-                }
-
-                #projects_timeline_grid_year_2021 {
-                    grid-column: 3 / 4;
-                }
-                
-                    .projects_timeline_grid_year_title {
-                        grid-column: 1 / 2;
-                        color: var(--color-text);
-                        font-family: 'Grenze';
-                        font-size: 2.5rem;
+                    #title-project-year {
                         display: flex;
-                        justify-content: center;
-                        align-items: center;
-                        writing-mode: vertical-rl;
-                        transform: rotate(180deg);
+                        align-self: center;
                     }
 
-                    .projects_timeline_grid_year_axes {
-                        grid-column: 2 / -1;
-                        display: grid;
-                        grid-template-columns: repeat(4, 1fr);
-                        grid-template-rows: 100%;
+                    #title-project-git {
+                        display: flex;
+                        align-self: baseline;
                     }
 
-                        .projects_timeline_grid_year_axes_jan_apr {
-                            grid-column: 1 / 2;
-                            grid-row: 1;
-                            display: grid;
-                            grid-template-columns: 100%;
-                            grid-template-rows: repeat(4, 1fr);
-                        }
-                        .projects_timeline_grid_year_axes_apr_jul {
-                            grid-column: 2 / 3;
-                            grid-row: 1;
-                            display: grid;
-                            grid-template-columns: 100%;
-                            grid-template-rows: repeat(4, 1fr);
-                        }
-                        .projects_timeline_grid_year_axes_jul_oct {
-                            grid-column: 3 / 4;
-                            grid-row: 1;
-                            display: grid;
-                            grid-template-columns: 100%;
-                            grid-template-rows: repeat(4, 1fr);
-                        }   
-                        .projects_timeline_grid_year_axes_oct_dec {
-                            grid-column: 4 / -1;
-                            grid-row: 1;
-                            display: grid;
-                            grid-template-columns: 100%;
-                            grid-template-rows: repeat(4, 1fr);
+                    #title-project-git a:hover {
+                        background: none;
+                    }
+
+                        #title-project-git-url {
+                            width: 1.25rem;
                         }
 
-                            .projects_timeline_grid_year_axes_jan_apr,
-                            .projects_timeline_grid_year_axes_apr_jul,
-                            .projects_timeline_grid_year_axes_jul_oct,
-                            .projects_timeline_grid_year_axes_oct_dec {
-                                border-top: var(--color-gridlines-major) dashed 0.06rem;
-                                border-bottom: var(--color-gridlines-major) dashed 0.06rem;
-                                border-left: var(--color-gridlines-major) dashed 0.06rem;
-                            }
+                        #title-project-git-icon {
+                            fill: var(--color-bg);
+                            transition: all 1000ms ease-in-out;
+                        }
 
-                            .row1,
-                            .row2,
-                            .row3,
-                            .row4 {
-                                display: grid;
-                                grid-template-columns: repeat(3, 1fr);
-                                grid-template-rows: 100%;
-                                border-bottom: var(--color-gridlines-minor) dotted 0.06rem;
-                            }
-
-                            .row4 {
-                                border-bottom: none;
-                            }
-
-                            .col1,
-                            .col2 {
-                                border-right: var(--color-gridlines-minor) dotted 0.06rem;
-                            }
-
-            .projects_content {
-                grid-column: 1;
-                grid-row: 2 / -1;
-                display: grid;
-                grid-template-columns: 50% 50%;
-                grid-template-rows: 100%;
-                column-gap: 2rem;
-                font-family: 'Grenze';
-                font-size: 1.25rem;
-                color: var(--color-text);
+                #title-text {
+                    font-size: 2rem;
+                    animation-name: fade-in;
+                    animation-duration: 500ms;
+                    animation-timing-function: ease-in-out;
+                    animation-fill-mode: forwards;
+                }
+            
+            #title-separator {
+                grid-row: 2 / 3;
+                border-width: 0.5rem;
+                border-style: solid;
+                border-color: var(--color-bg);
+                background: var(--color-bg);
+                transition: all 1000ms ease-in-out;
             }
 
-                .projects_content a {
+            .Projects__description__stats {
+                grid-row: 3 / 4;
+                display: flex;
+                padding-top: 0.5rem;
+                row-gap: 0.5rem;
+                flex-direction: column;
+            }
+
+            .Projects__description__content {
+                padding-top: 1rem;
+                display: grid;
+                grid-auto-rows: auto;
+                row-gap: 1rem;
+            }
+
+            .Projects__description__content__item,
+            .Projects__description__stats__item {
+                display: grid;
+                grid-template-columns: 17% auto;
+                grid-template-rows: 100%;
+                animation-name: fade-in;
+                animation-duration: 500ms;
+                animation-timing-function: ease-in-out;
+                animation-fill-mode: forwards;
+            }
+
+            .Projects__description__stats__title {
+                grid-column: 1 / 2;
+            }
+
+            #stats-stack-backend,
+            #stats-stack-frontend,
+            #stats-stack-tools {
+                grid-column: 2 / -1;
+                height: 2rem;
+                display: flex;
+                column-gap: 0.5rem;
+            }
+
+        #projects-description-bottom {
+            grid-row: 2 / 3;
+            align-self: flex-start;
+            padding-top: 3rem;
+        }
+
+            .Projects__description__access {
+                display: flex;
+                column-gap: 2.5rem;
+                justify-content: center;
+            }
+
+            .stack__button,
+            .access__button  {
+                background: var(--color-bg);
+                border-color: var(--color-text);
+                border-style: solid;
+                border-width: 0.1rem;
+                border-radius: 0.20rem;
+                padding: 0.25rem 0.5rem 0.25rem 0.5rem;
+                font-family: 'Space Mono', monospace;
+                font-size: 0.95rem;
+                opacity: 1;
+                cursor: pointer;
+                pointer-events: all;
+                transition: all 350ms;
+                animation-name: fade-in;
+                animation-duration: 500ms;
+                animation-timing-function: ease-in-out;
+                animation-fill-mode: forwards;
+            }
+
+            .access__button {
+                padding: 0.375rem 0.75rem 0.375rem 0.75rem;
+                font-size: 1.275rem;
+            }
+                .access__button__language {
+                    font-size: 1rem;
+                }
+
+                .stack__button a,
+                .access__button a {
                     color: var(--color-text);
-                    text-decoration: none;
-                    cursor: pointer;
+                }
+              
+                .stack__button a:visited,
+                .access__button a:visited {
+                    color: var(--color-text);
+                }
+            
+                .stack__button a:hover,
+                .access__button a:hover {
+                    background: none;
+                    color: var(--color-bg);
                     transition: all 500ms;
                 }
-                
-                    .projects_content a:visited {
-                        color: var(--color-text);
-                    }
-                
-                    .projects_content a:hover {
-                        background: var(--color-text);
-                        color: var(--color-bg);
-                        transition: all 500ms;
-                    }
-
-                .projects_content_main_frame {
-                    grid-column: 1 / 2;
-                    grid-row: 1;
-                    margin-bottom: 1rem;
-                    outline: transparent 0rem solid;
-                    outline-offset: 0.5rem;
-                    transition: all 500ms ease-in-out;
+            
+                .stack__button:hover,
+                .access__button:hover {
+                    background: var(--color-text);
+                    border-color: var(--color-bg);
+                    transition: all 350ms;
                 }
 
-                .projects_content_sub_frame {
-                    grid-column: 2 / -1;
-                    grid-row: 1;
-                    margin-bottom: 1rem;
-                    outline: transparent 0rem solid;
-                    outline-offset: 0.5rem;
-                    transition: all 500ms ease-in-out;
+                .stack__button:hover a,
+                .access__button:hover a {
+                    color: var(--color-bg);
+                    transition: all 350ms;
                 }
 
-                .projects_content_container {
-                    grid-row: 1;
-                    display: grid;
-                    grid-template-columns: 100%;
-                    grid-auto-rows: max-content;
-                    row-gap: 1rem;
-                    transition: all 700ms ease-in-out;
-                    overflow-y: scroll;
-                    overflow-x: hidden;
-                    padding-right: 1.5rem;
-                    padding-bottom: 3rem;
-                }
 
-                .projects_content_main {
-                    grid-column: 1 / 2;
-                }
+    .Projects__demo {
+        grid-column: 2 / 3;
+        grid-row: 1 / 2;
+        display: flex;
+        border-radius: 0.35rem;
+        padding-top: 1rem;
+        flex-wrap: wrap;
+        justify-content: flex-end;
+        align-content: flex-end;
+        animation-name: fade-in;
+        animation-duration: 500ms;
+        animation-timing-function: ease-in-out;
+        animation-fill-mode: forwards;
+    }
 
-                .projects_content_sub {
-                    grid-column: 2 / -1;
-                }
+        #demo-video {
+            border-radius: inherit;
+            display: inline-block;
+            width: calc(16rem*3 + 1rem*2);      /* matches selector grid width */
+        }
 
-                    /* Content scrollbar */
-                    .projects_content_container::-webkit-scrollbar {
-                        width: 0.65rem;
-                    }
-                    /* Scroll track above thumb */
-                    .projects_content_container::-webkit-scrollbar-track-piece {
-                        background-color: var(--background);
-                    }
-                    /* Scroll track below thumb */
-                    .projects_content_container::-webkit-scrollbar-track {
-                        background-color: var(--background);
-                    }
-                    /* Scroll direction buttons */
-                    .projects_content_container::-webkit-scrollbar-button {
-                        display: none;
-                    }
-                    /* Scroll "pong" bar */
-                    .projects_content_container::-webkit-scrollbar-thumb {
-                        background-color: var(--color-gridlines-minor);
-                        border-radius: 0.30rem;
-                    }
-                    .projects_content_container::-webkit-scrollbar-thumb:hover {
-                        background-color: var(--color-gridlines-major);
-                    }
+    
+    .Projects__selector {
+        grid-column: 2 / -1;
+        grid-row: 2 / -1;
+        display: grid;
+        grid-template-columns: 50% 50%;
+        grid-template-rows: calc(100% - 1.75rem*2) 1.75rem 1.75rem;
+        width: calc(16rem*3 + 1rem*2);      /* images x3 + gap x2 */
+        justify-self: flex-end;
+        align-self: baseline;
+    }
+        .Projects__selector__scroller {
+            background: none;
+            border: none;
+            color: var(--color-text);
+            display: flex;
+            align-self: center;
+            width: 5rem;
+            cursor: pointer;
+            transition: all 300ms ease-in-out;
+        }
+            .Projects__selector__scroller.unavailable {
+                color: var(--color-faded);
+                cursor: unset;
+                transition: all 300ms ease-in-out;
+            }
 
-                    .projects_content_main_container,
-                    .projects_content_sub_container {
-                        display: grid;
-                        grid-template-columns: 15% 85%;
-                        grid-template-rows: 100%;
-                    }
+            #scroller-left {
+                grid-column: 1 / 2;
+                grid-row: 3 / -1;
+                padding-right: 0.25rem;
+                flex-direction: row-reverse;
+                justify-self: flex-end;
+                align-self: flex-end;
+            }
 
-                    .projects_content_main_header_container,
-                    .projects_content_sub_header_container {
-                        display: grid;
-                        grid-template-columns: 100%;
-                        grid-auto-rows: auto;
-                        transition: all 700ms ease-in-out;
-                    }
+            #scroller-right {
+                grid-column: 2 / 3;
+                grid-row: 2 / 3;
+                padding-left: 0.25rem;
+                flex-direction: row;
+                justify-self: flex-start;
+                align-self: flex-start;
+            }
 
-                        .projects_content_main_header_item,
-                        .projects_content_sub_header_item {
-                            display: grid;
-                            grid-template-columns: 15% 85%;
-                            grid-template-rows: 100%;
-                        }
+            .Projects__selector__scroller__icon {
+                display: inline-block;
+                width: 2.5rem;
+                height: 100%;
+                pointer-events: none;
+            }
 
-                        #projects_content_main_header_category,
-                        #projects_content_sub_header_category {
-                            grid-template-columns: max-content;
-                        }
-                            
-                        .projects_content_main_text,
-                        .projects_content_sub_text {
-                            grid-column: 2 / -1;
-                            grid-row: 1;
-                        }
+        .Projects__selector__container {
+            grid-column: 1 / -1;
+            grid-row: 1 / 2;
+            display: flex;
+            column-gap: 1rem;
+            /* padding-left: 0.5rem;   centering/offsets the column gap */
+            padding-bottom: 1rem;   
+            overflow: hidden;
+            align-items: flex-start;
+        }
 
+            .Projects__selector__button__image__overlay {
+                background: none;
+                border-radius: 0.35rem;
+                transition: all 300ms ease-in-out;
+            }
 
-                        #projects_content_main_header_category_text, 
-                        #projects_content_sub_header_category_text {
-                            grid-column: 1;
-                            grid-row: 1;
-                            text-align: left;
-                            align-self: end;
-                            font-size: 1rem;
-                        }
-
-                            #projects_content_main_header_category_text_git,
-                            #projects_content_sub_header_category_text_git {
-                                grid-column: 2;
-                                grid-row: 1;
-                                padding-left: 0.5rem;
-                                /* display: flex; */
-                            }
-
-                                .ionicon.git {
-                                    vertical-align: middle;
-                                    fill: var(--color-text);
-                                }
-
-                                #projects_content_main_header_category_text_git a:hover,
-                                #projects_content_sub_header_category_text_git a:hover {
-                                    background: unset;
-                                    color: unset;
-                                    transition: all 500ms;
-                                }
-
-                                #projects_content_main_header_category_text_git:hover
-                                    > svg,
-                                #projects_content_sub_header_category_text_git:hover
-                                    > svg  {
-                                        fill: var(--color-text);
-                                        transition: all 500ms;
-                                    }
-                            
-                        #projects_content_main_header_title_text,
-                        #projects_content_sub_header_title_text {
-                            grid-column: 1 / -1;
-                            grid-row: 1;
-                            padding-bottom: 1rem;
-                            text-align: left;
-                            font-size: 1.75rem;
-                        }
-
-                        .projects_content_main_info_container,
-                        .projects_content_sub_info_container {
-                            display: grid;
-                            grid-template-columns: 100%;
-                            grid-auto-rows: auto;
-                            row-gap: 0.5rem;
-                            transition: all 700ms ease-in-out;
-                        }
-
-                            .projects_content_main_info_item,
-                            .projects_content_sub_info_item {
-                                display: grid;
-                                grid-template-columns: 15% 85%;
-                                grid-template-rows: 100%;
-                            }
-
-                            #projects_content_main_info_item_url_text {
-                                display: grid;
-                            }
-                            
-                            #projects_content_main_info_item_components_text,
-                            #projects_content_sub_info_item_components_text {
-                                display: flex;
-                                flex-direction: column;
-                                align-items: flex-start;
-                            }
-
-                                #projects_content_main_info_item_components button,
-                                #projects_content_sub_info_item_componentOf button {
-                                    background: none;
-                                    border: none;
-                                    font-family: 'Grenze';
-                                    font-size: 1.25rem;
-                                    color: var(--color-text);
-                                    cursor: pointer;
-                                    transition: all 500ms;
-                                }
-
-                                    #projects_content_main_info_item_components button:hover,
-                                    #projects_content_sub_info_item_componentOf button:hover {
-                                        background: var(--color-text);
-                                        color: var(--color-bg);
-                                        transition: all 500ms;
-                                    }
-
-                                    #projects_content_main_info_item_components i {
-                                        pointer-events: none;
-                                    }
-
-                            #projects_content_main_info_item_stack_text,
-                            #projects_content_sub_info_item_stack_text {
-                                display: grid;
-                                grid-template-columns: 100%;
-                                grid-template-rows: 50% 50%;
-                            }
-
-                                .projects_content_main_info_item_stack_text_backend,
-                                .projects_content_sub_info_item_stack_text_backend {
-                                    grid-column: 1;
-                                    grid-row: 1 / 2;
-                                    display: flex;
-                                    flex-wrap: wrap;
-                                    column-gap: 1rem;
-                                }
-
-                                .projects_content_main_info_item_stack_text_frontend,
-                                .projects_content_sub_info_item_stack_text_frontend {
-                                    grid-column: 1;
-                                    grid-row: 2 / -1;
-                                    display: flex;
-                                    flex-wrap: wrap;
-                                    column-gap: 1.5rem;
-                                }
-
-                        #projects_content_main_description_text,
-                        #projects_content_sub_description_text {
-                            grid-column: 1 / -1;
-                            grid-row: 1;
-                            padding-top: 2rem;
-                            text-align: left;
-                        }
-
-                            #projects_content_main_description_text p,
-                            #projects_content_sub_description_text p {
-                                padding-top: 1rem;
-                            }
-
-                        
-                        
-
-                        
+            .Projects__selector__button__image {
+                display: block;
+                opacity: 1.0;
+                width: 16rem;
+                border-radius: 0.35rem;
+                cursor: pointer;
+                transition: all 300ms ease-in-out;
+            }
