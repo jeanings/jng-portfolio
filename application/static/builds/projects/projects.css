@@ -30,34 +30,12 @@ body {
     }
 }
 
-.container {        /* during initial loading screen */
-    /* display: none */
+.container {
     height: 100%;
     display: grid;
     grid-template-columns: 100%;
     grid-template-rows: 100%;
 }
-    .container.fade {
-        animation-name: container-fade-in;
-        animation-duration: 2000ms;
-    }
-
-        @keyframes container-fade-in {
-            0% {
-                opacity: 0;
-            }
-            100% {
-                opacity: 1;
-            }
-        }
-
-    .container.show {       /* after loading screen lifts */
-        height: 100vh;
-        display: grid;
-        grid-template-columns: 100%;
-        grid-template-rows: 100%;
-    }
-
 
 .Projects {
     grid-column: 1;
