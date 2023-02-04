@@ -47,7 +47,9 @@ def resume():
 
     for section in collection.find():
         for key in section.keys():
-            if key == 'selectedProjects':
+            if key == 'contact': 
+                contact = section[key]
+            elif key == 'selectedProjects':
                 selected_projects = section[key]
             elif key == 'skills':
                 skills = section[key]
@@ -59,6 +61,7 @@ def resume():
 
     return render_template('resume.html', 
         title="Résumé  ——  jeanings.space",
+        contact=contact,
         selected_projects=selected_projects,
         skills=skills,
         education=education,
