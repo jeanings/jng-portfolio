@@ -18,28 +18,21 @@ body {
 }
 
 .container {        /* during initial loading screen */
-    display: none
+    display: grid;
+    height: 100%;
+    grid-template-columns: 50% 50%;
+    grid-template-rows: 50% 50%;
+    animation-name: container-fade-in;
+    animation-duration: 2000ms;
 }
-    .container.fade {
-        animation-name: container-fade-in;
-        animation-duration: 2000ms;
-    }
 
-        @keyframes container-fade-in {
-            0% {
-                opacity: 0;
-            }
-            100% {
-                opacity: 1;
-            }
+    @keyframes container-fade-in {
+        0% {
+            opacity: 0;
         }
-
-    .container.show {       /* after loading screen lifts */
-        display: grid;
-        height: 100%;
-        /* min-height: 240vh; */
-        grid-template-columns: 50% 50%;
-        grid-template-rows: 50% 50%;
+        100% {
+            opacity: 1;
+        }
     }
 
 .Index {
@@ -157,40 +150,13 @@ body {
     font-family: 'Grenze', serif;
     color: var(--color-text);
 }
-    #first-letter {
-        font-family: 'Sansita Swashed', cursive;
-        font-size: 5.5rem;
-        color: var(--color-accent-primary);
-        margin-top: -1rem;
-        margin-bottom: -0.5rem;
-        margin-right: 0.5rem;
-        float: left;
-    }
-        #first-letter:hover {
-            animation-name: first-letter-wiggle;
-            animation-duration: 500ms;
-            animation-timing-function: ease-in-out;
-            animation-fill-mode: forwards;
-            animation-iteration-count: 2;
-            animation-play-state: running;
-        }
-
-            @keyframes first-letter-wiggle {
-                25% {
-                    transform: rotate(-10deg);
-                    color: var(--color-accent-secondary)
-                }
-                
-                100% {
-                    transform: rotate(0deg);
-                    color: var(--color-accent-primary);
-                }
-            }
 
     .Index__about__intro {
         grid-column: 1 / 2;
         grid-row: 1 / 2;
+        width: 90%;
         display: grid;
+        justify-self: center;
         grid-template-rows: 8rem calc(100% - 8rem);
     }
 
@@ -201,102 +167,9 @@ body {
             justify-self: center;
             justify-content: flex-end;
             align-items: flex-end;
-            column-gap: 2rem;
             font-family: 'IBM Plex Mono', monospace;
-            filter: blur(0.15rem);
             cursor: pointer;
-        }
-
-            #greet:hover 
-                > #contact-text {
-                animation-name: slow-pulse-contact;
-                animation-duration: 1750ms;
-                animation-timing-function: cubic-bezier(0.075, 0.82, 0.165, 1);
-                animation-fill-mode: forwards;
-            }
-
-                @keyframes slow-pulse-contact {
-                    0% {
-                        color: var(--color-bg);
-                    }
-
-                    20% {
-                        color: var(--color-text);
-                    }
-
-                    50% {
-                        color: var(--color-bg);
-                    }
-
-                    65% {
-                        color: var(--color-text);
-                    }
-
-                    75% {
-                        color: var(--color-bg);
-                    }
-
-                    100% {
-                        color: var(--color-text);
-                    }
-                }
-
-            #greet:hover
-                > #address #domain {
-                color: var(--color-accent-primary);
-                animation-name: slow-pulse-domain;
-                animation-duration: 1750ms;
-                animation-timing-function: cubic-bezier(0.25, 0.46, 0.45, 0.94);
-                animation-fill-mode: forwards;
-            }
-
-                @keyframes slow-pulse-domain {
-                    0% {
-                        color: var(--color-text-faded);
-                    }
-    
-                    20% {
-                        color: var(--color-accent-primary);
-                    }
-    
-                    50% {
-                        color: var(--color-text-faded);
-                    }
-    
-                    65% {
-                        color: var(--color-accent-primary);
-                    }
-    
-                    75% {
-                        color: var(--color-text-faded);
-                    }
-    
-                    100% {
-                        color: var(--color-accent-primary);
-                    }
-                }
-
-            #contact-text {
-                display: flex;
-                color: var(--color-text-faded);
-                font-size: 4.5rem;
-                flex-wrap: wrap;
-                user-select: none;
-                animation-name: slow-off-contact;
-                animation-duration: 3500ms;
-                animation-timing-function: cubic-bezier(0.075, 0.82, 0.165, 1);
-                animation-fill-mode: forwards;
-            }
-            
-                @keyframes slow-off-contact {
-                    0% {
-                        color: var(--color-text)
-                    }
-
-                    100% {
-                        color: var(--color-text-faded);
-                    }
-                }
+        }          
 
             #address {
                 display: flex;
@@ -307,56 +180,101 @@ body {
 
                 #alias {
                     color: var(--color-accent-secondary-dim);
-                    animation-name: flicker-address;
+                    animation-name: flicker-alias;
                     animation-duration: 3500ms;
                     animation-timing-function: cubic-bezier(0.25, 0.46, 0.45, 0.94);
                     animation-fill-mode: forwards;
                     animation-iteration-count: infinite;
                 }
 
-                    @keyframes flicker-address {
-                        0% {
-                            color: var(--color-accent-secondary-dim);
-                        }
-        
-                        20% {
-                            color: var(--color-accent-secondary);
-                        }
-                        
-                        50% {
-                            color: var(--color-accent-secondary);
-                        }
-
-                        75% {
-                            color: var(--color-accent-secondary-dim);
-                        }
-
-                        85% {
-                            color: var(--color-accent-secondary);
-                        }
-                        
-                        100% {
-                            color: var(--color-accent-secondary-dim);
-                        }
+                @keyframes flicker-alias {
+                    0% {
+                        color: var(--color-accent-secondary);
+                        filter: blur(0.175rem);
                     }
+
+                    5% {
+                        color: var(--color-accent-secondary-dim);
+                        filter: blur(0.15rem);
+                    }
+
+                    10% {
+                        color: var(--color-accent-secondary-dim);
+                        filter: blur(0.20rem);
+                    }
+
+                    13% {
+                        color: var(--color-accent-secondary);
+                        filter: blur(0.175rem);
+                    }
+
+                    15% {
+                        color: var(--color-accent-secondary-dim);
+                        filter: blur(0.20rem);
+                    }   
+    
+                    17% {
+                        color: var(--color-accent-secondary);
+                        filter: blur(0.175rem);
+                    }
+    
+                    18% {
+                        color: var(--color-accent-secondary-dim);
+                        filter: blur(0.175rem);
+                    }
+
+                    20% {
+                        color: var(--color-accent-secondary);
+                        filter: blur(0.125rem);
+                    }
+
+                    25% {
+                        color: var(--color-accent-secondary-dim);
+                        filter: blur(0.15rem);
+                    }
+
+                    30% {
+                        color: var(--color-accent-secondary);
+                        filter: blur(0.125rem);
+                    }
+    
+                    65% {
+                        color: var(--color-accent-secondary);
+                        filter: blur(0.125rem);
+                    }
+    
+                    75% {
+                        color: var(--color-accent-secondary-dim);
+                        filter: blur(0.15rem);
+                    }
+    
+                    100% {
+                        color: var(--color-accent-secondary);
+                        filter: blur(0.175rem);
+                    }
+                }
 
                 #domain {
                     color: var(--color-text-faded);
-                    animation-name: slow-off-domain;
-                    animation-duration: 3500ms;
+                    filter: blur(0.175rem);
+                    animation-name: flicker-project-intro;
+                    animation-duration: 7500ms;
                     animation-timing-function: cubic-bezier(0.25, 0.46, 0.45, 0.94);
                     animation-fill-mode: forwards;
+                    animation-direction: reverse;
+                    animation-iteration-count: infinite;
                 }
 
-                    @keyframes slow-off-domain {
-                        0% {
-                            color: var(--color-accent-primary)
-                        }
-
-                        100% {
-                            color: var(--color-text-faded);
-                        }
-                    }
+        .Index__about__intro__text {
+            width: 60%;
+            display: flex;
+            font-family: 'Grenze', serif;
+            font-size: 2.25rem;
+            color: var(--color-text);
+            align-items: center;
+            justify-self: flex-end;
+            text-align: right;
+        }
 
     .Index__about__showcase {
         grid-column: 2 / -1;
@@ -367,15 +285,15 @@ body {
     }
 
         #project-intro {
+            margin-left: 5%;
             align-self: flex-end;
-            justify-self: center;
+            justify-self: flex-start;
             color: var(--color-text);
             font-size: 4rem;
             font-family: 'IBM Plex Mono', monospace;
-            filter: blur(0.15rem);
             user-select: none;
             animation-name: flicker-project-intro;
-            animation-duration: 10000ms;
+            animation-duration: 7500ms;
             animation-timing-function: cubic-bezier(0.25, 0.46, 0.45, 0.94);
             animation-fill-mode: forwards;
             animation-iteration-count: infinite;
@@ -384,26 +302,32 @@ body {
         @keyframes flicker-project-intro {
             0% {
                 color: var(--color-text);
+                filter: blur(0.23rem);
             }
 
             10% {
                 color: var(--color-text-dim);
+                filter: blur(0.25rem);
             }
 
             15% {
                 color: var(--color-text);
+                filter: blur(0.23rem);
             }
 
             90% {
                 color: var(--color-text);
+                filter: blur(0.2rem);
             }
     
             95% {
                 color: var(--color-text-dim);
+                filter: blur(0.23rem);
             }
             
             100% {
                 color: var(--color-text);
+                filter: blur(0.25rem);
             }
         }
 
@@ -425,53 +349,50 @@ body {
         row-gap: 1.5rem;
     }
 
-            .Index__about__links__button {
-                display: flex;
+        .Index__about__links__button {
+            display: flex;
+            background: var(--color-bg);
+            border-color: var(--color-text);
+            border-style: solid;
+            border-width: 0.1rem;
+            border-radius: 0.20rem;
+            font-family: 'IBM Plex Mono', monospace;
+            padding: 0.375rem 0.75rem 0.375rem 0.75rem;
+            font-size: 1.275rem;
+            opacity: 1;
+            cursor: pointer;
+            pointer-events: all;
+            transition: all 350ms;
+            animation-name: fade-in;
+            animation-duration: 500ms;
+            animation-timing-function: ease-in-out;
+            animation-fill-mode: forwards;
+        }
+            
+            #resume-link-button {
                 justify-self: flex-end;
-                margin-right: 5%;       /* to match video container */
-                background: var(--color-bg);
-                border-color: var(--color-text);
-                border-style: solid;
-                border-width: 0.1rem;
-                border-radius: 0.20rem;
-                /* font-family: 'Grenze', serif; */
-                font-family: 'IBM Plex Mono', monospace;
-                padding: 0.375rem 0.75rem 0.375rem 0.75rem;
-                font-size: 1.275rem;
-                opacity: 1;
-                cursor: pointer;
-                pointer-events: all;
+                margin-right: 5%;
+            }
+
+            #projects-link-button {
+                justify-self: flex-start;
+                margin-left: 5%;
+            }
+
+            .Index__about__links__button {
+                color: var(--color-text);
+                text-decoration: none;
+                user-select: none;
+            }
+            
+            .Index__about__links__button:visited {
+                color: var(--color-text);
+            }
+                    
+            .Index__about__links__button:hover {
+                background: var(--color-text);
+                border-color: var(--color-bg);
+                color: var(--color-bg);
                 transition: all 350ms;
-                animation-name: fade-in;
-                animation-duration: 500ms;
-                animation-timing-function: ease-in-out;
-                animation-fill-mode: forwards;
             }
         
-                .Index__about__links__button a {
-                    color: var(--color-text);
-                    text-decoration: none;
-                    user-select: none;
-                }
-                
-                .Index__about__links__button a:visited {
-                    color: var(--color-text);
-                }
-            
-                .Index__about__links__button a:hover {
-                    background: none;
-                    color: var(--color-bg);
-                    transition: all 500ms;
-                }
-            
-                .Index__about__links__button:hover {
-                    background: var(--color-text);
-                    border-color: var(--color-bg);
-                    transition: all 350ms;
-                }
-
-                .Index__about__links__button:hover a {
-                    color: var(--color-bg);
-                    transition: all 350ms;
-                }
-            
