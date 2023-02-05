@@ -2,12 +2,12 @@ window.onload = function() {
 	/* ------------------------
 		Loader for main page.
 	------------------------ */
-	let picFrame = document.getElementsByClassName("index_cityscape")[0];
+	let picFrame = document.getElementsByClassName("Index__cityscape")[0];
 	let initPicFrameWidthPercent = getComputedStyle(picFrame).width;
 
 	checkImagesLoaded();
     parallaxScroll(initPicFrameWidthPercent);
-	aboutTextObserver();
+	// aboutTextObserver();
 };
 
 
@@ -36,12 +36,14 @@ function checkImagesLoaded() {
 				loader.classList.add("hide");
 				container.classList.add("fade");
 				container.classList.add("show");
-			} else
+			} 
+			else {
 				console.log("Index images loaded; some may be broken.");
 				loader.classList.add("fade");
 				loader.classList.add("hide");
 				container.classList.add("fade");
 				container.classList.add("show");
+			}
 		});
 }
 
@@ -55,9 +57,11 @@ function parallaxScroll(initPicFrameWidthPercent) {
 		let container = document.getElementsByClassName("container show")[0];
 		let scrollWidth = container.scrollWidth;
 		let scrollHeight = container.scrollHeight;
-		let orientation = (window.innerWidth > window.innerHeight) ? 'landscape' : 'portrait';
-		let picFrame = document.getElementsByClassName("index_cityscape")[0];
-		let layers = document.getElementsByClassName("index_cityscape_layers");
+		let orientation = (window.innerWidth > window.innerHeight) 
+			? 'landscape'
+			: 'portrait';
+		let picFrame = document.getElementsByClassName("Index__cityscape")[0];
+		let layers = document.getElementsByClassName("Index__cityscape__layers");
 		let layerDistance, layer, scrollDepth, scrollFx;
 		let scrollDist = window.pageYOffset;
 		let scrollDistHeightRatio = scrollDist / scrollHeight; 
@@ -72,7 +76,8 @@ function parallaxScroll(initPicFrameWidthPercent) {
 			if (scrollDistHeightRatio <= 0.4) {
 				if (orientation === 'landscape') {
 					scrollDepth = scrollDist * layerDistance * 0.20;
-				} else if (orientation === 'portrait') {
+				} 
+				else if (orientation === 'portrait') {
 					scrollDepth = scrollDist * layerDistance * 0.10;
 				}
 			}
@@ -87,7 +92,8 @@ function parallaxScroll(initPicFrameWidthPercent) {
 			let newZoom = zoom + (scrollDist / scrollHeight * 25);
 			let widenPercent = Math.floor(newZoom).toString().concat('%');
 			picFrame.style.width = widenPercent;
-		} else
+		} 
+		else
 			picFrame.style.width = initPicFrameWidthPercent;
 	});
 };
@@ -128,7 +134,8 @@ function aboutTextObserver() {
 		entries.forEach(entry => {
 			if (entry.intersectionRatio >= 0.80) {
 				entry.target.style.opacity = "1";
-			} else if (entry.intersectionRatio < 0.80) {
+			} 
+			else if (entry.intersectionRatio < 0.80) {
 				entry.target.style.opacity = "0";
 			}
 		});
