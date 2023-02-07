@@ -329,3 +329,29 @@
         --root-font-size: 10px;
     }
 }
+
+
+/* ----------------------------------------------------------------- */
+/*            Portrait view -  mobile devices                        */
+/* ----------------------------------------------------------------- */
+@media screen and (orientation: portrait) 
+    /* and (-webkit-min-device-pixel-ratio: 1.5) */
+    and (max-height: 750px) {
+
+    :root {
+        --root-font-size: 9px;
+    }
+}
+
+
+/* ----------------------------------------------------------------- */
+/*            Portrait view -  mobile devices                        */
+/* ----------------------------------------------------------------- */
+@media screen and (orientation: portrait) 
+    /* and (-webkit-min-device-pixel-ratio: 1.5) */
+    and (max-height: 625px) {
+
+    :root {
+        --root-font-size: 8px;
+    }
+}
