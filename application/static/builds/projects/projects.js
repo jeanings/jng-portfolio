@@ -30,14 +30,10 @@ class ProjectsButton {
 		const itemAnchor = document.createElement("a");
 		itemAnchor.setAttribute("href", this.url);
 		itemAnchor.setAttribute("target", "_blank");
+		itemAnchor.setAttribute("class", this.className);
 		itemAnchor.innerHTML = innerHtml;
 
-		// Set up parent button element.
-		const itemButton = document.createElement("button");
-		itemButton.setAttribute("class", this.className);
-		itemButton.appendChild(itemAnchor);
-
-		return itemButton;
+		return itemAnchor;
 	}
 };
 

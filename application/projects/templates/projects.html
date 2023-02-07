@@ -6,7 +6,6 @@
 <section 
     class="Projects">
 
-
     <div 
         class="Projects__description"
         role="main"
@@ -62,14 +61,12 @@
                         id="stats-stack-backend">
                         {%- for item in projects[0].stack.backend -%}
                             {%- for name, url in item.items() -%}
-                                <button
+                                <a 
+                                    href="{{ url }}" 
+                                    target="_blank"
                                     class="stack__button">
-                                    <a 
-                                        href="{{ url }}" 
-                                        target="_blank">
-                                        {{ name }}
-                                    </a>
-                                </button>
+                                    {{ name }}
+                                </a>
                             {%- endfor -%}
                         {%- endfor -%}
                     </div>
@@ -85,14 +82,12 @@
                         id="stats-stack-frontend">
                         {%- for item in projects[0].stack.frontend -%}
                             {%- for name, url in item.items() -%}
-                                <button
+                                <a 
+                                    href="{{ url }}" 
+                                    target="_blank"
                                     class="stack__button">
-                                    <a 
-                                        href="{{ url }}" 
-                                        target="_blank">
-                                        {{ name }}
-                                    </a>
-                                </button>
+                                    {{ name }}
+                                </a>
                             {%- endfor -%}
                         {%- endfor -%}
                     </div>
@@ -108,14 +103,12 @@
                         id="stats-stack-tools">
                         {%- for item in projects[0].stack.tools -%}
                             {%- for name, url in item.items() -%}
-                                <button
+                                <a 
+                                    href="{{ url }}" 
+                                    target="_blank"
                                     class="stack__button">
-                                    <a 
-                                        href="{{ url }}" 
-                                        target="_blank">
-                                        {{ name }}
-                                    </a>
-                                </button>
+                                    {{ name }}
+                                </a>
                             {%- endfor -%}
                         {%- endfor -%}
                     </div>
@@ -161,18 +154,16 @@
                 id="access-links">
                 {%- for language in projects[0].url -%}
                     {%- for name, url in language.items() -%}
-                        <button
+                        <a 
+                            href="{{ url }}" 
+                            target="_blank"
                             class="access__button">
-                            <a 
-                                href="{{ url }}" 
-                                target="_blank">
-                                {% if name == 'English' %}
-                                    OPEN
-                                {% elif name == '日本語' %}
-                                    アクセス
-                                {% endif %}
-                            </a>
-                        </button>
+                            {% if name == 'English' %}
+                                OPEN
+                            {% elif name == '日本語' %}
+                                アクセス
+                            {% endif %}
+                        </a>
                     {%- endfor -%}
                 {%- endfor -%}
             </div>
