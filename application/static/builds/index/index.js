@@ -15,14 +15,13 @@ function parallaxScroll(initPicFrameWidthPercent) {
 	-------------------------- */
 	window.addEventListener("scroll", function(event) {
 		let container = document.getElementsByClassName("container")[0];
-		let scrollWidth = container.scrollWidth;
 		let scrollHeight = container.scrollHeight;
 		let orientation = (window.innerWidth > window.innerHeight) 
 			? 'landscape'
 			: 'portrait';
 		let picFrame = document.getElementsByClassName("Index__cityscape")[0];
 		let layers = document.getElementsByClassName("Index__cityscape__layers");
-		let layerDistance, layer, scrollDepth, scrollFx;
+		let layerDistance, layer, scrollDepth, scrollEffect;
 		let scrollDist = window.pageYOffset;
 		let scrollDistHeightRatio = scrollDist / scrollHeight; 
 		let zoom = Math.floor(initPicFrameWidthPercent.replace('%', ''));
@@ -43,12 +42,14 @@ function parallaxScroll(initPicFrameWidthPercent) {
 			}
 
 			// Shift layers' y-axis position.
-			scrollFx = 'translateY('.concat(scrollDepth, 'px)');
-			layer.style.transform = scrollFx;
+			scrollEffect = 'translateY('.concat(scrollDepth, 'px)');
+			layer.style.transform = scrollEffect;
 		}
 
 		// "Zoom" into frame if scrolled more than 150px.
-		if (scrollDist >= 150 && scrollDist < scrollHeight * 0.6) {
+		if (scrollDist >= 150 
+			&& scrollDist < scrollHeight * 0.6) {
+
 			let newZoom = zoom + (scrollDist / scrollHeight * 25);
 			let widenPercent = Math.floor(newZoom).toString().concat('%');
 			picFrame.style.width = widenPercent;

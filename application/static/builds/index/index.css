@@ -146,7 +146,7 @@ body {
     grid-template-rows: 85% 15%;
     width: 100%;
     height: 100%;
-    padding: 10rem 6rem;
+    padding: 5rem 6rem;
     font-family: 'Grenze', serif;
     color: var(--color-text);
 }
@@ -157,7 +157,7 @@ body {
         width: 90%;
         display: grid;
         justify-self: center;
-        grid-template-rows: 8rem calc(100% - 8rem);
+        grid-template-rows: 40% 60%;
     }
 
         #greet {
@@ -225,22 +225,22 @@ body {
 
                     20% {
                         color: var(--color-accent-secondary);
-                        filter: blur(0.125rem);
+                        filter: blur(0.15rem);
                     }
 
                     25% {
                         color: var(--color-accent-secondary-dim);
-                        filter: blur(0.15rem);
+                        filter: blur(0.125rem);
                     }
 
                     30% {
                         color: var(--color-accent-secondary);
-                        filter: blur(0.125rem);
+                        filter: blur(0.135rem);
                     }
     
                     65% {
                         color: var(--color-accent-secondary);
-                        filter: blur(0.125rem);
+                        filter: blur(0.165rem);
                     }
     
                     75% {
@@ -280,7 +280,7 @@ body {
         grid-column: 2 / -1;
         grid-row: 1 / 2;
         display: grid;
-        grid-template-rows: 8rem calc(100% - 8rem);
+        grid-template-rows: 40% 60%;
         justify-items: center;
     }
 
@@ -346,6 +346,7 @@ body {
         display: grid;
         grid-template-columns: 60% 40%;
         align-content: space-around;
+        align-self: baseline;
         row-gap: 1.5rem;
     }
 
