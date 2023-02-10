@@ -3,65 +3,90 @@
     {{ title }}
 {% endblock %}
 {% block content %}     
-<section class="resume" id="top">
+<section class="Resume" id="top">
 
-    <div class="resume_header">
-        <h1 id="resume_header_name">
+    <div 
+        class="Resume__header">
+        <h1 
+            id="full-name">
             Jeanings Ng
         </h1>
         
-        <div class="resume_header_contact">
-            <div class="resume_header_contact_item">
-                <svg xmlns="http://www.w3.org/2000/svg" class="ionicon" viewBox="0 0 512 512">
-                    <path d="M464 80H48a16 16 0 00-16 16v320a16 16 0 0016 16h416a16 16 0 0016-16V96a16 16 0 00-16-16zM265.82 284.63a16 16 0 01-19.64 0L89.55 162.81l19.64-25.26L256 251.73l146.81-114.18 19.64 25.26z"/>
-                </svg>
-                <a id="resume_header_contact_item_email" href="mailto:{{ contact.email }}">
-                    {{ contact.email }}
-                </a>
-            </div>
+        <div 
+            class="Resume__header__contact">
+            <div 
+                class="Resume__header__contact__item">
+                    <svg class="ionicon" xmlns="http://www.w3.org/2000/svg"  viewBox="0 0 512 512">
+                        <path d="M464 80H48a16 16 0 00-16 16v320a16 16 0 0016 16h416a16 16 0 0016-16V96a16 16 0 00-16-16zM265.82 284.63a16 16 0 01-19.64 0L89.55 162.81l19.64-25.26L256 251.73l146.81-114.18 19.64 25.26z"/>
+                    </svg>
+
+                    <a 
+                        id="header-email"
+                        href="mailto:{{ contact.email }}">
+                        {{ contact.email }}
+                    </a>
+                </div>
             
-            <div class="resume_header_contact_item">
-                <svg xmlns="http://www.w3.org/2000/svg" class="ionicon" viewBox="0 0 512 512">
+            <div 
+                class="Resume__header__contact__item">
+                <svg class="ionicon" xmlns="http://www.w3.org/2000/svg"  viewBox="0 0 512 512">
                     <path d="M416 174.74V48h-80v58.45L256 32 0 272h64v208h144V320h96v160h144V272h64l-96-97.26z"/>
                 </svg>
-                <a id="resume_header_contact_item_site" href="{{ 'https://' + contact.url }}" target="_blank">
+
+                <a
+                    id="header-website" 
+                    href="{{ 'https://' + contact.url }}" target="_blank">
                     {{ contact.url }}
                 </a>
             </div>
 
-            <div class="resume_header_contact_item">
-                <svg xmlns="http://www.w3.org/2000/svg" class="ionicon" viewBox="0 0 512 512">
+            <div 
+                class="Resume__header__contact__item">
+                <svg class="ionicon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
                     <path d="M256 32C132.3 32 32 134.9 32 261.7c0 101.5 64.2 187.5 153.2 217.9a17.56 17.56 0 003.8.4c8.3 0 11.5-6.1 11.5-11.4 0-5.5-.2-19.9-.3-39.1a102.4 102.4 0 01-22.6 2.7c-43.1 0-52.9-33.5-52.9-33.5-10.2-26.5-24.9-33.6-24.9-33.6-19.5-13.7-.1-14.1 1.4-14.1h.1c22.5 2 34.3 23.8 34.3 23.8 11.2 19.6 26.2 25.1 39.6 25.1a63 63 0 0025.6-6c2-14.8 7.8-24.9 14.2-30.7-49.7-5.8-102-25.5-102-113.5 0-25.1 8.7-45.6 23-61.6-2.3-5.8-10-29.2 2.2-60.8a18.64 18.64 0 015-.5c8.1 0 26.4 3.1 56.6 24.1a208.21 208.21 0 01112.2 0c30.2-21 48.5-24.1 56.6-24.1a18.64 18.64 0 015 .5c12.2 31.6 4.5 55 2.2 60.8 14.3 16.1 23 36.6 23 61.6 0 88.2-52.4 107.6-102.3 113.3 8 7.1 15.2 21.1 15.2 42.5 0 30.7-.3 55.5-.3 63 0 5.4 3.1 11.5 11.4 11.5a19.35 19.35 0 004-.4C415.9 449.2 480 363.1 480 261.7 480 134.9 379.7 32 256 32z"/>
                 </svg>
-                <a id="resume_header_contact_item_git" href="{{ 'https://' + contact.github }}" target="_blank">
+
+                <a 
+                    id="header-git" 
+                    href="{{ 'https://' + contact.github }}" target="_blank">
                     {{ contact.github }}
                 </a>
             </div>
         </div>
 
-        <span id="resume_header_location">
+        <span 
+            id="header-location">
             {{ contact.location|upper }}
         </span>
     </div>
 
     
-    <div class="resume_sections">
+    <div 
+        class="Resume__sections">
 
-        <div class="resume_section" id="resume_section_skills">
-            <h2 class="resume_section_name">
+        <div 
+            class="Resume__section" 
+            id="skills">
+            <h2 
+                class="Resume__section__name">
                 SKILLS
             </h2>
-            <div class="resume_section_item">
+            <div 
+                class="Resume__section__item">
                 {%- for item in skills -%}
                     {%- for skill_type in item -%}
-                        <ul class="resume_section_item_stack">
-                            <span class="resume_section_item_stack_name">
+                        <ul 
+                            class="Resume__section__item__stack">
+                            <span 
+                                class="Resume__section__item__stack__name">
                                 {{ skill_type }}
                             </span>
 
-                            <div class="resume_section_item_stack_container">
+                            <div 
+                                class="Resume__section__item__stack__container">
                                 {%- for list_item in item[skill_type] -%}
-                                    <li class="resume_section_item_stack_backend_item">
+                                    <li 
+                                        class="Resume__section__item__stack__backend__item">
                                         {{ list_item }}
                                     </li>
                                 {%- endfor -%}
@@ -72,38 +97,50 @@
             </div>
         </div>
 
-        <div class="resume_section" id="resume_section_projects">
-            <h2 class="resume_section_name">
+        <div 
+            class="Resume__section" 
+            id="projects">
+            <h2 
+                class="Resume__section__name">
                 FULL STACK PROJECTS
             </h2>
             {%- for project in selected_projects -%}
-                <div class="resume_section_item">
-                    <div class="resume_section_item_header">
-                        <h3 class="resume_section_item_header_name">
+                <div 
+                    class="Resume__section__item">
+                    <div 
+                        class="Resume__section__item__header">
+                        <h3 
+                            class="Resume__section__item__header__name">
                             {{ project.title }}
                         </h3>
 
-                        <h4 class="resume_section_item_header_date">
+                        <h4 
+                            class="Resume__section__item__header__date">
                             {{ project.date }}
                         </h4>
         
-                        <div class="resume_section_item_header_links">
-                            <a id="resume_selection_item_header_links_url" 
+                        <div 
+                            class="Resume__section__item__header__links">
+                            <a 
                                 href="{{ project.url }}">
                                 {{ project.url }}
                             </a>
                         </div>
                     </div>
 
-                    <div class="resume_section_item_summary">
-                        <span class="resume_section_item_summary_objectives">
+                    <div 
+                        class="Resume__section__item__summary">
+                        <span 
+                            class="Resume__section__item__summary__objectives">
                             Objectives — {{ project.objectives }}
                         </span>  
                     </div>
 
-                    <ul class="resume_section_item_list">
+                    <ul 
+                        class="Resume__section__item__list">
                         {%- for item in project.description -%}
-                            <li class="resume_section_item_list_item">
+                            <li 
+                                class="Resume__section__item__list__item">
                                 {{ item }}
                             </li>
                         {%- endfor -%}
@@ -112,34 +149,45 @@
             {%- endfor -%}
         </div>
         
-        <div class="resume_section" id="resume_section_education">
-            <h2 class="resume_section_name">
+        <div 
+            class="Resume__section" 
+            id="education">
+            <h2 
+                class="Resume__section__name">
                 EDUCATION
             </h2>
             {%- for institute in education -%}
                 {%- for name in institute -%}
-                    <div class="resume_section_item">
-                        <div class="resume_section_item_header">
-                            <h3 class="resume_section_item_header_name">
+                    <div 
+                        class="Resume__section__item">
+                        <div 
+                            class="Resume__section__item__header">
+                            <h3 
+                                class="Resume__section__item__header__name">
                                 {{ name }}
                             </h3>
 
-                            <h4 class="resume_section_item_header_title">
+                            <h4 
+                                class="Resume__section__item__header__title">
                                 {{ institute[name].title }}
                             </h4>
 
-                            <h4 class="resume_section_item_header_date">
+                            <h4 
+                                class="Resume__section__item__header__date">
                                 {{ institute[name].date }}
                             </h4>
 
-                            <h4 class="resume_section_item_header_location">
+                            <h4 
+                                class="Resume__section__item__header__location">
                                 {{ institute[name].location }}
                             </h4>
                         </div>
 
-                        <ul class="resume_section_item_list">
+                        <ul 
+                            class="Resume__section__item__list">
                             {%- for line in institute[name].description -%}
-                                <li class="resume_section_item_list_item">
+                                <li 
+                                    class="Resume__section__item__list__item">
                                     {{ line }}
                                 </li>
                             {%- endfor -%}
@@ -150,33 +198,45 @@
             {%- endfor -%}
         </div>
 
-        <div class="resume_section" id="resume_section_experience">
-            <h2 class="resume_section_name">
+        <div 
+            class="Resume__section" 
+            id="experience">
+            <h2 
+                class="Resume__section__name">
                 EXPERIENCE
             </h2>
             {%- for job in experience -%}
                 {%- for company in job -%}
-                    <div class="resume_section_item">
-                        <div class="resume_section_item_header">
-                            <h3 class="resume_section_item_header_name">
+                    <div 
+                        class="Resume__section__item">
+                        <div 
+                            class="Resume__section__item__header">
+                            <h3 
+                                class="Resume__section__item__header__name">
                                 {{ company }}
                             </h3>
-                            <h4 class="resume_section_item_header_title">
+
+                            <h4 
+                                class="Resume__section__item__header__title">
                                 {{ job[company].title }}
                             </h4>
 
-                            <h4 class="resume_section_item_header_date">
+                            <h4 
+                                class="Resume__section__item__header__date">
                                 {{ job[company].date }}
                             </h4>
 
-                            <h4 class="resume_section_item_header_location">
+                            <h4 
+                                class="Resume__section__item__header__location">
                                 {{ job[company].location }}
                             </h4>
                         </div>
 
-                        <ul class="resume_section_item_list">
+                        <ul 
+                            class="Resume__section__item__list">
                             {%- for line in job[company].description -%}
-                                <li class="resume_section_item_list_item">
+                                <li 
+                                    class="Resume__section__item__list__item">
                                     {{ line }}
                                 </li>
                             {%- endfor -%}
