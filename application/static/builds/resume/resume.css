@@ -55,7 +55,21 @@ h4 {
 .container {
     display: grid;
     background: var(--color-bg);
+    animation-name: fade-in;
+    animation-duration: 2000ms;
+    animation-timing-function: ease-in-out;
+    animation-fill-mode: forwards;
 }
+
+    @keyframes fade-in {
+        0% {
+            opacity: 0;
+        }
+
+        100% {
+            opacity: 1;
+        }
+    }
 
     .Resume {
         width: 210mm;
