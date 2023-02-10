@@ -1,44 +1,21 @@
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app), using the [Redux](https://redux.js.org/) and [Redux Toolkit](https://redux-toolkit.js.org/) template.
+# Dashboard comparison tool for visualizing housing prices
 
-## Available Scripts
+https://jeanings.space/projects/fudousan-kakaku-hikaku-2010-2020
 
-In the project directory, you can run:
+An exploratory tool to visualize and compare housing data in Japan from 2010 to 2020.  Data sourced from Ministry of Land, Infrastructure, Transport and Tourism of Japan (https://www.land.mlit.go.jp/webland/servlet/MainServlet).  Resolution goes from geographic regions (Kanto) down to local municipalities/neighbourhoods (Yoyogi).
 
-### `npm start`
+Search parameters using sliders include:
 
-Runs the app in the development mode.<br />
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+- Building type
+  - detached house
+  - apartment/condominium
+- Walking distance to nearest station (minutes)
+- Building construction type
+  - wood
+  - steel frame
+  - rebar
+  - concrete block
+- Construction year
+- Floor area (sq. meters)
 
-The page will reload if you make edits.<br />
-You will also see any lint errors in the console.
-
-### `npm test`
-
-Launches the test runner in the interactive watch mode.<br />
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
-
-### `npm run build`
-
-Builds the app for production to the `build` folder.<br />
-It correctly bundles React in production mode and optimizes the build for the best performance.
-
-The build is minified and the filenames include the hashes.<br />
-Your app is ready to be deployed!
-
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
-
-### `npm run eject`
-
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
-
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
-
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
+[project3.webm](https://user-images.githubusercontent.com/53713206/217718976-63a4ec56-ee47-4b3a-b35e-3a8002427310.webm)

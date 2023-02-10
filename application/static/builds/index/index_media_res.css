@@ -1,62 +1,23 @@
 /* ----------------------------------------------------------------- */
-/*                      Portrait view - general                      */
-/* ----------------------------------------------------------------- */
-@media screen and (orientation: portrait) {
-
-    .container.show {
-        display: grid;
-        grid-template-columns: 50% 50%;
-        grid-template-rows: 50% 50%;
-    }
-
-    .index_cityscape {
-        width: 80%;
-        height: 90vh;
-        padding: 2rem;
-    }
-
-    .index_about {
-        padding: 20vh 10vw 20vh 10vw;
-    }
-}
-
-
-/* ----------------------------------------------------------------- */
-/*               Portrait view - non-mobile screens                  */
-/* ----------------------------------------------------------------- */
-@media screen and (orientation: portrait)
-    /* and (-webkit-min-device-pixel-ratio: 1.5)  */
-    and (min-width: 700px)
-    and (max-width: 1200px) {
-    
-    .index_cityscape {
-        width: 70%;
-        padding: 3rem;
-    }
-}
-
-
-/* ----------------------------------------------------------------- */
-/*                Portrait view - high-res tablets                   */
-/* ----------------------------------------------------------------- */
-@media screen
-    and (-webkit-min-device-pixel-ratio: 1.5) 
-    and (min-width: 700px)
-    and (max-width: 1200px) {
-
-}
-
-
-/* ----------------------------------------------------------------- */
-/*          Landscape view - under 1920x1080, high-res               */
+/*              Landscape view - 3840x2160, high-res                 */
 /* ----------------------------------------------------------------- */
 @media screen and (orientation: landscape) 
-    and (-webkit-min-device-pixel-ratio: 1.5)
-    and (max-width: 1800px) {
+    /* and (-webkit-min-device-pixel-ratio: 1.5)  */
+    and (max-width: 5000px) {
+    
+   
+}
 
-    .index_cityscape {
-        width: 70%;
-    }
+
+/* ----------------------------------------------------------------- */
+/*            Landscape view - 2560x1600 plus, high-res              */
+/* ----------------------------------------------------------------- */
+@media screen and (orientation: landscape) 
+    /* and (-webkit-min-device-pixel-ratio: 1.5)  */
+    and (max-width: 2800px)
+    and (min-height: 1600px) {
+
+   
 }
 
 
@@ -65,16 +26,389 @@
 /* ----------------------------------------------------------------- */
 @media screen and (orientation: landscape) 
     /* and (-webkit-min-device-pixel-ratio: 1.5)  */
-    and (min-width: 2400px) {
+    and (max-width: 2800px) {
+
+  
 
 }
 
 
 /* ----------------------------------------------------------------- */
-/*              Landscape view - 3840x2160, high-res                 */
+/*            Landscape view - 1920x1080 standard                    */
 /* ----------------------------------------------------------------- */
 @media screen and (orientation: landscape) 
     /* and (-webkit-min-device-pixel-ratio: 1.5)  */
-    and (min-width: 3600px) {
+    and (max-width: 2400px) {
 
+   
+}
+
+
+/* ----------------------------------------------------------------- */
+/*            Landscape view - 1920x1080 standard                    */
+/* ----------------------------------------------------------------- */
+@media screen and (orientation: landscape) 
+    /* and (-webkit-min-device-pixel-ratio: 1.5)  */
+    and (max-width: 2000px) {
+
+   
+}
+
+
+/* ----------------------------------------------------------------- */
+/*                Landscape view - under 1920x1080                   */
+/* ----------------------------------------------------------------- */
+@media screen and (orientation: landscape) 
+    /* and (-webkit-min-device-pixel-ratio: 1.5) */
+    and (max-width: 1850px) {
+
+   
+}
+
+
+/* ----------------------------------------------------------------- */
+/*                Landscape view - under 1920x1080                   */
+/* ----------------------------------------------------------------- */
+@media screen and (orientation: landscape) 
+    /* and (-webkit-min-device-pixel-ratio: 1.5) */
+    and (max-width: 1650px) {
+
+   
+}
+
+
+/* ----------------------------------------------------------------- */
+/*                Landscape view - tablets, notebooks                */
+/* ----------------------------------------------------------------- */
+@media screen and (orientation: landscape) 
+    /* and (-webkit-min-device-pixel-ratio: 1.5) */
+    and (max-width: 1500px) {
+
+ 
+}
+
+
+/* ----------------------------------------------------------------- */
+/*                Landscape view - tablets, notebooks                */
+/* ----------------------------------------------------------------- */
+@media screen and (orientation: landscape) 
+    /* and (-webkit-min-device-pixel-ratio: 1.5) */
+    and (max-width: 1350px) {
+
+   
+}
+
+
+/* ----------------------------------------------------------------- */
+/*                Landscape view - mobile devices                    */
+/* ----------------------------------------------------------------- */
+@media screen and (orientation: landscape) 
+    /* and (-webkit-min-device-pixel-ratio: 1.5) */
+    and (max-width: 1200px) {
+
+  
+}
+
+
+/* ----------------------------------------------------------------- */
+/*                Landscape view - mobile devices                    */
+/* ----------------------------------------------------------------- */
+@media screen and (orientation: landscape) 
+    /* and (-webkit-min-device-pixel-ratio: 1.5) */
+    and (max-width: 1100px) {
+
+  
+}
+
+
+/* ----------------------------------------------------------------- */
+/*                Landscape view - mobile devices                    */
+/* ----------------------------------------------------------------- */
+@media screen and (orientation: landscape) 
+    /* and (-webkit-min-device-pixel-ratio: 1.5) */
+    and (max-width: 1000px) {
+
+   
+}
+
+
+/* ----------------------------------------------------------------- */
+/*                Landscape view - mobile devices                    */
+/* ----------------------------------------------------------------- */
+@media screen and (orientation: landscape) 
+    /* and (-webkit-min-device-pixel-ratio: 1.5) */
+    and (max-width: 900px) {
+
+   
+}
+
+
+/* ----------------------------------------------------------------- */
+/*                Landscape view - mobile devices                    */
+/* ----------------------------------------------------------------- */
+@media screen and (orientation: landscape) 
+    /* and (-webkit-min-device-pixel-ratio: 1.5) */
+    and (max-width: 750px) {
+
+}
+
+
+/* ----------------------------------------------------------------- */
+/*                Landscape view - mobile devices                    */
+/* ----------------------------------------------------------------- */
+@media screen and (orientation: landscape) 
+    /* and (-webkit-min-device-pixel-ratio: 1.5) */
+    and (max-width: 600px) {
+
+  
+}
+
+
+
+
+
+/* ----------------------------------------------------------------- */
+/*            Portrait view - default                                */
+/* ----------------------------------------------------------------- */
+@media screen and (orientation: portrait) {
+    html {
+        height: 175%;
+    }
+
+    .Index {
+        row-gap: 5rem;
+    }
+
+    .Index__cityscape {
+        width: 80%;
+        height: 80%;
+        padding: 4rem;
+        margin-top: 6rem;
+    }
+
+    .Index__about {
+        width: 95%;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        padding: 5rem 3rem;
+        row-gap: 3rem;
+        justify-content: flex-end;
+    }
+
+        .Index__about__intro {
+            display: flex;
+            flex-direction: column;
+            width: 80%;
+            row-gap: 2rem;
+            align-self: flex-end;
+            align-items: flex-end;
+        }
+
+            #greet {
+                width: 90%;
+                align-items: flex-end;
+            }
+
+            .Index__about__intro__text {
+                width: 85%;
+                justify-self: center;
+                align-items: baseline;
+            }
+
+        .Index__about__showcase {
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+            row-gap: 2rem;
+            align-self: flex-start;
+            align-items: flex-start;
+        }
+
+            #project-intro {
+                margin: 0;
+                align-self: flex-start;
+            }
+
+            #latest-project-video {
+                align-self: baseline;
+                width: 85%;
+                border-radius: 0.5rem;
+            }
+
+        .Index__about__links {
+            grid-column: 1 / -1;
+            grid-row: 3 / 4;
+            display: grid;
+            grid-template-columns: 85% 15%;
+            align-content: unset;
+            align-self: unset;
+            align-items: unset;
+            justify-self: unset;
+        }
+
+            .Index__about__links__button {
+                font-size: 2.5rem;
+                padding: 0.75rem 1.25rem;
+            }
+
+            #projects-link-button {
+                grid-column: 1 / 2;
+                grid-row: 1 / -1;
+                margin: 0;
+                justify-self: flex-end;
+                align-self: center;
+            }
+
+            #resume-link-button {
+                grid-column: 2 / -1;
+                grid-row: 1 / -1;
+                margin: 0;
+                justify-self: flex-end;
+                align-self: center;
+            }
+
+            
+
+        
+   
+}
+
+
+/* ----------------------------------------------------------------- */
+/*            Portrait view - 3840x2160, high-res                    */
+/* ----------------------------------------------------------------- */
+@media screen and (orientation: portrait) 
+    /* and (-webkit-min-device-pixel-ratio: 1.5)  */
+    and (max-height: 5000px) {
+    
+   
+}
+
+
+/* ----------------------------------------------------------------- */
+/*            Portrait view - 2560x1600 plus, high-res               */
+/* ----------------------------------------------------------------- */
+@media screen and (orientation: portrait) 
+    /* and (-webkit-min-device-pixel-ratio: 1.5)  */
+    and (min-width: 1600px)
+    and (max-height: 2800px) {
+
+   
+}
+
+
+/* ----------------------------------------------------------------- */
+/*              Portrait view - 2560x1440 plus, high-res             */
+/* ----------------------------------------------------------------- */
+@media screen and (orientation: portrait) 
+    /* and (-webkit-min-device-pixel-ratio: 1.5)  */
+    and (max-height : 2800px) {
+
+  
+
+}
+
+
+/* ----------------------------------------------------------------- */
+/*            Portrait view - 1920x1080 standard                     */
+/* ----------------------------------------------------------------- */
+@media screen and (orientation: portrait) 
+    /* and (-webkit-min-device-pixel-ratio: 1.5)  */
+    and (max-height: 2000px) {
+
+
+}
+
+
+/* ----------------------------------------------------------------- */
+/*            Portrait view - under 1920x1080                        */
+/* ----------------------------------------------------------------- */
+@media screen and (orientation: portrait) 
+    /* and (-webkit-min-device-pixel-ratio: 1.5) */
+    and (max-height: 1700px) {
+    
+    .Index__cityscape {
+        height: 100%;
+    }
+  
+}
+
+
+/* ----------------------------------------------------------------- */
+/*            Portrait view - tablets, notebooks                     */
+/* ----------------------------------------------------------------- */
+@media screen and (orientation: portrait) 
+    /* and (-webkit-min-device-pixel-ratio: 1.5) */
+    and (max-height: 1500px) {
+
+   
+}
+
+
+/* ----------------------------------------------------------------- */
+/*            Portrait view - tablets, notebooks                     */
+/* ----------------------------------------------------------------- */
+@media screen and (orientation: portrait) 
+    /* and (-webkit-min-device-pixel-ratio: 1.5) */
+    and (max-height: 1350px) {
+
+ 
+}
+
+
+/* ----------------------------------------------------------------- */
+/*            Portrait view -  mobile devices                        */
+/* ----------------------------------------------------------------- */
+@media screen and (orientation: portrait) 
+    /* and (-webkit-min-device-pixel-ratio: 1.5) */
+    and (max-height: 1200px) {
+
+    html {
+        height: 200%;
+    }
+
+    .Index__cityscape {
+        padding: 2rem;
+        width: 90%;
+        height: 85%;
+    }
+
+    .Index__about {
+        padding: 3rem 1rem;
+    }
+
+        #address {
+            font-size: 3.25rem;
+        }
+
+        #project-intro {
+            font-size: 3.25rem;
+        }
+
+        .Index__about__links__button {
+            font-size: 1.75rem;
+        }
+}
+
+
+/* ----------------------------------------------------------------- */
+/*            Portrait view -  mobile devices                        */
+/* ----------------------------------------------------------------- */
+@media screen and (orientation: portrait) 
+    /* and (-webkit-min-device-pixel-ratio: 1.5) */
+    and (max-height: 1100px) {
+
+
+}
+
+
+/* ----------------------------------------------------------------- */
+/*            Portrait view -  mobile devices                        */
+/* ----------------------------------------------------------------- */
+@media screen and (orientation: portrait) 
+    /* and (-webkit-min-device-pixel-ratio: 1.5) */
+    and (max-height: 1000px) {
+
+   
 }
