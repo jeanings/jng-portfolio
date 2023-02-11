@@ -7,6 +7,7 @@ from dotenv import load_dotenv
 from pathlib import Path
 from datetime import datetime
 from urllib.parse import quote_plus
+from decimal import *
 from PIL import Image, ExifTags
 from gps_unit_conversion import dms_to_deci_deg
 from image_metadata import Metadata
@@ -145,6 +146,8 @@ def get_metadata(image, cameras_dict, image_url):
     """
     Extract and build dict of image metadata of interest.
     """
+    # Decimal precision.
+    getcontext().prec = 15
 
     # Get metadata.
     pil_image = Image.open(image)
@@ -180,8 +183,8 @@ def get_metadata(image, cameras_dict, image_url):
         metadata.date['time'] = ':'.join([str(dt.hour), str(dt.minute), str(dt.second)])
 
         # Camera/lens data.
-        metadata.make = exif_data['Make']
-        metadata.model = exif_data['Model']
+        metadata.make = exif_data['Make'].strip()
+        metadata.model = exif_data['Model'].strip()
         
         if metadata.model == 'DMC-LX7':
             metadata.get_lens()
@@ -195,21 +198,22 @@ def get_metadata(image, cameras_dict, image_url):
         metadata.aperture = float(exif_data['FNumber'])
         metadata.shutter_speed = [exif_data['ExposureTime'].numerator, exif_data['ExposureTime'].denominator]
 
-        # GPS coordinates.
+  # GPS coordinates.
         metadata.gps['lat_ref'] = exif_data['GPSInfo'][1]
         if metadata.gps['lat_ref'] == 'N':
-            metadata.gps['lat'] = dms_to_deci_deg(exif_data['GPSInfo'][2])
+            metadata.gps['lat'] = float(dms_to_deci_deg(exif_data['GPSInfo'][2]))
         else:
-            metadata.gps['lat'] = dms_to_deci_deg(exif_data['GPSInfo'][2]) * -1
+            metadata.gps['lat'] = float(dms_to_deci_deg(exif_data['GPSInfo'][2])) * (-1.0)
 
         metadata.gps['lng_ref'] = exif_data['GPSInfo'][3]
         if metadata.gps['lng_ref'] == 'E':
-            metadata.gps['lng'] = dms_to_deci_deg(exif_data['GPSInfo'][4])
+            metadata.gps['lng'] = float(dms_to_deci_deg(exif_data['GPSInfo'][4]))
         else:
-            metadata.gps['lng'] = dms_to_deci_deg(exif_data['GPSInfo'][4]) * -1
+            metadata.gps['lng'] = float(dms_to_deci_deg(exif_data['GPSInfo'][4])) * (-1.0)
         
         # URL for uploaded image.
         metadata.url = image_url
+        metadata.url_thumb = image_url.replace('images', 'thumbs')
 
         # Tags.
         metadata.tags = raw_tags
@@ -240,18 +244,19 @@ def get_metadata(image, cameras_dict, image_url):
         # GPS coordinates.
         metadata.gps['lat_ref'] = exif_data['GPSInfo'][1]
         if metadata.gps['lat_ref'] == 'N':
-            metadata.gps['lat'] = dms_to_deci_deg(exif_data['GPSInfo'][2])
+            metadata.gps['lat'] = float(dms_to_deci_deg(exif_data['GPSInfo'][2]))
         else:
-            metadata.gps['lat'] = dms_to_deci_deg(exif_data['GPSInfo'][2]) * -1
+            metadata.gps['lat'] = float(dms_to_deci_deg(exif_data['GPSInfo'][2])) * (-1.0)
 
         metadata.gps['lng_ref'] = exif_data['GPSInfo'][3]
         if metadata.gps['lng_ref'] == 'E':
-            metadata.gps['lng'] = dms_to_deci_deg(exif_data['GPSInfo'][4])
+            metadata.gps['lng'] = float(dms_to_deci_deg(exif_data['GPSInfo'][4]))
         else:
-            metadata.gps['lng'] = dms_to_deci_deg(exif_data['GPSInfo'][4]) * -1
+            metadata.gps['lng'] = float(dms_to_deci_deg(exif_data['GPSInfo'][4])) * (-1.0)
 
         # URL for uploaded image.
         metadata.url = image_url
+        metadata.url_thumb = image_url.replace('images', 'thumbs')
 
         # Tags.
         metadata.tags = strip_metadata_in_tags(raw_tags)
@@ -272,6 +277,44 @@ def build_mongodb_doc(metadata):
     return mongodb_doc
 
 
+def get_gps_data(image):
+    # Get metadata.
+    pil_image = Image.open(image)
+    exif_data = {ExifTags.TAGS[key]: val for key, val in pil_image._getexif().items() if key in ExifTags.TAGS}
+    metadata = Metadata()
+
+    # GPS coordinates.
+    metadata.gps['lat_ref'] = exif_data['GPSInfo'][1]
+    if metadata.gps['lat_ref'] == 'N':
+        metadata.gps['lat'] = dms_to_deci_deg(exif_data['GPSInfo'][2])
+    else:
+        metadata.gps['lat'] = dms_to_deci_deg(exif_data['GPSInfo'][2]) * Decimal(-1.0)
+
+    metadata.gps['lng_ref'] = exif_data['GPSInfo'][3]
+    if metadata.gps['lng_ref'] == 'E':
+        metadata.gps['lng'] = dms_to_deci_deg(exif_data['GPSInfo'][4])
+    else:
+        metadata.gps['lng'] = dms_to_deci_deg(exif_data['GPSInfo'][4]) * Decimal(-1.0)
+    
+    return metadata.gps
+
+
+def calculate_map_bounds(coords):
+    # Get bounding box coordinates.
+    bbox = {
+        'lng': [
+            float(min(coords['lng'])), 
+            float(max(coords['lng']))
+        ], 
+        'lat': [
+            float(min(coords['lat'])),
+            float(max(coords['lat']))
+        ]
+    }
+
+    return bbox
+
+
 def create_mongodb_docs():
     """
     Gets list of image blobs and compares to MongoDB docs.
@@ -283,25 +326,39 @@ def create_mongodb_docs():
     images_folder_prefix = environ.get('GCS_BUCKET_IMG_PREFIX')
     storage_images_blob = list_blobs_with_prefix(bucket_name, images_folder_prefix)
 
-    # Get collections of MongoDB docs.
+    # Get collections of MongoDB docs to add.
     image_blobs_to_update = check_blobs_and_docs(storage_images_blob)
 
     # Create dict of all images in local folder.
     image_extensions = ['.jpg', '.jpeg', '.png', '.tiff']
     images = {}
     mongodb_collections = {}
+    bounding_boxes = {}
+    map_bounds = {}
 
     for year_folder in IMG_FOLDER.iterdir():
         # Initialize dict entry for the year.
         mongodb_collections[year_folder.name] = []
-        
+        bounding_boxes[year_folder.name] = []
+        map_bounds[year_folder.name] = {
+            'lat': [], 'lng': []
+        }
+
+        # image_set == tz code folder name, 'Japan', 'America.Vancouver'
         for image_set in year_folder.iterdir():
+            # item == files
             for item in image_set.iterdir():
                 if item.suffix in image_extensions:
+                    # Add GPS data for calculating bounds.
+                    gps_coords = get_gps_data(item)
+                    map_bounds[year_folder.name]['lat'].append(gps_coords['lat'])
+                    map_bounds[year_folder.name]['lng'].append(gps_coords['lng'])
+                    
                     # Build images_blob dict key from path.
                     parts_index = [4, 5, 6, 7, 8, 9]
                     blob_key = '/'.join([part for index, part in enumerate(item.parts) if index in parts_index])
 
+                    # Get images url for all images requiring to be added to MongoDB.
                     try:
                         image_url = image_blobs_to_update[year_folder.name][blob_key]
                     except KeyError:
@@ -310,17 +367,28 @@ def create_mongodb_docs():
 
                     images.update({item: image_url})
     
-    # Create MongoDB doc for each image and add to its year collection.
     cameras_json = PROJ_FOLDER / 'tools' / 'cameras.json'
     with open(cameras_json) as file:
         cameras_dict = json.load(file)
     
+    # Create MongoDB doc for each image and add to its year collection.
     for image in images:
         image_url = images[image]
         metadata = get_metadata(image, cameras_dict, image_url)
         mongodb_doc = build_mongodb_doc(metadata)
         # Add to its corresponding year in collections dict.
         mongodb_collections[str(mongodb_doc['date']['year'])].append(mongodb_doc)
+
+    # Insert bounding boxes.
+    for year in map_bounds:
+        bbox = calculate_map_bounds(map_bounds[year])
+        collection = db['bounds']
+        bbox_doc = {
+            'year': year, 
+            'bbox': bbox
+        }
+        collection.insert_one(bbox_doc)
+        print(">>> Bounding box for {0} inserted into collection.".format(year))
 
     # Insert collections to MongoDB database.
     for year in mongodb_collections:
@@ -332,7 +400,7 @@ def create_mongodb_docs():
         print(">>> {0} documents inserted into {1} collection.".format(len(mongodb_collections[year]), year))
 
     print(">>> MongoDB database of uploaded images updated.")
-   
+
 
 if __name__ == '__main__':
     create_mongodb_docs()
