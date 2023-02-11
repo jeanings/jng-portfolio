@@ -3,7 +3,7 @@ body {
     --color-accent-primary: rgb(187, 199, 21);
     --color-accent-secondary: rgb(42, 184, 124);
     --color-text: #cdcdcd;
-    --text-accent-primary: rgb(36, 147, 175);
+    --text-accent-primary: rgb(16, 106, 210);
     background: var(--color-bg);
     font-family: 'Raleway', sans-serif;
     color: #000000;
@@ -25,7 +25,7 @@ h1, h2, h3, h4 {
 }
 
 h2 {
-    font-size: 7mm;
+    font-size: 5.5mm;
 }
 
 h3 {
@@ -55,9 +55,23 @@ h4 {
 .container {
     display: grid;
     background: var(--color-bg);
+    animation-name: fade-in;
+    animation-duration: 2000ms;
+    animation-timing-function: ease-in-out;
+    animation-fill-mode: forwards;
 }
 
-    .resume {
+    @keyframes fade-in {
+        0% {
+            opacity: 0;
+        }
+
+        100% {
+            opacity: 1;
+        }
+    }
+
+    .Resume {
         width: 210mm;
         height: 297mm;
         background: #ffffff;
@@ -66,11 +80,11 @@ h4 {
         grid-row: 2;
         justify-self: center;
         grid-template-columns: 100%;
-        grid-template-rows: 11.5% auto;
+        grid-template-rows: 25mm auto;
         padding: 10mm 15mm 10mm 15mm;
     }
 
-        .resume_header {
+        .Resume__header {
             grid-row: 1 / 2;
             display: grid;
             grid-template-columns: 100%;
@@ -78,26 +92,27 @@ h4 {
             justify-items: center;
         }
 
-            #resume_header_name {
+            #full-name {
                 grid-row: 1 / 2;
-                font-size: 12mm;
+                font-size: 10mm;
                 color: var(--text-accent-primary);
+                font-weight: 400;
             }
 
-            .resume_header_contact {
+            .Resume__header__contact {
                 grid-row: 2 / 3;
                 display: flex;
                 column-gap: 5mm;
                 flex-direction: row;
-                font-size: 3mm;
+                font-size: 3.5mm;
                 align-items: center;
             }
-                .resume_header_contact_item {
+                .Resume__header__contact__item {
                     display: flex;
                     column-gap: 1mm;
 
                 }
-                    .resume_header_contact .ionicon {
+                    .Resume__header__contact .ionicon {
                         grid-column: unset;
                         grid-row: unset;
                         width: 3mm;
@@ -108,13 +123,13 @@ h4 {
                         transition: unset;
                     }
             
-            #resume_header_location {
+            #header-location {
                 grid-row: 3 / -1;
-                font-size: 2.5mm;
+                font-size: 3mm;
                 align-self: flex-start;
             }
 
-        .resume_sections {
+        .Resume__sections {
             grid-row: 2 / -1;
             display: grid;
             grid-template-columns: 100%;
@@ -122,42 +137,25 @@ h4 {
             row-gap: 5mm;
         }
 
-            .resume_section {
+            .Resume__section {
                 display: grid;
                 grid-template-rows: 10mm auto;
             }
 
-                .resume_section_item {
+                .Resume__section__item {
                     display: grid;
                     grid-template-columns: 100%;
                     grid-template-rows: 10mm auto;
                     row-gap: 2.5mm;
                     padding-bottom: 4mm;
                 }
-            
-            #resume_section_additional {
-                grid-template-columns: 60% 40%;
-            }
                 
-                #resume_section_projects .resume_section_item {
+                #projects .Resume__section__item {
                     display: grid;
-                    grid-template-rows: 10mm 15mm auto;
+                    grid-template-rows: 10mm 6mm;
                 }
 
-                #resume_section_additional .resume_section_item {
-                    grid-template-columns: 30% auto;
-                    grid-template-rows: 6mm auto;
-                }
-
-                    #resume_section_item_languages {
-                        grid-column: 1 / 2;
-                    }
-
-                    #resume_section_item_hobbies {
-                        grid-column: 2 / -1;
-                    }
-
-                    .resume_section_item_header {
+                    .Resume__section__item__header {
                         grid-column: 1 / -1;
                         grid-row: 1 / 2;
                         display: grid;
@@ -165,35 +163,35 @@ h4 {
                         grid-template-rows: 65% 35%;
                     }
     
-                    #resume_section_item_hobbies .resume_section_item_header {
-                        grid-column: 1 / -1;
-                    }
-
-                        .resume_section_item_header_name {
+                        .Resume__section__item__header__name {
                             grid-column: 1 / 2;
                             grid-row: 1 / 2;
                             color: var(--text-accent-primary);
+                            font-weight: 400;
+                            align-self: center;
                         }
 
-                        .resume_section_item_header_title {
+                        .Resume__section__item__header__title {
                             grid-column: 1 / 2;
                             grid-row: 2 / -1;
+                            font-style: italic;
+                            font-weight: 400;
                         }
 
-                        .resume_section_item_header_links {
+                        .Resume__section__item__header__links {
                             grid-column: 1 / -1;
                             grid-row: 2 / 3;
                             display: flex;
-                            align-self: center;
+                            align-self: baseline;
                             z-index: 2;
                         }
 
-                            #resume_selection_item_header_links_url {
-                                font-size: 3.3mm;
+                            .Resume__section__item__header__links a {
+                                font-size: 3.75mm;
                                 font-family: 'Space Mono', monospace;
                             }
 
-                        .resume_section_item_header_location {
+                        .Resume__section__item__header__date {
                             grid-column: 1 / -1;
                             grid-row: 1 / 2;
                             display: flex;
@@ -202,87 +200,84 @@ h4 {
                             justify-self: flex-end;
                         }
 
-                        .resume_section_item_header_date {
+                        .Resume__section__item__header__location {
                             grid-column: 1 / -1;
                             grid-row: 2 / -1;
                             display: flex;
                             text-align: end;
-                            align-self: center;
+                            align-self: baseline;
                             justify-self: flex-end;
+                        }                        
+
+                    .Resume__section__item__summary {
+                        grid-row: 2 / 3;
+                        display: flex;
+                        align-items: flex-end;
+                        font-size: 4mm;
+                    }
+
+                        .Resume__section__item__summary__objectives {
+                            font-style: italic;
+                            font-weight: 400;
                         }
 
-                        
-
-                    .resume_section_item_stack {
+                    #skills .Resume__section__item {
                         grid-column: 1 / 2;
-                        grid-row: 2 / 3;
+                        grid-row: 3 / 4;
                         display: grid;
                         grid-template-columns: 100%;
                         grid-template-rows: repeat(3, 1fr);
-                        font-size: 3.3mm;
+                        row-gap: 1.5mm;
+                        font-size: 3.75mm;
                     }
 
-                        .resume_section_item_stack ul {
+                        .Resume__section__item__stack {
                             display: grid;
                             grid-template-columns: 25mm auto;
                             grid-template-rows: 100%;
-                            font-family: 'Space Mono', monospace;
                         }
                             
-                            .resume_section_item_stack_name {
+                            .Resume__section__item__stack__name {
                                 display: flex;
                                 justify-self: flex-start;
                             }
                             
-                            .resume_section_item_stack_container {
+                            .Resume__section__item__stack__container {
                                 grid-column: 2 / -1;
                                 display: flex;
-                                column-gap: 8mm;
+                                column-gap: 5mm;
                             }
-                                .resume_section_item_stack li {
+                                .Resume__section__item__stack li {
                                     list-style: none;
                                 }
 
-                    .resume_section_item_list {
+                    .Resume__section__item__list {
                         grid-column: 1 / -1;
                         grid-row: 2 / -1;
                     }
 
-                    #resume_section_projects .resume_section_item_list {
+                    #projects .Resume__section__item__list {
                         grid-column: 1 / -1;
-                        grid-row: 3 / -1;
+                        grid-row: 4 / -1;
                     }
 
-                    #resume_section_item_list_language-name {
-                        grid-column: 1 / -1;
-                        grid-row: 2 / -1;
-                    }
-
-                    #resume_section_item_list_language-level {
-                        grid-column: 2 / -1;
-                        grid-row: 2 / -1;
-                    }
-
-                        .resume_section_item_list li {
+                        .Resume__section__item__list li {
                             list-style-type: circle;
                             list-style-position: inside;
                             font-size: 3.75mm;
                             line-height: 5.75mm;
                         }
 
-                        #resume_section_item_list_language-level li {
-                            list-style-type: none;
-                        }
-
+/* Cover letter template */
     
-    .resume_letter_block {
+    .Resume__letter__block {
         display: flex;
         flex-direction: column;
         font-size: 0.75rem;
     }
 
-    .resume_letter_body,
-    .resume_letter_footer {
+    .Resume__letter__body,
+    .Resume__letter__footer {
         display: grid;
         row-gap: 1rem;
         padding-top: 1rem;
@@ -290,19 +285,19 @@ h4 {
         font-size: 0.85rem;
     }
 
-        .resume_letter_body a {
+        .Resume__letter__body a {
             color: var(--text-accent-primary);
         }
 
-        .resume_letter_body_date {
+        .Resume__letter__body__date {
             font-style: italic;
         }
 
-        .resume_letter_body_title {
+        .Resume__letter__body__title {
             font-weight: 600;
             padding-bottom: 1rem;
         }
 
-        .resume_letter_body_proj_name {
+        .Resume__letter__body__proj__name {
             font-style: italic;
         }

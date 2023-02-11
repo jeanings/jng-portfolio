@@ -1,520 +1,465 @@
-window.onload = function() {
-	/* ------------------------
-		Loader for main page.
-	------------------------ */
-	loading();
-	fillGrid()
-	renderNewestProjects();
-	timelineStartFromMostRecent();
+/* -------------------------------------------------------
+	Button consctructor for stack and project URL items.
+------------------------------------------------------- */
+class ProjectsButton {
+	constructor(buttonType, nameUrlPair) {
+		const [ name, url ] = Object.entries(nameUrlPair)[0];
+		this.name = name;
+		this.url = url;
+		this.buttonType = buttonType;
+		this.className = buttonType + "__button";
+	}
+
+	create() {
+		let innerHtml = "";
+
+		switch (this.buttonType) {
+			case 'stack':
+				innerHtml = this.name;
+				break;
+			case 'access':
+				const buttonText = this.name === 'English'
+					? "OPEN"
+					: "アクセス";
+
+				innerHtml = buttonText;
+				break;
+		}
+
+		// Set up child anchor element.
+		const itemAnchor = document.createElement("a");
+		itemAnchor.setAttribute("href", this.url);
+		itemAnchor.setAttribute("target", "_blank");
+		itemAnchor.setAttribute("class", this.className);
+		itemAnchor.innerHTML = innerHtml;
+
+		return itemAnchor;
+	}
+};
+
+
+/* ---------------------------------------------------
+	Updates UI elements with new project properties.
+--------------------------------------------------- */
+function renderUpdates(clickedProjectId) {
+	const year = document.getElementById("title-project-year");
+	const gitUrl = document.getElementById("title-project-git-url");
+	const gitIcon = document.getElementById("title-project-git-icon");
+	const title = document.getElementById("title-text");
+	const titleSeparatorBar = document.getElementById("title-separator");
+	const objectives = document.getElementById("content-objectives");
+	const description = document.getElementById("content-description");
+	const demoVideo = document.getElementById("demo-video");
+	const demoVideoSrc = document.getElementById("demo-video-src");
+	const displayedProjectId = demoVideoSrc.dataset.projectId;
+
+
+	/* -----------------------------------------------
+		Run button removing/creating promises.
+	----------------------------------------------- */
+	async function runDelayedPromises(promisesArray) {
+		for (let promise = 0; promise < promisesArray.length; promise++) {
+			await promisesArray[promise]();
+		}
+	};
+
+	/* -----------------------------------------------
+		Removes all child buttons.
+	----------------------------------------------- */
+	function removeAllButtons(container) {
+		while (container.firstChild) {
+			container.removeChild(container.firstChild);
+		}
+	};
+
+	// Get clicked project through projectId.
+	let clickedProject;
+	let displayedProject;
+	try {
+		if (projects) {
+			clickedProject = projects.filter(project => project._id === clickedProjectId)[0];
+			displayedProject = projects.filter(project => project._id === displayedProjectId)[0];
+		}
+	} catch (error) {
+		console.error(error);
+		// global variable 'projects' wasn't set correctly through jinja template,
+		// or is undefined due to back-end issues.
+	}
+
+	// Update text elements with new entries from clicked project.
+	const rgbAccent = `rgb(${clickedProject.rgb}, 1.0)`;
+	year.innerHTML = clickedProject.year;
+	gitUrl.href = clickedProject.git;
+	gitIcon.style.fill = rgbAccent;
+	title.innerHTML = clickedProject.title;
+	objectives.innerHTML = clickedProject.objectives;
+	description.innerHTML = clickedProject.description;
+	titleSeparatorBar.style.borderColor = rgbAccent;
+	titleSeparatorBar.style.background = rgbAccent;
+
+	// Update selector overlays, thumbs.
+	const opacityForActiveThumb = 0.25;
+	const opacityForInactiveThumb = 1.0;
+	const selectorOverlays = document.getElementsByClassName("Projects__selector__button__image__overlay");
+	const clickedSelectorOverlay = Array.from(selectorOverlays).filter(overlay => 
+		overlay.dataset.projectId === clickedProjectId)[0];
+	const displayedSelectorOverlay = Array.from(selectorOverlays).filter(overlay => 
+		overlay.dataset.projectId === displayedProjectId)[0];
+	const clickedProjectThumb = document.getElementById(clickedProjectId);
+	const displayedProjectThumb = document.getElementById(displayedProjectId);
+	
+	if (displayedSelectorOverlay) {
+		displayedSelectorOverlay.style.background = "none";
+		displayedProjectThumb.style.opacity = opacityForInactiveThumb;
+	}
+
+	if (clickedSelectorOverlay) {
+		clickedSelectorOverlay.style.background = rgbAccent.replace(", 1.0)", ", 0.4)");
+		clickedProjectThumb.style.opacity = opacityForActiveThumb;
+	}
+
+	// Update video variables and reload container.
+	demoVideo.setAttribute('poster', clickedProject.thumb);
+	demoVideoSrc.setAttribute('src', clickedProject.demo);
+	demoVideoSrc.setAttribute('data-project-id', clickedProject._id);
+	demoVideo.load();
+	
+	// Update stack item buttons.
+	const displayedStack = {
+		"stats-stack-backend": displayedProject.stack.backend,
+		"stats-stack-frontend": displayedProject.stack.frontend,
+		"stats-stack-tools": displayedProject.stack.tools
+	};
+
+	const newStack = {
+		"stats-stack-backend": clickedProject.stack.backend,
+		"stats-stack-frontend": clickedProject.stack.frontend,
+		"stats-stack-tools": clickedProject.stack.tools
+	};
+
+	// Compare between displayed/clicked.
+	// Objects in 'displayed' are primed for removal.
+	// Objects in 'new' are primed for creation.
+	let addRemoveItems = {
+		'displayedStack': {
+			'backend': [],
+			'frontend': [],
+			'tools': []
+		},
+		'newStack': {
+			'backend': [],
+			'frontend': [],
+			'tools': []
+		}
+	};
+
+	for (let stack in addRemoveItems) {
+		let compareForRef = {};
+		let compareAgainstRef = {};
+
+		switch (stack) {
+			case 'displayedStack':
+				compareForRef = displayedStack;
+				compareAgainstRef = newStack;
+				break;
+			case 'newStack':
+				compareForRef = newStack;
+				compareAgainstRef = displayedStack;
+				break;
+		}
+
+		for (let stackCategory in addRemoveItems[stack]) {
+			// Compare for.
+			const stackA = Object.values(compareForRef["stats-stack-" + stackCategory]);
+			const flattenedStackA = Object.assign({}, ...stackA);
+			const stackAKeys = Object.keys(flattenedStackA);
+			// Compare against.
+			const stackB = Object.values(compareAgainstRef["stats-stack-" + stackCategory]);
+			const flattenedStackB = Object.assign({}, ...stackB);
+			const stackBKeys = Object.keys(flattenedStackB);
+
+			// Get items that aren't in second array.
+			let difference = stackAKeys.filter(key => !stackBKeys.includes(key));			
+			addRemoveItems[stack][stackCategory] = difference;
+		}
+	}
+	
+	const backendButtonsContainer = document.getElementById("stats-stack-backend");
+	const frontendButtonsContainer = document.getElementById("stats-stack-frontend");
+	const toolsButtonsContainer = document.getElementById("stats-stack-tools");
+	const buttonsContainers = {
+		'backend': backendButtonsContainer, 
+		'frontend': frontendButtonsContainer,
+		'tools': toolsButtonsContainer
+	};
+	
+	// Add or remove buttons according to addRemoveItems.
+	const delayedDeletionPromises = [];
+	const delayedInsertionPromises = [];
+	const delayMS = 175;
+
+	// Create button deletion promises.
+	for (let category in buttonsContainers) {
+		// Check for removal if buttons exist in stack category.
+		if (buttonsContainers[category].children) {
+			Array.from(buttonsContainers[category].children).forEach(button => {
+				const categoryItem = button.innerText;
+				// Remove buttons.
+				if (addRemoveItems.displayedStack[category].includes(categoryItem)) {
+					const delayedDeletion = function() {
+						return new Promise(resolve => {
+							setTimeout(() => {
+								buttonsContainers[category].removeChild(button);
+								resolve(true);
+							}, delayMS);
+						});
+					};
+
+					delayedDeletionPromises.push(delayedDeletion);
+				}
+			});
+		}
+	}
+
+	// Sequentially delete buttons, then sequentially add buttons.
+	runDelayedPromises(delayedDeletionPromises)
+		.then(() => {
+			// Create button insertion promises.
+			for (let category in buttonsContainers) {
+				// Create promises to add buttons.
+				const itemsToAdd = addRemoveItems.newStack[category];
+				const newCategoryItems = Object.values(newStack["stats-stack-" + category]);
+				if (newCategoryItems) {
+					for (let newCategoryItem of newCategoryItems) {
+						const newItemPairName = Object.keys(newCategoryItem)[0];
+						// Identify item to be added.
+						if (itemsToAdd.includes(newItemPairName)) {
+							// Insert new button in "correct (preferred)" order.
+							const delayedInsertion = function() {
+								return new Promise(resolve => {
+									setTimeout(() => {
+										const categoryItemButton = new ProjectsButton('stack', newCategoryItem);
+										const categoryItemButtonElement = categoryItemButton.create();
+					
+										// Get item order within updated category.
+										const itemOrder = newCategoryItems.indexOf(newCategoryItem);
+										const referenceNode = buttonsContainers[category].children[itemOrder];
+
+										buttonsContainers[category].insertBefore(categoryItemButtonElement, referenceNode);
+										resolve(true);
+									}, delayMS);
+								});
+							};
+		
+							delayedInsertionPromises.push(delayedInsertion);
+						}
+					}
+				}
+			}
+
+			// Add buttons.
+			runDelayedPromises(delayedInsertionPromises);
+		});
+	
+	// Update live project link buttons.
+	const accessLinksContainer = document.getElementById("access-links");
+	removeAllButtons(accessLinksContainer);
+
+	let newProjectAccessButtons = [];
+
+	Object.values(clickedProject.url).forEach(projectAccessItem => {
+		const projectAccessButton = new ProjectsButton('access', projectAccessItem);
+		newProjectAccessButtons.push(
+			projectAccessButton.create()
+		);
+	});  
+
+	for (let accessButton of newProjectAccessButtons) {
+		accessLinksContainer.appendChild(accessButton);
+	}
+};
+
+
+/* -------------------------------------------------------------
+	Handles project selector clicks.
+	Passes target project ID to resumeUpdates to be processed.
+------------------------------------------------------------- */
+function handleProjectSelectorClick(event) {
+	const clickedProjectId = event.target.dataset.projectId;
+	const demoVideoSrc = document.getElementById("demo-video-src");
+	const currentProjectId = demoVideoSrc.dataset.projectId;
+
+	if (clickedProjectId !== currentProjectId) {
+		renderUpdates(clickedProjectId);
+	}
+};
+
+
+/* ------------------------------------------------------
+	Add click listeners to project selector thumbnails.
+------------------------------------------------------ */
+const projectSelectorElements = document.getElementsByClassName("Projects__selector__button__image");
+for (let projectSelector of projectSelectorElements) {
+	projectSelector.addEventListener('click', handleProjectSelectorClick, false);
+};
+
+
+/* ------------------------------------------------------
+	Checks if project is currently visible in viewport.
+	Scrolls to element if not visible.
+------------------------------------------------------ */
+function checkProjectThumbVisibility(projectThumbElement) {
+	return new Promise(resolve => {
+		const projectsSelectorContainer = document.getElementsByClassName("Projects__selector__container")[0];
+
+		// Set up intersection observer.
+		const observerOptions = {
+			root: projectsSelectorContainer,
+			threshold: 0.90
+		};
+
+		const observerCallback = (observerEntries) => {
+			const [observerEntry] = observerEntries;
+			
+			resolve({ [projectThumbElement.id]: observerEntry.isIntersecting });
+
+			// CLean up observer.
+			projectThumbObserver.disconnect();
+		};
+
+		const projectThumbObserver = new IntersectionObserver(observerCallback, observerOptions);
+
+		// Observe target element.
+		projectThumbObserver.observe(projectThumbElement);
+	});
+};
+
+
+/* -------------------------------------------------------------
+	Handles project scroller clicks.
+	Uses initial thumbnail visibility state and updates it
+	on scroller clicks. 
+------------------------------------------------------------- */
+function handleProjectScrollerClick(event) {
+	if (thumbsIndexLeftId && thumbsIndexRightId && projects) {
+		// Determine what project to scroll to, how to update left/right indices.
+		const scrollDirection = event.target.id;
+		const leftMostThumb = projects.filter(project => project._id === thumbsIndexLeftId)[0];
+		const rightMostThumb = projects.filter(project => project._id === thumbsIndexRightId)[0];
+		const leftThumbIndex = projects.indexOf(leftMostThumb);
+		const rightThumbIndex = projects.indexOf(rightMostThumb);
+		let newLeftThumbIndex = 0;
+		let newRightThumbIndex = 0;
+		let pivot = 0;
+		let scrollIndex = 0;
+
+		switch(scrollDirection) {
+			case "scroller-right":
+				if (rightThumbIndex === projects.length - 1) {
+					return;
+				}
+				
+				pivot = 1;
+				break;
+
+			case "scroller-left":
+				if (leftThumbIndex === 0) {
+					return;
+				}
+
+				pivot = -1;
+				break;
+		};
+
+		// Update indices based on pivot.
+		newLeftThumbIndex = leftThumbIndex + pivot;
+		newRightThumbIndex = rightThumbIndex + pivot;
+
+		// Update un/available arrow styling.
+		const leftScroller = document.getElementById("scroller-left");
+		const rightscroller = document.getElementById("scroller-right");
+		newLeftThumbIndex === 0
+			? leftScroller.classList.add("unavailable")
+			: leftScroller.classList.remove("unavailable");
+
+		newRightThumbIndex === projects.length - 1
+			? rightscroller.classList.add("unavailable")
+			: rightscroller.classList.remove("unavailable");
+		
+		// Scroll in direction of clicked arrow.
+		scrollIndex = pivot > 0
+			? newRightThumbIndex
+			: newLeftThumbIndex;
+
+		const thumbIdToShow = projects[scrollIndex]._id;
+		const thumbToShow = document.getElementById(thumbIdToShow);
+		thumbToShow.scrollIntoView({ behavior: 'smooth' });
+
+		// Update global visible thumbs edge indices.
+		thumbsIndexLeftId = projects[newLeftThumbIndex]._id;
+		thumbsIndexRightId = projects[newRightThumbIndex]._id;
+	}
+};
+
+
+/* ------------------------------------------------------
+	Add click listeners to project selector nav arrows.
+------------------------------------------------------ */
+const projectSelectorScrollerElements = document.getElementsByClassName("Projects__selector__scroller");
+for (let scrollerElement of projectSelectorScrollerElements) {
+	scrollerElement.addEventListener('click', handleProjectScrollerClick, false);
 };
 
 
 
-function renderNewestProjects() {
-	/* --------------------------------------------------------------------
-		Simulate click on newest projects to render them on initial load.
-	-------------------------------------------------------------------- */
-	const newestMain = mainProjects[mainProjects.length - 1];
-	const newestSub = subProjects[subProjects.length - 1];
-	const latestYear = Object.keys(mainProjects[mainProjects.length - 1].year).pop();
-	const elemStr = "projects_timeline_grid_year_";
+// On initialization, check projects thumbnail visibility.
+const thumbs = document.getElementsByClassName("Projects__selector__button__image");
+let thumbsIndexLeftId;
+let thumbsIndexRightId;
+let thumbsVisibility = {};
+let thumbVisibilityPromises = [];
 
-	// Get newest projects' elements.
-	const newestMainElemStr = elemStr.concat(latestYear, '_', 'main_', newestMain._id);
-	const newestSubElemStr = elemStr.concat(latestYear, '_', 'sub_', newestSub._id);
-	const newestMainElem = document.getElementsByClassName(newestMainElemStr)[0];
-	const newestSubElem = document.getElementsByClassName(newestSubElemStr)[0];
-
-	// Click on elements to render.
-	newestMainElem.click();
-	newestSubElem.click();
-}
-
-
-
-function timelineStartFromMostRecent() {
-	/* -----------------------------------------
-		Scroll to "end" of timeline at start.
-	----------------------------------------- */
-	let timelineContainer = document.getElementsByClassName("projects_timeline")[0];
-	let scrollToEnd;
-
-	scrollToEnd = setInterval(() => {
-		let scrollWidth = timelineContainer.scrollWidth;
-		timelineContainer.scrollLeft = scrollWidth;
-
-		if (timelineContainer.scrollLeft !== scrollWidth) {
-			clearInterval(scrollToEnd);
-			scrollToEnd = null;
-		}
-	}, 500);
-}
-
-
-
-function fillGrid() {
-	/* -----------------------------------------------------
-		Fill in timeline grid with corresponding projects.
-	------------------------------------------------------*/
-	const newStyleSheet = document.createElement("style");
-	newStyleSheet.appendChild(document.createTextNode(''));
-	document.head.appendChild(newStyleSheet);
-	const newStyleSheetPos = Object.keys(document.styleSheets).length - 1;
-	const styleSheet = document.styleSheets[newStyleSheetPos];
-	const yearElementIdString = "projects_timeline_grid_year_";
-	const quarterElemMap = {
-		"Q1": ".projects_timeline_grid_year_axes_jan_apr",
-		"Q2": ".projects_timeline_grid_year_axes_apr_jul",
-		"Q3": ".projects_timeline_grid_year_axes_jul_oct",
-		"Q4": ".projects_timeline_grid_year_axes_oct_dec"
-	};
-	const rowMap = {
-		"1": ".row2",
-		"2": ".row3",
-		"3": ".row4",
-		"4": ".row2",
-		"5": ".row3",
-		"6": ".row4",
-		"7": ".row2",
-		"8": ".row3",
-		"9": ".row4",
-		"10": ".row2",
-		"11": ".row3"
-	};
-	const monthElemMap = {
-		"1": ".col1",
-		"2": ".col2",
-		"3": ".col3"
-	};
-	const borderStyles = {
-		"1": "dotted",
-		"2": "dashed",
-		"3": "double",
-		"4": "groove",
-		"5": "ridge",
-		"6": "dotted",
-		"7": "dashed",
-		"8": "double",
-		"9": "groove",
-		"10": "ridge",
-		"11": "dotted"
-	};
-	let projectColors = {};
-	let projectBorderStyles = {};
-	let mainProjectBorderWidth = 'var(--main-proj-border-width)';
-	let mainProjectBorderWidthHover = 'var(--main-proj-border-width-hover)';
-
-
-	mainProjects.forEach((project, index) => {
-		let color = mainColours[index];
-		
-		projectColors = {
-			...projectColors, 
-			[project.title]: color
-		};
-
-		Object.keys(project.year).forEach(yearItem => {
-			let yearElem = document.getElementById(yearElementIdString.concat(yearItem));
-			let borderStyle = 'solid'.concat(' ', mainProjectBorderWidth);
-			let border = color.concat(' ', borderStyle);
-
-			// Save border style per project.
-			projectBorderStyles = {
-				...projectBorderStyles,
-				[project.title]: border
-			};
-			
-			// Create project-specific style class.
-			let newClass = ".projects_timeline_grid_year_".concat(
-				yearItem, '_', 
-				'main_', project._id, '.hover'
-			);
-			let newStyle = '{'
-				+ 'border-bottom-width: 1rem !important;'
-				+ 'border-bottom-width: ' + mainProjectBorderWidthHover + ' !important;'
-				+ 'cursor: pointer;'
-				+ 'transition: all 300ms ease-in-out;'
-				+ '}';
-			let classSelector = newClass.replace('.', '').replace('.hover', '');
-			styleSheet.insertRule(newClass + newStyle);
-
-
-			Object.keys(project.year[yearItem]).forEach(quarterItem => {
-				let quarterElem = yearElem.querySelector(quarterElemMap[quarterItem]);
-
-				project.year[yearItem][quarterItem].forEach(monthItem => {
-					// Draw border "slot" for main project.
-					let monthElem = quarterElem.querySelector(monthElemMap[monthItem])
-
-					monthElem.style.borderBottom = projectBorderStyles[project.title];
-					monthElem.style.transition = 'all 300ms ease-in-out';
-
-					// Add project-specific class.
-					monthElem.classList.add(classSelector);
-
-					// Set attributes.
-					monthElem.setAttribute("data-id", project._id);
-					monthElem.setAttribute("data-category", "main");
-				});
-			});
-
-
-			// Add class to project elements.
-			let mainContentFrame = document.getElementsByClassName("projects_content_main_frame")[0];
-			let mainContentContainer = document.getElementsByClassName("projects_content_main")[0];
-			let projectElements = document.getElementsByClassName(classSelector);
-
-			Object.values(projectElements).forEach(element => {
-				// Add event listeners for all elements of project.
-				element.addEventListener('mouseover', () => {
-					Object.values(projectElements).forEach(elem => {
-						elem.classList.add("hover");
-						mainContentFrame.style.outline = border;
-						mainContentContainer.style.opacity = 0.10;
-					});	
-				});
-
-				// Remove event listeners for all elements of project.
-				element.addEventListener('mouseout', () => {
-					Object.values(projectElements).forEach(elem => {
-						elem.classList.remove("hover");
-						mainContentFrame.style.outlineColor = 'transparent';
-						mainContentFrame.style.outlineWidth = '0rem';
-						mainContentContainer.style.opacity = 1;
-					});	
-				});
-
-				element.addEventListener('click', handleProjectClick);
-			});
-		});
-	});
-
-
-	let mainProjectMarker;
-	let subProjectBorderWidth = 'var(--sub-proj-border-width)';
-	let subProjectBorderWidthHover = 'var(--sub-proj-border-width-hover)';
-	let rowCounter = 1;
-
-	subProjects.forEach(project => {
-		// Track which main project the current iteration is a component of.
-		if (mainProjectMarker === undefined) {
-			// Assign initial marker.
-			mainProjectMarker = project['componentOf'];
-		} else if (mainProjectMarker === project['componentOf']) {
-			// Increment row counter if under same main project.
-			rowCounter += 1;
-		} else if (mainProjectMarker !== project['componentOf']) {
-			// Update project marker.
-			mainProjectMarker = project['componentOf'];
-
-			// Reset row counter if different main project.
-			rowCounter = 1;
-		}
-		
-		// Assign subproject color (faded project color)./
-		let color = projectColors[project.componentOf].slice(0, -4) + '0.55)';
-
-
-		Object.keys(project.year).forEach(yearItem => {
-			let yearElem = document.getElementById(yearElementIdString.concat(yearItem));
-			let borderStyle = borderStyles[rowCounter].concat(' ', subProjectBorderWidth);
-			let border = color.concat(' ', borderStyle);
-
-			// Save border style per project.
-			projectBorderStyles = {
-				...projectBorderStyles,
-				[project.title]: border
-			};
-
-			// Create project-specific style class.
-			let newClass = ".projects_timeline_grid_year_".concat(
-				yearItem, '_', 
-				'sub_', project._id, '.hover'
-			);
-
-			let newStyle = '{'
-				+ 'border-bottom-width: ' + subProjectBorderWidthHover + ' !important;'
-				+ 'cursor: pointer;'
-				+ 'transition: all 300ms ease-in-out;'
-				+ '}';
-
-			let classSelector = newClass.replace('.', '').replace('.hover', '');
-			styleSheet.insertRule(newClass + newStyle);
-
-
-			Object.keys(project.year[yearItem]).forEach(quarterItem => {
-				let quarterElem = yearElem.querySelector(quarterElemMap[quarterItem]);
-
-				project.year[yearItem][quarterItem].forEach(monthItem => {					
-					// Draw border "slot" for sub project.
-					let monthElem = quarterElem.querySelector(
-						rowMap[rowCounter].concat(' ', monthElemMap[monthItem])
-					);
-
-					monthElem.style.borderBottom = projectBorderStyles[project.title];
-					monthElem.style.transition = 'all 300ms ease-in-out';
-
-					// Add project-specific class.
-					monthElem.classList.add(classSelector);
-
-					// Set attributes.
-					monthElem.setAttribute("data-id", project._id);
-					monthElem.setAttribute("data-category", "sub");
-				});
-			});
-
-			// Add class to project elements.
-			let subContentFrame = document.getElementsByClassName("projects_content_sub_frame")[0];
-			let subContentContainer = document.getElementsByClassName("projects_content_sub")[0];
-			let projectElements = document.getElementsByClassName(classSelector);
-
-			Object.values(projectElements).forEach(element => {
-				// Add event listeners for all elements of project.
-				element.addEventListener('mouseover', () => {
-					Object.values(projectElements).forEach(elem => {
-						elem.classList.add("hover");
-						subContentFrame.style.outline = projectBorderStyles[project.title];
-						subContentContainer.style.opacity = 0.10;
-					});	
-				});
-
-				// Remove event listeners for all elements of project.
-				element.addEventListener('mouseout', () => {
-					Object.values(projectElements).forEach(elem => {
-						elem.classList.remove("hover");
-						subContentFrame.style.outlineColor = 'transparent';
-						subContentFrame.style.outlineWidth = '0rem';
-						subContentContainer.style.opacity = 1;
-					});	
-				});
-
-				element.addEventListener('click', handleProjectClick);
-			});
-		});
-	});
-
-
-
-	function handleProjectClick(event) {
-		/* -------------------------------------------------------------------
-			Clicks on main project bars will render the project's info in the 
-			main project content component.
-	
-			Clicks on Components / Component of of projects will render for
-			its children / parent project.
-		------------------------------------------------------------------- */
-		const id = event.target.getAttribute("data-id");
-		const category = event.target.getAttribute("data-category");
-		var projectsObj = category == 'main' ? mainProjects : subProjects;
-		let mainContentContainer = document.getElementsByClassName("projects_content_main")[0];
-		let subContentContainer = document.getElementsByClassName("projects_content_sub")[0];
-
-		const elements = {
-			'main': {
-				'title': 'projects_content_main_header_title_text',
-				'git': 'projects_content_main_header_category_text_git',
-				'url': 'projects_content_main_info_item_url_text',
-				'component': 'projects_content_main_info_item_components_text',
-				'date': 'projects_content_main_info_item_date_text',
-				'stack': 'projects_content_main_info_item_stack_text',
-				'backend': 'projects_content_main_info_item_stack_text_backend',
-				'frontend': 'projects_content_main_info_item_stack_text_frontend',
-				'description': 'projects_content_main_description_text'
-			},
-			'sub': {
-				'title': 'projects_content_sub_header_title_text',
-				'git': 'projects_content_sub_header_category_text_git',
-				'url': 0,
-				'component': 'projects_content_sub_info_item_componentOf_text',
-				'date': 'projects_content_sub_info_item_date_text',
-				'stack': 'projects_content_sub_info_item_stack_text',
-				'backend': 'projects_content_sub_info_item_stack_text_backend',
-				'frontend': 'projects_content_sub_info_item_stack_text_frontend',
-				'description': 'projects_content_sub_description_text'
-			}
-		};
-		
-	
-		if (id) {
-			// Progress bar clicks.
-			projectsObj.forEach(project => {
-				if (project._id == id) 
-					updateContent(project, elements[category], category);
-			});
-			
-			// 'Brighten' darkened container on click.
-			if (category == 'main')
-				mainContentContainer.style.opacity = 1;
-			else if (category == 'sub') 
-				subContentContainer.style.opacity = 1;
-		} else {
-			// Content components & componentOf clicks.
-			const buttonType = event.target.getAttribute("data-clicksOf");
-			const componentTitle = event.target.innerHTML;
-			const componentCategory = buttonType == 'components' ? 'sub' : 'main';
-			projectsObj = buttonType == 'components' ? subProjects : mainProjects;
-		
-			projectsObj.forEach(project => {
-				if (project.title == componentTitle)
-					updateContent(project, elements[componentCategory], componentCategory);
-			});
-		}
-		
-			
-	
-		function updateContent(project, elements, category) {
-			/* -----------------------------------------------------------
-				Updates current content to clicked .
-			---------------------------------------------------------- */
-			// Assign all corresponding elements.
-			let titleElem = document.getElementById(elements.title);
-			let gitElem = document.getElementById(elements.git);
-			let urlElem = elements.url !== 0 ? document.getElementById(elements.url) : 0;
-			let componentElem = document.getElementById(elements.component);
-			let dateElem = document.getElementById(elements.date);
-			let backendElem = document.getElementsByClassName(elements.backend)[0];
-			let frontendElem = document.getElementsByClassName(elements.frontend)[0];
-			let textElem = document.getElementById(elements.description);
-			let backendLength = Object.keys(project.stack.backend).length;
-			let frontendLength = Object.keys(project.stack.frontend).length;
-			let componentKey = category == 'main' ? 'components' : 'componentOf';
-			let color = category == 'main'
-							? projectColors[project.title]
-							: projectColors[project.componentOf];
-
-	
-			// Update content. 
-			titleElem.innerHTML = project.title;
-			titleElem.style.borderBottom = projectBorderStyles[project.title];
-
-			if (project.git !== '') {
-				gitElem.children[0].href = project.git;
-				gitElem.children[0].style.cursor = 'pointer';
-				gitElem.children[0].style.pointerEvents = 'auto';
-				gitElem.children[0].children[0].style.fill = color;
-				gitElem.children[0].children[0].style.cursor = 'pointer';
-				gitElem.children[0].children[0].style.pointerEvents = 'auto';
-			} else {
-				gitElem.children[0].style.cursor = 'default';
-				gitElem.children[0].style.pointerEvents = 'none';
-				gitElem.children[0].children[0].style.fill = 'var(--color-bg)';
-				gitElem.children[0].children[0].style.cursor = 'default';
-				gitElem.children[0].children[0].style.pointerEvents = 'none';
-			}
-
-			if (project.url) {
-				let newChildren = [];
-				Object.values(project.url).forEach(lang => {
-					if (Object.keys(lang).length !== 0 ) {
-						let itemText = lang.emoji.concat('  ', lang.address);
-						let url = lang.address;
-						let newElem = document.createElement('a');
-						let newElemText = document.createTextNode(itemText);
-
-						newElem.setAttribute('href', url);
-						newElem.setAttribute('target', '_blank');
-						newElem.appendChild(newElemText);
-						newChildren.push(newElem);
-					}
-				});
-
-				// Replace set of children.
-				urlElem.replaceChildren(...newChildren);
-			}
-			
-
-			dateElem.innerHTML = Object.keys(project.year)[0].concat(' ', project.season);
-			textElem.innerHTML = project.objectives;
-			updateChildren(componentElem, componentKey, category);
-			updateChildren(backendElem, 'backend', category);
-			updateChildren(frontendElem, 'frontend', category);
-			document.getElementById(gitElem.id).scrollIntoView();
-	
-			function updateChildren(sectionElem, sectionKey, category) {
-				/* --------------------------------------
-					Create elements for content update.
-				-------------------------------------- */
-				let newChildren = [];
-	
-				if (sectionKey == 'backend' || sectionKey == 'frontend') {
-					// For stack sections.
-					Object.entries(project.stack[sectionKey]).forEach(stackItem => {
-						let itemName = stackItem[0];
-						let url = stackItem[1];
-						let newElem = document.createElement('a');
-						let newElemText = document.createTextNode(itemName);
-
-						newElem.setAttribute('href', url);
-						newElem.setAttribute('target', '_blank');
-						newElem.appendChild(newElemText);
-						newChildren.push(newElem);
-					});
-				} else {
-					// For components/component of section.
-					if (sectionKey === 'components') {
-						Object.entries(project[sectionKey]).forEach(componentItem => {
-							let itemName = componentItem[1];
-							let newElem = document.createElement('button');
-		
-							newElem.addEventListener('click', handleProjectClick);
-							newElem.setAttribute("data-clicksOf", sectionKey);
-							newElem.innerHTML = itemName;
-							newChildren.push(newElem);
-						});
-					} else if (sectionKey === 'componentOf') {
-						let itemName = project[sectionKey];
-						let newElem = document.createElement('button');
-	
-						newElem.addEventListener('click', handleProjectClick);
-						newElem.setAttribute("data-clicksOf", sectionKey);
-						newElem.innerHTML = itemName;
-						newChildren.push(newElem);
-					}
-				}
-
-				// Grid restyling.
-				let stackElemStr = category == 'main'
-					? sectionElem.className.slice(0, 43)  // 'projects_content_main_info_item_stack_text_'
-					: sectionElem.className.slice(0, 42); // 'projects_content_sub_info_item_stack_text_'
-				let remainElemStr = sectionKey == 'backend'
-					? stackElemStr.concat('frontend')
-					: stackElemStr.concat('backend');
-				let remainElem = document.getElementsByClassName(remainElemStr)[0];
-
-
-				if ((sectionKey == 'backend' && backendLength == 0)
-					|| (sectionKey == 'frontend' && frontendLength == 0)) {
-					// Restyle remaining grid item to take on entire grid if empty stack.
-					remainElem.style.gridRow = '1 / -1';
-					sectionElem.style.gridRow = '-1 / -1';
-				} else {
-					// Reset to default grid styling.
-					if (sectionKey == 'backend') 
-						remainElem.style.gridRow = '2 / -1';
-					else if (sectionKey == 'frontend')
-						remainElem.style.gridRow = '1 / 2';
-				}
-				
-				// Replace set of children.
-				sectionElem.replaceChildren(...newChildren);
-			}
-		}
+// Assign array of promises to check visibility of each thumbnail.
+if (thumbs.length > 0) {
+	for (let thumb of thumbs) {
+		thumbVisibilityPromises.push(checkProjectThumbVisibility(thumb));
 	}
 }
 
+Promise.all(thumbVisibilityPromises)
+	.then(results => {
+		thumbsVisibility = results;
+
+		// Use initial promise results to assign left/right edge indices of visible project thumbs.
+		let trueCounts = 0;
+		let falseCounts = 0;
+
+		for (let thumb = 0; thumb < thumbsVisibility.length; thumb++) {
+			// Keep track of delineation between true/false to determine the edges.
+			Object.values(thumbsVisibility[thumb])[0] === true
+				? trueCounts++
+				: falseCounts++; 
+
+			// Left edge.
+			if (trueCounts === 1) {
+				thumbsIndexLeftId = Object.keys(thumbsVisibility[thumb])[0];
+			}
+
+			// Right edge.
+			// Case [ F T T T F ]	iteration ending on a false.
+			if (trueCounts !== 0
+				&& falseCounts > 0
+				&& thumb !== thumbsVisibility.length - 1) {
+					thumbsIndexRightId = Object.keys(thumbsVisibility[thumb - 1])[0];
+					break;
+			}
+			// Case [ F F T T T ]	iteration ending on a true.
+			else if (falseCounts > 0 
+				&& trueCounts > 0 
+				&& thumb === thumbsVisibility.length - 1) {
+					thumbsIndexRightId = Object.keys(thumbsVisibility[thumb])[0];
+			}
+		}
+	});
 
 
-function loading() {
-	/* ---------------------------------------
-		Simple delay to show loading screen.
-	--------------------------------------- */
-	const loader = document.getElementsByClassName("loading")[0];
-	const container = document.getElementsByClassName("container")[0];
-
-	setInterval(() => {
-		loader.classList.add("fade");
-		loader.classList.add("hide");
-		container.classList.add("fade");
-		container.classList.add("show");
-	}, 2000);
-}
