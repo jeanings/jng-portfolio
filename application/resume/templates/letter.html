@@ -70,6 +70,7 @@
     </div> -->
 
     <div class="Resume__letter__body">
+
         <p class="Resume__letter__body__date">{{ body.date|safe }}</p>
         <p class="Resume__letter__body__title">{{ body.title }}</p>
         <p class="Resume__letter__body__greet">{{ body.greet }}</p>
@@ -77,15 +78,19 @@
         <p class="Resume__letter__body__exp">{{ body.exp|safe }}</p>
         <p class="Resume__letter__body__why">{{ body.why|safe }}</p>
         <p class="Resume__letter__body__closing">{{ body.closing|safe }}</p>
+
+        <div class="Resume__letter__footer">
+            <span id="sign-off">
+                Sincerely,
+            </span>
+            <span id="sign-off-name">
+                Jeanings Ng
+            </span>
+        </div>
+
     </div>
 
-    <div class="Resume__letter__footer">
-        <p>
-            Sincerely,
-            <br>
-            Jeanings Ng
-        </p>
-    </div>
+    
   
 
 </section>
