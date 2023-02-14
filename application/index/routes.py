@@ -32,17 +32,22 @@ MDB_PASS = quote_plus(MONGODB_KEY)
 # Connection to mongo server.
 client = MongoClient(f'mongodb+srv://{MONGODB_ID}:{MDB_PASS}@portfolio.8frim.mongodb.net/')
 db = client.projectsIndex
-collection = db['main']
+index_text = db['index']
+projects = db['main']
 
 
 # Index route.
 @index_bp.route('/', methods=['GET'])
 def index():
+    # Get intro blurb.
+    index_doc = list(index_text.find({}))
+
     # Get latest project.
-    docs = list(collection.find({}))
-    projects = sorted(docs, key=lambda doc: doc['project_id'], reverse=True)
+    project_docs = list(projects.find({}))
+    project_docs_sorted = sorted(project_docs, key=lambda doc: doc['project_id'], reverse=True)
 
     return render_template('index.html', 
         title="Some personal site on the web  ——  jeanings.space",
-        latest_project=projects[0]
+        index=index_doc[0],
+        latest_project=project_docs_sorted[0]
     )
