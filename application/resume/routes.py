@@ -74,6 +74,12 @@ def resume():
 @resume_bp.route('/resume/cover-letter-template/', methods=['GET'])
 def coverletter():
     cv_letter = {}
+    contact = {}
+
+    for section in collection.find():
+        for key in section.keys():
+            if key == 'contact': 
+                contact = section[key]
 
     with open(CV_LETTER_JSON, encoding='utf-8') as json_file:
         data = json.load(json_file)
@@ -83,5 +89,6 @@ def coverletter():
     return render_template('letter.html', 
         title="Cover letter template ——  jeanings.space",
         block=cv_letter["block"],
-        body=cv_letter["body"]
+        body=cv_letter["body"],
+        contact=contact
     )

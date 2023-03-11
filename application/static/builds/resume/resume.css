@@ -278,9 +278,10 @@ h4 {
 
     .Resume__letter__body,
     .Resume__letter__footer {
-        display: grid;
-        row-gap: 1rem;
-        padding-top: 1rem;
+        display: flex;
+        flex-direction: column;
+        row-gap: 5mm;
+        padding-top: 10mm;
         line-height: 1.75;
         font-size: 0.85rem;
     }
