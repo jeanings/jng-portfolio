@@ -86,6 +86,9 @@ const preloadedState: RootState = {
     toolbar: {
         filter: 'off',
         imageEnlarger: 'off'
+    },
+    login: {
+        tokenResponse: null    
     }
 };
 
@@ -126,6 +129,9 @@ const preloadedStateWithFilter: RootState = {
     toolbar: {
         filter: 'off',
         imageEnlarger: 'off'
+    },
+    login: {
+        tokenResponse: null    
     }
 }
 

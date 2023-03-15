@@ -27,6 +27,7 @@ import {
 // @ts-ignore
 import mapboxgl from 'mapbox-gl'; 
 import 'mapbox-gl/dist/mapbox-gl.css';
+import { login } from '../Login/loginSlice';
 
 const MapboxglSpiderfier: any = require('mapboxgl-spiderifier');
 
@@ -97,6 +98,9 @@ const preloadedState: RootState = {
     toolbar: {
         filter: 'off',
         imageEnlarger: 'off'
+    },
+    login: {
+        tokenResponse: null    
     }
 };
 
