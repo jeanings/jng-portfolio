@@ -55,6 +55,7 @@ export const fetchAccessToken = (loginUrl: string, request: oauthCodeResponseTyp
         axios.get(
             loginUrl, { 
                 params: authCode,
+                withCredentials: true
             }
         )
     );

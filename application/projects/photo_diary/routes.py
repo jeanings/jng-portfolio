@@ -2,7 +2,7 @@
 # Route for photo diary page.
 #----------------------------------------------
 
-from flask import Blueprint, render_template
+from flask import Blueprint
 from flask import current_app as app
 from flask import jsonify, request, send_from_directory, session
 from bson.json_util import ObjectId
@@ -84,12 +84,21 @@ def photo_diary_data():
     '''
     MongoDB aggregation pipelines for filter functionality.
     '''
+
+    # Get session cookies from request.
+    state = request.cookies.get('state')
+    user = request.cookies.get('user')
+
     # Create a state token to prevent request forgery.
     # Store it in the session for later validation.
-    # if 'state' not in session:
-    #     state = hashlib.sha256(os.urandom(1024)).hexdigest()
-    #     session['state'] = state
-    
+    if not state:
+        state = hashlib.sha256(os.urandom(1024)).hexdigest()
+        user = 'default'
+
+    session['state'] = state
+    session['user'] = user
+
+    # Handle request query.
     try:
         year = request.args.get('year')
         month = request.args.get('month')
@@ -191,7 +200,29 @@ def photo_diary_data():
         'bounds': bounding_box,
     }
         
+    # Convert results to JSON, add cookies to track session.
     response = jsonify(results)
+    
+    # Session state cookie, not read into front end.
+    max_age_sec = 60 * 15
+    response.set_cookie(
+        'state', 
+        session['state'],
+        secure=True,
+        httponly=True,
+        samesite='Lax',
+        max_age=max_age_sec)
+    
+    # Session user cookie.
+    response.set_cookie(
+        'user', 
+        session['user'],
+        secure=True,
+        httponly=False,
+        samesite='Lax',
+        max_age=max_age_sec)
+    
+    print(response, session)
 
     return response
 
@@ -218,7 +249,10 @@ def photo_diary_login():
     '''
 
     auth_code = request.args.get('auth-code')
-    # state = session['state']
+
+    # Get session cookies from request.
+    session['state'] = request.cookies.get('state')
+    session['user'] = request.cookies.get('user')
 
     # Create authorization flow instance.
     flow = Flow.from_client_secrets_file(
@@ -228,7 +262,7 @@ def photo_diary_login():
             'https://www.googleapis.com/auth/userinfo.profile',
             'openid'    
         ],
-        # state=state,
+        state=session['state'],
         redirect_uri=GAE_OAUTH_REDIRECT_URI
     )
 

@@ -2,7 +2,7 @@
 # Flask app initialization.
 #--------------------------
 
-from flask import Flask, make_response, render_template
+from flask import Flask, render_template
 from flask_cors import CORS, cross_origin
 from config import Config
 # from flask_sqlalchemy import SQLAlchemy
@@ -20,7 +20,16 @@ def create_app():
     app = Flask(__name__)
     app.config.from_object(Config)
     # db.init_app(app)
-    CORS(app)
+    DEBUG_MODE = app.config['FLASK_DEBUG']
+    
+    # CORS settings.
+    origins = []
+    if DEBUG_MODE == False:
+      origins.append(app.config['CORS_ORIGIN_PRODUCTION'])
+    else:
+      origins.extend([app.config['CORS_ORIGIN_DEV1'], app.config['CORS_ORIGIN_DEV2']])
+
+    CORS(app, origins=origins, supports_credentials=True)
 
 
     # Import blueprints, routes for application.

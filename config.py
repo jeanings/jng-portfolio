@@ -23,6 +23,11 @@ class Config:
     elif flask_debug_env.lower() in ('f', 'false', False, '0', 0, 'off'):
         FLASK_DEBUG = False
 
+    # CORS origins
+    CORS_ORIGIN_DEV1 =  environ.get('CORS_ORIGIN_DEV1')
+    CORS_ORIGIN_DEV2 = environ.get('CORS_ORIGIN_DEV2')
+    CORS_ORIGIN_PRODUCTION = environ.get('CORS_ORIGIN_PRODUCTION')
+
 
     # Database
     MONGODB_ID = environ.get('MONGODB_ID')
