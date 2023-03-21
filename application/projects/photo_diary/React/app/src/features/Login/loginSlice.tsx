@@ -13,13 +13,14 @@ import { loginUrl } from '../../app/App';
     Receives authentication code from user and posts it to backend,
     exchanging it for access token.
 ============================================================================== */
+// axios.defaults.withCredentials = true;
 
 /* ---------------------------------------------------------
     Async thunk for exchanging OAuth code for access token.
 --------------------------------------------------------- */
 export const exchangeOAuthCodeToken = createAsyncThunk(
     'login/exchangeOAuthCodeToken',
-    async (request: oauthCodeResponseType, { rejectWithValue }) => {
+    async (request: oAuthCodeResponseType, { rejectWithValue }) => {
         // Async fetch 
         try {
             const response: AxiosResponse = await fetchAccessToken(loginUrl, request);
@@ -43,33 +44,32 @@ export const exchangeOAuthCodeToken = createAsyncThunk(
 );
 
 
-/* --------------------------------
+/* ----------------------------------
     Access token fetcher for thunk.
--------------------------------- */
-export const fetchAccessToken = (loginUrl: string, request: oauthCodeResponseType) => {
+---------------------------------- */
+export const fetchAccessToken = (loginUrl: string, request: oAuthCodeResponseType) => {
     const authCode = {
         'auth-code': request.code
     }
 
-    const oauthTokenPromise = Promise.resolve(
-        axios.get(
-            loginUrl, { 
-                params: authCode,
-                withCredentials: true
-            }
-        )
+    const oAuthTokenPromise = Promise.resolve(
+        axios.get(loginUrl, { 
+            params: authCode,
+            withCredentials: true
+        })
     );
 
-    return oauthTokenPromise;
-}
+    return oAuthTokenPromise;
+};
 
 
-/* ------------------------------------------
-    Handles updates to timeline selection.
------------------------------------------- */
+/* -------------------------------
+    Handles authenticating user.
+------------------------------- */
 // State for initial render.
 const initialState: LoginProps = {
-    tokenResponse: null
+    tokenResponse: 'idle',
+    user: 'default'
 };
 
 const loginSlice = createSlice({
@@ -86,27 +86,57 @@ const loginSlice = createSlice({
             ------------------------------------- */
             .addCase(exchangeOAuthCodeToken.fulfilled, (state, action) => {
                 const data = action.payload;
-                state.tokenResponse = data;
+
+                if (data.user === 'unauthorized') {
+                    state.tokenResponse = 'error';
+                }
+                else {
+                    state.user = data.user;
+                    state.tokenResponse = 'successful';
+                }
             })
             /* --------------------------------------- 
                 Catches errors on fetching from API.
             --------------------------------------- */
             .addMatcher(isRejectedAction, (state, action) => {
-                state.responseStatus = 'error';
+                state.tokenResponse = 'error';
             })
-    },
+    }
 });
+
+
+
+/* =====================================================================
+    Helper functions.
+===================================================================== */
+export function getCookie(cookieKey: string) {
+    const cookies: string = document.cookie;
+
+    const cookieValue: string = cookies.split(' ')
+        .filter(cookie => cookie.includes(cookieKey))[0]
+        .split('=')[1]
+        .split(';')[0];
+    
+    return cookieValue;
+}
 
 
 /* =====================================================================
     Types.
 ===================================================================== */
 export interface LoginProps {
-    [index: string]: string | null,
-    'tokenResponse': any
+    [index: string]: string | UserProps,
+    'tokenResponse': 'successful' | 'error' | 'idle',
+    'user': 'default' | UserProps
 };
 
-export interface oauthCodeResponseType {
+interface UserProps {
+    'name': string,
+    'email': string,
+    'profilePic': string
+};
+
+export interface oAuthCodeResponseType {
     [index: string]: string,
     'authuser': string,
     'code': string,
@@ -120,7 +150,7 @@ interface RejectedAction extends Action {
   
 function isRejectedAction(action: AnyAction): action is RejectedAction {
     return action.type.endsWith('rejected');
-};
+}
 
 // Selector for selection state.
 export const login = (state: RootState) => state.login;

@@ -12,28 +12,38 @@ import { exchangeOAuthCodeToken } from './loginSlice';
 ==================================================================== */
 const Login: React.FunctionComponent = () => {
     const dispatch = useAppDispatch();
-
+    const user = useAppSelector(state => state.login.user);
     const classBase: string = "Login";
 
     const onLoginSuccess = (codeResponse: any) => {
-        console.log(codeResponse)
         dispatch(exchangeOAuthCodeToken(codeResponse))
     }
-
 
     const login = useGoogleLogin({
         onSuccess: codeResponse => { onLoginSuccess(codeResponse) },
         onError: errorResponse => console.log(errorResponse),
         flow: 'auth-code'
     });
+    
+    const logout = () => {
+        // TODO
+        console.log('log out func')
+    };
 
 
     return (
-        <button onClick={() => login()}>
-            Sign in
-        </button>
+        <div>
+            <button onClick={ user === 'default'
+                ? () => login()
+                : () => logout() }>
+
+                { user === 'default'
+                    ? "Log in"
+                    : "Log out " + user.name }
+            </button>
+        </div>
     );
-}
+};
 
 
 /* =====================================================================

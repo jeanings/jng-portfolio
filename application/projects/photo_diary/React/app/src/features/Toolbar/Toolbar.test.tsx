@@ -100,7 +100,8 @@ const preloadedState: RootState = {
         imageEnlarger: 'off'
     },
     login: {
-        tokenResponse: null    
+        tokenResponse: 'idle',
+        user: 'default'
     }
 };
 

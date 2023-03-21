@@ -4,7 +4,7 @@
 
 from flask import Blueprint
 from flask import current_app as app
-from flask import jsonify, request, send_from_directory, session
+from flask import jsonify, make_response, request, send_from_directory, session
 from bson.json_util import ObjectId
 from pathlib import Path
 from pymongo import MongoClient
@@ -19,9 +19,21 @@ from .tools.mongodb_helpers import (
     build_geojson_collection,
     get_bounding_box
 )
-import json, pymongo, hashlib, os
+from flask_jwt_extended import (
+    create_access_token,
+    get_jwt_identity,
+    get_jwt,
+    jwt_required,
+    set_access_cookies,
+    JWTManager
+)
+import json, pymongo, hashlib, hmac, os
 
 DEBUG_MODE = app.config['FLASK_DEBUG']
+# Set up Flask-JWT-extended instance.
+app.config['JWT_TOKEN_LOCATION'] = ['headers', 'cookies']
+jwt = JWTManager(app)
+
 
 
 """ -------------------------
@@ -211,7 +223,8 @@ def photo_diary_data():
         secure=True,
         httponly=True,
         samesite='Lax',
-        max_age=max_age_sec)
+        max_age=max_age_sec
+    )
     
     # Session user cookie.
     response.set_cookie(
@@ -220,9 +233,8 @@ def photo_diary_data():
         secure=True,
         httponly=False,
         samesite='Lax',
-        max_age=max_age_sec)
-    
-    print(response, session)
+        max_age=max_age_sec
+    )
 
     return response
 
@@ -250,9 +262,8 @@ def photo_diary_login():
 
     auth_code = request.args.get('auth-code')
 
-    # Get session cookies from request.
+    # Get session state cookie from request.
     session['state'] = request.cookies.get('state')
-    session['user'] = request.cookies.get('user')
 
     # Create authorization flow instance.
     flow = Flow.from_client_secrets_file(
@@ -266,38 +277,61 @@ def photo_diary_login():
         redirect_uri=GAE_OAUTH_REDIRECT_URI
     )
 
-    # access_type 'offline' allows for retrieval of refresh access token,
-    # state can mitigate CSRF attacks by validating response,
-    # authorization_url, state = flow.authorization_url(
-    #     access_type='offline',
-    #     state=state
-    # )
-
     # Fetch access token using authorization code obtained from front end.
     # Return value used in credentials, authorized_session().
     flow.fetch_token(code=auth_code)
 
-    # Get credentials.
-    # https://google-auth.readthedocs.io/en/stable/reference/google.oauth2.credentials.html#google.oauth2.credentials.Credentials
-    credentials = flow.credentials
-    session['credentials'] = {
-        'token': credentials.token,
-        'refresh_token': credentials.refresh_token,
-        'scopes': credentials.scopes
-    }
+    try: 
+        # Get credentials.
+        # https://google-auth.readthedocs.io/en/stable/reference/google.oauth2.credentials.html#google.oauth2.credentials.Credentials
+        credentials = flow.credentials
+        session['credentials'] = {
+            'token': credentials.token,
+            'refresh_token': credentials.refresh_token,
+            'scopes': credentials.scopes
+        }
+
+    except ValueError:
+        response = jsonify({'user': 'unauthorized'})
+        return response
 
     # Get authorized session.
     # https://google-auth.readthedocs.io/en/stable/reference/google.auth.transport.requests.html#google.auth.transport.requests.AuthorizedSession
     authed_session = flow.authorized_session()
     session['authorized'] = authed_session.get('https://www.googleapis.com/userinfo/v2/me').json()
+    session['user'] = {
+        'name': session['authorized']['name'],
+        'email': session['authorized']['email'],
+        'profilePic': session['authorized']['picture']
+    }
 
-    return jsonify({})
+    # Create base response with authorized profile.
+    response = jsonify({'user': session['user']})
+ 
+    # User profile cookie.
+    max_age_sec = 60 * 15
+    response.set_cookie(
+        'authorized', 
+        json.dumps(session['authorized']),
+        secure=True,
+        httponly=True,
+        samesite='Lax',
+        max_age=max_age_sec
+    )
 
+    # Create JWT token for validation.
+    jwt_additional_claims = {
+        'state': session['state'],
+        'credentials': session['credentials'],
+    }
 
-# @photo_diary_bp.route('/photo-diary/logout', methods=['GET'])
-# def photo_diary_logout():
-#     if 'credentials' in session:
-#         del session['credentials']
-#     response = {'credentials': 'cleared' }
-#     return jsonify(response)
+    jwt_access_token = create_access_token(
+        session['user'], 
+        additional_claims=jwt_additional_claims
+    )
 
+    # Set JWT-containing cookie, along with X-CSRF token.
+    # Routes requiring login (@jwt-required) will need 'X-CSRF-TOKEN' in headers.
+    set_access_cookies(response, jwt_access_token)
+
+    return response

@@ -12,6 +12,7 @@ import { apiUrl } from '../../app/App';
     Slice for handling current selection of timeline; year and month.
     Handles updates to << timeline >> state.
 ============================================================================== */
+// axios.defaults.withCredentials = true;
 
 /* -------------------------------------------------
     Async thunk for fetching initial MongoDB data.
@@ -75,12 +76,10 @@ export const fetchDocs = (apiUrl: string, request: ImageDocsRequestProps) => {
     }
 
     const mongoDbPromise = Promise.resolve(
-        axios.get(
-            apiUrl, { 
-                params: parsedRequest,
-                withCredentials: true 
-            }
-        )
+        axios.get(apiUrl, { 
+            params: parsedRequest,
+            withCredentials: true
+        })
     );
     
     return mongoDbPromise;
