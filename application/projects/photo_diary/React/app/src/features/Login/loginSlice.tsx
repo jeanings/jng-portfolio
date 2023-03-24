@@ -13,7 +13,6 @@ import { loginUrl } from '../../app/App';
     Receives authentication code from user and posts it to backend,
     exchanging it for access token.
 ============================================================================== */
-// axios.defaults.withCredentials = true;
 
 /* ---------------------------------------------------------
     Async thunk for exchanging OAuth code for access token.
@@ -50,7 +49,7 @@ export const exchangeOAuthCodeToken = createAsyncThunk(
 export const fetchAccessToken = (loginUrl: string, request: oAuthCodeResponseType) => {
     const authCode = {
         'auth-code': request.code
-    }
+    };
 
     const oAuthTokenPromise = Promise.resolve(
         axios.get(loginUrl, { 
@@ -69,7 +68,8 @@ export const fetchAccessToken = (loginUrl: string, request: oAuthCodeResponseTyp
 // State for initial render.
 const initialState: LoginProps = {
     tokenResponse: 'idle',
-    user: 'default'
+    user: 'default',
+    loggedIn: false
 };
 
 const loginSlice = createSlice({
@@ -89,10 +89,13 @@ const loginSlice = createSlice({
 
                 if (data.user === 'unauthorized') {
                     state.tokenResponse = 'error';
+                    state.user = 'default';
+                    state.loggedIn = false;
                 }
                 else {
-                    state.user = data.user;
                     state.tokenResponse = 'successful';
+                    state.user = data.user;
+                    state.loggedIn = true;
                 }
             })
             /* --------------------------------------- 
@@ -100,6 +103,10 @@ const loginSlice = createSlice({
             --------------------------------------- */
             .addMatcher(isRejectedAction, (state, action) => {
                 state.tokenResponse = 'error';
+                // let user = getCookie('user')
+                // if (user === 'unauthorized') 
+                state.user = 'default';
+                state.loggedIn = false;
             })
     }
 });
@@ -109,14 +116,24 @@ const loginSlice = createSlice({
 /* =====================================================================
     Helper functions.
 ===================================================================== */
+
+/* -----------------------------------------------
+    Helper for searching for cookie in document.
+----------------------------------------------- */
 export function getCookie(cookieKey: string) {
     const cookies: string = document.cookie;
+    let cookieValue: string = '';
 
-    const cookieValue: string = cookies.split(' ')
-        .filter(cookie => cookie.includes(cookieKey))[0]
-        .split('=')[1]
-        .split(';')[0];
+    const cookieEntry: Array<string> = cookies.split(' ')
+        .filter(cookie => cookie.includes(cookieKey));
     
+    if (cookieEntry[0]) {
+        cookieValue = cookieEntry[0].split('=')[1].split(';')[0];
+    }
+    else {
+        return 'key not found';
+    }
+        
     return cookieValue;
 }
 
@@ -125,12 +142,13 @@ export function getCookie(cookieKey: string) {
     Types.
 ===================================================================== */
 export interface LoginProps {
-    [index: string]: string | UserProps,
+    [index: string]: string | boolean | UserProps,
     'tokenResponse': 'successful' | 'error' | 'idle',
-    'user': 'default' | UserProps
+    'user': 'default' | UserProps,
+    'loggedIn': boolean
 };
 
-interface UserProps {
+export interface UserProps {
     'name': string,
     'email': string,
     'profilePic': string

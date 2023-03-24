@@ -13,6 +13,7 @@ import { exchangeOAuthCodeToken } from './loginSlice';
 const Login: React.FunctionComponent = () => {
     const dispatch = useAppDispatch();
     const user = useAppSelector(state => state.login.user);
+    const loggedIn = useAppSelector(state => state.login.loggedIn);
     const classBase: string = "Login";
 
     const onLoginSuccess = (codeResponse: any) => {
@@ -30,16 +31,16 @@ const Login: React.FunctionComponent = () => {
         console.log('log out func')
     };
 
-
     return (
         <div>
-            <button onClick={ user === 'default'
+            <button onClick={ !loggedIn
+                // Pass in login or logout function.
                 ? () => login()
                 : () => logout() }>
 
-                { user === 'default'
+                { !loggedIn
                     ? "Log in"
-                    : "Log out " + user.name }
+                    : "Log out" }
             </button>
         </div>
     );
