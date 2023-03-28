@@ -1,0 +1,68 @@
+.Login {
+    grid-column: 3 / 4;
+    grid-row: 1 / 2;
+    position: relative;
+    display: flex;
+    z-index: 2;
+}
+
+    .Login__button {
+        display: grid;
+        align-items: center;
+        justify-items: center;
+        height: 100%;
+        width: 2.25rem;
+        background: none;
+        border: none;
+        align-items: flex-end;
+        cursor: pointer;
+        pointer-events: all;
+    }
+
+        .Login__button__user {
+            fill: var(--colour-text-inactive);
+            width: 2.25rem;
+            transition: 300ms all;
+            pointer-events: none;
+        }
+
+            .Login__button__user.authorized {
+                border-radius: 1.5rem;
+            }
+
+        /* Status indicator points sideways of user icon */
+        .Login__button__indicator {
+            fill: var(--colour-text-inactive);
+            width: 1.5rem;
+            transition: 300ms all;
+            pointer-events: none;
+        }
+            /* Keeps indicator pointing at user to signal logged in status */
+            .Login__button__indicator.authorized {
+                fill: var(--colour-accent-primary);
+                transform: rotate(90deg);
+                transition: 300ms all;
+            }
+
+    .Login__button:hover
+    > .Login__button__user {
+        fill: var(--colour-accent-secondary);
+        transition: 300ms all;
+    }
+
+    /* Turns indicator towards user icon */
+    .Login__button:hover
+    > .Login__button__indicator {
+        transform: rotate(90deg);
+        transition: 300ms all;
+    }
+
+        /* Resets indicator position to signal log off action */
+        .Login__button.authorized:hover 
+        > .Login__button__indicator.authorized {
+            fill: var(--colour-text-inactive);
+            transform: rotate(0deg);
+            transition: 300ms all;
+        }
+
+    
