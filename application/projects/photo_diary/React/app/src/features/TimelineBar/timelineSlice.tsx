@@ -81,7 +81,9 @@ export const fetchDocs = (apiUrl: string, request: ImageDocsRequestProps) => {
     };
 
     const mongoDbPromise = Promise.resolve(
-        axios.get(apiUrl, {
+        axios({
+            method: 'get',
+            url: apiUrl,
             headers: headers,
             params: parsedRequest,
             withCredentials: true

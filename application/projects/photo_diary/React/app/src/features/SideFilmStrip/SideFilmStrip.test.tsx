@@ -125,7 +125,7 @@ const preloadedState: RootState = {
     login: {
         tokenResponse: 'idle',
         loggedIn: false,
-        user: 'default'
+        user: 'visitor'
     }
 };
 

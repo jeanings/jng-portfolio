@@ -33,6 +33,7 @@ from flask_jwt_extended import (
     jwt_required,
     set_access_cookies,
     set_refresh_cookies,
+    unset_jwt_cookies
 )
 import json, pymongo, hashlib, os
 
@@ -118,7 +119,7 @@ def photo_diary_data():
     if not state:
         state = hashlib.sha256(os.urandom(1024)).hexdigest()
     if not user:
-        user = 'default'
+        user = 'visitor'
 
     session['state'] = state
     session['user'] = user
@@ -357,13 +358,21 @@ def photo_diary_login():
     return response
 
 
+# Logout route to revoke access for access token.
+@photo_diary_bp.route('/photo-diary/logout', methods=['POST'])
+def photo_diary_logout():    
+    response = jsonify({'user': 'logout'})
+    unset_jwt_cookies(response)
+    return response
+
+
 # Checks for expiring token and refreshes them.
 @photo_diary_bp.after_request
 def auto_refresh_expiring_jwt(response):
     cookies = response.headers.getlist('Set-Cookie')
 
     # No logged user, return original response.
-    if ('user=default' or 'user=unauthorized') in cookies:
+    if ('user=visitor' or 'user=unauthorized') in cookies:
         return response
     
     # Logged user, check if access token requires refreshing.

@@ -5,7 +5,7 @@ import {
     AnyAction } from '@reduxjs/toolkit';
 import axios, { AxiosError, AxiosResponse } from 'axios';
 import { RootState } from '../../app/store';
-import { loginUrl } from '../../app/App';
+import { loginUrl, logoutUrl } from '../../app/App';
 
 
 /* ==============================================================================
@@ -52,7 +52,9 @@ export const fetchAccessToken = (loginUrl: string, request: oAuthCodeResponseTyp
     };
 
     const oAuthTokenPromise = Promise.resolve(
-        axios.get(loginUrl, { 
+        axios({
+            method: 'get',
+            url: loginUrl,
             params: authCode,
             withCredentials: true
         })
@@ -62,13 +64,58 @@ export const fetchAccessToken = (loginUrl: string, request: oAuthCodeResponseTyp
 };
 
 
+/* ---------------------------------------------------------
+    Async thunk for invalidationg JWT token - logging out.
+--------------------------------------------------------- */
+export const logoutUser = createAsyncThunk(
+    'login/logoutUser',
+    async (request: LogoutType, { rejectWithValue }) => {
+        // Async fetch 
+        try {
+            const response: AxiosResponse = await requestLogout(logoutUrl, request);
+            if (response.status === 200) {
+                // Returns promise status, handling done by extra reducer.
+                return (await response.data);
+            }
+        } 
+        catch (err) {
+            // Errors handled by extra reducer.
+            if (axios.isAxiosError(err)) {
+                const error = err as AxiosError;
+                return rejectWithValue(error.response!.data);
+            }
+            else {
+                const error = err;
+                return rejectWithValue(error);
+            }
+        }
+    }
+);
+
+
+/* ----------------------------------
+    Log out post method.
+---------------------------------- */
+export const requestLogout = (logoutUrl: string, request: LogoutType) => {
+    const logoutThisUser = Promise.resolve(
+        axios({
+            method: 'post',
+            url: logoutUrl,
+            data: request,
+            withCredentials: true
+        })
+    );
+    return logoutThisUser;
+};
+
+
 /* -------------------------------
     Handles authenticating user.
 ------------------------------- */
 // State for initial render.
 const initialState: LoginProps = {
     tokenResponse: 'idle',
-    user: 'default',
+    user: 'visitor',
     loggedIn: false
 };
 
@@ -89,13 +136,22 @@ const loginSlice = createSlice({
 
                 if (data.user === 'unauthorized') {
                     state.tokenResponse = 'error';
-                    state.user = 'default';
+                    state.user = 'visitor';
                     state.loggedIn = false;
                 }
                 else {
                     state.tokenResponse = 'successful';
                     state.user = data.user;
                     state.loggedIn = true;
+                }
+            })
+            .addCase(logoutUser.fulfilled, (state, action) => {
+                const data = action.payload
+
+                // Log out user and reset to 'visitor' profile.
+                if (data.user === 'logout') {
+                    state.user = 'visitor';
+                    state.loggedIn = false;
                 }
             })
             /* --------------------------------------- 
@@ -105,7 +161,7 @@ const loginSlice = createSlice({
                 state.tokenResponse = 'error';
                 // let user = getCookie('user')
                 // if (user === 'unauthorized') 
-                state.user = 'default';
+                state.user = 'visitor';
                 state.loggedIn = false;
             })
     }
@@ -144,8 +200,12 @@ export function getCookie(cookieKey: string) {
 export interface LoginProps {
     [index: string]: string | boolean | UserProps,
     'tokenResponse': 'successful' | 'error' | 'idle',
-    'user': 'default' | UserProps,
+    'user': 'visitor' | UserProps,
     'loggedIn': boolean
+};
+
+export type LogoutType = {
+    'user': 'logout'
 };
 
 export interface UserProps {

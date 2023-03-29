@@ -90,7 +90,7 @@ const preloadedState: RootState = {
     login: {
         tokenResponse: 'idle',
         loggedIn: false,
-        user: 'default'
+        user: 'visitor'
     }
 };
 
@@ -135,7 +135,7 @@ const preloadedStateWithFilter: RootState = {
     login: {
         tokenResponse: 'idle',
         loggedIn: false,
-        user: 'default'
+        user: 'visitor'
     }
 }
 

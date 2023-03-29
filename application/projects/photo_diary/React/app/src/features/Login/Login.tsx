@@ -4,7 +4,7 @@ import {
     useAppSelector, 
     useMediaQueries } from '../../common/hooks';
 import { useGoogleLogin } from '@react-oauth/google';
-import { exchangeOAuthCodeToken, UserProps } from './loginSlice';
+import { exchangeOAuthCodeToken, logoutUser, UserProps } from './loginSlice';
 import './Login.css';
 
 
@@ -18,7 +18,8 @@ const Login: React.FunctionComponent = () => {
     const classBase: string = "Login";
 
     const onLoginSuccess = (codeResponse: any) => {
-        dispatch(exchangeOAuthCodeToken(codeResponse))
+        // Dispatch oauth code to backend to obtain access token / user profile.
+        dispatch(exchangeOAuthCodeToken(codeResponse));
     }
 
     const login = useGoogleLogin({
@@ -28,8 +29,8 @@ const Login: React.FunctionComponent = () => {
     });
     
     const logout = () => {
-        // TODO
-        console.log('log out func')
+        // Request backend to invalidate active JWT token.
+        dispatch(logoutUser({ 'user': 'logout' }))
     };
 
     return (
@@ -42,9 +43,9 @@ const Login: React.FunctionComponent = () => {
                         ? " " + "authorized"
                         : "") }
                 onClick={ !isLoggedIn
-                // Pass in login or logout function.
-                ? () => login()
-                : () => logout() }>
+                    // Pass in login or logout function.
+                    ? () => login()
+                    : () => logout() }>
 
 
                 <svg 
