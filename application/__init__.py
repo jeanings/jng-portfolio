@@ -2,11 +2,12 @@
 # Flask app initialization.
 #--------------------------
 
-from flask import Flask, make_response, render_template
-from flask_cors import CORS, cross_origin
+from flask import Flask, render_template
+from flask_cors import CORS
 from config import Config
 # from flask_sqlalchemy import SQLAlchemy
 # db = SQLAlchemy()
+# db.init_app(app)
 
 
 def error_404(e):
@@ -19,8 +20,17 @@ def create_app():
     """ Initiate Flask application factory. """
     app = Flask(__name__)
     app.config.from_object(Config)
-    # db.init_app(app)
-    CORS(app)
+    DEBUG_MODE = app.config['FLASK_DEBUG']
+    
+    # CORS settings.
+    origins = []
+    if DEBUG_MODE == False:
+      origins.append(app.config['CORS_ORIGIN_PRODUCTION'])
+    else:
+      origins.append(app.config['CORS_ORIGIN_DEV'])
+
+    app.config['CORS_ORIGIN'] = origins
+    CORS(app, origin=origins, supports_credentials=True)
 
 
     # Import blueprints, routes for application.

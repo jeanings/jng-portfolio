@@ -131,7 +131,10 @@
         text-align: right;
     }
         
-        .SideFilmStrip__image-enlarger__metadata span {
+        .SideFilmStrip__image-enlarger__metadata span,
+        .SideFilmStrip__image-enlarger__metadata label,
+        .SideFilmStrip__image-enlarger__metadata input,
+        .SideFilmStrip__image-enlarger__metadata textarea {
             font-family: 'Barlow Semi Condensed', sans-serif;
         }
             /* For category names. */
@@ -143,6 +146,39 @@
             .image-enlarger__metadata-value {
                 font-size: 1.15rem;
             }
+
+                /* Edit mode. */
+                .image-enlarger__metadata-value.edit {
+                    background: none;
+                    border-width: 0.15rem;
+                    border-color: var(--colour-border);
+                    border-style: dotted;
+                    border-top: 0;
+                    border-right: 0;
+                    color: #000000;
+                    text-align: inherit;
+                    user-select: all;
+                    pointer-events: all;
+                }
+                    /* Indicate input field is in focus. */
+                    .image-enlarger__metadata-value.edit:focus {
+                        border-width: 0.20rem;
+                        border-color: var(--colour-accent-secondary);
+                        border-style: dashed;
+                        border-top: 0;
+                        border-right: 0;
+                        outline: 0;
+                        caret-color: var(--colour-accent-secondary);
+
+                    }
+                    /* Indicate input field has value. */
+                    .image-enlarger__metadata-value.edit:not(:placeholder-shown) {
+                        border-width: 0.20rem;
+                        border-color: var(--colour-accent-primary);
+                        border-style: dashed;
+                        border-top: 0;
+                        border-right: 0;
+                    }
 
             .SideFilmStrip__image-enlarger__metadata-category {
                 display: flex;

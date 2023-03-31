@@ -6,6 +6,7 @@ import {
 import axios, { AxiosError, AxiosResponse } from 'axios';
 import { RootState } from '../../app/store';
 import { apiUrl } from '../../app/App';
+import { getCookie } from '../Login/loginSlice';
 
 
 /* ==============================================================================
@@ -74,14 +75,23 @@ export const fetchDocs = (apiUrl: string, request: ImageDocsRequestProps) => {
         }
     }
 
+    // Attach session cookies.
+    const headers = {
+        'X-CSRF-TOKEN': getCookie('csrf_access_token')
+    };
+
     const mongoDbPromise = Promise.resolve(
-        axios.get(
-            apiUrl, { params: parsedRequest }
-        )
+        axios({
+            method: 'get',
+            url: apiUrl,
+            headers: headers,
+            params: parsedRequest,
+            withCredentials: true
+        })
     );
     
     return mongoDbPromise;
-}
+};
 
 
 /* ------------------------------------------
