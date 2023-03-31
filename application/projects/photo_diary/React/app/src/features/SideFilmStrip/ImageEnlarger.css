@@ -76,17 +76,18 @@
             border: white 2rem solid;
         }
         
-    .enlarged-image__nav-buttons__container {
+    .enlarged-image__border-buttons__container {
         grid-column: 2 / -1;
         grid-row: 1 / 2;
         display: grid;
         height: 2rem;
-        grid-template-columns: repeat(4, 2rem);
+        grid-template-columns: repeat(5, 2rem);
         grid-template-rows: 2rem;
         justify-content: flex-end;
         pointer-events: none;
     }
-        .enlarged-image__nav-buttons {
+        .enlarged-image__border-buttons {
+            grid-row: 1;
             display: flex;
             opacity: 0.40;
             background: none;
@@ -98,28 +99,52 @@
             pointer-events: auto;
             transition: all 300ms;
         }  
-            .enlarged-image__nav-buttons:hover {
+            .enlarged-image__border-buttons:hover {
                 opacity: 1;
                 transition: all 300ms;
             } 
 
-            #enlarger-previous {
+            #enlarger-border-save-edits {
                 grid-column: 1;
             }
 
-            #enlarger-full-screen {
+            #enlarger-border-previous {
                 grid-column: 2;
             }
 
-            #enlarger-next {
+            #enlarger-border-full-screen {
                 grid-column: 3;
             }
 
-            .enlarged-image__nav-buttons svg {
+            #enlarger-border-next {
+                grid-column: 4;
+            }
+
+            .enlarged-image__border-buttons svg {
                 width: 1.5rem;
                 height: 1.5rem;
                 fill: var(--colour-text-inactive);
                 pointer-events: none;
+            }
+
+            /* For save icon: activates when form has populated fields */
+            .enlarged-image__border-buttons.available {
+                opacity: 0.6;
+                transition: all 300ms;
+            }
+
+                .enlarged-image__border-buttons.available:hover {
+                    opacity: 1;
+                }
+
+                .enlarged-image__border-buttons.available svg {
+                    fill: var(--colour-accent-primary);
+                    transition: all 300ms;
+                }
+            
+            .enlarged-image__border-buttons.unavailable {
+                /* pointer-events: none; */
+                cursor: not-allowed;
             }
     
 
