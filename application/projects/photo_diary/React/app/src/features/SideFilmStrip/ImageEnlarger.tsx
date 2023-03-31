@@ -23,6 +23,7 @@ const ImageEnlarger: React.FunctionComponent <ImageEnlargerProps> = (props: Imag
     const toolbarEnlarger = useAppSelector(state => state.toolbar.imageEnlarger);
     const timelineSelected = useAppSelector(state => state.timeline.selected);
     const imageDocs = useAppSelector(state => state.timeline.imageDocs);
+    const isLoggedIn = useAppSelector(state => state.login.loggedIn);
     const classBase: string = "image-enlarger";
     
     let imageSource: string = '';
@@ -110,7 +111,8 @@ const ImageEnlarger: React.FunctionComponent <ImageEnlargerProps> = (props: Imag
             'Camera': imageDoc.make + ' ' + imageDoc.model,
             'Lens': imageDoc.lens,
             'Tags': imageDoc.tags,
-            'Description': imageDoc.description
+            'Description': imageDoc.description,
+            'Coordinates': imageDoc.gps.lat + ', ' + imageDoc.gps.lng
         };
     }
 
@@ -137,14 +139,14 @@ const ImageEnlarger: React.FunctionComponent <ImageEnlargerProps> = (props: Imag
             
             default:
                 clickFunction = onEnlargerNavButtonClicks;
-                ariaLabel = "show".concat(" ", name, " image");
+                ariaLabel = "show" + " " + name + " " + "image";
                 svgKey = name;
         }
     
         return (
             <button
                 className={ "enlarged-image__nav-buttons" }
-                id={ "enlarger".concat("-", "nav", "-", name) }
+                id={ "enlarger-nav-" + name }
                 aria-label={ ariaLabel }
                 onClick={ clickFunction }>
                 { getNavSVG[svgKey] }
@@ -198,44 +200,69 @@ const ImageEnlarger: React.FunctionComponent <ImageEnlargerProps> = (props: Imag
     /* ----------------------------------------------------------
         Prepare image stats categories for generating elements.
     ---------------------------------------------------------- */
-    let infoElems: Array<JSX.Element> = [];
     const infoElemsClassName = useMediaQueries(
-        props.baseClassName.concat("__", classBase, "__", "metadata", "-", "category"));
+        props.baseClassName + "__" + classBase + "__metadata-category");
 
-    Object.entries(imageInfo).forEach(item => {
-        // Only add category if their data exists.
-        const categoryName = item[0];
-        const categoryData = item[1];
+    const infoElems: Array<JSX.Element> = Object.entries(imageInfo)
+        .filter(category => {
+            const categoryName = category[0];
+            const categoryData = category[1]!;
 
-        if (categoryData !== null) {
-            
-            const category: JSX.Element = (
+            if (categoryData === null) {
+                // Filter out categories without data.
+                return false;
+            }
+            else if (isLoggedIn === false && categoryName !== 'Coordinates') {
+                // For viewing-only role, don't show coordinates.
+                return true;
+            }
+            else if (isLoggedIn) {
+                // Show everything available to edit.
+                return true;
+            }
+        })   
+        .map(category => {
+            // Create JSX element for each category and store in array.
+            const categoryName = category[0];
+            const categoryData = category[1]!;
+
+            const categoryElem: JSX.Element = (
                 <div 
                     className={ infoElemsClassName }
-                    id={ "image-enlarger".concat("__", categoryName) }
+                    id={ "image-enlarger" + "__" + categoryName }
                     role="figure"
                     aria-label="metadata entry for enlarged image"
-                    key={ "key".concat("_", "enlarger-metadata", "_", categoryName) }>
+                    key={ "key_enlarger-metadata_" + categoryName }>
                     
                     { getCategoryMetadataSpan(categoryName, categoryData) }
                 </div>
-            )
-            infoElems.push(category);
+            );
             
-        }
-    })
+            return categoryElem;
+        });
+
     
     // Create image stats elements to populate info panel next to enlarged image.
+    const imageInfoElemClassName = useMediaQueries(props.baseClassName + "__" + classBase + "__metadata")
     const imageInfoElem: JSX.Element = (
-        <figcaption
-            className={ useMediaQueries(props.baseClassName.concat("__", classBase, "__", "metadata")) }
-            id="enlarged-image-metadata"
-            role="figure"
-            aria-label="metadata for enlarged image">
+        isLoggedIn === false
+            ?   <figcaption
+                    className={ imageInfoElemClassName }
+                    id="enlarged-image-metadata"
+                    role="figure"
+                    aria-label="metadata for enlarged image">
 
-            { /* List of image stats. */
-                infoElems }
-        </figcaption>
+                    { /* List of image stats. */
+                        infoElems }
+                </figcaption>
+            :   <form
+                    className={ imageInfoElemClassName }
+                    id="enlarged-image-metadata"
+                    aria-label="edit form of metadata for enlarged image">
+
+                    { /* List of image stats. */
+                        infoElems }
+                </form>
     );
 
 
@@ -247,39 +274,66 @@ const ImageEnlarger: React.FunctionComponent <ImageEnlargerProps> = (props: Imag
         categoryData: string | number | Array<string>) {
             
         // For all the base metadata items.
-        let metaDataSpan: JSX.Element = (
-            <>
-                {/* Category names. */}
-                <span
-                    className={ "image-enlarger__metadata".concat("-", "name") }
-                    role="figure"
-                    aria-label={ categoryName.concat(" metadata") }>
-                
-                    { categoryName === 'FocalLength'
-                        ? 'Focal Length'.toUpperCase()
-                        : categoryName.toUpperCase() }
-                </span>
+        const metaDataSpan: JSX.Element = (
+            isLoggedIn === false
+                ?   <>
+                        <span
+                            className={ "image-enlarger__metadata-name" }
+                            role="figure"
+                            aria-label={ categoryName + " " + "metadata" }>
+                        
+                            { categoryName === 'FocalLength'
+                                ? 'Focal Length'.toUpperCase()
+                                : categoryName.toUpperCase() }
+                        </span>
 
-                {/* Category content. */}
-                <span
-                    className={ "image-enlarger__metadata".concat("-", "value") }
-                    role="figure"
-                    aria-label={ categoryName.concat(" metadata value")}>
-                    { getCategoryData(categoryName, categoryData) }
-                </span>
-            </>
-        )
+                        <span
+                            className={ "image-enlarger__metadata-value" }
+                            role="figure"
+                            aria-label={ categoryName + " " + "metadata value" }>
+                            { getCategoryData(categoryName, categoryData) }
+                        </span>
+                    </>
+                :   <>
+                        <label
+                            htmlFor={ categoryName }
+                            className={ "image-enlarger__metadata-name" }
+                            aria-label={ categoryName + " " + "metadata" }>
+                        
+                            { categoryName === 'FocalLength'
+                                ? 'Focal Length'.toUpperCase()
+                                : categoryName.toUpperCase() }
+                        </label>
+
+                        { categoryName !== 'Tags' 
+                        ?   <input
+                                name={ categoryName }
+                                className={ "image-enlarger__metadata-value" + " " + "edit" }
+                                type="text"
+                                placeholder={ getCategoryData(categoryName, categoryData) as string }
+                                aria-label={ categoryName + " " + "editable metadata value" }
+                            />
+                        :   <textarea
+                                name={ categoryName }
+                                className={ "image-enlarger__metadata-value" + " " + "edit" }
+                                placeholder={ getCategoryData(categoryName, categoryData) as string }
+                                aria-label={ categoryName + " " + "editable metadata value" }
+                            />
+                        }
+                    </>
+        );
+
         return metaDataSpan;
     };
 
     
     return (
         <div 
-            className={ useMediaQueries(props.baseClassName.concat("__", classBase)) + 
+            className={ useMediaQueries(props.baseClassName + "__" + classBase) + 
                 // Add "show" styling based on clicked state. 
                 (toolbarEnlarger === 'off'
                     ? ""
-                    : " ".concat("show")) }
+                    : " " + "show") }
             id="image-enlarger"
             role="tab" 
             aria-label="image enlarger"
@@ -292,7 +346,7 @@ const ImageEnlarger: React.FunctionComponent <ImageEnlargerProps> = (props: Imag
             { imageInfoElem }
 
             <div
-                className={ useMediaQueries(props.baseClassName.concat("__", classBase, "__", "image")) }
+                className={ useMediaQueries(props.baseClassName + "__" + classBase + "__image") }
                 id="enlarged-image-container">
                 {/* Regular enlarged image. */}
                 { enlargedImageElem }
