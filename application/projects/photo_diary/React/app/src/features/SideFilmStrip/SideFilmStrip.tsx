@@ -246,8 +246,8 @@ const SideFilmStrip: React.FunctionComponent = () => {
         return (
             <button
                 className={ "slide-mode-overlay__nav-buttons" }
-                id={ "slide-mode".concat("-", "nav", "-", name) }
-                aria-label={ "show".concat(" ", name, " slide image") }
+                id={ `slide-mode-nav-${name}` }
+                aria-label={ `show ${name} slide image` }
                 onClick={ onSlideViewNavButtonClick }>
                 { getNavSVG[name] }
             </button>
@@ -304,7 +304,7 @@ const SideFilmStrip: React.FunctionComponent = () => {
                 className={ useMediaQueries(classBase) 
                     +   // Add styling for loading: hidden if initial fetch not loaded
                     (isLoaded === 'uninitialized'
-                        ? " ".concat("loading")
+                        ? " " + "loading"
                         : "") }
                 id={ classBase }
                 role="main"
@@ -312,11 +312,11 @@ const SideFilmStrip: React.FunctionComponent = () => {
 
                 {/* Panel for enlarged image and its stats. */}
                 <div 
-                    className={ useMediaQueries(classBase.concat("__", "image-enlarger-container"))
+                    className={ useMediaQueries(`${classBase}__image-enlarger-container`)
                         +   // Add "slide" styling: slides left if mouse hovered on film strip. 
                         (filmStripHovered === false
                             ? ""
-                            : " ".concat("slide")) }
+                            : " " + "slide") }
                     id="image-enlarger-container"
                     role="figure"
                     aria-label="enlarged image with metadata">
@@ -327,11 +327,11 @@ const SideFilmStrip: React.FunctionComponent = () => {
 
                 {/* "Film strip" showing image collection in columnar form. */}
                 <div 
-                    className={ useMediaQueries(classBase.concat("__", "film-strip")) 
+                    className={ useMediaQueries(`${classBase}__film-strip`) 
                         +   // Add "expand" styling: reveals second column of images.
                         (filmStripHovered === false
                             ? ""
-                            : " ".concat("expand")) }
+                            : " " + "expand") }
                     id="film-strip"
                     ref={ filmStripRef }
                     role="listbox" 
@@ -350,11 +350,11 @@ const SideFilmStrip: React.FunctionComponent = () => {
             </aside>
 
             <div
-                className={ useMediaQueries(classBase.concat("__", "slide-mode-overlay")) 
+                className={ useMediaQueries(`${classBase}__slide-mode-overlay`) 
                     +   // Show slide view overlay depending on state.
                     (slideView === 'on'
-                        ? " show"
-                        : " hide") }
+                        ? " " + "show"
+                        : " " + "hide") }
                 id="enlarged-image-slide-mode"
                 role="img"
                 aria-label="full screen slide view mode"
@@ -387,12 +387,12 @@ function createImageFrames(classBase: string, imageDoc: ImageDocTypes, index: nu
             baseClassName={ classBase }
             imageDoc={ imageDoc }
             docIndex= { index }
-            key={ "key".concat("_", classBase, "_", index.toString()) }
+            key={ `key_${classBase}_${index.toString()}` }
         />
     );
     
     return imageFrame;
-};
+}
 
 
 export default SideFilmStrip;

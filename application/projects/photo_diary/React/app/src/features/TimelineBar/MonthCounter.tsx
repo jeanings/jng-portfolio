@@ -59,7 +59,7 @@ const MonthCounter: React.FunctionComponent<MonthCounterProps> = (props: MonthCo
 
     return (
         <div 
-            className={ useMediaQueries(props.baseClassName.concat("__", props.className)) }
+            className={ useMediaQueries(`${props.baseClassName}__${props.className}`) }
             role="figure" 
             aria-label="image counter for month">
 

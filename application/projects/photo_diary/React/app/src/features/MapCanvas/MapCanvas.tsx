@@ -320,7 +320,7 @@ const MapCanvas: React.FunctionComponent = () => {
                 }
 
                 // Add docId as id as identifier.
-                leafElem.id = "spider-pin".concat("__", dbDoc._id); 
+                leafElem.id = `spider-pin__${dbDoc._id}`; 
 
                 // Clicks on leaves same as single markers, film strip clicks. 
                 leafElem.addEventListener('click', () => {

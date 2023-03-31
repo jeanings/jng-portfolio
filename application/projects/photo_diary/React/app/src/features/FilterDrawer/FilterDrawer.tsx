@@ -28,9 +28,9 @@ const FilterDrawer: React.FunctionComponent = () => {
     const toolbarFilterSwitch = useAppSelector(state => state.toolbar.filter);
     const classBase: string = "FilterDrawer";
     const classNames: ClassNameTypes = {
-        'parent': useMediaQueries(classBase.concat("__", "parameters")),
-        'title': useMediaQueries(classBase.concat("__", "header")),
-        'options': useMediaQueries(classBase.concat("__", "options")),
+        'parent': useMediaQueries(`${classBase}__parameters`),
+        'title': useMediaQueries(`${classBase}__header`),
+        'options': useMediaQueries(`${classBase}__options`),
         'base': classBase
     };
 
@@ -112,7 +112,7 @@ const FilterDrawer: React.FunctionComponent = () => {
         // Assign styling through classname.
         filtersActive === true
             ? resetAvailablity = ""
-            : resetAvailablity = " ".concat("unavailable");
+            : resetAvailablity = " " + "unavailable";
 
         return resetAvailablity;
     };
@@ -123,14 +123,14 @@ const FilterDrawer: React.FunctionComponent = () => {
             className={ useMediaQueries(classBase) 
                 +   // Add "show" styling based on clicked state.
                 (toolbarFilterSwitch === 'off'
-                        ? ""
-                        : " ".concat("show")) }
+                    ? ""
+                    : " " + "show") }
             id={ classBase }
             role="form" 
             aria-label="filters menu">
 
             <div 
-                className={ useMediaQueries(classBase.concat("__", "parameters-container")) }>
+                className={ useMediaQueries(`${classBase}__parameters-container`) }>
 
                 {/* Generates each filter category and its buttons. */}
                 { createCategory(classNames, "format", formats) }
@@ -142,7 +142,7 @@ const FilterDrawer: React.FunctionComponent = () => {
             </div>
 
             <button 
-                    className={ useMediaQueries(classBase.concat("__", "reset")) + getResetAvailability() }
+                    className={ useMediaQueries(`${classBase}__reset`) + getResetAvailability() }
                     id="Toolbar__reset"
                     aria-label="reset filters"
                     onClick={ onResetClick }>
@@ -164,7 +164,11 @@ const FilterDrawer: React.FunctionComponent = () => {
 /* --------------------------------------------
     Constructor for filter drawer categories.
 -------------------------------------------- */
-function createCategory(classNames: ClassNameTypes, categoryName: string, selectables: Array<string | number>) {
+function createCategory(
+    classNames: ClassNameTypes, 
+    categoryName: string, 
+    selectables: Array<string | number>) {
+    
     let sortedSelectables: Array<string | number> = [];
     if (selectables.length !== 0) {
         sortedSelectables = [...selectables].sort();
@@ -175,7 +179,7 @@ function createCategory(classNames: ClassNameTypes, categoryName: string, select
             className={ classNames['parent'] }
             id={ categoryName }
             role="group"
-            aria-label={ categoryName.concat(" filter group") }>
+            aria-label={ `${categoryName} filter group` }>
 
             <h1 
                 className={ classNames['title']}>
@@ -187,7 +191,7 @@ function createCategory(classNames: ClassNameTypes, categoryName: string, select
             <div 
                 className={ classNames['options'] }
                 role="group" 
-                aria-label={ categoryName.concat(" filter options") }>
+                aria-label={ `${categoryName} filter options` }>
                 
                 {/* Generate buttons for all the values in each filter category. */
                     sortedSelectables.map((selectable, index) => (
@@ -195,7 +199,7 @@ function createCategory(classNames: ClassNameTypes, categoryName: string, select
                             baseClassName={ classNames['base'] }
                             categoryName={ categoryName }
                             selectableName={ selectable }
-                            key={ "key".concat("_", categoryName, "_", index.toString()) }
+                            key={ `key_ ${categoryName}_${index.toString()}` }
                         />
                     )) }
             </div>
