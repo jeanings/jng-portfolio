@@ -104,15 +104,15 @@ const ImageEnlarger: React.FunctionComponent <ImageEnlargerProps> = (props: Imag
                 (dateTime !== ''
                     ? '\u00A0 \u00A0 \u00A0' + dateTime
                     : '')).toString(),
-            'Format': imageDoc.format.type + ' ' + imageDoc.format.medium,
+            'Format': `${imageDoc.format.type} ${imageDoc.format.medium}`,
             'Film': imageDoc.film,
-            'FocalLength': imageDoc.focal_length_35mm + 'mm',
+            'FocalLength': `${imageDoc.focal_length_35mm}mm`,
             'ISO': imageDoc.iso,
-            'Camera': imageDoc.make + ' ' + imageDoc.model,
+            'Camera': `${imageDoc.make} ${imageDoc.model}`,
             'Lens': imageDoc.lens,
             'Tags': imageDoc.tags,
             'Description': imageDoc.description,
-            'Coordinates': imageDoc.gps.lat + ', ' + imageDoc.gps.lng
+            'Coordinates': `${imageDoc.gps.lat}, ${imageDoc.gps.lng}`
         };
     }
 
@@ -139,14 +139,14 @@ const ImageEnlarger: React.FunctionComponent <ImageEnlargerProps> = (props: Imag
             
             default:
                 clickFunction = onEnlargerNavButtonClicks;
-                ariaLabel = "show" + " " + name + " " + "image";
+                ariaLabel = `show ${name} image`;
                 svgKey = name;
         }
     
         return (
             <button
                 className={ "enlarged-image__nav-buttons" }
-                id={ "enlarger-nav-" + name }
+                id={ `enlarger-nav-${name}` }
                 aria-label={ ariaLabel }
                 onClick={ clickFunction }>
                 { getNavSVG[svgKey] }
@@ -200,8 +200,7 @@ const ImageEnlarger: React.FunctionComponent <ImageEnlargerProps> = (props: Imag
     /* ----------------------------------------------------------
         Prepare image stats categories for generating elements.
     ---------------------------------------------------------- */
-    const infoElemsClassName = useMediaQueries(
-        props.baseClassName + "__" + classBase + "__metadata-category");
+    const infoElemsClassName = useMediaQueries(`${props.baseClassName}__${classBase}__metadata-category`);
 
     const infoElems: Array<JSX.Element> = Object.entries(imageInfo)
         .filter(category => {
@@ -229,10 +228,10 @@ const ImageEnlarger: React.FunctionComponent <ImageEnlargerProps> = (props: Imag
             const categoryElem: JSX.Element = (
                 <div 
                     className={ infoElemsClassName }
-                    id={ "image-enlarger" + "__" + categoryName }
+                    id={ `image-enlarger__${categoryName}` }
                     role="figure"
                     aria-label="metadata entry for enlarged image"
-                    key={ "key_enlarger-metadata_" + categoryName }>
+                    key={ `key_enlarger-metadata_${categoryName}` }>
                     
                     { getCategoryMetadataSpan(categoryName, categoryData) }
                 </div>
@@ -243,7 +242,7 @@ const ImageEnlarger: React.FunctionComponent <ImageEnlargerProps> = (props: Imag
 
     
     // Create image stats elements to populate info panel next to enlarged image.
-    const imageInfoElemClassName = useMediaQueries(props.baseClassName + "__" + classBase + "__metadata")
+    const imageInfoElemClassName = useMediaQueries(`${props.baseClassName}__${classBase}__metadata`)
     const imageInfoElem: JSX.Element = (
         isLoggedIn === false
             ?   <figcaption
@@ -280,7 +279,7 @@ const ImageEnlarger: React.FunctionComponent <ImageEnlargerProps> = (props: Imag
                         <span
                             className={ "image-enlarger__metadata-name" }
                             role="figure"
-                            aria-label={ categoryName + " " + "metadata" }>
+                            aria-label={ `${categoryName} metadata` }>
                         
                             { categoryName === 'FocalLength'
                                 ? 'Focal Length'.toUpperCase()
@@ -290,7 +289,7 @@ const ImageEnlarger: React.FunctionComponent <ImageEnlargerProps> = (props: Imag
                         <span
                             className={ "image-enlarger__metadata-value" }
                             role="figure"
-                            aria-label={ categoryName + " " + "metadata value" }>
+                            aria-label={ `${categoryName} metadata value` }>
                             { getCategoryData(categoryName, categoryData) }
                         </span>
                     </>
@@ -298,7 +297,7 @@ const ImageEnlarger: React.FunctionComponent <ImageEnlargerProps> = (props: Imag
                         <label
                             htmlFor={ categoryName }
                             className={ "image-enlarger__metadata-name" }
-                            aria-label={ categoryName + " " + "metadata" }>
+                            aria-label={ `${categoryName} metadata` }>
                         
                             { categoryName === 'FocalLength'
                                 ? 'Focal Length'.toUpperCase()
@@ -308,16 +307,16 @@ const ImageEnlarger: React.FunctionComponent <ImageEnlargerProps> = (props: Imag
                         { categoryName !== 'Tags' 
                         ?   <input
                                 name={ categoryName }
-                                className={ "image-enlarger__metadata-value" + " " + "edit" }
+                                className={ "image-enlarger__metadata-value edit" }
                                 type="text"
                                 placeholder={ getCategoryData(categoryName, categoryData) as string }
-                                aria-label={ categoryName + " " + "editable metadata value" }
+                                aria-label={ `${categoryName} editable metadata value` }
                             />
                         :   <textarea
                                 name={ categoryName }
-                                className={ "image-enlarger__metadata-value" + " " + "edit" }
+                                className={ "image-enlarger__metadata-value edit" }
                                 placeholder={ getCategoryData(categoryName, categoryData) as string }
-                                aria-label={ categoryName + " " + "editable metadata value" }
+                                aria-label={ `${categoryName} editable metadata value` }
                             />
                         }
                     </>
@@ -329,7 +328,7 @@ const ImageEnlarger: React.FunctionComponent <ImageEnlargerProps> = (props: Imag
     
     return (
         <div 
-            className={ useMediaQueries(props.baseClassName + "__" + classBase) + 
+            className={ useMediaQueries(`${props.baseClassName}__${classBase}`) + 
                 // Add "show" styling based on clicked state. 
                 (toolbarEnlarger === 'off'
                     ? ""
@@ -346,7 +345,7 @@ const ImageEnlarger: React.FunctionComponent <ImageEnlargerProps> = (props: Imag
             { imageInfoElem }
 
             <div
-                className={ useMediaQueries(props.baseClassName + "__" + classBase + "__image") }
+                className={ useMediaQueries(`${props.baseClassName}__${classBase}__image`) }
                 id="enlarged-image-container">
                 {/* Regular enlarged image. */}
                 { enlargedImageElem }

@@ -37,7 +37,7 @@ const Login: React.FunctionComponent = () => {
         <div 
             className={ useMediaQueries(classBase) }>
             <button 
-                className={ useMediaQueries(classBase + "__button")
+                className={ useMediaQueries(`${classBase}__button`)
                 +   // Change styling based on logged status.
                     (isLoggedIn === true
                         ? " " + "authorized"
@@ -49,7 +49,7 @@ const Login: React.FunctionComponent = () => {
 
 
                 <svg 
-                    className={ useMediaQueries(classBase + "__button__indicator") 
+                    className={ useMediaQueries(`${classBase}__button__indicator`) 
                         +   // Change styling based on logged status.
                         (isLoggedIn === true
                             ? " " + "authorized"
@@ -61,7 +61,7 @@ const Login: React.FunctionComponent = () => {
                     </path>
                 </svg>
 
-                { getUserIcon(isLoggedIn, useMediaQueries(classBase + "__button__user"), user) }
+                { getUserIcon(isLoggedIn, useMediaQueries(`${classBase}__button__user`), user) }
                 
             </button>
         </div>

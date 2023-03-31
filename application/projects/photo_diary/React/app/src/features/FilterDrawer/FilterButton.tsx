@@ -145,22 +145,22 @@ const FilterButton: React.FunctionComponent<FilterButtonProps> = (props: FilterB
    
     return (
         <button 
-            className={ useMediaQueries(props.baseClassName.concat("__", "buttons"))
+            className={ useMediaQueries(`${props.baseClassName} __buttons`)
                 +   // Grey out and disable button if unavailable for set of data.
                 getAvailability()
                 +   // Set "active" styling if filter is selected. 
                 (activeFiltersInCategory.includes(selectable) === false
                     ? ""
-                    : " ".concat("active")) }
+                    : " " + "active") }
             role="checkbox"
-            aria-label={ props.categoryName.concat(" filter option") }
+            aria-label={ `${props.categoryName} filter option` }
             aria-checked={ activeFiltersInCategory.includes(selectable) === false
                 ? "false"
                 : "true" }
             onClick={ onFilterClick }>
 
                 { props.categoryName === 'focalLength'
-                        ? props.selectableName.toString().concat('mm')      // Add focal length unit.
+                        ? props.selectableName.toString() + "mm"      // Add focal length unit.
                         : props.selectableName }                
         </button>
     );

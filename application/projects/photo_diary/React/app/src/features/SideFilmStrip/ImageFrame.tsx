@@ -52,7 +52,7 @@ const ImageFrame: React.FunctionComponent <ImageFrameProps> = (props: ImageFrame
             onClick={ onImageClick }>
 
             <img 
-                className={ useMediaQueries(classBase + "__image") 
+                className={ useMediaQueries(`${classBase}__image`) 
                     +   // Add class styling to indicate selected state
                     (enlargeDoc?._id === props.imageDoc._id
                         ? " " + "selected"
@@ -64,7 +64,7 @@ const ImageFrame: React.FunctionComponent <ImageFrameProps> = (props: ImageFrame
             
         </div>
     );
-}
+};
 
 
 /* =====================================================================

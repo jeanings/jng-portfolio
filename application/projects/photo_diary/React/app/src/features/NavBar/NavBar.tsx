@@ -61,30 +61,30 @@ const NavBar: React.FC = () => {
             role="menubar"
             aria-label="main site navigation menu">
             <nav 
-                className={ useMediaQueries(classBase.concat("__", "menu")) 
+                className={ useMediaQueries(`${classBase}__menu`) 
                     +   // Add styling if toggled
                     (menuToggled === true
-                        ? " ".concat("toggle")
+                        ? " " + "toggle"
                         : "") }
                 role="navigation"
                 aria-label="main site navigation">
                 <ul 
                     className={
                         menuToggled === true
-                            ? " ".concat("toggle")
+                            ? " " + "toggle"
                             : "" }
-                    id={ classBase.concat("__", "menu") }
+                    id={ `${classBase}__menu` }
                     role="listbox"
                     aria-label="main site links list">
                     
                     <li 
-                        id={ classBase.concat("__", "menu", "-", "about") }
+                        id={ `${classBase}__menu-about` }
                         role="menuitem"
                         aria-label="main site about link"
                         onClick={ onMenuItemClicks }>
                         <a 
                             href="https://jeanings.space/#index_about"
-                            className={ useMediaQueries(classBase.concat("__", "menu", "__", "name")) }>
+                            className={ useMediaQueries(`${classBase}__menu__name`) }>
                                 about
                         </a>
 
@@ -96,13 +96,13 @@ const NavBar: React.FC = () => {
                     </li>
 
                     <li
-                        id={ classBase.concat("__", "menu", "-", "projects") }
+                        id={ `${classBase}__menu-projects` }
                         role="menuitem"
                         aria-label="main site projects link"
                         onClick={ onMenuItemClicks }>
                         <a 
                             href="https://jeanings.space/projects" 
-                            className={ useMediaQueries(classBase.concat("__", "menu", "__", "name")) }>
+                            className={ useMediaQueries(`${classBase}__menu__name`) }>
                                 projects
                         </a>
 
@@ -114,7 +114,7 @@ const NavBar: React.FC = () => {
                     </li>
 
                     <li 
-                        id={ classBase.concat("__", "menu", "-", "resume") }
+                        id={ `${classBase}__menu-resume` }
                         role="menuitem"
                         aria-label="main site resume link"
                         onClick={ onMenuItemClicks }
@@ -122,7 +122,7 @@ const NavBar: React.FC = () => {
                         onMouseOut={ onResumeHover }>
                         <a 
                             href="https://jeanings.space/resume" 
-                            className={ useMediaQueries(classBase.concat("__", "menu", "__", "name")) }>
+                            className={ useMediaQueries(`${classBase}__menu__name`) }>
                                 résumé
                         </a>
 
@@ -135,14 +135,14 @@ const NavBar: React.FC = () => {
                 </ul>
 
                 <div 
-                    className={ useMediaQueries(classBase.concat("__", "menu-toggle")) 
+                    className={ useMediaQueries(`${classBase}__menu-toggle`) 
                         +   // Add styling if toggled
                         (menuToggled === true
-                            ? " ".concat("toggle")
+                            ? " " + "toggle"
                             : "") 
                         +   // Add background matching with resume button
                         (resumeItemHovered === true
-                            ? " ".concat("blend")
+                            ? " " + "blend"
                             : "") }
                     role="button"
                     aria-label="open main site navigation menu"
@@ -150,16 +150,16 @@ const NavBar: React.FC = () => {
                     <div 
                         className={
                             menuToggled === true
-                                ? " ".concat("toggle")
+                                ? " " + "toggle"
                                 : "" }
-                        id={ classBase.concat("__", "menu-toggle", "__", "stroke1") }>
+                        id={ `${classBase}__menu-toggle__stroke1` }>
                     </div>
                     <div 
                         className={
                             menuToggled === true
-                                ? " ".concat("toggle")
+                                ? " " + "toggle"
                                 : "" }
-                        id={ classBase.concat("__","menu-toggle", "__", "stroke2") }>
+                        id={ `${classBase}__menu-toggle__stroke2` }>
                     </div>
                 </div>
             </nav>

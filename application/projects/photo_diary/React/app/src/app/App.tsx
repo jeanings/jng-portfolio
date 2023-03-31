@@ -89,7 +89,7 @@ const App: React.FunctionComponent = () => {
             className={ useMediaQueries(classBase) 
                 +   // Add styling for loading: hidden if initial fetch not loaded 
                 (isLoaded === 'uninitialized'
-                    ? " ".concat("loading")
+                    ? " " + "loading"
                     : "") }>
             <NavBar />
             <TimelineBar />
