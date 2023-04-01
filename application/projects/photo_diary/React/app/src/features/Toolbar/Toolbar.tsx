@@ -18,7 +18,7 @@ const Toolbar: React.FunctionComponent = () => {
             aria-label="toolbar">
             
             <div 
-                className={ useMediaQueries(classBase.concat("__", "button-container")) }>
+                className={ useMediaQueries(`${classBase}__button-container`) }>
                 
                 { createToolbarButton(classBase, 'filter') }
                 { createToolbarButton(classBase, 'bounds') }
@@ -42,7 +42,7 @@ function createToolbarButton(classBase: string, buttonName: ToolbarButtonProps['
         <ToolbarButton 
             name={ buttonName }
             baseClassName={ classBase }
-            key={ "key".concat("_", classBase, "-", buttonName) }
+            key={ "key_" +  classBase + "-" + buttonName }
         />
     )
 }

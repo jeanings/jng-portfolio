@@ -73,20 +73,20 @@ const ToolbarButton: React.FunctionComponent<ToolbarButtonProps> = (props: Toolb
 
     return (
         <button 
-            className={ useMediaQueries(props.baseClassName.concat("__", "button"))
+            className={ useMediaQueries(`${props.baseClassName}__button`)
                 +   // Disable image enlarger button if no image is clicked for enlarging. 
                 (enlargeDoc !== null
                     ? ""
                     : props.name === 'imageEnlarger'
-                        ? " ".concat("unavailable")
+                        ? " " + "unavailable"
                         : "")
                 +   // Add "active" styling based on clicked state.
                 (props.name === 'bounds'
                     ? ""
                     : toolbarState[props.name] === 'off'
                         ? ""
-                        : " ".concat("active")) }
-            id={ props.baseClassName.concat("-", props.name) }
+                        : " " + "active") }
+            id={ `${props.baseClassName}-${props.name}` }
             aria-label={ 
                 props.name === 'filter'
                     ? "open filter drawer"

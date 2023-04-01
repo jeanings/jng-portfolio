@@ -113,10 +113,16 @@ export const requestLogout = (logoutUrl: string, request: LogoutType) => {
     Handles authenticating user.
 ------------------------------- */
 // State for initial render.
+const DEV_USER = {
+    'name': 'Dev',
+    'email': 'dev@email.com',
+    'profilePic': ''
+};
+
 const initialState: LoginProps = {
     tokenResponse: 'idle',
-    user: 'visitor',
-    loggedIn: false
+    user: DEV_USER,
+    loggedIn: true
 };
 
 const loginSlice = createSlice({

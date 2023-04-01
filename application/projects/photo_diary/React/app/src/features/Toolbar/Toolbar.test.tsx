@@ -1,7 +1,7 @@
 import React from 'react';
 import * as reactRedux from 'react-redux';
 import { Provider } from 'react-redux';
-import { setupStore, RootState } from '../../app/store';
+import { setupStore } from '../../app/store';
 import {
     cleanup,
     render,
@@ -12,7 +12,7 @@ import axios from 'axios';
 import MockAdapter from 'axios-mock-adapter';
 import '@testing-library/jest-dom';
 import mockDefaultData from '../../utils/mockDefaultData.json';
-import { GeojsonFeatureCollectionProps } from '../TimelineBar/timelineSlice';
+import preloadedState from '../../utils/testHelpers';
 import { 
     setStyleLoadStatus, 
     cleanupMarkerSource, 
@@ -44,67 +44,6 @@ afterEach(() => {
     jest.resetModules(); 
     cleanup;
 });
-
-/* -------------------------------------------------
-    Mocked state.
-------------------------------------------------- */
-const preloadedState: RootState = {
-    timeline: {
-        responseStatus: 'successful',
-        query: { year: 2022 },
-        initYear: 2022,
-        selected: { year: 2022, month: 'all' },
-        years: mockDefaultData.years,
-        counter: {
-            'all': 0,
-            'jan': 0, 'feb': 0, 'mar': 0,
-            'apr': 0, 'may': 0, 'jun': 0,
-            'jul': 0, 'aug': 0, 'sep': 0,
-            'oct': 0, 'nov': 0, 'dec': 0,
-            'previous': {
-                'all': 0,
-                'jan': 0, 'feb': 0, 'mar': 0,
-                'apr': 0, 'may': 0, 'jun': 0,
-                'jul': 0, 'aug': 0, 'sep': 0,
-                'oct': 0, 'nov': 0, 'dec': 0,
-            }
-        },
-        imageDocs: null,
-        filterSelectables: mockDefaultData.filterSelectables[0],
-        filteredSelectables: null,
-        geojson: mockDefaultData.featureCollection as GeojsonFeatureCollectionProps,
-        bounds: mockDefaultData.bounds
-    },
-    filter: {
-        formatMedium: [],
-        formatType: [],
-        film: [],
-        camera: [],
-        lens: [],
-        focalLength: [],
-        tags: []
-    },
-    mapCanvas: {
-        styleLoaded: false,
-        sourceStatus: 'idle',
-        markersStatus: 'idle',
-        fitBoundsButton: 'idle',
-        markerLocator: 'idle'
-    },
-    sideFilmStrip: {
-        enlargeDoc: null,
-        docIndex: null
-    },
-    toolbar: {
-        filter: 'off',
-        imageEnlarger: 'off'
-    },
-    login: {
-        tokenResponse: 'idle',
-        loggedIn: false,
-        user: 'visitor'
-    }
-};
 
 
 /* =====================================================================

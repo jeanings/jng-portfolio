@@ -43,12 +43,12 @@ const MonthButton: React.FunctionComponent<MonthButtonProps> = (props: MonthButt
     
     return (
         <div 
-            className={ useMediaQueries(props.baseClassName.concat("__", props.className)) 
+            className={ useMediaQueries(`${props.baseClassName}__${props.className}`) 
                 +   // Add "active" styling for selected element.
                 (selectedTimeline.month === props.month
-                    ? " ".concat("active")
+                    ? " " + "active"
                     : "") }
-            id={ props.className.concat('-', props.month) }
+            id={ `${props.className}-${props.month}` }
             role="menuitemradio" 
             aria-label={ "month selector option" }
             aria-checked={// Changed pressed state based on selected element.
@@ -81,7 +81,7 @@ function createMonthCounter(month: string, classBase: string, index: number) {
             month={ month }
             baseClassName={ classBase }
             className="month-counter"
-            key={ "key-month-counter_".concat(index.toString()) }
+            key={ `key-month-counter_${index.toString()}` }
         />
     );
 
