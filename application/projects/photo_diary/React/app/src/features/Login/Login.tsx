@@ -17,17 +17,26 @@ const Login: React.FunctionComponent = () => {
     const isLoggedIn = useAppSelector(state => state.login.loggedIn);
     const classBase: string = "Login";
 
+    /* --------------------------------------------
+        Handle app logins, passing code to thunk.
+    -------------------------------------------- */    
     const onLoginSuccess = (codeResponse: any) => {
         // Dispatch oauth code to backend to obtain access token / user profile.
         dispatch(exchangeOAuthCodeToken(codeResponse));
-    }
+    };
 
+    /* -------------------------------------------
+        Handle Google OAuth login for auth code.
+    ------------------------------------------- */        
     const login = useGoogleLogin({
-        onSuccess: codeResponse => { onLoginSuccess(codeResponse) },
+        onSuccess: codeResponse => onLoginSuccess(codeResponse),
         onError: errorResponse => console.log(errorResponse),
         flow: 'auth-code'
     });
     
+    /* ---------------------
+        Handle app logout.
+    --------------------- */    
     const logout = () => {
         // Request backend to invalidate active JWT token.
         dispatch(logoutUser({ 'user': 'logout' }))
@@ -42,6 +51,7 @@ const Login: React.FunctionComponent = () => {
                     (isLoggedIn === true
                         ? " " + "authorized"
                         : "") }
+                aria-label="login using Google OAuth"
                 onClick={ !isLoggedIn
                     // Pass in login or logout function.
                     ? () => login()
@@ -103,7 +113,6 @@ function getUserIcon(isLoggedIn: boolean, className: string, user: string | User
     
     return userIcon;
 }
-
 
 
 export default Login;
