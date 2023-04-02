@@ -121,8 +121,8 @@ const DEV_USER = {
 
 const initialState: LoginProps = {
     tokenResponse: 'idle',
-    user: DEV_USER,
-    loggedIn: true
+    user: 'visitor',
+    loggedIn: false
 };
 
 const loginSlice = createSlice({
@@ -165,8 +165,6 @@ const loginSlice = createSlice({
             --------------------------------------- */
             .addMatcher(isRejectedAction, (state, action) => {
                 state.tokenResponse = 'error';
-                // let user = getCookie('user')
-                // if (user === 'unauthorized') 
                 state.user = 'visitor';
                 state.loggedIn = false;
             })
