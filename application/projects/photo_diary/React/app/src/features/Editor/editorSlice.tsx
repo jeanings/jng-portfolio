@@ -83,7 +83,17 @@ const initialState: EditorProps = {
 const editorSlice = createSlice({
     name: 'editor',
     initialState,
-    reducers: {},
+    reducers: {
+        /* ----------------------------------------
+            Handles clearing << updated >> state.
+        ---------------------------------------- */
+        handleUpdatedDocsClear: (state, action) => {
+            const confirmation: ClearUpdatedDocsType = action.payload;
+            if (confirmation.msg === 'clear updated docs') {
+                state.updated = {};
+            }
+        }
+    },
     /* ----------------------------------------------------
         Reducers for edit requests.
     ---------------------------------------------------- */
@@ -143,6 +153,11 @@ export type UpdatedDocsType = {
     [index: string]: ImageDocTypes
 };
 
+export type ClearUpdatedDocsType = {
+    [index: string]: string,
+    'msg': 'clear updated docs'
+};
+
 export interface UserProps {
     'name': string,
     'email': string,
@@ -171,5 +186,5 @@ export const editor = (state: RootState) => state.editor;
 
 // Export actions, reducers.
 const { actions, reducer } = editorSlice;
-export const { } = actions;
+export const { handleUpdatedDocsClear } = actions;
 export default reducer;

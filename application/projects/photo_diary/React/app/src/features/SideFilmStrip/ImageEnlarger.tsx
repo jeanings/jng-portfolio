@@ -13,7 +13,11 @@ import {
     handleSlideView, 
     SideFilmStripProps } from './sideFilmStripSlice';
 import { ImageDocTypes } from '../TimelineBar/timelineSlice';
-import { updateDoc, UpdateRequestDocType } from '../Editor/editorSlice';
+import { 
+    updateDoc, 
+    handleUpdatedDocsClear,
+    ClearUpdatedDocsType, 
+    UpdateRequestDocType } from '../Editor/editorSlice';
 import './ImageEnlarger.css';
 
 
@@ -57,7 +61,7 @@ const ImageEnlarger: React.FunctionComponent <ImageEnlargerProps> = (props: Imag
             // Zoom map to marker.
             dispatch(handleMarkerLocator('clicked'));
 
-            // Clear form and edit state.
+            // Clear local form and edit state.
             if (metadataForm.current) {
                 metadataForm.current.reset();
                 setMetadataEdits({});
@@ -92,6 +96,19 @@ const ImageEnlarger: React.FunctionComponent <ImageEnlargerProps> = (props: Imag
 
         dispatch(handleEnlarger(payloadEnlarger));
     }, [timelineSelected]);
+
+
+    /* -------------------------------------------------------------
+        Clear store's << editor.updated >> state on new db fetches. 
+    ------------------------------------------------------------- */
+    useEffect(() => {
+        if (Object.keys(updatedDocs).length > 0) {
+            const payloadResetUpdatedDocs: ClearUpdatedDocsType = {
+                'msg': 'clear updated docs'
+            };
+            dispatch(handleUpdatedDocsClear(payloadResetUpdatedDocs));
+        }
+    }, [imageDocs]);
 
 
     /* ---------------------------------------------
