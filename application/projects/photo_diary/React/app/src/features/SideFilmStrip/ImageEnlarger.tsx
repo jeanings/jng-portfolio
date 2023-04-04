@@ -12,6 +12,8 @@ import {
     handleEnlarger, 
     handleSlideView, 
     SideFilmStripProps } from './sideFilmStripSlice';
+import { ImageDocTypes } from '../TimelineBar/timelineSlice';
+import { updateDoc, UpdateRequestDocType } from '../Editor/editorSlice';
 import './ImageEnlarger.css';
 
 
@@ -26,9 +28,10 @@ const ImageEnlarger: React.FunctionComponent <ImageEnlargerProps> = (props: Imag
     const toolbarEnlarger = useAppSelector(state => state.toolbar.imageEnlarger);
     const timelineSelected = useAppSelector(state => state.timeline.selected);
     const imageDocs = useAppSelector(state => state.timeline.imageDocs);
-    const [ metadataEdits, setMetadataEdits ] = useState<MetadataEditInputProps>({});
+    const [ metadataEdits, setMetadataEdits ] = useState<MetadataEditInputType>({});
     const metadataForm = useRef<HTMLFormElement | null>(null);
     const isLoggedIn = useAppSelector(state => state.login.loggedIn);
+    const updatedDocs = useAppSelector(state => state.editor.updated);
     const classBase: string = "image-enlarger";
     
     let imageSource: string = '';
@@ -91,40 +94,86 @@ const ImageEnlarger: React.FunctionComponent <ImageEnlargerProps> = (props: Imag
     }, [timelineSelected]);
 
 
+    /* ---------------------------------------------
+        Handles clicks to open "slide-mode" viewer
+    --------------------------------------------- */
+    const onEnlargerFullScreenClick = (event: React.SyntheticEvent) => {
+        const payloadSlideView = 'on';
+        dispatch(handleSlideView(payloadSlideView)); 
+    };
+
+    /* -----------------------------------------------------------
+        Handles clicks to save edits to metadata in editor mode. 
+    ----------------------------------------------------------- */
+    const onSaveEditsClick = (event: React.SyntheticEvent) => {
+        if (enlargeDoc) {
+            const payloadDocUpdate: UpdateRequestDocType = {
+                'id': enlargeDoc._id,
+                'collection': enlargeDoc.date.year,
+                'fields': metadataEdits
+            };
+            dispatch(updateDoc(payloadDocUpdate));
+        }
+    };
+
+    /* --------------------------------------------------
+        Handles edited values and saves to local state. 
+    -------------------------------------------------- */
+    const handleMetadataInput = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+        const metadataName = event.target.name;
+        const metadataUpdatedField = event.target.value;
+        
+        if (metadataUpdatedField) {
+            // Add to metadata edits state.
+            setMetadataEdits({...metadataEdits,
+                [metadataName]: metadataUpdatedField 
+            });
+        }
+        else {
+            // Delete key if no value present.
+            const newMetadataEdits = {...metadataEdits};
+            delete newMetadataEdits[metadataName];
+            setMetadataEdits(newMetadataEdits);
+        }
+    };
+
+
     /* ------------------------------------------------------------------
         Prepare object for image info taken from << enlargeDoc >> state.
     ------------------------------------------------------------------ */
     if (enlargeDoc !== null) {
+        const isUpdated: boolean = enlargeDoc._id in updatedDocs ? true : false;
+        const targetDoc: ImageDocTypes = isUpdated ? updatedDocs[enlargeDoc._id] : enlargeDoc;
         // Construct date strings for date entry.
-        imageSource = enlargeDoc.url;
-        const dateMonth = enlargeDoc.date.month.toString().length === 1
-            ? '0' + enlargeDoc.date.month
-            : enlargeDoc.date.month;
+        imageSource = targetDoc.url;
+        const dateMonth = targetDoc.date.month.toString().length === 1
+            ? '0' + targetDoc.date.month
+            : targetDoc.date.month;
 
-        const dateDay = enlargeDoc.date.day !== null
-            ? '/' + enlargeDoc.date.day
+        const dateDay = targetDoc.date.day !== null
+            ? '/' + targetDoc.date.day
             : '';
 
-        const dateTime = enlargeDoc.date.taken !== null
-            ? enlargeDoc.date.taken.split(' ')[1]
+        const dateTime = targetDoc.date.taken !== null
+            ? targetDoc.date.taken.split(' ')[1]
             : '';
             
         imageInfo = {
-            'Title': enlargeDoc.title,
+            'Title': targetDoc.title,
             'Date': (
-                enlargeDoc.date.year + '/' + dateMonth + dateDay + 
+                targetDoc.date.year + '/' + dateMonth + dateDay + 
                 (dateTime !== ''
                     ? '\u00A0 \u00A0 \u00A0' + dateTime
                     : '')).toString(),
-            'Format': `${enlargeDoc.format.type} ${enlargeDoc.format.medium}`,
-            'Film': enlargeDoc.film,
-            'FocalLength': `${enlargeDoc.focal_length_35mm}mm`,
-            'ISO': enlargeDoc.iso,
-            'Camera': `${enlargeDoc.make} ${enlargeDoc.model}`,
-            'Lens': enlargeDoc.lens,
-            'Tags': enlargeDoc.tags,
-            'Description': enlargeDoc.description,
-            'Coordinates': `${enlargeDoc.gps.lat}, ${enlargeDoc.gps.lng}`
+            'Format': `${targetDoc.format.type} ${targetDoc.format.medium}`,
+            'Film': targetDoc.film,
+            'FocalLength': `${targetDoc.focal_length_35mm}mm`,
+            'ISO': targetDoc.iso,
+            'Camera': `${targetDoc.make} ${targetDoc.model}`,
+            'Lens': targetDoc.lens,
+            'Tags': targetDoc.tags,
+            'Description': targetDoc.description,
+            'Coordinates': `${targetDoc.gps.lat}, ${targetDoc.gps.lng}`
         };
     }
 
@@ -166,7 +215,7 @@ const ImageEnlarger: React.FunctionComponent <ImageEnlargerProps> = (props: Imag
         return (
             <button
                 className={ "enlarged-image__border-buttons"
-                    +   // Indicate form values changed; can be saved.
+                    +   // For save form button: Indicate form values changed; can be saved.
                     ( name !== 'save-edits'
                         ? " " 
                         : Object.keys(metadataEdits).length !== 0
@@ -213,43 +262,7 @@ const ImageEnlarger: React.FunctionComponent <ImageEnlargerProps> = (props: Imag
             dispatch(handleEnlarger(payloadEnlarger));
         }
     };
-
-    /* ---------------------------------------------
-        Handles clicks to open "slide-mode" viewer
-    --------------------------------------------- */
-    const onEnlargerFullScreenClick = (event: React.SyntheticEvent) => {
-        const payloadSlideView = 'on';
-        dispatch(handleSlideView(payloadSlideView)); 
-    };
-
-    /* -----------------------------------------------------------
-        Handles clicks to save edits to metadata in editor mode. 
-    ----------------------------------------------------------- */
-    const onSaveEditsClick = (event: React.SyntheticEvent) => {
-        console.log('save these edits', metadataEdits)
-    };
-
-    /* --------------------------------------------------
-        Handles edited values and saves to local state. 
-    -------------------------------------------------- */
-    const handleMetadataInput = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-        const metadataName = event.target.name;
-        const metadataUpdatedField = event.target.value;
-        
-        if (metadataUpdatedField) {
-            // Add to metadata edits state.
-            setMetadataEdits({...metadataEdits,
-                [metadataName]: metadataUpdatedField 
-            });
-        }
-        else {
-            // Delete key if no value present.
-            const newMetadataEdits = {...metadataEdits};
-            delete newMetadataEdits[metadataName];
-            setMetadataEdits(newMetadataEdits);
-        }
-        
-    };
+    
 
     /* ----------------------------------------------------------
         Prepare image stats categories for generating elements.
@@ -506,7 +519,7 @@ export type ImageInfoType = {
     'Coordinates': string | null
 };
 
-interface MetadataEditInputProps {
+export type MetadataEditInputType = {
     [index: string]: string | undefined
     'Title'?: string | undefined,
     'Date'?: string | undefined,

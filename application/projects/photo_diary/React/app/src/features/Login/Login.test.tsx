@@ -141,7 +141,7 @@ test("gets login credentials on successful sign-ins", async() => {
 });
 
 
-test("sets user to 'visitor' and response from backend removes access token cookies", async() => {
+test("logout sets user to 'visitor' and response from backend removes access token cookies", async() => {
     /* --------------------------------------------------------
         Mocks                                          start
     -------------------------------------------------------- */
@@ -244,7 +244,7 @@ test("sets user to 'visitor' and response from backend removes access token cook
 
     // Verify successful logout.    
     expect(newStore.getState().login.loggedIn).toEqual(false);
-    expect(newStore.getState().login.user).toEqual('visitor');
+    expect(newStore.getState().login.user).toEqual(null);
 });
 
 

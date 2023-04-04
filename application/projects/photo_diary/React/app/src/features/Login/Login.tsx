@@ -14,7 +14,7 @@ import './Login.css';
 const Login: React.FunctionComponent = () => {
     const dispatch = useAppDispatch();
     const user = useAppSelector(state => state.login.user);
-    const isLoggedIn = useAppSelector(state => state.login.loggedIn);
+    const isEditor = useAppSelector(state => state.login.role) === 'editor' ? true : false;
     const classBase: string = "Login";
 
     /* --------------------------------------------
@@ -48,11 +48,11 @@ const Login: React.FunctionComponent = () => {
             <button 
                 className={ useMediaQueries(`${classBase}__button`)
                 +   // Change styling based on logged status.
-                    (isLoggedIn === true
+                    (isEditor === true
                         ? " " + "authorized"
                         : "") }
                 aria-label="login using Google OAuth"
-                onClick={ !isLoggedIn
+                onClick={ !isEditor
                     // Pass in login or logout function.
                     ? () => login()
                     : () => logout() }>
@@ -61,7 +61,7 @@ const Login: React.FunctionComponent = () => {
                 <svg 
                     className={ useMediaQueries(`${classBase}__button__indicator`) 
                         +   // Change styling based on logged status.
-                        (isLoggedIn === true
+                        (isEditor === true
                             ? " " + "authorized"
                             : "") }
                     xmlns='http://www.w3.org/2000/svg' 
@@ -71,7 +71,7 @@ const Login: React.FunctionComponent = () => {
                     </path>
                 </svg>
 
-                { getUserIcon(isLoggedIn, useMediaQueries(`${classBase}__button__user`), user) }
+                { getUserIcon(isEditor, useMediaQueries(`${classBase}__button__user`), user) }
                 
             </button>
         </div>
@@ -82,7 +82,7 @@ const Login: React.FunctionComponent = () => {
 /* =====================================================================
     Helper functions.
 ===================================================================== */
-function getUserIcon(isLoggedIn: boolean, className: string, user: string | UserProps) {
+function getUserIcon(isLoggedIn: boolean, className: string, user: UserProps | null) {
     const unloggedUser = (
         <svg
             className={ className }
@@ -100,7 +100,7 @@ function getUserIcon(isLoggedIn: boolean, className: string, user: string | User
                 (isLoggedIn === true
                     ? " " + "authorized"
                     : "") }
-            src={ typeof(user) === 'object'
+            src={ user !== null
                 ? user.profilePic
                 : "" }
             referrerPolicy='no-referrer'

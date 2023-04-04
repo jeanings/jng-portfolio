@@ -19,6 +19,12 @@ export const loginUrl: string = DEV_MODE === 'True'
 export const logoutUrl: string = DEV_MODE === 'True'
     ? process.env.REACT_APP_LOGOUT_URL_DEV!
     : process.env.REACT_APP_LOGOUT_URL!;
+export const updateUrl: string = DEV_MODE === 'True'
+    ? process.env.REACT_APP_UPDATE_URL_DEV!
+    : process.env.REACT_APP_UPDATE_URL!;
+export const createUrl: string = DEV_MODE === 'True'
+    ? process.env.REACT_APP_CREATE_URL_DEV!
+    : process.env.REACT_APP_CREATE_URL!;
 
 /* =====================================================================
     Entry point of application.  Renders the base structure of the app.

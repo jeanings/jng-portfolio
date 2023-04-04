@@ -4,7 +4,13 @@
 
 from flask import Blueprint
 from flask import current_app as app
-from flask import jsonify, make_response, request, send_from_directory, session
+from flask import (
+    jsonify, 
+    make_response, 
+    request, 
+    send_from_directory, 
+    session
+)
 from bson.json_util import ObjectId
 from datetime import (
     datetime,
@@ -161,7 +167,6 @@ def photo_diary_data():
     whitespaced_keywords = ['camera', 'film', 'lenses', 'tags']
 
     for key, val in raw_queries.items():
-        
         if val:
             if key == 'month':
                 queries.update({key: int(val)})
@@ -249,7 +254,6 @@ def photo_diary_data():
         samesite='Lax',
         max_age=max_age_sec
     )
-
     return response
 
 
@@ -315,7 +319,8 @@ def photo_diary_login():
     session['user'] = {
         'name': session['authorized']['name'],
         'email': session['authorized']['email'],
-        'profilePic': session['authorized']['picture']
+        'profilePic': session['authorized']['picture'],
+        'role': 'editor'
     }
 
     # Create base response with authorized profile.
@@ -363,6 +368,152 @@ def photo_diary_login():
 def photo_diary_logout():    
     response = jsonify({'user': 'logout'})
     unset_jwt_cookies(response)
+    return response
+
+
+# Update route for editing doc's metadata.
+@photo_diary_bp.route('/photo-diary/update', methods=['PATCH'])
+@jwt_required()
+def photo_diary_update():
+    update_request = request.get_json()
+    # Get doc properties from request.
+    try:
+        doc_id = ObjectId(update_request['id'])
+        doc_collection = update_request['collection']
+        fields_to_update = update_request['fields']
+    except KeyError:
+        return jsonify({'updateStatus': 'Error: JSON formatted incorrectly, missing required keys.'})
+    
+    # Locate requested doc in database.
+    collection = db[str(doc_collection)]
+    doc = collection.find({'_id': doc_id})
+    if (len(list(doc)) == 0):
+        return jsonify({'updateStatus': ('Error: {0} not found in {1} collection.', doc_id, doc_collection)})
+    
+    # Parse request into correct fields and values for database.  
+    fields = {}
+    for key, val in fields_to_update.items():
+        if val:
+            if key == 'Date':
+                try:
+                    year = month = day = time = None
+                    date_time = val.split(' ', 1)
+                    yyyy_mm_dd = date_time[0]
+                    if len(date_time) == 2:
+                        yyyy_mm_dd, time = date_time
+                    yyyy_mm_dd = yyyy_mm_dd.split('/')
+                    if len(yyyy_mm_dd) == 3:
+                        year, month, day = [int(segment) for segment in yyyy_mm_dd]
+                    elif len(yyyy_mm_dd) == 2:
+                        year, month = [int(segment) for segment in yyyy_mm_dd]
+                    else:
+                        year = int(yyyy_mm_dd)
+                    date = {
+                        'year': year, 
+                        'month': month, 
+                        'day': day, 
+                        'time': time
+                    }
+                    fields.update({
+                        'date': date
+                    })
+                except:
+                    # Date not in correct format, skip.
+                    pass
+            elif key == 'FocalLength':
+                # Strip units and keep only digits.
+                focal_length = [char for char in val if char.isdigit()]
+                if len(focal_length) == 0:
+                    # Focal length in '50mm' format, skip.
+                    pass
+                else:
+                    focal_length_35mm = int(''.join(focal_length[:]))
+                    fields.update({
+                        'focal_length_35mm': focal_length_35mm
+                    })
+            elif key == 'Format':
+                try:
+                    # Split into photo medium and medium type.
+                    format_mediums = ['digital', 'film']
+                    format_medium = format_type = ''
+                    formats = [category.lower() for category in val.split(' ')]
+                    for category in formats:
+                        if category in format_mediums:
+                            format_medium = category
+                        else: 
+                            format_type = category
+                    fields.update({
+                        'format': {
+                            'medium': format_medium, 
+                            'type': format_type
+                        }
+                    })
+                except ValueError:
+                    # Format not in 'Medium Type' format, skip.
+                    pass
+            elif key == 'Camera':
+                try:
+                    make, model = val.split(' ', 1)
+                    fields.update({
+                        'make': make, 
+                        'model': model
+                    })
+                except ValueError:
+                    # Camera in 'Make Model' format, skip.
+                    pass
+            elif key == 'Tags': 
+                tags = [tag.strip().lower() for tag in val.split(',')]
+                fields.update({
+                    'tags': tags
+                })
+            elif key == 'Coordinates':
+                try:
+                    coords = [float(coord.strip()) for coord in val.split(',')]
+                    lat, lng = coords[0], coords[1]
+                    lat_ref, lng_ref = 'N', 'E'
+                    if lat < 0:
+                        lat_ref = 'S'
+                    if lng < 0:
+                        lng_ref = 'W'
+                    if lat < -90 or lat > 90:
+                        lat = None
+                    if lng < -180 or lng > 180:
+                        lng = None
+                    gps = {
+                        'lat': lat, 
+                        'lat_ref': lat_ref, 
+                        'lng': lng, 
+                        'lng_ref': lng_ref
+                    }
+                    fields.update({
+                        'gps': gps
+                    })
+                except ValueError:
+                    # Not numbers, skip.
+                    pass
+            else:
+                try:
+                    # Convert to int when possible, database value type.
+                    val = int(val)
+                except ValueError:
+                    # Keep value as is.
+                    pass
+                fields.update({
+                    key.lower(): val
+                })
+    
+    # Update document with parsed fields.
+    collection.update_one(
+        {'_id': doc_id}, 
+        {'$set': fields}
+    )
+
+    updated_doc = list(collection.find({'_id': doc_id}))[0]
+
+    response = jsonify({
+        'updateStatus': 'successful', 
+        'updatedDoc': updated_doc
+    })
     return response
 
 

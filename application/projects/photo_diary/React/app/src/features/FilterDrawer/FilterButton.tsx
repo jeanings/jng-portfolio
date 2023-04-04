@@ -145,7 +145,7 @@ const FilterButton: React.FunctionComponent<FilterButtonProps> = (props: FilterB
    
     return (
         <button 
-            className={ useMediaQueries(`${props.baseClassName} __buttons`)
+            className={ useMediaQueries(`${props.baseClassName}__buttons`)
                 +   // Grey out and disable button if unavailable for set of data.
                 getAvailability()
                 +   // Set "active" styling if filter is selected. 

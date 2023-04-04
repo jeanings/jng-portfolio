@@ -7,6 +7,7 @@ import {
     screen } from '@testing-library/react';
 import axios from 'axios';
 import MockAdapter from 'axios-mock-adapter';
+import { GoogleOAuthProvider } from '@react-oauth/google';
 import '@testing-library/jest-dom';
 import App, { apiUrl } from './App';
 
@@ -46,7 +47,9 @@ test("renders all features on initial load", () => {
     const newStore = setupStore();
     render(
         <Provider store={newStore}>
-            <App />
+            <GoogleOAuthProvider clientId={ 'some-client-id' }>
+                <App />
+            </GoogleOAuthProvider>
         </Provider>
     );
     

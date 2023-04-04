@@ -116,12 +116,14 @@ export const requestLogout = (logoutUrl: string, request: LogoutType) => {
 const DEV_USER = {
     'name': 'Dev',
     'email': 'dev@email.com',
-    'profilePic': ''
+    'profilePic': '',
+    'role': 'editor'
 };
 
 const initialState: LoginProps = {
     tokenResponse: 'idle',
-    user: 'visitor',
+    user: null,
+    role: 'viewer',
     loggedIn: false
 };
 
@@ -142,21 +144,24 @@ const loginSlice = createSlice({
 
                 if (data.user === 'unauthorized') {
                     state.tokenResponse = 'error';
-                    state.user = 'visitor';
+                    state.user = null;
+                    state.role = 'viewer';
                     state.loggedIn = false;
                 }
                 else {
                     state.tokenResponse = 'successful';
                     state.user = data.user;
+                    state.role = data.user.role;
                     state.loggedIn = true;
                 }
             })
             .addCase(logoutUser.fulfilled, (state, action) => {
                 const data = action.payload
 
-                // Log out user and reset to 'visitor' profile.
+                // Log out user and reset to 'viewer' profile.
                 if (data.user === 'logout') {
-                    state.user = 'visitor';
+                    state.user = null;
+                    state.role = 'viewer'
                     state.loggedIn = false;
                 }
             })
@@ -165,7 +170,8 @@ const loginSlice = createSlice({
             --------------------------------------- */
             .addMatcher(isRejectedAction, (state, action) => {
                 state.tokenResponse = 'error';
-                state.user = 'visitor';
+                state.user = null;
+                state.role = 'viewer';
                 state.loggedIn = false;
             })
     }
@@ -202,9 +208,10 @@ export function getCookie(cookieKey: string) {
     Types.
 ===================================================================== */
 export interface LoginProps {
-    [index: string]: string | boolean | UserProps,
+    [index: string]: string | boolean | null | UserProps,
     'tokenResponse': 'successful' | 'error' | 'idle',
-    'user': 'visitor' | UserProps,
+    'user': UserProps | null,
+    'role': 'viewer' | 'editor'
     'loggedIn': boolean
 };
 
