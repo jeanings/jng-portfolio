@@ -81,7 +81,7 @@
         grid-row: 1 / 2;
         display: grid;
         height: 2rem;
-        grid-template-columns: repeat(6, 2rem);
+        grid-template-columns: 10rem repeat(7, 2rem);
         grid-template-rows: 2rem;
         justify-content: flex-end;
         pointer-events: none;
@@ -104,24 +104,44 @@
                 transition: all 300ms;
             }
 
-            #enlarger-border-save-edits {
-                grid-column: 1;
+            #enlarger-border-save-response-message.show {
+                opacity: 1;
+                transition: all 300ms;
             }
 
-            #enlarger-border-clear-edits {
+            #enlarger-border-save-response-message {
+                grid-column: 1;
+                display: flex;
+                justify-content: flex-end;
+                align-items: center;
+                opacity: 0;
+                font-family: 'Barlow Semi Condensed', sans-serif;
+                font-size: 0.75rem;
+                transition: all 300ms;
+            }
+            
+            #enlarger-border-save-status {
                 grid-column: 2;
             }
 
-            #enlarger-border-previous {
+            #enlarger-border-save-edits {
                 grid-column: 3;
             }
 
-            #enlarger-border-full-screen {
+            #enlarger-border-clear-edits {
                 grid-column: 4;
             }
 
-            #enlarger-border-next {
+            #enlarger-border-previous {
                 grid-column: 5;
+            }
+
+            #enlarger-border-full-screen {
+                grid-column: 6;
+            }
+
+            #enlarger-border-next {
+                grid-column: 7;
             }
 
             .enlarged-image__border-buttons svg {
@@ -150,7 +170,22 @@
                     fill: #1e38cf;
                     transition: all 300ms;
                 }
-            
+
+                #enlarger-border-save-status.green svg {
+                    fill: #37ad3d;
+                    transition: all 300ms;
+                }
+
+                #enlarger-border-save-status.amber svg {
+                    fill: #e9b610;
+                    transition: all 300ms;
+                }
+                
+                #enlarger-border-save-status.red svg {
+                    fill: #da482f;
+                    transition: all 300ms;
+                }
+                
             .enlarged-image__border-buttons.unavailable {
                 cursor: not-allowed;
             }

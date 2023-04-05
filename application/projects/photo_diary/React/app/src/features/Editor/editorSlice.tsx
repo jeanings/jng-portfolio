@@ -77,6 +77,7 @@ export const requestUpdate = (updateUrl: string, request: UpdateRequestDocType) 
 ------------------------------------------- */
 const initialState: EditorProps = {
     response: 'idle',
+    message: null,
     updated: {}
 };
 
@@ -107,13 +108,15 @@ const editorSlice = createSlice({
                 // Add updated doc data to state, 
                 // for displaying updated metadata without refetching entire collection.
                 state.response = data.updateStatus;
+                state.message = data.updateMessage;
                 state.updated[data.updatedDoc._id] = data.updatedDoc;
             })
             /* --------------------------------------- 
                 Catches errors on fetching from API.
             --------------------------------------- */
             .addMatcher(isRejectedAction, (state, action) => {
-                state.response = 'error';
+                state.response = 'failed';
+                state.message = "DB/network error!"
                 let message: string = '';
                 if (action.payload) {
                     message = 'msg' in action.payload 
@@ -131,14 +134,13 @@ const editorSlice = createSlice({
     Helper functions.
 ===================================================================== */
 
-
-
 /* =====================================================================
     Types.
 ===================================================================== */
 export interface EditorProps {
-    [index: string]: string | UpdatedDocsType
-    'response': 'idle' | 'successful' | 'error'
+    [index: string]: string | null | UpdatedDocsType
+    'response': 'idle' | 'successful' | 'passed with error' | 'failed',
+    'message': string | null,
     'updated': UpdatedDocsType
 };
 

@@ -392,6 +392,7 @@ def photo_diary_update():
     
     # Parse request into correct fields and values for database.  
     fields = {}
+    skipped_flag = False
     for key, val in fields_to_update.items():
         if val:
             if key == 'Date':
@@ -419,12 +420,13 @@ def photo_diary_update():
                     })
                 except:
                     # Date not in correct format, skip.
-                    pass
+                    skipped_flag = True
             elif key == 'FocalLength':
                 # Strip units and keep only digits.
                 focal_length = [char for char in val if char.isdigit()]
                 if len(focal_length) == 0:
                     # Focal length in '50mm' format, skip.
+                    skipped_flag = True
                     pass
                 else:
                     focal_length_35mm = int(''.join(focal_length[:]))
@@ -450,7 +452,7 @@ def photo_diary_update():
                     })
                 except ValueError:
                     # Format not in 'Medium Type' format, skip.
-                    pass
+                    skipped_flag = True
             elif key == 'Camera':
                 try:
                     make, model = val.split(' ', 1)
@@ -460,7 +462,16 @@ def photo_diary_update():
                     })
                 except ValueError:
                     # Camera in 'Make Model' format, skip.
-                    pass
+                    skipped_flag = True
+            elif key == 'ISO':
+                try:
+                    iso = int(val)
+                    fields.update({
+                        'iso': iso
+                    })
+                except ValueError:
+                    # Not number, skip.
+                    skipped_flag = True
             elif key == 'Tags': 
                 tags = [tag.strip().lower() for tag in val.split(',')]
                 fields.update({
@@ -490,7 +501,7 @@ def photo_diary_update():
                     })
                 except ValueError:
                     # Not numbers, skip.
-                    pass
+                    skipped_flag = True
             else:
                 try:
                     # Convert to int when possible, database value type.
@@ -509,10 +520,16 @@ def photo_diary_update():
     )
 
     updated_doc = list(collection.find({'_id': doc_id}))[0]
+    update_status = "successful"
+    update_message = "All edits OK!"
+    if (skipped_flag is True):
+        update_status = "passed with error"
+        update_message = "Some edit(s) in wrong format."
 
     response = jsonify({
-        'updateStatus': 'successful', 
-        'updatedDoc': updated_doc
+        'updateStatus': update_status, 
+        'updatedDoc': updated_doc,
+        'updateMessage': update_message 
     })
     return response
 

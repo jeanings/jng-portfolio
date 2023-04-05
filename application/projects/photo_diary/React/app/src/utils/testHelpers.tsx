@@ -62,6 +62,7 @@ export const preloadedState: RootState = {
     },
     editor: {
         response: 'idle',
+        message: null,
         updated: {}
     }
 };
