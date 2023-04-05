@@ -34,8 +34,7 @@ const ImageEnlarger: React.FunctionComponent <ImageEnlargerProps> = (props: Imag
     const imageDocs = useAppSelector(state => state.timeline.imageDocs);
     const [ metadataEdits, setMetadataEdits ] = useState<MetadataEditInputType>({});
     const metadataForm = useRef<HTMLFormElement | null>(null);
-    const isLoggedIn = useAppSelector(state => state.login.loggedIn);
-    const userRole = useAppSelector(state => state.login.role);
+    const isUserEditor: boolean = useAppSelector(state => state.login.role) === 'editor' ? true : false;
     const editor = useAppSelector(state => state.editor);
     const [ showEditResponseMessage, setShowEditResponseMessage ] = useState<boolean>(false);
     const classBase: string = "image-enlarger";
@@ -339,11 +338,11 @@ const ImageEnlarger: React.FunctionComponent <ImageEnlargerProps> = (props: Imag
                 // Filter out categories without data.
                 return false;
             }
-            else if (isLoggedIn === false && categoryName !== 'Coordinates') {
+            else if (isUserEditor === false && categoryName !== 'Coordinates') {
                 // For viewer role, don't show coordinates.
                 return true;
             }
-            else if (isLoggedIn) {
+            else if (isUserEditor) {
                 // For editor role, show everything available to edit.
                 return true;
             }
@@ -372,19 +371,9 @@ const ImageEnlarger: React.FunctionComponent <ImageEnlargerProps> = (props: Imag
     // Create image stats elements to populate info panel next to enlarged image.
     const imageInfoElemClassName = useMediaQueries(`${props.baseClassName}__${classBase}__metadata`)
     const imageInfoElem: JSX.Element = (
-        isLoggedIn === false
-            // Static component for viewers. 
-            ?   <figcaption
-                    className={ imageInfoElemClassName }
-                    id="enlarged-image-metadata"
-                    role="figure"
-                    aria-label="metadata for enlarged image">
-
-                    { /* List of image stats. */
-                        infoElems }
-                </figcaption>
+        isUserEditor === true
             // Editable form component for editors.
-            :   <form
+            ?   <form
                     className={ imageInfoElemClassName }
                     id="enlarged-image-metadata"
                     aria-label="edit form of metadata for enlarged image"
@@ -394,6 +383,17 @@ const ImageEnlarger: React.FunctionComponent <ImageEnlargerProps> = (props: Imag
                     { /* List of image stats. */
                         infoElems }
                 </form>
+            // Static component for viewers. 
+            :   <figcaption
+                    className={ imageInfoElemClassName }
+                    id="enlarged-image-metadata"
+                    role="figure"
+                    aria-label="metadata for enlarged image">
+
+                    { /* List of image stats. */
+                        infoElems }
+                </figcaption>
+            
     );
 
 
@@ -406,28 +406,9 @@ const ImageEnlarger: React.FunctionComponent <ImageEnlargerProps> = (props: Imag
             
         // For all the base metadata items.
         const metaDataSpan: JSX.Element = (
-            isLoggedIn === false
-                // Viewer role mode.
+            isUserEditor === true
+            // Editor mode.
                 ? <>
-                    <span
-                        className={ "image-enlarger__metadata-name" }
-                        role="figure"
-                        aria-label={ `${categoryName} metadata` }>
-                    
-                        { categoryName === 'FocalLength'
-                            ? 'Focal Length'.toUpperCase()
-                            : categoryName.toUpperCase() }
-                    </span>
-
-                    <span
-                        className={ "image-enlarger__metadata-value" }
-                        role="figure"
-                        aria-label={ `${categoryName} metadata value` }>
-                        { getCategoryData(categoryName, categoryData) }
-                    </span>
-                </>
-                // Editor role mode.
-                : <>
                     <label
                         htmlFor={ categoryName }
                         className={ "image-enlarger__metadata-name" }
@@ -456,6 +437,25 @@ const ImageEnlarger: React.FunctionComponent <ImageEnlargerProps> = (props: Imag
                             aria-label={ `${categoryName} editable metadata value` }
                         />
                     }
+                </>
+                // Viewer (default) mode.
+                : <>
+                    <span
+                        className={ "image-enlarger__metadata-name" }
+                        role="figure"
+                        aria-label={ `${categoryName} metadata` }>
+                    
+                        { categoryName === 'FocalLength'
+                            ? 'Focal Length'.toUpperCase()
+                            : categoryName.toUpperCase() }
+                    </span>
+
+                    <span
+                        className={ "image-enlarger__metadata-value" }
+                        role="figure"
+                        aria-label={ `${categoryName} metadata value` }>
+                        { getCategoryData(categoryName, categoryData) }
+                    </span>
                 </>
         );
         return metaDataSpan;
@@ -509,7 +509,7 @@ const ImageEnlarger: React.FunctionComponent <ImageEnlargerProps> = (props: Imag
 
                 {/* Buttons on top border of image. */}
                 {/* Editor tools. */}
-                { userRole === 'editor'
+                { isUserEditor
                     ? (<>
                         { createImageBorderButton('save-status') }
                         { createImageBorderButton('save-edits') }
