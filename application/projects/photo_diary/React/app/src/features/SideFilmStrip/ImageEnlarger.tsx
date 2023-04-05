@@ -35,6 +35,7 @@ const ImageEnlarger: React.FunctionComponent <ImageEnlargerProps> = (props: Imag
     const [ metadataEdits, setMetadataEdits ] = useState<MetadataEditInputType>({});
     const metadataForm = useRef<HTMLFormElement | null>(null);
     const isLoggedIn = useAppSelector(state => state.login.loggedIn);
+    const userRole = useAppSelector(state => state.login.role);
     const editor = useAppSelector(state => state.editor);
     const [ showEditResponseMessage, setShowEditResponseMessage ] = useState<boolean>(false);
     const classBase: string = "image-enlarger";
@@ -507,9 +508,15 @@ const ImageEnlarger: React.FunctionComponent <ImageEnlargerProps> = (props: Imag
                     :   "" }
 
                 {/* Buttons on top border of image. */}
-                { createImageBorderButton('save-status') }
-                { createImageBorderButton('save-edits') }
-                { createImageBorderButton('clear-edits') }
+                {/* Editor tools. */}
+                { userRole === 'editor'
+                    ? (<>
+                        { createImageBorderButton('save-status') }
+                        { createImageBorderButton('save-edits') }
+                        { createImageBorderButton('clear-edits') }
+                    </>)
+                    : "" }
+                {/* Standard icons. */}
                 { createImageBorderButton('previous') }
                 { createImageBorderButton('full-screen') }
                 { createImageBorderButton('next') }
