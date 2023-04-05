@@ -62,10 +62,7 @@ const ImageEnlarger: React.FunctionComponent <ImageEnlargerProps> = (props: Imag
             dispatch(handleMarkerLocator('clicked'));
 
             // Clear local form and edit state.
-            if (metadataForm.current) {
-                metadataForm.current.reset();
-                setMetadataEdits({});
-            }
+            clearMetadataFormEdits();
 
             // Add class to show panel.
             const payloadToolbarButtons: ToolbarProps = {
@@ -154,6 +151,16 @@ const ImageEnlarger: React.FunctionComponent <ImageEnlargerProps> = (props: Imag
         }
     };
 
+    /* -----------------------------------------------
+        Handles clearing form edits and local state.
+    ----------------------------------------------- */
+    const clearMetadataFormEdits = () => {
+        if (metadataForm.current) {
+            metadataForm.current.reset();
+            setMetadataEdits({});
+        }
+    };
+
 
     /* ------------------------------------------------------------------
         Prepare object for image info taken from << enlargeDoc >> state.
@@ -202,7 +209,9 @@ const ImageEnlarger: React.FunctionComponent <ImageEnlargerProps> = (props: Imag
             draggable="false"/>
     );
 
-    // Create buttons that live on white image border.
+    /* ---------------------------------------------------
+        Creates buttons that live on white image border.
+    --------------------------------------------------- */
     function createImageBorderButton(name: string) {
         let clickFunction;
         let ariaLabel: string = '';
@@ -214,7 +223,6 @@ const ImageEnlarger: React.FunctionComponent <ImageEnlargerProps> = (props: Imag
                 ariaLabel = "show image full screen";
                 svgKey = "fullScreen";
                 break;
-
             case 'save-edits':
                 clickFunction = Object.keys(metadataEdits).length !== 0
                     ? onSaveEditsClick
@@ -222,7 +230,11 @@ const ImageEnlarger: React.FunctionComponent <ImageEnlargerProps> = (props: Imag
                 ariaLabel = "save metadata edits on image";
                 svgKey = "saveEdits";
                 break;
-            
+            case 'clear-edits':
+                clickFunction = clearMetadataFormEdits;
+                ariaLabel = "clear metadata form edits";
+                svgKey = "clearEdits";
+                break;           
             default:
                 clickFunction = onEnlargerNavButtonClicks;
                 ariaLabel = `show ${name} image`;
@@ -233,11 +245,11 @@ const ImageEnlarger: React.FunctionComponent <ImageEnlargerProps> = (props: Imag
             <button
                 className={ "enlarged-image__border-buttons"
                     +   // For save form button: Indicate form values changed; can be saved.
-                    ( name !== 'save-edits'
-                        ? " " 
-                        : Object.keys(metadataEdits).length !== 0
+                    ( name == 'save-edits' || name == 'clear-edits'
+                        ? Object.keys(metadataEdits).length !== 0
                             ? " " + "available"
-                            : " " + "unavailable") }
+                            : " " + "unavailable"
+                        : "") }
                 id={ `enlarger-border-${name}` }
                 aria-label={ ariaLabel }
                 onClick={ clickFunction }>
@@ -449,6 +461,7 @@ const ImageEnlarger: React.FunctionComponent <ImageEnlargerProps> = (props: Imag
                 role="navigation"
                 aria-label="image enlarger navigation tools">
                 {/* Buttons on top border of image. */}
+                { createImageBorderButton('clear-edits') }
                 { createImageBorderButton('save-edits') }
                 { createImageBorderButton('previous') }
                 { createImageBorderButton('full-screen') }
@@ -489,6 +502,11 @@ export const getBorderSVG: { [index: string]: React.SVGProps<SVGSVGElement> } = 
     'saveEdits': (
         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
             <path d="M5 21h14a2 2 0 0 0 2-2V8l-5-5H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2zM7 5h4v2h2V5h2v4H7V5zm0 8h10v6H7v-6z"/>
+        </svg>
+    ),
+    'clearEdits': (
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+            <path d="M12.48 3 7.73 7.75 3 12.59a2 2 0 0 0 0 2.82l4.3 4.3A1 1 0 0 0 8 20h12v-2h-7l7.22-7.22a2 2 0 0 0 0-2.83L15.31 3a2 2 0 0 0-2.83 0zM8.41 18l-4-4 4.75-4.84.74-.75 4.95 4.95-4.56 4.56-.07.08z"/>
         </svg>
     )
 };
