@@ -126,10 +126,9 @@ def photo_diary_data():
         state = hashlib.sha256(os.urandom(1024)).hexdigest()
     if not user:
         user = 'visitor'
-
     session['state'] = state
     session['user'] = user
-    print(session['user'])
+
     # Handle request query.
     try:
         year = request.args.get('year')
@@ -144,11 +143,11 @@ def photo_diary_data():
 
         # Retrieve admin's collection if user is visitor.
         if session['user'] == 'visitor' or session['user'] == 'unauthorized':
-            user_profile = db['accounts'].find_one({'role': 'admin'})
+            account = db['accounts'].find_one({'role': 'admin'})
         else:
-            user_profile = db['accounts'].find_one({'email': session['user']['email']})
+            account = db['accounts'].find_one({'email': session['user']['email']})
 
-        collections = sorted(user_profile['collections'])
+        collections = sorted(account['collections'])
         if year == 'default':
             # Set default year to current year on initial renders.
             year = collections[-1]
@@ -197,10 +196,10 @@ def photo_diary_data():
     # Query MongoDB.
     if len(queries) == 0:
         # For query with just 'year'.
-        docs = list(collection.find({'owner': user_profile['_id']}))
+        docs = list(collection.find({'owner': account['_id']}))
     else:
         # For other queries.
-        match_stage = create_match_stage(user_profile['_id'])
+        match_stage = create_match_stage(account['_id'])
         facet_stage = create_facet_stage(queries, query_field)
         projection_stage = create_projection_stage(facet_stage)
 
@@ -213,7 +212,7 @@ def photo_diary_data():
 
     # Get unique values from each field for displaying in filter component buttons.
     # Uses data from images for the whole year.
-    filter_selectables = list(collection.aggregate(get_selectables_pipeline(user_profile['_id'])))
+    filter_selectables = list(collection.aggregate(get_selectables_pipeline(account['_id'])))
     # For month queries, build separate dict.
     if month:
         filtered_selectables = get_filtered_selectables(docs)
@@ -330,8 +329,11 @@ def photo_diary_login():
     account = db['accounts'].find_one({'email': session['user']['email']})
     if account:
         session['user']['role'] = account['role']
+        session['user']['_id'] = json.dumps(account['_id'], default=str)
     else:
         session['user']['role'] = 'viewer'
+        session['user']['_id'] = json.dumps(ObjectId(), default=str)
+    print("session user:", session['user'])
 
     # Create base response with authorized profile.
     response = jsonify({'user': session['user']})
@@ -390,6 +392,8 @@ def photo_diary_update():
     Returns response status, its message, and the updated doc.
     '''
     update_request = request.get_json()
+    access_jwt = get_jwt()
+
     # Get doc properties from request.
     try:
         doc_id = ObjectId(update_request['id'])
@@ -400,10 +404,18 @@ def photo_diary_update():
     
     # Locate requested doc in database.
     collection = db[str(doc_collection)]
-    doc = collection.find({'_id': doc_id})
-    if (len(list(doc)) == 0):
+    try:
+        doc = list(collection.find({'_id': doc_id}))[0]
+    except IndexError:
         return jsonify({'updateStatus': ('Error: {0} not found in {1} collection.', doc_id, doc_collection)})
-    
+
+    # Check ownership of collection.
+    account = ObjectId(json.loads(access_jwt['sub']['_id']))
+    if account == doc['owner']:
+        pass
+    else:
+        return jsonify({'updateStatus': 'Error: Current user not the owner of collection.  Operation unauthorized.'})
+
     # Parse request into correct fields and values for database.  
     fields = {}
     skipped_flag = False
