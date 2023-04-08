@@ -4,7 +4,13 @@
 
 from flask import Blueprint
 from flask import current_app as app
-from flask import jsonify, make_response, request, send_from_directory, session
+from flask import (
+    jsonify, 
+    make_response, 
+    request, 
+    send_from_directory, 
+    session
+)
 from bson.json_util import ObjectId
 from datetime import (
     datetime,
@@ -12,10 +18,11 @@ from datetime import (
     timezone
 )
 from pathlib import Path
-from pymongo import MongoClient
+from pymongo import MongoClient, UpdateMany
 from urllib.parse import quote_plus
 from google_auth_oauthlib.flow import Flow
 from .tools.mongodb_helpers import (
+    create_match_stage,
     create_facet_stage,
     create_projection_stage,
     get_filtered_selectables,
@@ -109,7 +116,6 @@ def photo_diary_data():
     '''
     MongoDB aggregation pipelines for filter functionality.
     '''
-
     # Get session cookies from request.
     state = request.cookies.get('state')
     user = request.cookies.get('user')
@@ -120,7 +126,6 @@ def photo_diary_data():
         state = hashlib.sha256(os.urandom(1024)).hexdigest()
     if not user:
         user = 'visitor'
-
     session['state'] = state
     session['user'] = user
 
@@ -136,9 +141,13 @@ def photo_diary_data():
         focal_length = request.args.get('focal-length')
         tags = request.args.get('tags')
 
-        collections_list = db.list_collection_names()
-        collections = sorted(collections_list)
-        collections.remove('bounds')
+        # Retrieve admin's collection if user is visitor.
+        if session['user'] == 'visitor' or session['user'] == 'unauthorized':
+            account = db['accounts'].find_one({'role': 'admin'})
+        else:
+            account = db['accounts'].find_one({'email': session['user']['email']})
+
+        collections = sorted(account['collections'])
         if year == 'default':
             # Set default year to current year on initial renders.
             year = collections[-1]
@@ -161,7 +170,6 @@ def photo_diary_data():
     whitespaced_keywords = ['camera', 'film', 'lenses', 'tags']
 
     for key, val in raw_queries.items():
-        
         if val:
             if key == 'month':
                 queries.update({key: int(val)})
@@ -188,24 +196,25 @@ def photo_diary_data():
     # Query MongoDB.
     if len(queries) == 0:
         # For query with just 'year'.
-        docs = list(collection.find({}))
+        docs = list(collection.find({'owner': account['_id']}))
     else:
         # For other queries.
+        match_stage = create_match_stage(account['_id'])
         facet_stage = create_facet_stage(queries, query_field)
         projection_stage = create_projection_stage(facet_stage)
 
         # Query for the group of filters requested.
-        filtered_query = collection.aggregate([facet_stage, projection_stage])
+        filtered_query = collection.aggregate([match_stage, facet_stage, projection_stage])
         docs = list(filtered_query)[0]['intersect']
 
     # Get image counts for each month.
     counter = get_image_counts(docs)
 
-    # Get unique values from fields for selectables to display in filter component.
-    # Uses values from images in the whole year.
-    filter_selectables = list(collection.aggregate(get_selectables_pipeline()))
+    # Get unique values from each field for displaying in filter component buttons.
+    # Uses data from images for the whole year.
+    filter_selectables = list(collection.aggregate(get_selectables_pipeline(account['_id'])))
     # For month queries, build separate dict.
-    if month != None:
+    if month:
         filtered_selectables = get_filtered_selectables(docs)
     else:
         filtered_selectables = []
@@ -249,7 +258,6 @@ def photo_diary_data():
         samesite='Lax',
         max_age=max_age_sec
     )
-
     return response
 
 
@@ -273,7 +281,6 @@ def photo_diary_login():
 
     Returns cookie with JWT token and JSON of authorized user profile.
     '''
-
     auth_code = request.args.get('auth-code')
 
     # Get session state cookie from request.
@@ -317,6 +324,16 @@ def photo_diary_login():
         'email': session['authorized']['email'],
         'profilePic': session['authorized']['picture']
     }
+
+    # Assign role to enable permissions-based operations.
+    account = db['accounts'].find_one({'email': session['user']['email']})
+    if account:
+        session['user']['role'] = account['role']
+        session['user']['_id'] = json.dumps(account['_id'], default=str)
+    else:
+        session['user']['role'] = 'viewer'
+        session['user']['_id'] = json.dumps(ObjectId(), default=str)
+    print("session user:", session['user'])
 
     # Create base response with authorized profile.
     response = jsonify({'user': session['user']})
@@ -363,6 +380,183 @@ def photo_diary_login():
 def photo_diary_logout():    
     response = jsonify({'user': 'logout'})
     unset_jwt_cookies(response)
+    return response
+
+
+# Update route for editing doc's metadata.
+@photo_diary_bp.route('/photo-diary/update', methods=['PATCH'])
+@jwt_required()
+def photo_diary_update():
+    '''
+    Update requests handling only if JWT access token is verified.
+    Returns response status, its message, and the updated doc.
+    '''
+    update_request = request.get_json()
+    access_jwt = get_jwt()
+
+    # Get doc properties from request.
+    try:
+        doc_id = ObjectId(update_request['id'])
+        doc_collection = update_request['collection']
+        fields_to_update = update_request['fields']
+    except KeyError:
+        return jsonify({'updateStatus': 'Error: JSON formatted incorrectly, missing required keys.'})
+    
+    # Locate requested doc in database.
+    collection = db[str(doc_collection)]
+    try:
+        doc = list(collection.find({'_id': doc_id}))[0]
+    except IndexError:
+        return jsonify({'updateStatus': ('Error: {0} not found in {1} collection.', doc_id, doc_collection)})
+
+    # Check ownership of collection.
+    account = ObjectId(json.loads(access_jwt['sub']['_id']))
+    if account == doc['owner']:
+        pass
+    else:
+        return jsonify({'updateStatus': 'Error: Current user not the owner of collection.  Operation unauthorized.'})
+
+    # Parse request into correct fields and values for database.  
+    fields = {}
+    skipped_flag = False
+    for key, val in fields_to_update.items():
+        if val:
+            if key == 'Date':
+                try:
+                    year = month = day = time = None
+                    date_time = val.split(' ', 1)
+                    yyyy_mm_dd = date_time[0]
+                    if len(date_time) == 2:
+                        yyyy_mm_dd, time = date_time
+                    yyyy_mm_dd = yyyy_mm_dd.split('/')
+                    if len(yyyy_mm_dd) == 3:
+                        year, month, day = [int(segment) for segment in yyyy_mm_dd]
+                    elif len(yyyy_mm_dd) == 2:
+                        year, month = [int(segment) for segment in yyyy_mm_dd]
+                    else:
+                        year = int(yyyy_mm_dd)
+                    date = {
+                        'year': year, 
+                        'month': month, 
+                        'day': day, 
+                        'time': time
+                    }
+                    fields.update({
+                        'date': date
+                    })
+                except:
+                    # Date not in correct format, skip.
+                    skipped_flag = True
+            elif key == 'FocalLength':
+                # Strip units and keep only digits.
+                focal_length = [char for char in val if char.isdigit()]
+                if len(focal_length) == 0:
+                    # Focal length in '50mm' format, skip.
+                    skipped_flag = True
+                    pass
+                else:
+                    focal_length_35mm = int(''.join(focal_length[:]))
+                    fields.update({
+                        'focal_length_35mm': focal_length_35mm
+                    })
+            elif key == 'Format':
+                try:
+                    # Split into photo medium and medium type.
+                    format_mediums = ['digital', 'film']
+                    format_medium = format_type = ''
+                    formats = [category.lower() for category in val.split(' ')]
+                    for category in formats:
+                        if category in format_mediums:
+                            format_medium = category
+                        else: 
+                            format_type = category
+                    fields.update({
+                        'format': {
+                            'medium': format_medium, 
+                            'type': format_type
+                        }
+                    })
+                except ValueError:
+                    # Format not in 'Medium Type' format, skip.
+                    skipped_flag = True
+            elif key == 'Camera':
+                try:
+                    make, model = val.split(' ', 1)
+                    fields.update({
+                        'make': make, 
+                        'model': model
+                    })
+                except ValueError:
+                    # Camera in 'Make Model' format, skip.
+                    skipped_flag = True
+            elif key == 'ISO':
+                try:
+                    iso = int(val)
+                    fields.update({
+                        'iso': iso
+                    })
+                except ValueError:
+                    # Not number, skip.
+                    skipped_flag = True
+            elif key == 'Tags': 
+                tags = [tag.strip().lower() for tag in val.split(',')]
+                fields.update({
+                    'tags': tags
+                })
+            elif key == 'Coordinates':
+                try:
+                    coords = [float(coord.strip()) for coord in val.split(',')]
+                    lat, lng = coords[0], coords[1]
+                    lat_ref, lng_ref = 'N', 'E'
+                    if lat < 0:
+                        lat_ref = 'S'
+                    if lng < 0:
+                        lng_ref = 'W'
+                    if lat < -90 or lat > 90:
+                        lat = None
+                    if lng < -180 or lng > 180:
+                        lng = None
+                    gps = {
+                        'lat': lat, 
+                        'lat_ref': lat_ref, 
+                        'lng': lng, 
+                        'lng_ref': lng_ref
+                    }
+                    fields.update({
+                        'gps': gps
+                    })
+                except ValueError:
+                    # Not numbers, skip.
+                    skipped_flag = True
+            else:
+                try:
+                    # Convert to int when possible, database value type.
+                    val = int(val)
+                except ValueError:
+                    # Keep value as is.
+                    pass
+                fields.update({
+                    key.lower(): val
+                })
+    
+    # Update document with parsed fields.
+    collection.update_one(
+        {'_id': doc_id}, 
+        {'$set': fields}
+    )
+
+    updated_doc = list(collection.find({'_id': doc_id}))[0]
+    update_status = "successful"
+    update_message = "All edits OK!"
+    if (skipped_flag is True):
+        update_status = "passed with error"
+        update_message = "Some edit(s) in wrong format."
+
+    response = jsonify({
+        'updateStatus': update_status, 
+        'updatedDoc': updated_doc,
+        'updateMessage': update_message 
+    })
     return response
 
 

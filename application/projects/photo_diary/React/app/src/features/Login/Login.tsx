@@ -4,7 +4,10 @@ import {
     useAppSelector, 
     useMediaQueries } from '../../common/hooks';
 import { useGoogleLogin } from '@react-oauth/google';
-import { exchangeOAuthCodeToken, logoutUser, UserProps } from './loginSlice';
+import { 
+    exchangeOAuthCodeToken, 
+    logoutUser, 
+    UserProps } from './loginSlice';
 import './Login.css';
 
 
@@ -13,22 +16,31 @@ import './Login.css';
 ==================================================================== */
 const Login: React.FunctionComponent = () => {
     const dispatch = useAppDispatch();
-    const user = useAppSelector(state => state.login.user);
-    const isLoggedIn = useAppSelector(state => state.login.loggedIn);
+    const isLoggedIn: boolean = useAppSelector(state => state.login.loggedIn);
+    const user: UserProps | null = useAppSelector(state => state.login.user)
     const classBase: string = "Login";
 
+    /* --------------------------------------------
+        Handle app logins, passing code to thunk.
+    -------------------------------------------- */    
     const onLoginSuccess = (codeResponse: any) => {
         // Dispatch oauth code to backend to obtain access token / user profile.
         dispatch(exchangeOAuthCodeToken(codeResponse));
-    }
+    };
 
-    const login = useGoogleLogin({
-        onSuccess: codeResponse => { onLoginSuccess(codeResponse) },
+    /* -------------------------------------------
+        Handle Google OAuth login for auth code.
+    ------------------------------------------- */        
+    const oAuthlogin = useGoogleLogin({
+        onSuccess: codeResponse => onLoginSuccess(codeResponse),
         onError: errorResponse => console.log(errorResponse),
         flow: 'auth-code'
     });
     
-    const logout = () => {
+    /* ---------------------
+        Handle app logout.
+    --------------------- */    
+    const oAuthlogout = () => {
         // Request backend to invalidate active JWT token.
         dispatch(logoutUser({ 'user': 'logout' }))
     };
@@ -42,10 +54,11 @@ const Login: React.FunctionComponent = () => {
                     (isLoggedIn === true
                         ? " " + "authorized"
                         : "") }
-                onClick={ !isLoggedIn
+                aria-label="login using Google OAuth"
+                onClick={ isLoggedIn === false
                     // Pass in login or logout function.
-                    ? () => login()
-                    : () => logout() }>
+                    ? () => oAuthlogin()
+                    : () => oAuthlogout() }>
 
 
                 <svg 
@@ -72,7 +85,7 @@ const Login: React.FunctionComponent = () => {
 /* =====================================================================
     Helper functions.
 ===================================================================== */
-function getUserIcon(isLoggedIn: boolean, className: string, user: string | UserProps) {
+function getUserIcon(isLoggedIn: boolean, className: string, user: UserProps | null) {
     const unloggedUser = (
         <svg
             className={ className }
@@ -90,9 +103,9 @@ function getUserIcon(isLoggedIn: boolean, className: string, user: string | User
                 (isLoggedIn === true
                     ? " " + "authorized"
                     : "") }
-            src={ typeof(user) === 'object'
-                ? user.profilePic
-                : "" }
+            src={ user
+                    ? user.profilePic
+                    : "" }
             referrerPolicy='no-referrer'
         />
     );
@@ -103,7 +116,6 @@ function getUserIcon(isLoggedIn: boolean, className: string, user: string | User
     
     return userIcon;
 }
-
 
 
 export default Login;

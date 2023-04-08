@@ -269,7 +269,7 @@ export interface TimelineProps {
         'year': number | null,
         'month': string | null
     },
-    'years': Array<string> | null,
+    'years': Array<string | number> | null,
     'counter': CounterTypes,
     'imageDocs': Array<ImageDocTypes> | null,
     'filterSelectables': FilterableTypes | null,
@@ -338,7 +338,8 @@ export type ImageDocTypes = {
     'tags': Array<string>,
     'title': string | null,
     'url': string,
-    'url_thumb': string
+    'url_thumb': string,
+    'owner': string
 };
 
 export type ImageDocFormatTypes = {

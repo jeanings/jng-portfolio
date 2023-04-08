@@ -76,17 +76,18 @@
             border: white 2rem solid;
         }
         
-    .enlarged-image__nav-buttons__container {
+    .enlarged-image__border-buttons__container {
         grid-column: 2 / -1;
         grid-row: 1 / 2;
         display: grid;
         height: 2rem;
-        grid-template-columns: repeat(4, 2rem);
+        grid-template-columns: 10rem repeat(7, 2rem);
         grid-template-rows: 2rem;
         justify-content: flex-end;
         pointer-events: none;
     }
-        .enlarged-image__nav-buttons {
+        .enlarged-image__border-buttons {
+            grid-row: 1;
             display: flex;
             opacity: 0.40;
             background: none;
@@ -98,28 +99,95 @@
             pointer-events: auto;
             transition: all 300ms;
         }  
-            .enlarged-image__nav-buttons:hover {
+            .enlarged-image__border-buttons:hover {
                 opacity: 1;
                 transition: all 300ms;
-            } 
-
-            #enlarger-previous {
-                grid-column: 1;
             }
 
-            #enlarger-full-screen {
+            #enlarger-border-save-response-message.show {
+                opacity: 1;
+                transition: all 300ms;
+            }
+
+            #enlarger-border-save-response-message {
+                grid-column: 1;
+                display: flex;
+                justify-content: flex-end;
+                align-items: center;
+                opacity: 0;
+                font-family: 'Barlow Semi Condensed', sans-serif;
+                font-size: 0.75rem;
+                transition: all 300ms;
+            }
+            
+            #enlarger-border-save-status {
                 grid-column: 2;
             }
 
-            #enlarger-next {
+            #enlarger-border-save-edits {
                 grid-column: 3;
             }
 
-            .enlarged-image__nav-buttons svg {
+            #enlarger-border-clear-edits {
+                grid-column: 4;
+            }
+
+            #enlarger-border-previous {
+                grid-column: 5;
+            }
+
+            #enlarger-border-full-screen {
+                grid-column: 6;
+            }
+
+            #enlarger-border-next {
+                grid-column: 7;
+            }
+
+            .enlarged-image__border-buttons svg {
                 width: 1.5rem;
                 height: 1.5rem;
                 fill: var(--colour-text-inactive);
                 pointer-events: none;
+            }
+
+            /* For form icons: activates when form has populated fields */
+            .enlarged-image__border-buttons.available {
+                opacity: 0.6;
+                transition: all 300ms;
+            }
+
+                .enlarged-image__border-buttons.available:hover {
+                    opacity: 1;
+                }
+
+                #enlarger-border-save-edits.available svg {
+                    fill: var(--colour-accent-primary);
+                    transition: all 300ms;
+                }
+
+                #enlarger-border-clear-edits.available svg {
+                    fill: #1e38cf;
+                    transition: all 300ms;
+                }
+
+                #enlarger-border-save-status.green svg {
+                    fill: #37ad3d;
+                    transition: all 300ms;
+                }
+
+                #enlarger-border-save-status.amber svg {
+                    fill: #e9b610;
+                    transition: all 300ms;
+                }
+                
+                #enlarger-border-save-status.red svg {
+                    fill: #da482f;
+                    transition: all 300ms;
+                }
+                
+            .enlarged-image__border-buttons.unavailable {
+                cursor: not-allowed;
             }
     
 
@@ -179,7 +247,12 @@
                         border-top: 0;
                         border-right: 0;
                     }
-
+                    /* Indicate wrong formatting for input */
+                    .image-enlarger__metadata-value.edit.wrongFormat {
+                        border-width: 0.50rem;
+                        border-color: red;
+                        border-style: solid;
+                    }
             .SideFilmStrip__image-enlarger__metadata-category {
                 display: flex;
                 flex-direction: column;

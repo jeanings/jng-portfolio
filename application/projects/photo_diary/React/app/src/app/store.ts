@@ -10,6 +10,7 @@ import mapCanvasReducer from '../features/MapCanvas/mapCanvasSlice';
 import sideFilmStripReducer from '../features/SideFilmStrip/sideFilmStripSlice';
 import toolbarReducer from '../features/Toolbar/toolbarSlice';
 import loginReducer from '../features/Login/loginSlice';
+import editorReducer from '../features/Editor/editorSlice';
 
 
 // Create the root reducer independently to obtain the RootState type.
@@ -19,7 +20,8 @@ const rootReducer = combineReducers({
     mapCanvas: mapCanvasReducer,
     sideFilmStrip: sideFilmStripReducer,
     toolbar: toolbarReducer,
-    login: loginReducer
+    login: loginReducer,
+    editor: editorReducer
 });
 
 export function setupStore(preloadedState?: PreloadedState<RootState>) {
@@ -36,7 +38,8 @@ export const store = configureStore({
         mapCanvas: mapCanvasReducer,
         sideFilmStrip: sideFilmStripReducer,
         toolbar: toolbarReducer,
-        login: loginReducer
+        login: loginReducer,
+        editor: editorReducer
     },
 });
 

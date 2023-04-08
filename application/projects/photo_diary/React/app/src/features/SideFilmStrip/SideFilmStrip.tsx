@@ -13,7 +13,7 @@ import {
     SideFilmStripProps } from './sideFilmStripSlice';
 import { handleToolbarButtons, ToolbarProps } from '../Toolbar/toolbarSlice';
 import ImageFrame from './ImageFrame';
-import ImageEnlarger, { getNavSVG } from './ImageEnlarger';
+import ImageEnlarger, { getBorderSVG } from './ImageEnlarger';
 import './SideFilmStrip.css';
 
 
@@ -29,7 +29,7 @@ const SideFilmStrip: React.FunctionComponent = () => {
     const [ isImageViewableInFilmStrip, setIsImageViewableInFilmStrip ] = useState(true);
     const isLoaded = useAppSelector(state => state.timeline.responseStatus);
     const imageDocs = useAppSelector(state => state.timeline.imageDocs);
-    const imageDoc = useAppSelector(state => state.sideFilmStrip.enlargeDoc);
+    const enlargeDoc = useAppSelector(state => state.sideFilmStrip.enlargeDoc);
     const docIndex = useAppSelector(state => state.sideFilmStrip.docIndex);
     const slideView = useAppSelector(state => state.sideFilmStrip.slideView);
     const imageEnlarger = useAppSelector(state => state.toolbar.imageEnlarger);
@@ -126,8 +126,8 @@ const SideFilmStrip: React.FunctionComponent = () => {
         }
 
         // Observe clicked image frame and determine if scrolling is needed.
-        if (filmStripRef.current && imageDoc) {
-            const imageFrame = document.getElementById(imageDoc._id) as HTMLElement;
+        if (filmStripRef.current && enlargeDoc) {
+            const imageFrame = document.getElementById(enlargeDoc._id) as HTMLElement;
 
             // Set observer.
             filmStripObserverRef.current.observe(imageFrame);
@@ -136,7 +136,7 @@ const SideFilmStrip: React.FunctionComponent = () => {
                 imageFrame.scrollIntoView({ behavior: 'smooth' });
             }
         }
-    }, [imageDoc, isImageViewableInFilmStrip])
+    }, [enlargeDoc, isImageViewableInFilmStrip])
     
 
     /* ---------------------------------------
@@ -176,7 +176,7 @@ const SideFilmStrip: React.FunctionComponent = () => {
                 }
                 // Base image enlarger nav previous.
                 else if (imageEnlarger === 'on') {
-                    const enlargerPrevious = document.getElementById("enlarger-nav-previous") as HTMLElement;
+                    const enlargerPrevious = document.getElementById("enlarger-border-previous") as HTMLElement;
                     enlargerPrevious.click();
                 }
                 break;
@@ -189,7 +189,7 @@ const SideFilmStrip: React.FunctionComponent = () => {
                 }
                 // Base image enlarger nav next.
                 else if (imageEnlarger === 'on') {
-                    const enlargerNext = document.getElementById("enlarger-nav-next") as HTMLElement;
+                    const enlargerNext = document.getElementById("enlarger-border-next") as HTMLElement;
                     enlargerNext.click();
                 }
                 break;
@@ -230,7 +230,7 @@ const SideFilmStrip: React.FunctionComponent = () => {
     if (imageDocs) {
         imageSource = slideImageIndex !== null
             ? imageDocs[slideImageIndex as number].url  // Use slide viewer's indexing
-            : imageDoc?.url as string;                  // Else use base index from enlarger.
+            : enlargeDoc?.url as string;                  // Else use base index from enlarger.
     }
     
     const enlargedImageElem: JSX.Element = (
@@ -249,7 +249,7 @@ const SideFilmStrip: React.FunctionComponent = () => {
                 id={ `slide-mode-nav-${name}` }
                 aria-label={ `show ${name} slide image` }
                 onClick={ onSlideViewNavButtonClick }>
-                { getNavSVG[name] }
+                { getBorderSVG[name] }
             </button>
         );
     };

@@ -56,8 +56,14 @@ export const preloadedState: RootState = {
     },
     login: {
         tokenResponse: 'idle',
-        loggedIn: false,
-        user: 'visitor'
+        user: null,
+        role: 'viewer',
+        loggedIn: false
+    },
+    editor: {
+        response: 'idle',
+        message: null,
+        updated: {}
     }
 };
 
