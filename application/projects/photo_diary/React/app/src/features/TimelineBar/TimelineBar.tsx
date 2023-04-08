@@ -80,18 +80,18 @@ const TimelineBar: React.FunctionComponent = () => {
             aria-label="timeline selector">
             
             <div 
-                className={ useMediaQueries(classBase.concat("__", "year-selector")) 
+                className={ useMediaQueries(`${classBase}__year-selector`) 
                     +   // Add "dropdown" styling on hover
                     (isYearSelectorHovered === false
                         ? ""
-                        : " ".concat("dropdown"))}
+                        : " " + "dropdown")}
                 role="menubar"
                 aria-label="year selector"
                 onMouseEnter={ onYearSelectorHover }
                 onMouseLeave={ onYearSelectorHover }>
 
                 <div 
-                    className={ useMediaQueries(classBase.concat("__", "year-selected")) }
+                    className={ useMediaQueries(`${classBase}__year-selected`) }
                     role="menuitem"
                     aria-label="selected year">
                     
@@ -103,7 +103,7 @@ const TimelineBar: React.FunctionComponent = () => {
             </div>
 
             <div
-                className={ useMediaQueries(classBase.concat("__", "month-selector")) }
+                className={ useMediaQueries(`${classBase}__month-selector`) }
                 role="menubar"
                 aria-label="month selector">
                 
@@ -130,7 +130,7 @@ function createYearButton(year: string, index: number, classBase: string) {
             year={ year }
             baseClassName={ classBase }
             className="year-item"
-            key={ "key-year_".concat(index.toString()) }
+            key={ `key-year_${index.toString()}` }
         />
     );
 
@@ -150,7 +150,7 @@ function createMonthButton(month: string, index: number, classBase: string) {
             baseClassName={ classBase }
             className="month-item"
             keyIndex={ index }
-            key={ "key-month_".concat(index.toString()) }
+            key={ `key-month_${index.toString()}` }
         />
     );
 

@@ -52,10 +52,10 @@ const ImageFrame: React.FunctionComponent <ImageFrameProps> = (props: ImageFrame
             onClick={ onImageClick }>
 
             <img 
-                className={ useMediaQueries(classBase.concat("__", "image")) 
+                className={ useMediaQueries(`${classBase}__image`) 
                     +   // Add class styling to indicate selected state
                     (enlargeDoc?._id === props.imageDoc._id
-                        ? " ".concat("selected")
+                        ? " " + "selected"
                         : "") }
                 src={ props.imageDoc.url_thumb }
                 aria-label="thumbnail image"
@@ -64,7 +64,7 @@ const ImageFrame: React.FunctionComponent <ImageFrameProps> = (props: ImageFrame
             
         </div>
     );
-}
+};
 
 
 /* =====================================================================

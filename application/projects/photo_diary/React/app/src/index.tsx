@@ -4,13 +4,18 @@ import { Provider } from 'react-redux';
 import './index.css';
 import App from './app/App';
 import { store } from './app/store';
+import { GoogleOAuthProvider } from '@react-oauth/google';
 import * as serviceWorker from './serviceWorker';
 
 
+const GAE_OAUTH_CLIENT_ID = process.env.REACT_APP_GAE_OAUTH_CLIENT_ID as string;
+
 ReactDOM.render(
     <React.StrictMode>
-        <Provider store={store}>
-            <App />
+        <Provider store={ store }>
+            <GoogleOAuthProvider clientId={ GAE_OAUTH_CLIENT_ID }>
+                <App />
+            </GoogleOAuthProvider>
         </Provider>
     </React.StrictMode>,
     document.getElementById('root')

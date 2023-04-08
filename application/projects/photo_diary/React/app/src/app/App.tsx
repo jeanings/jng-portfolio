@@ -6,12 +6,25 @@ import MapCanvas from '../features/MapCanvas/MapCanvas';
 import SideFilmStrip from '../features/SideFilmStrip/SideFilmStrip';
 import Toolbar from '../features/Toolbar/Toolbar';
 import NavBar from '../features/NavBar/NavBar';
+import Login from '../features/Login/Login';
 import './App.css';
 
 export const DEV_MODE = process.env.REACT_APP_DEV_MODE;
 export const apiUrl: string = DEV_MODE === 'True'
     ? process.env.REACT_APP_API_URL_DEV!
     : process.env.REACT_APP_API_URL!;
+export const loginUrl: string = DEV_MODE === 'True'
+    ? process.env.REACT_APP_LOGIN_URL_DEV!
+    : process.env.REACT_APP_LOGIN_URL!;
+export const logoutUrl: string = DEV_MODE === 'True'
+    ? process.env.REACT_APP_LOGOUT_URL_DEV!
+    : process.env.REACT_APP_LOGOUT_URL!;
+export const updateUrl: string = DEV_MODE === 'True'
+    ? process.env.REACT_APP_UPDATE_URL_DEV!
+    : process.env.REACT_APP_UPDATE_URL!;
+export const createUrl: string = DEV_MODE === 'True'
+    ? process.env.REACT_APP_CREATE_URL_DEV!
+    : process.env.REACT_APP_CREATE_URL!;
 
 /* =====================================================================
     Entry point of application.  Renders the base structure of the app.
@@ -82,7 +95,7 @@ const App: React.FunctionComponent = () => {
             className={ useMediaQueries(classBase) 
                 +   // Add styling for loading: hidden if initial fetch not loaded 
                 (isLoaded === 'uninitialized'
-                    ? " ".concat("loading")
+                    ? " " + "loading"
                     : "") }>
             <NavBar />
             <TimelineBar />
@@ -90,6 +103,7 @@ const App: React.FunctionComponent = () => {
             <MapCanvas />
             <SideFilmStrip />
             <Toolbar />
+            <Login />
         </div>
     );
 };

@@ -1,6 +1,6 @@
 import React from 'react';
 import { Provider } from 'react-redux';
-import { setupStore, RootState } from '../../app/store';
+import { setupStore } from '../../app/store';
 import { 
     cleanup, 
     render, 
@@ -15,6 +15,7 @@ import mockDefaultData from '../../utils/mockDefaultData.json';
 import mock2022Data from '../../utils/mock2022Data.json';
 import mock2022DataJun from '../../utils/mock2022DataJun.json';
 import mock2015Data from '../../utils/mock2015Data.json';
+import preloadedState from '../../utils/testHelpers';
 import TimelineBar from '../TimelineBar/TimelineBar';
 import { TimelineProps } from '../TimelineBar/timelineSlice';
 import FilterDrawer from './FilterDrawer';
@@ -32,102 +33,6 @@ afterEach(() => {
     mockAxios.reset();
     cleanup;
 });
-
-/* -------------------------------------------------
-    Mocked state.
-------------------------------------------------- */
-const preloadedState: RootState = {
-    timeline: {
-        responseStatus: 'initialized',
-        query: { year: 2022 },
-        initYear: 2022,
-        selected: { year: 2022, month: 'all' },
-        years: mockDefaultData.years,
-        counter: {
-            'all': 0,
-            'jan': 0, 'feb': 0, 'mar': 0,
-            'apr': 0, 'may': 0, 'jun': 0,
-            'jul': 0, 'aug': 0, 'sep': 0,
-            'oct': 0, 'nov': 0, 'dec': 0,
-            'previous': {
-                'all': 0,
-                'jan': 0, 'feb': 0, 'mar': 0,
-                'apr': 0, 'may': 0, 'jun': 0,
-                'jul': 0, 'aug': 0, 'sep': 0,
-                'oct': 0, 'nov': 0, 'dec': 0,
-            }
-        },
-        imageDocs: null,
-        filterSelectables: mockDefaultData.filterSelectables[0],
-        filteredSelectables: null,
-        geojson: null,
-        bounds: null
-    },
-    filter: {
-        formatMedium: [],
-        formatType: [],
-        film: [],
-        camera: [],
-        lens: [],
-        focalLength: [],
-        tags: []
-    },
-    mapCanvas: {
-        styleLoaded: false,
-        sourceStatus: 'idle',
-        markersStatus: 'idle',
-        fitBoundsButton: 'idle',
-        markerLocator: 'idle'
-    },
-    sideFilmStrip: {
-        enlargeDoc: null,
-        docIndex: null
-    },
-    toolbar: {
-        filter: 'off',
-        imageEnlarger: 'off'
-    }
-};
-
-const preloadedStateWithFilter: RootState = {
-    timeline: {
-        responseStatus: 'successful',
-        query: { year: 2022, film: [ "Kodak_Gold_200", "Fujifilm_Superia_X-TRA_400" ] },
-        initYear: 2022,
-        selected: { year: 2022, month: 'all' },
-        years: mockDefaultData.years,
-        counter: preloadedState.timeline.counter,
-        imageDocs: preloadedState.timeline.imageDocs,
-        filterSelectables: mockDefaultData.filterSelectables[0],
-        filteredSelectables: null,
-        geojson: null,
-        bounds: null
-    },
-    filter: {
-        formatMedium: [],
-        formatType: [],
-        film: [ "Kodak Gold 200", "Fujifilm Superia X-TRA 400" ],
-        camera: [],
-        lens: [],
-        focalLength: [],
-        tags: []
-    },
-    mapCanvas: {
-        styleLoaded: false,
-        sourceStatus: 'idle',
-        markersStatus: 'idle',
-        fitBoundsButton: 'idle',
-        markerLocator: 'idle'
-    },
-    sideFilmStrip: {
-        enlargeDoc: null,
-        docIndex: null
-    },
-    toolbar: {
-        filter: 'off',
-        imageEnlarger: 'off'
-    }
-}
 
 
 /* =====================================================================
@@ -478,7 +383,7 @@ test("<< filter >> state resets to initial state when year is changed", async() 
     );
 
     // Verify filter state is blank.
-    expect(newStore.getState().timeline.responseStatus).toEqual('initialized');
+    expect(newStore.getState().timeline.responseStatus).toEqual('successful');
     expect(newStore.getState().filter.film.length).toEqual(0);
 
     // Wait for elements to render.
@@ -654,7 +559,7 @@ test("fetches year's data when going from filters activated to deactivated", asy
         </Provider>
     );
 
-    await waitFor(() => expect(newStore.getState().timeline.responseStatus).toEqual('initialized'));
+    await waitFor(() => expect(newStore.getState().timeline.responseStatus).toEqual('successful'));
     expect(newStore.getState().filter.film.length).toEqual(0);
 
     await waitFor(() => screen.findAllByRole('checkbox', { name: "film filter option" }));

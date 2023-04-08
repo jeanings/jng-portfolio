@@ -13,7 +13,7 @@ import {
     SideFilmStripProps } from './sideFilmStripSlice';
 import { handleToolbarButtons, ToolbarProps } from '../Toolbar/toolbarSlice';
 import ImageFrame from './ImageFrame';
-import ImageEnlarger, { getNavSVG } from './ImageEnlarger';
+import ImageEnlarger, { getBorderSVG } from './ImageEnlarger';
 import './SideFilmStrip.css';
 
 
@@ -29,7 +29,7 @@ const SideFilmStrip: React.FunctionComponent = () => {
     const [ isImageViewableInFilmStrip, setIsImageViewableInFilmStrip ] = useState(true);
     const isLoaded = useAppSelector(state => state.timeline.responseStatus);
     const imageDocs = useAppSelector(state => state.timeline.imageDocs);
-    const imageDoc = useAppSelector(state => state.sideFilmStrip.enlargeDoc);
+    const enlargeDoc = useAppSelector(state => state.sideFilmStrip.enlargeDoc);
     const docIndex = useAppSelector(state => state.sideFilmStrip.docIndex);
     const slideView = useAppSelector(state => state.sideFilmStrip.slideView);
     const imageEnlarger = useAppSelector(state => state.toolbar.imageEnlarger);
@@ -126,8 +126,8 @@ const SideFilmStrip: React.FunctionComponent = () => {
         }
 
         // Observe clicked image frame and determine if scrolling is needed.
-        if (filmStripRef.current && imageDoc) {
-            const imageFrame = document.getElementById(imageDoc._id) as HTMLElement;
+        if (filmStripRef.current && enlargeDoc) {
+            const imageFrame = document.getElementById(enlargeDoc._id) as HTMLElement;
 
             // Set observer.
             filmStripObserverRef.current.observe(imageFrame);
@@ -136,7 +136,7 @@ const SideFilmStrip: React.FunctionComponent = () => {
                 imageFrame.scrollIntoView({ behavior: 'smooth' });
             }
         }
-    }, [imageDoc, isImageViewableInFilmStrip])
+    }, [enlargeDoc, isImageViewableInFilmStrip])
     
 
     /* ---------------------------------------
@@ -157,7 +157,7 @@ const SideFilmStrip: React.FunctionComponent = () => {
     ---------------------------------------------- */
     const onKeyPress = (event: KeyboardEvent) => {
         const keyPress = event;
-
+        const isFocusOnInput: boolean = document.activeElement?.tagName === 'INPUT' ? true : false; 
         // Key listeners.
         switch(keyPress.key) {
             case 'Escape':
@@ -175,8 +175,8 @@ const SideFilmStrip: React.FunctionComponent = () => {
                     slideViewPrevious.click();
                 }
                 // Base image enlarger nav previous.
-                else if (imageEnlarger === 'on') {
-                    const enlargerPrevious = document.getElementById("enlarger-nav-previous") as HTMLElement;
+                else if (imageEnlarger === 'on' && isFocusOnInput === false) {
+                    const enlargerPrevious = document.getElementById("enlarger-border-previous") as HTMLElement;
                     enlargerPrevious.click();
                 }
                 break;
@@ -188,8 +188,8 @@ const SideFilmStrip: React.FunctionComponent = () => {
                     slideViewNext.click();
                 }
                 // Base image enlarger nav next.
-                else if (imageEnlarger === 'on') {
-                    const enlargerNext = document.getElementById("enlarger-nav-next") as HTMLElement;
+                else if (imageEnlarger === 'on' && isFocusOnInput === false) {
+                    const enlargerNext = document.getElementById("enlarger-border-next") as HTMLElement;
                     enlargerNext.click();
                 }
                 break;
@@ -230,7 +230,7 @@ const SideFilmStrip: React.FunctionComponent = () => {
     if (imageDocs) {
         imageSource = slideImageIndex !== null
             ? imageDocs[slideImageIndex as number].url  // Use slide viewer's indexing
-            : imageDoc?.url as string;                  // Else use base index from enlarger.
+            : enlargeDoc?.url as string;                  // Else use base index from enlarger.
     }
     
     const enlargedImageElem: JSX.Element = (
@@ -246,10 +246,10 @@ const SideFilmStrip: React.FunctionComponent = () => {
         return (
             <button
                 className={ "slide-mode-overlay__nav-buttons" }
-                id={ "slide-mode".concat("-", "nav", "-", name) }
-                aria-label={ "show".concat(" ", name, " slide image") }
+                id={ `slide-mode-nav-${name}` }
+                aria-label={ `show ${name} slide image` }
                 onClick={ onSlideViewNavButtonClick }>
-                { getNavSVG[name] }
+                { getBorderSVG[name] }
             </button>
         );
     };
@@ -304,7 +304,7 @@ const SideFilmStrip: React.FunctionComponent = () => {
                 className={ useMediaQueries(classBase) 
                     +   // Add styling for loading: hidden if initial fetch not loaded
                     (isLoaded === 'uninitialized'
-                        ? " ".concat("loading")
+                        ? " " + "loading"
                         : "") }
                 id={ classBase }
                 role="main"
@@ -312,11 +312,11 @@ const SideFilmStrip: React.FunctionComponent = () => {
 
                 {/* Panel for enlarged image and its stats. */}
                 <div 
-                    className={ useMediaQueries(classBase.concat("__", "image-enlarger-container"))
+                    className={ useMediaQueries(`${classBase}__image-enlarger-container`)
                         +   // Add "slide" styling: slides left if mouse hovered on film strip. 
                         (filmStripHovered === false
                             ? ""
-                            : " ".concat("slide")) }
+                            : " " + "slide") }
                     id="image-enlarger-container"
                     role="figure"
                     aria-label="enlarged image with metadata">
@@ -327,11 +327,11 @@ const SideFilmStrip: React.FunctionComponent = () => {
 
                 {/* "Film strip" showing image collection in columnar form. */}
                 <div 
-                    className={ useMediaQueries(classBase.concat("__", "film-strip")) 
+                    className={ useMediaQueries(`${classBase}__film-strip`) 
                         +   // Add "expand" styling: reveals second column of images.
                         (filmStripHovered === false
                             ? ""
-                            : " ".concat("expand")) }
+                            : " " + "expand") }
                     id="film-strip"
                     ref={ filmStripRef }
                     role="listbox" 
@@ -350,11 +350,11 @@ const SideFilmStrip: React.FunctionComponent = () => {
             </aside>
 
             <div
-                className={ useMediaQueries(classBase.concat("__", "slide-mode-overlay")) 
+                className={ useMediaQueries(`${classBase}__slide-mode-overlay`) 
                     +   // Show slide view overlay depending on state.
                     (slideView === 'on'
-                        ? " show"
-                        : " hide") }
+                        ? " " + "show"
+                        : " " + "hide") }
                 id="enlarged-image-slide-mode"
                 role="img"
                 aria-label="full screen slide view mode"
@@ -387,12 +387,12 @@ function createImageFrames(classBase: string, imageDoc: ImageDocTypes, index: nu
             baseClassName={ classBase }
             imageDoc={ imageDoc }
             docIndex= { index }
-            key={ "key".concat("_", classBase, "_", index.toString()) }
+            key={ `key_${classBase}_${index.toString()}` }
         />
     );
     
     return imageFrame;
-};
+}
 
 
 export default SideFilmStrip;
