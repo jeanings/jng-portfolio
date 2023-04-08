@@ -114,6 +114,7 @@ export const requestLogout = (logoutUrl: string, request: LogoutType) => {
 ------------------------------- */
 // State for initial render.
 const DEV_USER = {
+    '_id': 'some_encoded_objectid',
     'name': 'Dev',
     'email': 'dev@email.com',
     'profilePic': '',
@@ -151,6 +152,7 @@ const loginSlice = createSlice({
                 else {
                     state.tokenResponse = 'successful';
                     state.user = data.user;
+                    state.user!._id = JSON.parse(data.user._id);
                     state.role = data.user.role;
                     state.loggedIn = true;
                 }
@@ -220,6 +222,7 @@ export type LogoutType = {
 };
 
 export interface UserProps {
+    '_id': string,
     'name': string,
     'email': string,
     'profilePic': string

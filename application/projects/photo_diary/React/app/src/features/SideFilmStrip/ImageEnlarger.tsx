@@ -13,14 +13,13 @@ import {
     handleSlideView, 
     SideFilmStripProps } from './sideFilmStripSlice';
 import { ImageDocTypes } from '../TimelineBar/timelineSlice';
-import { LoginProps } from '../Login/loginSlice';
+import { LoginProps, UserProps } from '../Login/loginSlice';
 import { 
     updateDoc, 
     handleUpdatedDocsClear,
     ClearUpdatedDocsType, 
     UpdateRequestDocType } from '../Editor/editorSlice';
 import './ImageEnlarger.css';
-import { PassThrough } from 'stream';
 
 
 /* =====================================================================
@@ -37,8 +36,9 @@ const ImageEnlarger: React.FunctionComponent <ImageEnlargerProps> = (props: Imag
     const [ metadataEdits, setMetadataEdits ] = useState<MetadataEditInputType>({});
     const [ isFormatCorrect, setIsFormatCorrect ] = useState<MetadataCorrectnessType>({});
     const metadataForm = useRef<HTMLFormElement | null>(null);
-    const userRole: LoginProps['role'] = useAppSelector(state => state.login.role);
-    const isUserEditor: boolean = (userRole === 'editor') || (userRole === 'admin') ? true : false;
+    const role: LoginProps['role'] = useAppSelector(state => state.login.role);
+    const user: UserProps | null = useAppSelector(state => state.login.user);
+    const isUserEditor: boolean = (role === 'editor') || (role === 'admin') ? true : false;
     const editor = useAppSelector(state => state.editor);
     const [ showEditResponseMessage, setShowEditResponseMessage ] = useState<boolean>(false);
     const classBase: string = "image-enlarger";
@@ -404,7 +404,8 @@ const ImageEnlarger: React.FunctionComponent <ImageEnlargerProps> = (props: Imag
     // Create image stats elements to populate info panel next to enlarged image.
     const imageInfoElemClassName = useMediaQueries(`${props.baseClassName}__${classBase}__metadata`)
     const imageInfoElem: JSX.Element = (
-        isUserEditor === true
+        isUserEditor === true 
+        && user?._id === enlargeDoc?.owner
             // Editable form component for editors.
             ? <form
                 className={ imageInfoElemClassName }
@@ -440,6 +441,7 @@ const ImageEnlarger: React.FunctionComponent <ImageEnlargerProps> = (props: Imag
         // For all the base metadata items.
         const metaDataSpan: JSX.Element = (
             isUserEditor === true
+            && user?._id === enlargeDoc?.owner
             // Editor mode.
                 ? <>
                     <label

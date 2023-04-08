@@ -160,12 +160,6 @@ export type ClearUpdatedDocsType = {
     'msg': 'clear updated docs'
 };
 
-export interface UserProps {
-    'name': string,
-    'email': string,
-    'profilePic': string
-};
-
 export interface oAuthCodeResponseType {
     [index: string]: string,
     'authuser': string,
