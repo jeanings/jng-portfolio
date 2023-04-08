@@ -157,7 +157,7 @@ const SideFilmStrip: React.FunctionComponent = () => {
     ---------------------------------------------- */
     const onKeyPress = (event: KeyboardEvent) => {
         const keyPress = event;
-
+        const isFocusOnInput: boolean = document.activeElement?.tagName === 'INPUT' ? true : false; 
         // Key listeners.
         switch(keyPress.key) {
             case 'Escape':
@@ -175,7 +175,7 @@ const SideFilmStrip: React.FunctionComponent = () => {
                     slideViewPrevious.click();
                 }
                 // Base image enlarger nav previous.
-                else if (imageEnlarger === 'on') {
+                else if (imageEnlarger === 'on' && isFocusOnInput === false) {
                     const enlargerPrevious = document.getElementById("enlarger-border-previous") as HTMLElement;
                     enlargerPrevious.click();
                 }
@@ -188,7 +188,7 @@ const SideFilmStrip: React.FunctionComponent = () => {
                     slideViewNext.click();
                 }
                 // Base image enlarger nav next.
-                else if (imageEnlarger === 'on') {
+                else if (imageEnlarger === 'on' && isFocusOnInput === false) {
                     const enlargerNext = document.getElementById("enlarger-border-next") as HTMLElement;
                     enlargerNext.click();
                 }
