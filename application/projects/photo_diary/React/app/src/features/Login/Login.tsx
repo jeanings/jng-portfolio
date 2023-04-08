@@ -4,7 +4,10 @@ import {
     useAppSelector, 
     useMediaQueries } from '../../common/hooks';
 import { useGoogleLogin } from '@react-oauth/google';
-import { exchangeOAuthCodeToken, logoutUser, UserProps } from './loginSlice';
+import { 
+    exchangeOAuthCodeToken, 
+    logoutUser, 
+    UserProps } from './loginSlice';
 import './Login.css';
 
 
@@ -13,8 +16,8 @@ import './Login.css';
 ==================================================================== */
 const Login: React.FunctionComponent = () => {
     const dispatch = useAppDispatch();
-    const user = useAppSelector(state => state.login.user);
-    const isEditor = useAppSelector(state => state.login.role) === 'editor' ? true : false;
+    const isLoggedIn: boolean = useAppSelector(state => state.login.loggedIn);
+    const user: UserProps | null = useAppSelector(state => state.login.user)
     const classBase: string = "Login";
 
     /* --------------------------------------------
@@ -28,7 +31,7 @@ const Login: React.FunctionComponent = () => {
     /* -------------------------------------------
         Handle Google OAuth login for auth code.
     ------------------------------------------- */        
-    const login = useGoogleLogin({
+    const oAuthlogin = useGoogleLogin({
         onSuccess: codeResponse => onLoginSuccess(codeResponse),
         onError: errorResponse => console.log(errorResponse),
         flow: 'auth-code'
@@ -37,7 +40,7 @@ const Login: React.FunctionComponent = () => {
     /* ---------------------
         Handle app logout.
     --------------------- */    
-    const logout = () => {
+    const oAuthlogout = () => {
         // Request backend to invalidate active JWT token.
         dispatch(logoutUser({ 'user': 'logout' }))
     };
@@ -48,20 +51,20 @@ const Login: React.FunctionComponent = () => {
             <button 
                 className={ useMediaQueries(`${classBase}__button`)
                 +   // Change styling based on logged status.
-                    (isEditor === true
+                    (isLoggedIn === true
                         ? " " + "authorized"
                         : "") }
                 aria-label="login using Google OAuth"
-                onClick={ !isEditor
+                onClick={ isLoggedIn === false
                     // Pass in login or logout function.
-                    ? () => login()
-                    : () => logout() }>
+                    ? () => oAuthlogin()
+                    : () => oAuthlogout() }>
 
 
                 <svg 
                     className={ useMediaQueries(`${classBase}__button__indicator`) 
                         +   // Change styling based on logged status.
-                        (isEditor === true
+                        (isLoggedIn === true
                             ? " " + "authorized"
                             : "") }
                     xmlns='http://www.w3.org/2000/svg' 
@@ -71,7 +74,7 @@ const Login: React.FunctionComponent = () => {
                     </path>
                 </svg>
 
-                { getUserIcon(isEditor, useMediaQueries(`${classBase}__button__user`), user) }
+                { getUserIcon(isLoggedIn, useMediaQueries(`${classBase}__button__user`), user) }
                 
             </button>
         </div>
@@ -100,9 +103,9 @@ function getUserIcon(isLoggedIn: boolean, className: string, user: UserProps | n
                 (isLoggedIn === true
                     ? " " + "authorized"
                     : "") }
-            src={ user !== null
-                ? user.profilePic
-                : "" }
+            src={ user
+                    ? user.profilePic
+                    : "" }
             referrerPolicy='no-referrer'
         />
     );

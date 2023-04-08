@@ -13,12 +13,14 @@ import {
     handleSlideView, 
     SideFilmStripProps } from './sideFilmStripSlice';
 import { ImageDocTypes } from '../TimelineBar/timelineSlice';
+import { LoginProps } from '../Login/loginSlice';
 import { 
     updateDoc, 
     handleUpdatedDocsClear,
     ClearUpdatedDocsType, 
     UpdateRequestDocType } from '../Editor/editorSlice';
 import './ImageEnlarger.css';
+import { PassThrough } from 'stream';
 
 
 /* =====================================================================
@@ -33,8 +35,10 @@ const ImageEnlarger: React.FunctionComponent <ImageEnlargerProps> = (props: Imag
     const timelineSelected = useAppSelector(state => state.timeline.selected);
     const imageDocs = useAppSelector(state => state.timeline.imageDocs);
     const [ metadataEdits, setMetadataEdits ] = useState<MetadataEditInputType>({});
+    const [ isFormatCorrect, setIsFormatCorrect ] = useState<MetadataCorrectnessType>({});
     const metadataForm = useRef<HTMLFormElement | null>(null);
-    const isUserEditor: boolean = useAppSelector(state => state.login.role) === 'editor' ? true : false;
+    const userRole: LoginProps['role'] = useAppSelector(state => state.login.role);
+    const isUserEditor: boolean = (userRole === 'editor') || (userRole === 'admin') ? true : false;
     const editor = useAppSelector(state => state.editor);
     const [ showEditResponseMessage, setShowEditResponseMessage ] = useState<boolean>(false);
     const classBase: string = "image-enlarger";
@@ -139,20 +143,49 @@ const ImageEnlarger: React.FunctionComponent <ImageEnlargerProps> = (props: Imag
     const handleMetadataInput = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         const metadataName = event.target.name;
         const metadataUpdatedField = event.target.value;
-        
-        if (metadataUpdatedField) {
-            // Add to metadata edits state.
+        const updateThis = new MetadataInput(metadataName, metadataUpdatedField);
+        updateThis.checkInputs();
+       
+        if (updateThis.passes) {
+            // Add to metadata edits to state if input format passes.
             setMetadataEdits({...metadataEdits,
-                [metadataName]: metadataUpdatedField 
+                [updateThis.field]: updateThis.value 
             });
         }
         else {
-            // Delete key if no value present.
+            // Flag metadata as incorrectly formatted.
+            setMetadataEdits({...metadataEdits,
+                [updateThis.field]: 'wrong format'
+            });
+        }
+
+        if (!updateThis.value) {
+            // Delete key if no value present (cleared by user).
             const newMetadataEdits = {...metadataEdits};
-            delete newMetadataEdits[metadataName];
+            delete newMetadataEdits[updateThis.field];
             setMetadataEdits(newMetadataEdits);
         }
     };
+
+    /* -------------------------------------------------------------------------------
+        Handles indicating format correctness through subscribed elements.
+        Decouples from metadataEdits local state to only affect after onBlur events.
+    --------------------------------------------------------------------------------*/
+    const handleCorrectnessIndicator = (event: React.FocusEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+        const thisField = event.target.name;
+        const thisInput = metadataEdits[thisField]
+        
+        if (thisInput === 'wrong format') {
+            setIsFormatCorrect({...isFormatCorrect,
+                [thisField]: false
+            });
+        }
+        else {
+            setIsFormatCorrect({...isFormatCorrect,
+                [thisField]: true
+            });
+        }
+    }   
 
     /* -----------------------------------------------
         Handles clearing form edits and local state.
@@ -373,26 +406,26 @@ const ImageEnlarger: React.FunctionComponent <ImageEnlargerProps> = (props: Imag
     const imageInfoElem: JSX.Element = (
         isUserEditor === true
             // Editable form component for editors.
-            ?   <form
-                    className={ imageInfoElemClassName }
-                    id="enlarged-image-metadata"
-                    aria-label="edit form of metadata for enlarged image"
-                    ref={ metadataForm }
-                    onSubmit={ onSaveEditsClick }>
+            ? <form
+                className={ imageInfoElemClassName }
+                id="enlarged-image-metadata"
+                aria-label="edit form of metadata for enlarged image"
+                ref={ metadataForm }
+                onSubmit={ onSaveEditsClick }>
 
-                    { /* List of image stats. */
-                        infoElems }
-                </form>
+                { /* List of image stats. */
+                    infoElems }
+            </form>
             // Static component for viewers. 
-            :   <figcaption
-                    className={ imageInfoElemClassName }
-                    id="enlarged-image-metadata"
-                    role="figure"
-                    aria-label="metadata for enlarged image">
+            : <figcaption
+                className={ imageInfoElemClassName }
+                id="enlarged-image-metadata"
+                role="figure"
+                aria-label="metadata for enlarged image">
 
-                    { /* List of image stats. */
-                        infoElems }
-                </figcaption>
+                { /* List of image stats. */
+                    infoElems }
+            </figcaption>
             
     );
 
@@ -419,21 +452,40 @@ const ImageEnlarger: React.FunctionComponent <ImageEnlargerProps> = (props: Imag
                             : categoryName.toUpperCase() }
                     </label>
 
-                    { categoryName !== 'Tags' 
-                    ?   <input
+                    { categoryName === 'Tags'
+                        ? <textarea
                             name={ categoryName }
-                            className={ "image-enlarger__metadata-value edit" }
-                            id={ `${categoryName}-input` }
-                            type="text"
+                            className={ "image-enlarger__metadata-value edit" 
+                                +   // Add additional indicator styling if incorrect formatting
+                                ( isFormatCorrect[categoryName] === undefined
+                                    || isFormatCorrect[categoryName] === true
+                                    ? ""
+                                    : " " + "wrongFormat")}
                             placeholder={ getCategoryData(categoryName, categoryData) as string }
                             onChange={ (event) => handleMetadataInput(event) }
+                            onBlur={ (event) => handleCorrectnessIndicator(event) }
                             aria-label={ `${categoryName} editable metadata value` }
                         />
-                    :   <textarea
+                        : <input
                             name={ categoryName }
-                            className={ "image-enlarger__metadata-value edit" }
-                            placeholder={ getCategoryData(categoryName, categoryData) as string }
+                            className={ "image-enlarger__metadata-value edit"
+                                +   // Add additional indicator styling if incorrect formatting
+                                ( isFormatCorrect[categoryName] === undefined
+                                    || isFormatCorrect[categoryName] === true
+                                    ? ""
+                                    : " " + "wrongFormat")}
+                            id={ `${categoryName}-input` }
+                            type="text"
+                            placeholder={ getCategoryData(categoryName, categoryData) as string
+                                +   // Add input format hint for date if it only contains year/month.
+                                ( categoryName === 'Date' 
+                                    && (categoryData as string).split(' ', 1).length === 1
+                                    ? " " + "(yyyy/mm/dd hh:mm:ss)"
+                                    : categoryName === 'FocalLength'    // Focal length equiv. reminder
+                                        ? " " + "(35mm equiv., in mm/cm)"
+                                        : "") }
                             onChange={ (event) => handleMetadataInput(event) }
+                            onBlur={ (event) => handleCorrectnessIndicator(event) }
                             aria-label={ `${categoryName} editable metadata value` }
                         />
                     }
@@ -444,7 +496,7 @@ const ImageEnlarger: React.FunctionComponent <ImageEnlargerProps> = (props: Imag
                         className={ "image-enlarger__metadata-name" }
                         role="figure"
                         aria-label={ `${categoryName} metadata` }>
-                    
+
                         { categoryName === 'FocalLength'
                             ? 'Focal Length'.toUpperCase()
                             : categoryName.toUpperCase() }
@@ -460,7 +512,6 @@ const ImageEnlarger: React.FunctionComponent <ImageEnlargerProps> = (props: Imag
         );
         return metaDataSpan;
     }
-    
 
     return (
         <div 
@@ -530,6 +581,133 @@ const ImageEnlarger: React.FunctionComponent <ImageEnlargerProps> = (props: Imag
 /* =====================================================================
     Helper functions.
 ===================================================================== */
+
+/* --------------------------------------------------------------
+    Class for validating inputs being sent to update docs in db.
+-------------------------------------------------------------- */
+class MetadataInput {
+    field: string;
+    value: string;
+    passes: boolean;
+
+    constructor(name: string, input: string) {
+        this.field = name;
+        this.value = input;
+        this.passes = false;
+    };
+
+    checkInputs() {
+        switch (this.field) {
+            case 'Date':
+                this.passes = this.isDateInputCorrect(this.value);
+                break;
+            case 'Format':
+                this.passes = ['film', 'digital'].some(medium => this.value.includes(medium));
+                break;
+            case 'FocalLength':
+                this.passes = ['mm', 'cm'].some(unit => this.value.includes(unit));
+                break;
+            case 'ISO':
+                this.passes = parseInt(this.value) > 0 ? true : false
+                break;
+            case 'Camera':
+                this.passes = this.isCameraInputCorrect(this.value);
+                break;
+            case 'Coordinates':
+                this.passes = this.isCoordinatesInputCorrect(this.value);
+                break;
+        }
+    }
+
+    /*-------------------------------------------
+        Methods for format-checking some fields.
+    ------------------------------------------ */
+    isDateInputCorrect(value: string) {
+        const today = new Date();
+        const [ thisYear, thisMonth, thisDay ] = [ 
+            today.getFullYear(), 
+            today.getMonth() + 1,   // getMonth() indexes January as 0.
+            today.getDate()
+        ];
+
+        // 2022/12/31 23:59:59
+        const [ date, time ] = value.split(' ');
+
+        if (time) {
+            // Check correctness of time format.
+            const [ hour, minute, second ] = time.split(':').map(unit => parseInt(unit));
+            if (hour && minute && second) {
+                if (hour < 0 || hour > 23) {
+                    return false;
+                }
+                if (minute < 0 || minute > 59) {
+                    return false;
+                }
+                if (second < 0 || second > 59) {
+                    return false;
+                }
+            }
+            else {
+                // Any of the parts missing, mark as incorrect format.
+                return false;
+            }
+        }
+        
+        if (date) {
+            const [ year, month, day ] = date.split('/').map(unit => parseInt(unit));
+            
+            if (year && month) {                      
+                if (year < 1920 || year > thisYear) {
+                    return false;
+                }
+                if (month < 0 || month > 12) {
+                    return false;
+                }
+                if (year === thisYear && month > thisMonth) {
+                    // No time travelling yet, reject metadata from the future.
+                    return false;
+                }
+                if (day) {
+                    if (day < 0 || day > 31) {
+                        // Very simplified, but this isn't a critical app...
+                        return false;
+                    }
+                }
+            }
+            else {
+                // Reject any input missing year and month.
+                return false;
+            }
+        }
+        return true;
+    };
+
+
+    isCameraInputCorrect(value: string) {
+        // Camera input requires a maker and model name.
+        const hasMakeAndModel = value.split(' ').length >= 2 ? true : false;
+        return hasMakeAndModel;
+    };
+
+
+    isCoordinatesInputCorrect(value: string) {
+        const coords = value.split(',');
+        const setOfCoords = coords.length === 2 ? true : false;
+
+        if (setOfCoords) {
+            // Check range of latitude, longitude values.
+            let [lat, lng] = coords;
+            const latOK = parseFloat(lat) >= -90 && parseFloat(lat) <= 90 ? true : false;
+            const lngOK = parseFloat(lng) >= -180 == parseFloat(lng) <= 180 ? true : false; 
+
+            return (latOK && lngOK);
+        }
+        else {
+            return false;
+        }
+    };
+}
+
 
 /* -------------------------------------
     SVGs for image border buttons.
@@ -636,6 +814,21 @@ export type MetadataEditInputType = {
     'Tags'?: string | undefined, 
     'Description'?: string | undefined,
     'Coordinates'?: string | undefined
+};
+
+type MetadataCorrectnessType = {
+    [index: string]: boolean | undefined
+    'Title'?: boolean | undefined,
+    'Date'?: boolean | undefined,
+    'Format'?: boolean | undefined,
+    'Film'?: boolean | undefined,
+    'FocalLength'?: boolean | undefined,
+    'ISO'?: boolean | undefined,
+    'Camera'?: boolean | undefined,
+    'Lens'?: boolean | undefined,
+    'Tags'?: boolean | undefined, 
+    'Description'?: boolean | undefined,
+    'Coordinates'?: boolean | undefined
 };
 
 

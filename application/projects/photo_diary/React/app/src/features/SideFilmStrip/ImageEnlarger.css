@@ -247,7 +247,12 @@
                         border-top: 0;
                         border-right: 0;
                     }
-
+                    /* Indicate wrong formatting for input */
+                    .image-enlarger__metadata-value.edit.wrongFormat {
+                        border-width: 0.50rem;
+                        border-color: red;
+                        border-style: solid;
+                    }
             .SideFilmStrip__image-enlarger__metadata-category {
                 display: flex;
                 flex-direction: column;

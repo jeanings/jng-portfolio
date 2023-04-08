@@ -211,7 +211,7 @@ export interface LoginProps {
     [index: string]: string | boolean | null | UserProps,
     'tokenResponse': 'successful' | 'error' | 'idle',
     'user': UserProps | null,
-    'role': 'viewer' | 'editor'
+    'role': 'viewer' | 'editor' | 'admin'
     'loggedIn': boolean
 };
 

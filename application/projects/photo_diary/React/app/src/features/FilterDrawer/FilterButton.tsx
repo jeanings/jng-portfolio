@@ -81,7 +81,7 @@ const FilterButton: React.FunctionComponent<FilterButtonProps> = (props: FilterB
         // Assign styling through classname.
         buttonsToDisable.includes(props.selectableName) === false
             ? classNameAddOn = ""
-            : classNameAddOn = "unavailable";
+            : classNameAddOn = " " + "unavailable";
 
         return classNameAddOn;
     };

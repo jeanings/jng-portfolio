@@ -18,10 +18,11 @@ from datetime import (
     timezone
 )
 from pathlib import Path
-from pymongo import MongoClient
+from pymongo import MongoClient, UpdateMany
 from urllib.parse import quote_plus
 from google_auth_oauthlib.flow import Flow
 from .tools.mongodb_helpers import (
+    create_match_stage,
     create_facet_stage,
     create_projection_stage,
     get_filtered_selectables,
@@ -115,7 +116,6 @@ def photo_diary_data():
     '''
     MongoDB aggregation pipelines for filter functionality.
     '''
-
     # Get session cookies from request.
     state = request.cookies.get('state')
     user = request.cookies.get('user')
@@ -129,7 +129,7 @@ def photo_diary_data():
 
     session['state'] = state
     session['user'] = user
-
+    print(session['user'])
     # Handle request query.
     try:
         year = request.args.get('year')
@@ -142,9 +142,13 @@ def photo_diary_data():
         focal_length = request.args.get('focal-length')
         tags = request.args.get('tags')
 
-        collections_list = db.list_collection_names()
-        collections = sorted(collections_list)
-        collections.remove('bounds')
+        # Retrieve admin's collection if user is visitor.
+        if session['user'] == 'visitor' or session['user'] == 'unauthorized':
+            user_profile = db['accounts'].find_one({'role': 'admin'})
+        else:
+            user_profile = db['accounts'].find_one({'email': session['user']['email']})
+
+        collections = sorted(user_profile['collections'])
         if year == 'default':
             # Set default year to current year on initial renders.
             year = collections[-1]
@@ -193,24 +197,25 @@ def photo_diary_data():
     # Query MongoDB.
     if len(queries) == 0:
         # For query with just 'year'.
-        docs = list(collection.find({}))
+        docs = list(collection.find({'owner': user_profile['_id']}))
     else:
         # For other queries.
+        match_stage = create_match_stage(user_profile['_id'])
         facet_stage = create_facet_stage(queries, query_field)
         projection_stage = create_projection_stage(facet_stage)
 
         # Query for the group of filters requested.
-        filtered_query = collection.aggregate([facet_stage, projection_stage])
+        filtered_query = collection.aggregate([match_stage, facet_stage, projection_stage])
         docs = list(filtered_query)[0]['intersect']
 
     # Get image counts for each month.
     counter = get_image_counts(docs)
 
-    # Get unique values from fields for selectables to display in filter component.
-    # Uses values from images in the whole year.
-    filter_selectables = list(collection.aggregate(get_selectables_pipeline()))
+    # Get unique values from each field for displaying in filter component buttons.
+    # Uses data from images for the whole year.
+    filter_selectables = list(collection.aggregate(get_selectables_pipeline(user_profile['_id'])))
     # For month queries, build separate dict.
-    if month != None:
+    if month:
         filtered_selectables = get_filtered_selectables(docs)
     else:
         filtered_selectables = []
@@ -277,7 +282,6 @@ def photo_diary_login():
 
     Returns cookie with JWT token and JSON of authorized user profile.
     '''
-
     auth_code = request.args.get('auth-code')
 
     # Get session state cookie from request.
@@ -319,9 +323,15 @@ def photo_diary_login():
     session['user'] = {
         'name': session['authorized']['name'],
         'email': session['authorized']['email'],
-        'profilePic': session['authorized']['picture'],
-        'role': 'editor'
+        'profilePic': session['authorized']['picture']
     }
+
+    # Assign role to enable permissions-based operations.
+    account = db['accounts'].find_one({'email': session['user']['email']})
+    if account:
+        session['user']['role'] = account['role']
+    else:
+        session['user']['role'] = 'viewer'
 
     # Create base response with authorized profile.
     response = jsonify({'user': session['user']})
@@ -375,6 +385,10 @@ def photo_diary_logout():
 @photo_diary_bp.route('/photo-diary/update', methods=['PATCH'])
 @jwt_required()
 def photo_diary_update():
+    '''
+    Update requests handling only if JWT access token is verified.
+    Returns response status, its message, and the updated doc.
+    '''
     update_request = request.get_json()
     # Get doc properties from request.
     try:
