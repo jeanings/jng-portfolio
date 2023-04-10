@@ -47,7 +47,7 @@ import json, pymongo, hashlib, os
 DEBUG_MODE = app.config['FLASK_DEBUG']
 # Set up Flask-JWT-extended instance.
 token_expiry_minutes = 30
-app.config["JWT_COOKIE_SECURE"] = False
+app.config["JWT_COOKIE_SECURE"] = True
 app.config['JWT_TOKEN_LOCATION'] = ['headers', 'cookies']
 app.config['JWT_ACCESS_TOKEN_EXPIRES'] = timedelta(minutes=token_expiry_minutes)
 app.config['JWT_REFRESH_TOKEN_EXPIRES'] = timedelta(minutes=token_expiry_minutes)

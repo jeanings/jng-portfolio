@@ -114,7 +114,7 @@ export const requestLogout = (logoutUrl: string, request: LogoutType) => {
 ------------------------------- */
 // State for initial render.
 const DEV_USER = {
-    '_id': 'some_encoded_objectid',
+    '_id': '',
     'name': 'Dev',
     'email': 'dev@email.com',
     'profilePic': '',
