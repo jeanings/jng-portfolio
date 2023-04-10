@@ -40,6 +40,11 @@
 /* ==================================================================================
                                 Media breakpoints 
 ================================================================================== */
+.App.portable.port {
+    grid-template-rows: 3.5rem calc(100% - 2*3.5rem - 2*2rem) 3.5rem;
+}
+
+
 .App.mobile.port {
     position: fixed; /* timeline                toolbar */
     grid-template-rows: 7rem calc(100% - 12rem) 5rem;
