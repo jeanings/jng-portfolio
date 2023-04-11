@@ -118,11 +118,17 @@ const editorSlice = createSlice({
                 state.response = 'failed';
                 state.message = "DB/network error!"
                 let message: string = '';
-                if (action.payload) {
-                    message = 'msg' in action.payload 
-                        ? `--> ${action.payload['msg']}`
-                        : '';
+                try {
+                    if (action.payload) {
+                        message = 'msg' in action.payload 
+                            ? `--> ${action.payload['msg']}`
+                            : '';
+                    }
                 }
+                catch (TypeError) {
+                    message = state.message;
+                }
+
                 console.log(`Error: ${action.type} ${message}`);
             })
     }
