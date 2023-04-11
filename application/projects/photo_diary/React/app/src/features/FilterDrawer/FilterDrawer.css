@@ -200,13 +200,19 @@
 .FilterDrawer.mobile.port {
     grid-column: 1 / -1;
     grid-row: 2 / 3;
+    padding-bottom: 12rem;
 }
 
 .FilterDrawer.mobile.port.show {
     grid-column: 1 / -1;
     grid-row: 2 / 3;
+    padding-bottom: 12rem;
 }
 
-    .FilterDrawer.mobile.port #tags {
-        display: none;
+    .FilterDrawer__parameters-container.mobile.port {
+        grid-template-rows: 15% 22% 15% calc(100% - 15% - 22% - 15%);
+    }
+
+    .FilterDrawer__reset.mobile.port {
+        height: 25rem;
     }

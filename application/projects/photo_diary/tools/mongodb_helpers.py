@@ -101,6 +101,7 @@ def get_facet_pipeline(query, target_field):
                 'url_thumb': 1,
                 'title': 1,
                 'description': 1,
+                'owner': 1,
                 'isSubset': operator
             }
         },

@@ -344,7 +344,7 @@
         align-items: flex-end;
     }
 
-        .enlarged-image__nav-buttons__container.mobile.port {
+        .enlarged-image__border-buttons__container.mobile.port {
             grid-column: 1 / -1;
             grid-row: 1 / -1;
             grid-template-columns: repeat(3, 5rem);
@@ -354,10 +354,37 @@
             align-self: flex-end;
         }
 
-        .enlarged-image__nav-buttons__container.mobile.port 
-            .enlarged-image__nav-buttons {
+        .enlarged-image__border-buttons__container.mobile.port 
+            .enlarged-image__border-buttons {
             justify-self: center;
         }
+
+            .enlarged-image__border-buttons__container.mobile.port 
+                #enlarger-border-save-border-message,
+            .enlarged-image__border-buttons__container.mobile.port 
+                #enlarger-border-save-status,
+            .enlarged-image__border-buttons__container.mobile.port 
+                #enlarger-border-save-edits,
+            .enlarged-image__border-buttons__container.mobile.port 
+                #enlarger-border-clear-edits {
+                display: none;
+            }
+
+            .enlarged-image__border-buttons__container.mobile.port 
+                #enlarger-border-previous {
+                grid-column: 1;
+            }
+
+            .enlarged-image__border-buttons__container.mobile.port 
+                #enlarger-border-full-screen {
+                grid-column: 2;
+            }
+
+            .enlarged-image__border-buttons__container.mobile.port 
+                #enlarger-border-next {
+                grid-column: 3;
+            }
+
 
         .SideFilmStrip__image-enlarger__image.mobile.port 
             #enlarged-image {
