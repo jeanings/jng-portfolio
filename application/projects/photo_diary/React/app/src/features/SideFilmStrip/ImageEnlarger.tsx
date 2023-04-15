@@ -618,6 +618,9 @@ class MetadataInput {
             case 'Coordinates':
                 this.passes = this.isCoordinatesInputCorrect(this.value);
                 break;
+            default:
+                // Film, Lens, Tags strings don't need checking.
+                this.passes = true;
         }
     }
 
