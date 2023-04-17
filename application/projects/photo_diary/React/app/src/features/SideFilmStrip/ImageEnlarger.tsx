@@ -660,12 +660,11 @@ class MetadataInput {
         
         if (date) {
             const [ year, month, day ] = date.split('/').map(unit => parseInt(unit));
-            
             if (year && month) {                      
                 if (year < 1920 || year > thisYear) {
                     return false;
                 }
-                if (month < 0 || month > 12) {
+                if (month < 1 || month > 12) {
                     return false;
                 }
                 if (year === thisYear && month > thisMonth) {
@@ -673,10 +672,14 @@ class MetadataInput {
                     return false;
                 }
                 if (day) {
-                    if (day < 0 || day > 31) {
+                    if (day < 1 || day > 31) {
+                        console.log(day);
                         // Very simplified, but this isn't a critical app...
                         return false;
                     }
+                }
+                else if (day === 0) {
+                    return false;
                 }
             }
             else {
