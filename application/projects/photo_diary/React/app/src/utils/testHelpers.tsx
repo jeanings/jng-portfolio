@@ -68,4 +68,49 @@ export const preloadedState: RootState = {
 };
 
 
+const mockUser = {
+    "visitor": {
+        "_id": 'some_visitor',
+        "email": "test@gmail.com",
+        "name": "Test",
+        "profilePic": "https://lh3.googleusercontent.com/a/some-profile-pic",
+        "role": "editor"
+    },
+    "editor": {
+        "_id": 'some_editor',
+        "email": "test@gmail.com",
+        "name": "Test",
+        "profilePic": "https://lh3.googleusercontent.com/a/some-profile-pic",
+        "role": "editor"
+    },
+    "owner": {
+        "_id": preloadedState.timeline.imageDocs![0].owner,
+        "email": "test@gmail.com",
+        "name": "Test",
+        "profilePic": "https://lh3.googleusercontent.com/a/some-profile-pic",
+        "role": "editor"
+    }
+};
+
+
+export const preloadedStateEditor: RootState = {...preloadedState,
+    login: {
+        tokenResponse: 'idle',
+        user: mockUser.editor,
+        role: 'editor',
+        loggedIn: true
+    }
+};
+
+
+export const preloadedStateEditorOwner: RootState = {...preloadedState,
+    login: {
+        tokenResponse: 'idle',
+        user: mockUser.owner,
+        role: 'editor',
+        loggedIn: true
+    }
+};
+
+
 export default preloadedState;
