@@ -302,14 +302,14 @@ export type TimelineMonthTypes =
     'oct' | 'nov' | 'dec' |
     'all';
 
-export type CounterTypes = {
+export interface CounterTypes {
     [index: string]: number | object,
     'previous': {
         [index: string]: number | null
     }
 };
 
-export type ImageDocTypes = {
+export interface ImageDocTypes {
     '_id': string,
     'aperture': number | null,
     'date':  {
@@ -342,12 +342,12 @@ export type ImageDocTypes = {
     'owner': string
 };
 
-export type ImageDocFormatTypes = {
+export interface ImageDocFormatTypes {
     'medium': 'digital' | 'film' | string,
     'type': '120' | '35mm' | 'APS-C' | 'Micro43' | 'Full-frame' | string
 };
 
-export type FilterableTypes = {
+export interface FilterableTypes {
     [index: string]: Array<string | number | null> | undefined,
     'make'?: Array<string>,
     'model'?: Array<string>,
@@ -366,7 +366,7 @@ export interface GeojsonFeatureCollectionProps {
     'features': Array<GeojsonFeatureType>
 };
 
-export type GeojsonFeatureType = {
+export interface GeojsonFeatureType {
     [index: string]: string | object,
     'type': string,
     'geometry': {
@@ -383,7 +383,7 @@ export type GeojsonFeatureType = {
     }
 };
 
-export type BboxType = {
+export interface BboxType {
     [index: string]: Array<number>,
     'lat': Array<number>,
     'lng': Array<number>

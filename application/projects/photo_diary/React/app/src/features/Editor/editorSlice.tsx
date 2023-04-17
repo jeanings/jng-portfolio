@@ -150,7 +150,7 @@ export interface EditorProps {
     'updated': UpdatedDocsType
 };
 
-export type UpdateRequestDocType = {
+export interface UpdateRequestDocType {
     [index: string]: ImageDocTypes['_id'] | ImageDocTypes['date']['year'] | MetadataEditInputType
     'id': ImageDocTypes['_id'],
     'collection': ImageDocTypes['date']['year']

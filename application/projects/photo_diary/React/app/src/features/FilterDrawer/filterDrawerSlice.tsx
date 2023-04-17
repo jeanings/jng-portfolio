@@ -75,7 +75,7 @@ export interface FilterProps {
     'tags': Array<string>
 };
 
-export type FilterPayloadType = {
+export interface FilterPayloadType {
     [index: string]: string | number | undefined,
     'make'?: string,
     'model'?: string,
