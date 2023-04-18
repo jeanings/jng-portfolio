@@ -2,7 +2,9 @@ import {
     createSlice, 
     createAsyncThunk,
     Action,
-    AnyAction } from '@reduxjs/toolkit';
+    AnyAction, 
+    isRejectedWithValue,
+    ActionCreator} from '@reduxjs/toolkit';
 import axios, { AxiosError, AxiosResponse } from 'axios';
 import { RootState } from '../../app/store';
 import { getCookie } from '../Login/loginSlice';
@@ -29,9 +31,6 @@ export const updateDoc = createAsyncThunk(
             if (response.status === 200) {
                 // Returns promise status, handling done by extra reducer.
                 return (await response.data);
-            }
-            else if (response.status === 401) {
-                return rejectWithValue(response.data)
             }
         } 
         catch (err) {
@@ -114,14 +113,16 @@ const editorSlice = createSlice({
             /* --------------------------------------- 
                 Catches errors on fetching from API.
             --------------------------------------- */
-            .addMatcher(isRejectedAction, (state, action) => {
+            .addMatcher(isRejectedWithValue(updateDoc), (state, action) => {
+                const rejectedResponse = action.payload as UpdateResponseType;
                 state.response = 'failed';
                 state.message = "DB/network error!"
                 let message: string = '';
+
                 try {
-                    if (action.payload) {
-                        message = 'msg' in action.payload 
-                            ? `--> ${action.payload['msg']}`
+                    if (rejectedResponse['updateMessage']) {
+                        message = rejectedResponse
+                            ? `--> ${rejectedResponse['updateMessage']}`
                             : '';
                     }
                 }
@@ -157,6 +158,13 @@ export interface UpdateRequestDocType {
     'fields': MetadataEditInputType
 };
 
+interface UpdateResponseType {
+    [index: string]: string | UpdatedDocsType | undefined,
+    'updateStatus': string,
+    'upduatedDoc'?: UpdatedDocsType | undefined,
+    'updateMessage'?: string | undefined
+}
+
 export type UpdatedDocsType = {
     [index: string]: ImageDocTypes
 };
@@ -164,14 +172,6 @@ export type UpdatedDocsType = {
 export type ClearUpdatedDocsType = {
     [index: string]: string,
     'msg': 'clear updated docs'
-};
-
-export interface oAuthCodeResponseType {
-    [index: string]: string,
-    'authuser': string,
-    'code': string,
-    'prompt': string,
-    'scope': string
 };
 
 interface RejectedAction extends Action {

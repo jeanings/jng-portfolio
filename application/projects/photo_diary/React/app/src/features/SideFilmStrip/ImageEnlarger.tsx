@@ -618,6 +618,9 @@ class MetadataInput {
             case 'Coordinates':
                 this.passes = this.isCoordinatesInputCorrect(this.value);
                 break;
+            default:
+                // Film, Lens, Tags strings don't need checking.
+                this.passes = true;
         }
     }
 
@@ -657,12 +660,11 @@ class MetadataInput {
         
         if (date) {
             const [ year, month, day ] = date.split('/').map(unit => parseInt(unit));
-            
             if (year && month) {                      
                 if (year < 1920 || year > thisYear) {
                     return false;
                 }
-                if (month < 0 || month > 12) {
+                if (month < 1 || month > 12) {
                     return false;
                 }
                 if (year === thisYear && month > thisMonth) {
@@ -670,10 +672,13 @@ class MetadataInput {
                     return false;
                 }
                 if (day) {
-                    if (day < 0 || day > 31) {
+                    if (day < 1 || day > 31) {
                         // Very simplified, but this isn't a critical app...
                         return false;
                     }
+                }
+                else if (day === 0) {
+                    return false;
                 }
             }
             else {
@@ -699,8 +704,8 @@ class MetadataInput {
         if (setOfCoords) {
             // Check range of latitude, longitude values.
             let [lat, lng] = coords;
-            const latOK = parseFloat(lat) >= -90 && parseFloat(lat) <= 90 ? true : false;
-            const lngOK = parseFloat(lng) >= -180 == parseFloat(lng) <= 180 ? true : false; 
+            const latOK = (parseFloat(lat) >= -90) && (parseFloat(lat) <= 90) ? true : false;
+            const lngOK = (parseFloat(lng) >= -180) && (parseFloat(lng) <= 180) ? true : false; 
 
             return (latOK && lngOK);
         }
