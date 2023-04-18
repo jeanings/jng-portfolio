@@ -1,31 +1,29 @@
 import React from 'react';
 import * as reactRedux from 'react-redux';
 import { Provider } from 'react-redux';
-import { setupStore } from '../../app/store';
+import { setupStore, RootState } from '../../app/store';
 import { 
     cleanup, 
     render, 
     screen, 
     waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import axios from 'axios';
+import MockAdapter from 'axios-mock-adapter';
+import { updateUrl } from '../../app/App';
 import '@testing-library/jest-dom';
 import { 
     preloadedState, 
     preloadedStateEditor,
     preloadedStateEditorOwner } from '../../utils/testHelpers';
 import SideFilmStrip from '../SideFilmStrip/SideFilmStrip';
-import { loadOptions } from '@babel/core';
+import { EnhancedStore } from '@reduxjs/toolkit';
 
-
+var mockAxios = new MockAdapter(axios);
 var user = userEvent.setup();
 
 
 beforeEach(() => {
-    // Mocked React functions.
-    // const useDispatchSpy = jest.spyOn(reactRedux, 'useDispatch');
-    // const mockDispatch = jest.fn();
-    // useDispatchSpy.mockReturnValue(mockDispatch);
-
     // Mock scrollTo.
     window.HTMLElement.prototype.scrollTo = jest.fn();
 
@@ -52,26 +50,36 @@ beforeEach(() => {
 });
 
 afterEach(() => {
+    cleanup;
+    mockAxios.reset();
     jest.clearAllMocks();
     jest.restoreAllMocks();
-    cleanup;
 });
 
 afterAll(() => {
+    cleanup;
+    mockAxios.reset();
     jest.clearAllMocks();
     jest.restoreAllMocks();
-    cleanup;
 });
 
 
-
-test("shows edit form, input if user is editor and owner of doc", async() => {
-    const newStore = setupStore(preloadedStateEditorOwner);
-    render(
+/* --------------------------------------
+    Boilerplate for rendering document.
+-------------------------------------- */
+function renderBoilerplate(preloadedState: RootState) {
+    const newStore = setupStore(preloadedState);
+    const container = render(
         <Provider store={newStore}>
             <SideFilmStrip />
         </Provider>
     );
+    return { ...container, newStore };
+}
+
+
+test("shows edit form, input if user is editor and owner of doc", async() => {
+    const { newStore } = renderBoilerplate(preloadedStateEditorOwner);
 
     // Verify editor is owner of collection.
     expect(newStore.getState().timeline.imageDocs).not.toBeNull();
@@ -84,7 +92,7 @@ test("shows edit form, input if user is editor and owner of doc", async() => {
     await waitFor(() => screen.findAllByRole('img', { name: 'thumbnail image container' }));
     const imageFrameElems = screen.getAllByRole('img', { name: 'thumbnail image container' });
     const imageToClick = imageFrameElems[0];
-    user.click(imageToClick);
+    await user.click(imageToClick);
 
     // Verify form is enabled/exists.
     await waitFor(() => screen.findByRole('form', { name: 'edit form of metadata for enlarged image' }));
@@ -98,12 +106,7 @@ test("shows edit form, input if user is editor and owner of doc", async() => {
 
 
 test("shows edit UI buttons if user is editor and owner of doc", async() => {
-    const newStore = setupStore(preloadedStateEditorOwner);
-    render(
-        <Provider store={newStore}>
-            <SideFilmStrip />
-        </Provider>
-    );
+    const { newStore } = renderBoilerplate(preloadedStateEditorOwner);
 
     // Verify editor is owner of collection.
     expect(newStore.getState().timeline.imageDocs).not.toBeNull();
@@ -116,7 +119,7 @@ test("shows edit UI buttons if user is editor and owner of doc", async() => {
     await waitFor(() => screen.findAllByRole('img', { name: 'thumbnail image container' }));
     const imageFrameElems = screen.getAllByRole('img', { name: 'thumbnail image container' });
     const imageToClick = imageFrameElems[0];
-    user.click(imageToClick);
+    await user.click(imageToClick);
 
     // Verify form is enabled/exists.
     await waitFor(() => screen.findByRole('form', { name: 'edit form of metadata for enlarged image' }));
@@ -132,12 +135,7 @@ test("shows edit UI buttons if user is editor and owner of doc", async() => {
 
 
 test("does not show edit form if user is editor but not owner of doc", async() => {
-    const newStore = setupStore(preloadedStateEditor);
-    render(
-        <Provider store={newStore}>
-            <SideFilmStrip />
-        </Provider>
-    );
+    const { newStore } = renderBoilerplate(preloadedStateEditor);
 
     // Verify user is editor.
     expect(newStore.getState().timeline.imageDocs).not.toBeNull();
@@ -152,7 +150,7 @@ test("does not show edit form if user is editor but not owner of doc", async() =
     await waitFor(() => screen.findAllByRole('img', { name: 'thumbnail image container' }));
     const imageFrameElems = screen.getAllByRole('img', { name: 'thumbnail image container' });
     const imageToClick = imageFrameElems[0];
-    user.click(imageToClick);
+    await user.click(imageToClick);
 
     // Verify form is not enabled.
     const formForEdit = screen.queryByRole('form');
@@ -161,12 +159,7 @@ test("does not show edit form if user is editor but not owner of doc", async() =
 
 
 test("does not show edit form if user is not editor", async() => {
-    const newStore = setupStore(preloadedState);
-    render(
-        <Provider store={newStore}>
-            <SideFilmStrip />
-        </Provider>
-    );
+    const { newStore } = renderBoilerplate(preloadedState);
 
     // Verify user is viewer.
     expect(newStore.getState().timeline.imageDocs).not.toBeNull();
@@ -176,7 +169,7 @@ test("does not show edit form if user is not editor", async() => {
     await waitFor(() => screen.findAllByRole('img', { name: 'thumbnail image container' }));
     const imageFrameElems = screen.getAllByRole('img', { name: 'thumbnail image container' });
     const imageToClick = imageFrameElems[0];
-    user.click(imageToClick);
+    await user.click(imageToClick);
 
     // Verify form is not enabled.
     const formForEdit = screen.queryByRole('form');
@@ -185,12 +178,7 @@ test("does not show edit form if user is not editor", async() => {
 
 
 test("does not show edit UI buttons if user is viewer", async() => {
-    const newStore = setupStore(preloadedState);
-    render(
-        <Provider store={newStore}>
-            <SideFilmStrip />
-        </Provider>
-    );
+    const { newStore } = renderBoilerplate(preloadedState);
 
     // Verify editor is owner of collection.
     expect(newStore.getState().timeline.imageDocs).not.toBeNull();
@@ -200,7 +188,7 @@ test("does not show edit UI buttons if user is viewer", async() => {
     await waitFor(() => screen.findAllByRole('img', { name: 'thumbnail image container' }));
     const imageFrameElems = screen.getAllByRole('img', { name: 'thumbnail image container' });
     const imageToClick = imageFrameElems[0];
-    user.click(imageToClick);
+    await user.click(imageToClick);
 
     // Verify editor UI buttons hidden.
     const saveEditsButton = screen.queryByRole('button', { name: 'save metadata edits on image' });
@@ -211,12 +199,7 @@ test("does not show edit UI buttons if user is viewer", async() => {
 
 
 test("enables submit button on input existence", async() => {
-    const newStore = setupStore(preloadedStateEditorOwner);
-    render(
-        <Provider store={newStore}>
-            <SideFilmStrip />
-        </Provider>
-    );
+    const { newStore } = renderBoilerplate(preloadedStateEditorOwner);
 
     // Verify editor is owner of collection.
     expect(newStore.getState().timeline.imageDocs).not.toBeNull();
@@ -229,7 +212,7 @@ test("enables submit button on input existence", async() => {
     await waitFor(() => screen.findAllByRole('img', { name: 'thumbnail image container' }));
     const imageFrameElems = screen.getAllByRole('img', { name: 'thumbnail image container' });
     const imageToClick = imageFrameElems[0];
-    user.click(imageToClick);
+    await user.click(imageToClick);
 
     // Verify inputs are displayed.
     await waitFor(() => screen.findAllByRole('textbox'));
@@ -243,22 +226,17 @@ test("enables submit button on input existence", async() => {
     expect(saveEditsButton.onclick).toEqual(null);
 
     // Type in some input.
-    const dateInput = formInputs[0] as HTMLInputElement;
-    user.type(dateInput, '2022/06');
+    const dateInput = formInputs[0];
+    await user.type(dateInput, '2022/06');
 
     // Verify onClick enabled.
-    await waitFor(() => expect(dateInput.value).toEqual('2022/06'));
+    await waitFor(() => expect(dateInput).toHaveValue('2022/06'));
     expect(saveEditsButton.onclick).not.toEqual(null);
 });
 
 
 test("enables clear edits button on input existence", async() => {
-    const newStore = setupStore(preloadedStateEditorOwner);
-    render(
-        <Provider store={newStore}>
-            <SideFilmStrip />
-        </Provider>
-    );
+    const { newStore } = renderBoilerplate(preloadedStateEditorOwner);
 
     // Verify editor is owner of collection.
     expect(newStore.getState().timeline.imageDocs).not.toBeNull();
@@ -271,7 +249,7 @@ test("enables clear edits button on input existence", async() => {
     await waitFor(() => screen.findAllByRole('img', { name: 'thumbnail image container' }));
     const imageFrameElems = screen.getAllByRole('img', { name: 'thumbnail image container' });
     const imageToClick = imageFrameElems[0];
-    user.click(imageToClick);
+    await user.click(imageToClick);
 
     // Verify inputs are displayed.
     await waitFor(() => screen.findAllByRole('textbox'));
@@ -283,13 +261,13 @@ test("enables clear edits button on input existence", async() => {
 
     // Type in some input.
     const dateInput = formInputs[0] as HTMLInputElement;
-    user.type(dateInput, '2022/06');
+    await user.type(dateInput, '2022/06');
 
     // Verify data in input.
     await waitFor(() => expect(dateInput.value).toEqual('2022/06'));
 
     // Clear edits.
-    user.click(clearEditsButton);
+    await user.click(clearEditsButton);
     
     // Verify input cleared.
     await waitFor(() => expect(dateInput.value).toEqual(''));
@@ -297,12 +275,7 @@ test("enables clear edits button on input existence", async() => {
 
 
 test("dispatches action on form submission", async() => {
-    const newStore = setupStore(preloadedStateEditorOwner);
-    render(
-        <Provider store={newStore}>
-            <SideFilmStrip />
-        </Provider>
-    );
+    const { newStore } = renderBoilerplate(preloadedStateEditorOwner);
 
     // Verify editor is owner of collection.
     expect(newStore.getState().timeline.imageDocs).not.toBeNull();
@@ -315,7 +288,7 @@ test("dispatches action on form submission", async() => {
     await waitFor(() => screen.findAllByRole('img', { name: 'thumbnail image container' }));
     const imageFrameElems = screen.getAllByRole('img', { name: 'thumbnail image container' });
     const imageToClick = imageFrameElems[0];
-    user.click(imageToClick);
+    await user.click(imageToClick);
 
     // Verify inputs are displayed.
     await waitFor(() => screen.findAllByRole('textbox'));
@@ -326,7 +299,8 @@ test("dispatches action on form submission", async() => {
     const saveEditsButton = screen.getByRole('button', { name: 'save metadata edits on image' });
     
     // Type in some input.
-    user.type(formInputs[0], '2022/06');
+    const dateInput = formInputs[0] as HTMLInputElement;
+    await user.type(dateInput, '2022/06');
 
     // Mock dispatch function.
     const useDispatchSpy = jest.spyOn(reactRedux, 'useDispatch');
@@ -335,21 +309,62 @@ test("dispatches action on form submission", async() => {
 
     // Submit edit.
     await waitFor(() => expect(saveEditsButton.onclick).not.toEqual(null));
-    user.click(saveEditsButton);
+    await user.click(saveEditsButton);
     
     // Verify dispatch.
     await waitFor(() => expect(mockDispatch).toHaveBeenCalled());
 });
 
 
-// test("clears unsubmitted inputs on transition to different image", async() => {
+test("clears inputs on changing enlarged image", async() => {
+    const { newStore } = renderBoilerplate(preloadedStateEditorOwner);
 
-// });
+    // Verify editor is owner of collection.
+    expect(newStore.getState().timeline.imageDocs).not.toBeNull();
+    expect(newStore.getState().login.role).toEqual('editor');
+    const mockUser = newStore.getState().login.user;
+    const docOwner = newStore.getState().timeline.imageDocs![0].owner;
+    expect(mockUser?._id).toEqual(docOwner);
+    
+    // Enlarge an image.
+    await waitFor(() => screen.findAllByRole('img', { name: 'thumbnail image container' }));
+    const imageFrameElems = screen.getAllByRole('img', { name: 'thumbnail image container' });
+    const imageToClick = imageFrameElems[0];
+    await user.click(imageToClick);
 
+    // Verify inputs are displayed.
+    await waitFor(() => screen.findAllByRole('textbox'));
+    const formInputs = screen.queryAllByRole('textbox');
+    await waitFor(() => expect(formInputs).not.toEqual(null));
+
+    // Type in some input.
+    const dateInput = formInputs[0] as HTMLInputElement;
+    await user.type(dateInput, '2022/06');
+    await waitFor(() => expect(dateInput.value).toEqual('2022/06'));
+
+    // Change enlarged doc.
+    await user.click(imageFrameElems[1]);
+    
+    // Verify inputs cleared.
+    await waitFor(() => expect(dateInput.value).toEqual(''));
+});
 
 
 describe("on input blur, input formatting gets checked", () => {
-    var imageToClick: HTMLElement;
+    /* --------------------------
+        Helper: initial tests.
+    -------------------------- */
+    const doMoreBoilerPlate = (newStore: EnhancedStore) => {
+        // Verify editor and owner.
+        expect(newStore.getState().timeline.imageDocs).not.toBeNull();
+        expect(newStore.getState().login.role).toEqual('editor');
+        const mockUser = newStore.getState().login.user;
+        const docOwner = newStore.getState().timeline.imageDocs![0].owner;
+        expect(mockUser?._id).toEqual(docOwner);
+
+        const imageToClick = screen.getAllByRole('img', { name: 'thumbnail image container'})[0];
+        return { imageToClick };
+    };
 
     beforeEach(() => {
         /* --------------------------------------------------------
@@ -382,28 +397,18 @@ describe("on input blur, input formatting gets checked", () => {
         /* --------------------------------------------------------
             Mocks                                            end
         -------------------------------------------------------- */
-    
-        const newStore = setupStore(preloadedStateEditorOwner);
-        render(
-            <Provider store={newStore}>
-                <SideFilmStrip />
-            </Provider>
-        );
-    
-        expect(newStore.getState().timeline.imageDocs).not.toBeNull();
-        expect(newStore.getState().login.role).toEqual('editor');
-        const mockUser = newStore.getState().login.user;
-        const docOwner = newStore.getState().timeline.imageDocs![0].owner;
-        expect(mockUser?._id).toEqual(docOwner);
-
-        imageToClick = screen.getAllByRole('img', { name: 'thumbnail image container'})[0];
-        user.click(imageToClick);
     });
 
     afterEach(() => {
+        cleanup;
         jest.clearAllMocks();
         jest.restoreAllMocks();
+    });
+
+    afterAll(() => {
         cleanup;
+        jest.clearAllMocks();
+        jest.restoreAllMocks();
     });
     
     /* -------------------------------
@@ -411,8 +416,8 @@ describe("on input blur, input formatting gets checked", () => {
     ------------------------------- */
     const checkInputs = async(inputElem: HTMLInputElement, testType: 'pass' | 'fail', input: string) => {
         // Type and wait for input.
-        user.click(inputElem);
-        user.type(inputElem, input);
+        inputElem.focus();
+        await user.type(inputElem, input);
         await waitFor(() => expect(inputElem.value).toEqual(input), { timeout: 9000 });
 
         // Lose focus on input to trigger onBlur input checking event.
@@ -427,20 +432,27 @@ describe("on input blur, input formatting gets checked", () => {
         }
 
         // Clean up inputs.
-        user.click(inputElem);
-        user.clear(inputElem);
+        inputElem.focus();
+        await user.clear(inputElem);
+        await waitFor(() => expect(inputElem).toHaveValue(''));
     };
 
 
     test("date input passes check", async() => {
+        const { newStore } = renderBoilerplate(preloadedStateEditorOwner);
+        const { imageToClick } = doMoreBoilerPlate(newStore);
+        await user.click(imageToClick);
         await waitFor(() => screen.findByRole('textbox', { name: 'Date editable metadata value' }));
         const dateInput = screen.getByRole('textbox', { name: 'Date editable metadata value' }) as HTMLInputElement;
-        checkInputs(dateInput, 'pass', '2022/12');
-        checkInputs(dateInput, 'pass', '2022/12/31');
-        checkInputs(dateInput, 'pass', '2022/12/31 23:59:59');
+        await checkInputs(dateInput, 'pass', '2022/12');
+        await checkInputs(dateInput, 'pass', '2022/12/31');
+        await checkInputs(dateInput, 'pass', '2022/12/31 23:59:59');
     });
 
     test("date input fails check", async() => {
+        const { newStore } = renderBoilerplate(preloadedStateEditorOwner);
+        const { imageToClick } = doMoreBoilerPlate(newStore);
+        await user.click(imageToClick);
         await waitFor(() => screen.findByRole('textbox', { name: 'Date editable metadata value' }));
         const dateInput = screen.getByRole('textbox', { name: 'Date editable metadata value' }) as HTMLInputElement;
         const today = new Date();
@@ -451,133 +463,392 @@ describe("on input blur, input formatting gets checked", () => {
         ];
 
         // Fail year only.
-        checkInputs(dateInput, 'fail', '2022');
+        await checkInputs(dateInput, 'fail', '2022');
         // Fail future year.
-        checkInputs(dateInput, 'fail', (nextYear + '/12'));
+        await checkInputs(dateInput, 'fail', (nextYear + '/12'));
         // Fail deep past year.
-        checkInputs(dateInput, 'fail', '1919/12');
+        await checkInputs(dateInput, 'fail', '1919/12');
         // Fail bad months.
-        checkInputs(dateInput, 'fail', '2022/00/31');
-        checkInputs(dateInput, 'fail', '2022/13/31');
+        await checkInputs(dateInput, 'fail', '2022/00/31');
+        await checkInputs(dateInput, 'fail', '2022/13/31');
         // Fail bad days.
-        checkInputs(dateInput, 'fail', '2022/12/0');
-        checkInputs(dateInput, 'fail', '2022/12/32');
+        await checkInputs(dateInput, 'fail', '2022/12/0');
+        await checkInputs(dateInput, 'fail', '2022/12/32');
         // Fail bad hours.
-        checkInputs(dateInput, 'fail', '2022/12/31 24:59:59');
+        await checkInputs(dateInput, 'fail', '2022/12/31 24:59:59');
         // Fail bad minutes.
-        checkInputs(dateInput, 'fail', '2022/12/31 23:60:59');
+        await checkInputs(dateInput, 'fail', '2022/12/31 23:60:59');
         // Fail bad seconds.
-        checkInputs(dateInput, 'fail', '2022/12/31 23:59:60');
+        await checkInputs(dateInput, 'fail', '2022/12/31 23:59:60');
         // Fail non-digits.
-        checkInputs(dateInput, 'fail', 'today');
-        checkInputs(dateInput, 'fail', '2022/Xmas');
+        await checkInputs(dateInput, 'fail', 'today');
+        await checkInputs(dateInput, 'fail', '2022/Xmas');
     });
 
     test("format input passes check", async() => {
+        const { newStore } = renderBoilerplate(preloadedStateEditorOwner);
+        const { imageToClick } = doMoreBoilerPlate(newStore);
+        await user.click(imageToClick);
         await waitFor(() => screen.findByRole('textbox', { name: 'Format editable metadata value' }));
         const formatInput = screen.getByRole('textbox', { name: 'Format editable metadata value' }) as HTMLInputElement;
-        checkInputs(formatInput, 'pass', 'film');
-        checkInputs(formatInput, 'pass', 'digital');
+        await checkInputs(formatInput, 'pass', 'film');
+        await checkInputs(formatInput, 'pass', 'digital');
     });
 
     test("format input fails check", async() => {
+        const { newStore } = renderBoilerplate(preloadedStateEditorOwner);
+        const { imageToClick } = doMoreBoilerPlate(newStore);
+        await user.click(imageToClick);
         await waitFor(() => screen.findByRole('textbox', { name: 'Format editable metadata value' }));
         const formatInput = screen.getByRole('textbox', { name: 'Format editable metadata value' }) as HTMLInputElement;
         // Fail missing 'film' or 'digital'
-        checkInputs(formatInput, 'fail', 'digi');
+        await checkInputs(formatInput, 'fail', 'digi');
     });
 
 
     test("focal length input passes check", async() => {
+        const { newStore } = renderBoilerplate(preloadedStateEditorOwner);
+        const { imageToClick } = doMoreBoilerPlate(newStore);
+        await user.click(imageToClick);
         await waitFor(() => screen.findByRole('textbox', { name: 'FocalLength editable metadata value' }));
         const fLenInput = screen.getByRole('textbox', { name: 'FocalLength editable metadata value' }) as HTMLInputElement;
         // Pass 'mm' and 'cm' included inputs.
-        checkInputs(fLenInput, 'pass', 'mm');
-        checkInputs(fLenInput, 'pass', 'cm');
+        await checkInputs(fLenInput, 'pass', 'mm');
+        await checkInputs(fLenInput, 'pass', 'cm');
     });
  
     test("focal length fails  passes check", async() => {
+        const { newStore } = renderBoilerplate(preloadedStateEditorOwner);
+        const { imageToClick } = doMoreBoilerPlate(newStore);
+        await user.click(imageToClick);
         await waitFor(() => screen.findByRole('textbox', { name: 'FocalLength editable metadata value' }));
         const fLenInput = screen.getByRole('textbox', { name: 'FocalLength editable metadata value' }) as HTMLInputElement;
         // Fail missing 'mm' or 'cm' units.
-        checkInputs(fLenInput, 'fail', '50');
+        await checkInputs(fLenInput, 'fail', '50');
     });
 
     test("iso input passes check", async() => {
+        const { newStore } = renderBoilerplate(preloadedStateEditorOwner);
+        const { imageToClick } = doMoreBoilerPlate(newStore);
+        await user.click(imageToClick);
         await waitFor(() => screen.findByRole('textbox', { name: 'ISO editable metadata value' }));
         const isoInput = screen.getByRole('textbox', { name: 'ISO editable metadata value' }) as HTMLInputElement;
         // Pass numbers larger than 0.
-        checkInputs(isoInput, 'pass', '400');
+        await checkInputs(isoInput, 'pass', '400');
     });
 
     test("iso input fails check", async() => {
+        const { newStore } = renderBoilerplate(preloadedStateEditorOwner);
+        const { imageToClick } = doMoreBoilerPlate(newStore);
+        await user.click(imageToClick);
         await waitFor(() => screen.findByRole('textbox', { name: 'ISO editable metadata value' }));
         const isoInput = screen.getByRole('textbox', { name: 'ISO editable metadata value' }) as HTMLInputElement;
         // Fail numbers less than 0.
-        checkInputs(isoInput, 'fail', '-35');
+        await checkInputs(isoInput, 'fail', '-35');
         // Fail NaN.
-        checkInputs(isoInput, 'fail', 'iso');
+        await checkInputs(isoInput, 'fail', 'iso');
     });
 
     test("camera input passes check", async() => {
+        const { newStore } = renderBoilerplate(preloadedStateEditorOwner);
+        const { imageToClick } = doMoreBoilerPlate(newStore);
+        await user.click(imageToClick);
         await waitFor(() => screen.findByRole('textbox', { name: 'Camera editable metadata value' }));
         const cameraInput = screen.getByRole('textbox', { name: 'Camera editable metadata value' }) as HTMLInputElement;
         // Pass inputs with 2 or more words (brand and model).
-        checkInputs(cameraInput, 'pass', 'Leica M5');
-        checkInputs(cameraInput, 'pass', 'iPotato 99XXSL');
+        await checkInputs(cameraInput, 'pass', 'Leica M5');
+        await checkInputs(cameraInput, 'pass', 'iPotato 99XXSL');
     });
 
     test("camera input fails check", async() => {
+        const { newStore } = renderBoilerplate(preloadedStateEditorOwner);
+        const { imageToClick } = doMoreBoilerPlate(newStore);
+        await user.click(imageToClick);
         await waitFor(() => screen.findByRole('textbox', { name: 'Camera editable metadata value' }));
         const cameraInput = screen.getByRole('textbox', { name: 'Camera editable metadata value' }) as HTMLInputElement;
         // Fail single words.
-        checkInputs(cameraInput, 'fail', 'iPhone');
+        await checkInputs(cameraInput, 'fail', 'iPhone');
     });
 
     test("coordinates input passes check", async() => {
+        const { newStore } = renderBoilerplate(preloadedStateEditorOwner);
+        const { imageToClick } = doMoreBoilerPlate(newStore);
+        await user.click(imageToClick);
         await waitFor(() => screen.findByRole('textbox', { name: 'Coordinates editable metadata value' }));
         const coordsInput = screen.getByRole('textbox', { name: 'Coordinates editable metadata value' }) as HTMLInputElement;
         // Pass lat between -90, 90 and lng between -180, 180.
-        checkInputs(coordsInput, 'pass', '-89.9999991, -179.9999999992');
-        checkInputs(coordsInput, 'pass', '89.99999991, 179.9999999992');
+        await checkInputs(coordsInput, 'pass', '-89.9999991, -179.9999999992');
+        await checkInputs(coordsInput, 'pass', '89.99999991, 179.9999999992');
     });
 
     test("coordinates input fails check", async() => {
+        const { newStore } = renderBoilerplate(preloadedStateEditorOwner);
+        const { imageToClick } = doMoreBoilerPlate(newStore);
+        await user.click(imageToClick);
         await waitFor(() => screen.findByRole('textbox', { name: 'Coordinates editable metadata value' }));
         const coordsInput = screen.getByRole('textbox', { name: 'Coordinates editable metadata value' }) as HTMLInputElement;
         // Fail lat under -90, over 90 and lng under -180, over 180.
-        checkInputs(coordsInput, 'fail', '-90.00000001, -180.0000000002');
-        checkInputs(coordsInput, 'fail', '90.00000001, 180.000000002');
+        await checkInputs(coordsInput, 'fail', '-90.00000001, -180.0000000002');
+        await checkInputs(coordsInput, 'fail', '90.00000001, 180.000000002');
         // Fail NaN.
-        checkInputs(coordsInput, 'fail', '49th parallel');
+        await checkInputs(coordsInput, 'fail', '49th parallel');
     });
 
     test("film, lens, tags input always passes check", async() => {
+        const { newStore } = renderBoilerplate(preloadedStateEditorOwner);
+        const { imageToClick } = doMoreBoilerPlate(newStore);
+        await user.click(imageToClick);
         await waitFor(() => screen.findAllByRole('textbox'));
         const filmInput = screen.getByRole('textbox', { name: 'Film editable metadata value' }) as HTMLInputElement;
         const lensInput = screen.getByRole('textbox', { name: 'Lens editable metadata value' }) as HTMLInputElement;
         const tagsInput = screen.getByRole('textbox', { name: 'Tags editable metadata value' }) as HTMLInputElement;
         // Passes any kind of string.
-        checkInputs(filmInput, 'pass', 'alternative process');
-        checkInputs(lensInput, 'pass', 'myopic glasses');
-        checkInputs(tagsInput, 'pass', 'jurassic park, alpha centauri, 4th dimension');
+        await checkInputs(filmInput, 'pass', 'alternative process');
+        await checkInputs(lensInput, 'pass', 'myopic glasses');
+        await checkInputs(tagsInput, 'pass', 'jurassic park, alpha centauri, 4th dimension');
     });
 });
 
 
+describe("shows save status indicators on form submission", () => {
+    /* --------------------------
+        Helper: initial tests.
+    -------------------------- */
+    const doMoreBoilerPlate = (newStore: EnhancedStore) => {
+        // Verify editor and owner.
+        expect(newStore.getState().timeline.imageDocs).not.toBeNull();
+        expect(newStore.getState().login.role).toEqual('editor');
+        const mockUser = newStore.getState().login.user;
+        const docOwner = newStore.getState().timeline.imageDocs![0].owner;
+        expect(mockUser?._id).toEqual(docOwner);
+
+        const imageToClick = screen.getAllByRole('img', { name: 'thumbnail image container'})[0];
+        return { imageToClick };
+    };
+
+    beforeEach(() => {
+        /* --------------------------------------------------------
+            Mocks                                          start
+        -------------------------------------------------------- */
+        mockAxios = new MockAdapter(axios);
+
+        // Mock scrollTo.
+        window.HTMLElement.prototype.scrollTo = jest.fn();
+
+        // Mock IntersectionObserver.
+        class IntersectionObserverStub {
+            // Stub methods.
+            root() {}
+            takeRecords() {}
+            observe() {}
+            disconnect() {}
+        };
+    
+        jest.doMock('intersectionObserverMock', () => 
+            IntersectionObserverStub, 
+            { virtual: true }
+        );
+    
+        window.IntersectionObserver = jest.requireMock('intersectionObserverMock');
+    
+        jest.spyOn(window.IntersectionObserver.prototype, 'observe')
+            .mockImplementation(() => {
+                return jest.fn();
+            });
+        /* --------------------------------------------------------
+            Mocks                                            end
+        -------------------------------------------------------- */
+    });
+
+    afterEach(() => {
+        cleanup;
+        mockAxios.reset();
+        jest.clearAllMocks();
+        jest.restoreAllMocks();
+    });
+
+    afterAll(() => {
+        cleanup;
+        mockAxios.reset();
+        jest.clearAllMocks();
+        jest.restoreAllMocks();
+    });
 
 
+    test("indicates green check on successful edits", async() => {
+        const { newStore } = renderBoilerplate(preloadedStateEditorOwner);
+        const { imageToClick } = doMoreBoilerPlate(newStore);
+        await user.click(imageToClick);
+        await waitFor(() => screen.findByRole('textbox', { name: 'Format editable metadata value' }));
+        const formatInput = screen.getByRole('textbox', { name: 'Format editable metadata value' });
 
-// describe("shows save status indicators on form submission", () => {
-//     test("indicates green check on successful edits", async() => {
+        // Enter an accepted input.
+        const input = 'some sheet film';
+        formatInput.focus();
+        await user.type(formatInput, input);
+        await waitFor(() => expect(formatInput).toHaveValue(input), { timeout: 9000 });
 
-//     });
+        // Mocked Axios calls.
+        mockAxios = new MockAdapter(axios);
+        mockAxios
+            .onAny(updateUrl)
+            .reply(200, {
+                'updateStatus': 'successful',
+                'updatedDoc': {...preloadedStateEditorOwner.timeline.imageDocs![0],
+                    'format': {
+                        'medium': 'film',
+                        'type': 'some sheet'
+                    }
+                },
+                'updateMessage': 'All (mocked) edits OK!'
+            });
 
-//     test("indicates amber exclamation on issues with submission", async() => {
+        // Save (dispatch fetch) to update doc.
+        const saveInputButton = screen.getByRole('button', { name: 'save metadata edits on image' });
+        await user.click(saveInputButton);
+        
+        // Verify request successful.
+        await waitFor(() => expect(newStore.getState().editor.message).not.toEqual(null));
+        expect(mockAxios.history.patch.length).toEqual(1);
+        expect(newStore.getState().editor.response).toEqual('successful');
 
-//     });
+        // Indicator style change to green.
+        const responseIndicator = screen.getByRole('button', { name: 'metadata edit status' });
+        expect(responseIndicator).toHaveClass('green');
 
-//     test("indicates red exclamation on network issues with submission", async() => {
+        // Cleanup.
+        formatInput.focus();
+        await user.clear(formatInput);
+        await waitFor(() => expect(formatInput).toHaveValue(''));
+    });
 
-//     });
-// })
+    test("indicates amber exclamation on issues with submission", async() => {
+        const { newStore } = renderBoilerplate(preloadedStateEditorOwner);
+        const { imageToClick } = doMoreBoilerPlate(newStore);
+        await user.click(imageToClick);
+        await waitFor(() => screen.findByRole('textbox', { name: 'Camera editable metadata value' }));
+        const cameraInput = screen.getByRole('textbox', { name: 'Camera editable metadata value' });
+
+        // Enter a incorrectly formatted input.
+        // Still goes through but backend will not update that field.
+        const input = 'iPhone';
+        cameraInput.focus();
+        await user.type(cameraInput, input);
+        await waitFor(() => expect(cameraInput).toHaveValue(input), { timeout: 9000 });
+
+        // Mocked Axios calls.
+        mockAxios = new MockAdapter(axios);
+        mockAxios
+            .onAny(updateUrl)
+            .reply(200, {
+                'updateStatus': 'passed with error',
+                'updatedDoc': preloadedStateEditorOwner.timeline.imageDocs![0],
+                'updateMessage': 'Some (mocked) edit(s) in wrong format.'
+            });
+
+        // Save (dispatch fetch) to update doc.
+        const saveInputButton = screen.getByRole('button', { name: 'save metadata edits on image' });
+        await user.click(saveInputButton);
+        
+        // Verify request successful.
+        await waitFor(() => expect(newStore.getState().editor.message).not.toEqual(null));
+        expect(mockAxios.history.patch.length).toEqual(1);
+        expect(newStore.getState().editor.response).toEqual('passed with error');
+
+        // Indicator style change to green.
+        const responseIndicator = screen.getByRole('button', { name: 'metadata edit status' });
+        expect(responseIndicator).toHaveClass('amber');
+
+        // Cleanup.
+        cameraInput.focus();
+        await user.clear(cameraInput);
+        await waitFor(() => expect(cameraInput).toHaveValue(''));
+    });
+
+    test("indicates red exclamation on request/auth issues with submission", async() => {
+        const { newStore } = renderBoilerplate(preloadedStateEditorOwner);
+        const { imageToClick } = doMoreBoilerPlate(newStore);
+        await user.click(imageToClick);
+        await waitFor(() => screen.findByRole('textbox', { name: 'ISO editable metadata value' }));
+        const isoInput = screen.getByRole('textbox', { name: 'ISO editable metadata value' });
+
+        // Enter an input.
+        const input = '50';
+        isoInput.focus();
+        await user.type(isoInput, input);
+        await waitFor(() => expect(isoInput).toHaveValue(input), { timeout: 9000 });
+
+        // Mocked Axios calls.
+        mockAxios = new MockAdapter(axios);
+        mockAxios
+            .onAny(updateUrl)
+            .reply(401, {
+                'updateStatus': 'Error: Not authorized.'
+            });
+
+        // Save (dispatch fetch) to update doc.
+        const saveInputButton = screen.getByRole('button', { name: 'save metadata edits on image' });
+        await user.click(saveInputButton);
+        
+        // Verify request successful.
+        await waitFor(() => expect(newStore.getState().editor.message).not.toEqual(null));
+        expect(mockAxios.history.patch.length).toEqual(1);
+        expect(newStore.getState().editor.response).toEqual('failed');
+
+        // Indicator style change to green.
+        await waitFor(() => screen.findByRole('button', { name: 'metadata edit status' }));
+        const responseIndicator = screen.getByRole('button', { name: 'metadata edit status' });
+        expect(responseIndicator).toHaveClass('red');
+
+        // Cleanup.
+        isoInput.focus();
+        await user.clear(isoInput);
+        await waitFor(() => expect(isoInput).toHaveValue(''));
+    });
+
+    test("shows updated metadata after successful edit", async() => {
+        const { newStore } = renderBoilerplate(preloadedStateEditorOwner);
+        const { imageToClick } = doMoreBoilerPlate(newStore);
+        await user.click(imageToClick);
+        await waitFor(() => screen.findByRole('textbox', { name: 'Film editable metadata value' }));
+        const filmInput = screen.getByRole('textbox', { name: 'Film editable metadata value' }) as HTMLInputElement;
+
+        // Confirm original placeholder text.
+        expect(filmInput.placeholder).toEqual(preloadedStateEditorOwner.timeline.imageDocs![0].film);
+
+        // Enter an accepted input.
+        const updateToThisInput = 'Fujimockedfilm Superia 400';
+        await user.type(filmInput, updateToThisInput);
+        await waitFor(() => expect(filmInput.value).toEqual(updateToThisInput));
+
+        // Mocked Axios calls.
+        mockAxios = new MockAdapter(axios);
+        mockAxios
+            .onAny(updateUrl)
+            .reply(200, {
+                'updateStatus': 'successful',
+                'updatedDoc': {...preloadedStateEditorOwner.timeline.imageDocs![0],
+                    'film': updateToThisInput
+                },
+                'updateMessage': 'All (mocked) edits OK!'
+            })
+
+        // Save (dispatch fetch) to update doc.
+        const saveInputButton = screen.getByRole('button', { name: 'save metadata edits on image' });
+        await user.click(saveInputButton);
+        
+        // Verify request successful.
+        await waitFor(() => expect(newStore.getState().editor.message).not.toEqual(null));
+        expect(mockAxios.history.patch.length).toEqual(1);
+        expect(newStore.getState().editor.message).toEqual('All (mocked) edits OK!');
+
+        // Verify updated metadata view.
+        expect(filmInput.placeholder).not.toEqual(preloadedStateEditorOwner.timeline.imageDocs![0].film);
+        expect(filmInput.placeholder).toEqual(updateToThisInput);
+
+        // Cleanup.
+        filmInput.focus();
+        await user.clear(filmInput);
+        await waitFor(() => expect(filmInput).toHaveValue(''));
+    });
+})

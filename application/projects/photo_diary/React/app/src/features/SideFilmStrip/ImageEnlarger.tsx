@@ -673,7 +673,6 @@ class MetadataInput {
                 }
                 if (day) {
                     if (day < 1 || day > 31) {
-                        console.log(day);
                         // Very simplified, but this isn't a critical app...
                         return false;
                     }
@@ -705,8 +704,8 @@ class MetadataInput {
         if (setOfCoords) {
             // Check range of latitude, longitude values.
             let [lat, lng] = coords;
-            const latOK = parseFloat(lat) >= -90 && parseFloat(lat) <= 90 ? true : false;
-            const lngOK = parseFloat(lng) >= -180 == parseFloat(lng) <= 180 ? true : false; 
+            const latOK = (parseFloat(lat) >= -90) && (parseFloat(lat) <= 90) ? true : false;
+            const lngOK = (parseFloat(lng) >= -180) && (parseFloat(lng) <= 180) ? true : false; 
 
             return (latOK && lngOK);
         }

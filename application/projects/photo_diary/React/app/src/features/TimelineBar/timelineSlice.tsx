@@ -2,7 +2,8 @@ import {
     createSlice, 
     createAsyncThunk,
     Action,
-    AnyAction } from '@reduxjs/toolkit';
+    AnyAction, 
+    isRejectedWithValue} from '@reduxjs/toolkit';
 import axios, { AxiosError, AxiosResponse } from 'axios';
 import { RootState } from '../../app/store';
 import { apiUrl } from '../../app/App';
@@ -249,7 +250,7 @@ const timelineSlice = createSlice({
             /* --------------------------------------- 
                 Catches errors on fetching from API.
             --------------------------------------- */
-            .addMatcher(isRejectedAction, (state, action) => {
+            .addMatcher(isRejectedWithValue(fetchImagesData), (state, action) => {
                 // MongoDB image data action rejected.
                 state.responseStatus = 'error';
             })
