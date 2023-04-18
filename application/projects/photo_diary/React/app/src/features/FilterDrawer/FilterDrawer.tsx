@@ -278,7 +278,7 @@ export function getFilterStateStatus(filterState: FilterableTypes) {
 /* =====================================================================
     Types.
 ===================================================================== */
-export type ClassNameTypes = {
+export interface ClassNameTypes {
     [index: string]: string,
     'parent': string,
     'title': string,

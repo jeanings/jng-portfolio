@@ -793,7 +793,7 @@ export interface ImageEnlargerProps {
     'baseClassName': string
 };
 
-export type ImageInfoType = {
+export interface ImageInfoType {
     [index: string]: string | number | Array<string> | null
     'Title': string | null,
     'Date': string,
@@ -808,7 +808,7 @@ export type ImageInfoType = {
     'Coordinates': string | null
 };
 
-export type MetadataEditInputType = {
+export interface MetadataEditInputType {
     [index: string]: string | undefined
     'Title'?: string | undefined,
     'Date'?: string | undefined,
@@ -823,7 +823,7 @@ export type MetadataEditInputType = {
     'Coordinates'?: string | undefined
 };
 
-type MetadataCorrectnessType = {
+interface MetadataCorrectnessType {
     [index: string]: boolean | undefined
     'Title'?: boolean | undefined,
     'Date'?: boolean | undefined,
