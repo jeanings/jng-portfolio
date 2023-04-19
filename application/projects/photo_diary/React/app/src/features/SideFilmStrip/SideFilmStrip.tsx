@@ -214,11 +214,13 @@ const SideFilmStrip: React.FunctionComponent = () => {
         Handle expand/contract of film strip on hover/touch.
     ------------------------------------------------------ */
     const onImageHover = (event: React.SyntheticEvent) => {
-        filmStripHovered === false
-            ? setFilmStripHovered(true)
-            : imageEnlarger === 'on'
-                ? setFilmStripHovered(true)
-                : setFilmStripHovered(false);
+        filmStripHovered === true
+            ? setFilmStripHovered(false)
+            : setFilmStripHovered(true);
+        
+        if (imageEnlarger === 'on') {
+            setFilmStripHovered(true);
+        }
     };
 
 

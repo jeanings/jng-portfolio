@@ -143,7 +143,7 @@ const loginSlice = createSlice({
             ------------------------------------- */
             .addCase(exchangeOAuthCodeToken.fulfilled, (state, action) => {
                 const data = action.payload;
-
+                
                 if (data.user === 'unauthorized') {
                     state.tokenResponse = 'error';
                     state.user = null;

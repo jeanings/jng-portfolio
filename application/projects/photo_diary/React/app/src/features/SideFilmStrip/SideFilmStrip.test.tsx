@@ -1,7 +1,7 @@
 import React from 'react';
 import * as reactRedux from 'react-redux';
 import { Provider } from 'react-redux';
-import { setupStore } from '../../app/store';
+import { setupStore, RootState } from '../../app/store';
 import { 
     cleanup, 
     render, 
@@ -14,16 +14,10 @@ import '@testing-library/jest-dom';
 import mockDefaultData from '../../utils/mockDefaultData.json';
 import preloadedState from '../../utils/testHelpers';
 import { handleYearSelect, handleMonthSelect } from '../TimelineBar/timelineSlice';
-import Toolbar from '../Toolbar/Toolbar';
 import { handleToolbarButtons, ToolbarProps } from '../Toolbar/toolbarSlice';
 import SideFilmStrip from './SideFilmStrip';
 import { handleEnlarger } from './sideFilmStripSlice';
-// @ts-ignore
-import mapboxgl from 'mapbox-gl'; 
-import 'mapbox-gl/dist/mapbox-gl.css';
 
-
-const MapboxglSpiderfier: any = require('mapboxgl-spiderifier');
 
 var mockAxios = new MockAdapter(axios);
 var user = userEvent.setup();
@@ -65,16 +59,25 @@ afterEach(() => {
 });
 
 
-/* ===============================================================
-    Tests on state data, map, and image displaying interactions. 
-=============================================================== */
-test("renders side strip panel", async() => {
+/* --------------------------------------
+    Boilerplate for rendering document.
+-------------------------------------- */
+function renderBoilerplate(preloadedState: RootState) {
     const newStore = setupStore(preloadedState);
-    render(
+    const container = render(
         <Provider store={newStore}>
             <SideFilmStrip />
         </Provider>
     );
+    return { ...container, newStore };
+}
+
+
+/* ===============================================================
+    Tests on state data, map, and image displaying interactions. 
+=============================================================== */
+test("renders side strip panel", async() => {
+    const { newStore } = renderBoilerplate(preloadedState);
     
     // Verify data to build film strip is available.
     expect(newStore.getState().timeline.imageDocs).not.toBeNull();
@@ -87,12 +90,7 @@ test("renders side strip panel", async() => {
 
 
 test("displays image collection in side strip panel", async() => {
-    const newStore = setupStore(preloadedState);
-    render(
-        <Provider store={newStore}>
-            <SideFilmStrip />
-        </Provider>
-    );
+    const { newStore } = renderBoilerplate(preloadedState);
 
     // Verify data to build film strip is available.
     const imageDocs = newStore.getState().timeline.imageDocs
@@ -112,12 +110,7 @@ test("displays image collection in side strip panel", async() => {
 
 
 test("changes on selected image (sideFilmStrip.enlargeDoc state) calls IntersectionObserver API", async() => {
-    const newStore = setupStore(preloadedState);
-    render(
-        <Provider store={newStore}>
-            <SideFilmStrip />
-        </Provider>
-    );
+    const { newStore } = renderBoilerplate(preloadedState);
     
     // Wait for render.
     await waitFor(() => screen.findByRole('main', { name: 'images panel' }));
@@ -129,28 +122,22 @@ test("changes on selected image (sideFilmStrip.enlargeDoc state) calls Intersect
     
     // Verify empty state.
     expect(newStore.getState().sideFilmStrip.enlargeDoc).toBeNull();
-    await waitFor(() => expect(window.IntersectionObserver.prototype.observe).not.toHaveBeenCalled());
+    expect(window.IntersectionObserver.prototype.observe).not.toHaveBeenCalled();
 
-    // Get image to click on.
+    // Click on an image.
     const imageToClick = imageFrameElems[0];
     expect(imageToClick.firstChild).not.toHaveClass("selected");
-
-    await waitFor(() => user.click(imageToClick));
+    await user.click(imageToClick);
 
     await waitFor(() => expect(window.IntersectionObserver.prototype.observe).toHaveBeenCalledTimes(1));
 });
 
 
 test("clicks on images in film strip changes film frame styling, dispatches action", async() => {
-    const newStore = setupStore(preloadedState);
-    render(
-        <Provider store={newStore}>
-            <SideFilmStrip />
-        </Provider>
-    );
-    
+    const { newStore } = renderBoilerplate(preloadedState);
+
     // Verify data to build film strip is available.
-    const imageDocs = newStore.getState().timeline.imageDocs
+    const imageDocs = newStore.getState().timeline.imageDocs;
     expect(imageDocs).not.toBeNull();
     expect(imageDocs!.length).toEqual(40);
 
@@ -171,21 +158,16 @@ test("clicks on images in film strip changes film frame styling, dispatches acti
     const imageToClick = imageFrameElems[0];
     expect(imageToClick.firstChild).not.toHaveClass("selected");
 
-    await waitFor(() => user.click(imageToClick));
+    await user.click(imageToClick);
 
     // Verify clicked image state updated.
-    expect(newStore.getState().sideFilmStrip.enlargeDoc).not.toBeNull();
+    await waitFor(() => expect(newStore.getState().sideFilmStrip.enlargeDoc).not.toBeNull());
     expect(imageToClick.firstChild).toHaveClass("selected");
 });
 
 
 test("renders 'image-enlarger' popup for showing enlarged image", async() => {
-    const newStore = setupStore(preloadedState);
-    render(
-        <Provider store={newStore}>
-            <SideFilmStrip />
-        </Provider>
-    );
+    const { newStore } = renderBoilerplate(preloadedState);
     
     // Verify data to build film strip is available.
     const imageDocs = newStore.getState().timeline.imageDocs
@@ -208,10 +190,10 @@ test("renders 'image-enlarger' popup for showing enlarged image", async() => {
     // Get image to click on.
     const imageToClick = imageFrameElems[0];
 
-    await waitFor(() => user.click(imageToClick));
+    await user.click(imageToClick);
 
     // Verify clicked image state updated.
-    expect(newStore.getState().sideFilmStrip.enlargeDoc).not.toBeNull();
+    await waitFor(() => expect(newStore.getState().sideFilmStrip.enlargeDoc).not.toBeNull());
 
     // Check for enlarger popup to be rendered.
     await waitFor(() => screen.findByRole('tab', { name: 'image enlarger' }));
@@ -221,12 +203,7 @@ test("renders 'image-enlarger' popup for showing enlarged image", async() => {
 
 
 test("renders 'image-enlarger' element", async() => {
-    const newStore = setupStore(preloadedState);
-    render(
-        <Provider store={newStore}>
-            <SideFilmStrip />
-        </Provider>
-    );
+    const { newStore } = renderBoilerplate(preloadedState);
     
     // Verify data to build film strip is available.
     const imageDocs = newStore.getState().timeline.imageDocs
@@ -246,10 +223,10 @@ test("renders 'image-enlarger' element", async() => {
     // Get image to click on.
     const imageToClick = imageFrameElems[0];
 
-    await waitFor(() => user.click(imageToClick));
+    await user.click(imageToClick);
 
     // Verify clicked image state updated.
-    expect(newStore.getState().sideFilmStrip.enlargeDoc).not.toBeNull();
+    await waitFor(() => expect(newStore.getState().sideFilmStrip.enlargeDoc).not.toBeNull());
 
     // Check for enlarger popup to be rendered.
     await waitFor(() => screen.findByRole('tab', { name: 'image enlarger' }));
@@ -262,12 +239,7 @@ test("renders 'image-enlarger' element", async() => {
 
 
 test("renders image to be enlarged based on << enlargeDoc >> state", async() => {
-    const newStore = setupStore(preloadedState);
-        render(
-            <Provider store={newStore}>
-                <SideFilmStrip />
-            </Provider>
-        );
+    const { newStore } = renderBoilerplate(preloadedState);
     
     // Verify data to build film strip is available.
     const imageDocs = newStore.getState().timeline.imageDocs
@@ -287,7 +259,7 @@ test("renders image to be enlarged based on << enlargeDoc >> state", async() => 
     // Get image to click on.
     const imageToClick = imageFrameElems[0];
 
-    await waitFor(() => user.click(imageToClick));
+    await user.click(imageToClick);
 
     // Verify clicked image state updated.
     expect(newStore.getState().sideFilmStrip.enlargeDoc).not.toBeNull();
@@ -308,12 +280,7 @@ test("renders image to be enlarged based on << enlargeDoc >> state", async() => 
 
 
 test("reveals/hides enlarger depending on state availability", async() => {
-    const newStore = setupStore(preloadedState);
-    render(
-        <Provider store={newStore}>
-            <SideFilmStrip />
-        </Provider>
-    );
+    const { newStore } = renderBoilerplate(preloadedState);
     
     // "Reset" << enlargeDoc >> to null, unclicked state.
     newStore.dispatch(handleEnlarger({
@@ -333,8 +300,8 @@ test("reveals/hides enlarger depending on state availability", async() => {
         'enlargeDoc': mockDefaultData.docs[0],
         'docIndex': 0
     }));
-    expect(newStore.getState().sideFilmStrip.enlargeDoc).not.toBeNull();
     await waitFor(() => {
+        expect(newStore.getState().sideFilmStrip.enlargeDoc).not.toBeNull();
         expect(imageEnlargerElem).toHaveAttribute("aria-expanded", 'true');
         expect(imageEnlargerElem).toHaveClass("show");
     });
@@ -342,13 +309,7 @@ test("reveals/hides enlarger depending on state availability", async() => {
 
 
 test("opens image enlarger (if closed) if same image clicked on", async() => {
-    const newStore = setupStore(preloadedState);
-    render(
-        <Provider store={newStore}>
-            <Toolbar />
-            <SideFilmStrip />
-        </Provider>
-    );
+    const { newStore } = renderBoilerplate(preloadedState);
     
     expect(newStore.getState().sideFilmStrip.enlargeDoc).toBeNull();
 
@@ -364,14 +325,12 @@ test("opens image enlarger (if closed) if same image clicked on", async() => {
     const thumbnailToClick = thumbnailElems.filter(thumbnail => 
         thumbnail.id === idForImageToEnlarge)[0];
 
-    await waitFor(() => user.click(thumbnailToClick));
+    await user.click(thumbnailToClick);
 
     expect(newStore.getState().sideFilmStrip.enlargeDoc).not.toBeNull();
     
-    await waitFor(() => {
-        expect(imageEnlargerElem).toHaveAttribute("aria-expanded", 'true');
-        expect(imageEnlargerElem).toHaveClass("show");
-    });
+    expect(imageEnlargerElem).toHaveAttribute("aria-expanded", 'true');
+    expect(imageEnlargerElem).toHaveClass("show");
 
     // Close image enlarger with toolbar button.
     const payloadToolbarButtons: ToolbarProps = {
@@ -387,7 +346,7 @@ test("opens image enlarger (if closed) if same image clicked on", async() => {
     });
 
     // Click on image in strip again.
-    await waitFor(() => user.click(thumbnailToClick));
+    await user.click(thumbnailToClick);
 
     // Verify image enlarger opens.
     await waitFor(() => {
@@ -398,13 +357,7 @@ test("opens image enlarger (if closed) if same image clicked on", async() => {
 
 
 test("closes image enlarger on year or month selection", async() => {
-    const newStore = setupStore(preloadedState);
-    render(
-        <Provider store={newStore}>
-            <Toolbar />
-            <SideFilmStrip />
-        </Provider>
-    );
+    const { newStore } = renderBoilerplate(preloadedState);
     
     expect(newStore.getState().sideFilmStrip.enlargeDoc).toBeNull();
     const imageEnlargerElem = screen.getByRole('tab', { name: 'image enlarger' });
@@ -415,7 +368,7 @@ test("closes image enlarger on year or month selection", async() => {
     const thumbnailToClick = thumbnailElems.filter(thumbnail => 
         thumbnail.id === idForImageToEnlarge)[0];
 
-    await waitFor(() => user.click(thumbnailToClick));
+    await user.click(thumbnailToClick);
     expect(newStore.getState().sideFilmStrip.enlargeDoc).not.toBeNull();
     
     await waitFor(() => {
@@ -433,7 +386,7 @@ test("closes image enlarger on year or month selection", async() => {
     });
 
     // Click on image in strip again.
-    await waitFor(() => user.click(thumbnailToClick));
+    await user.click(thumbnailToClick);
 
     // Verify enlarger opened.
 
@@ -454,12 +407,7 @@ test("closes image enlarger on year or month selection", async() => {
 
 
 test("expands film strip on hover and slides image enlarger to the left", async() => {
-    const newStore = setupStore(preloadedState);
-    render(
-        <Provider store={newStore}>
-            <SideFilmStrip />
-        </Provider>
-    );
+    const { newStore } = renderBoilerplate(preloadedState);
     
     expect(newStore.getState().sideFilmStrip.enlargeDoc).toBeNull();
     const imageEnlargerElem = screen.getByRole('tab', { name: 'image enlarger' });
@@ -470,7 +418,7 @@ test("expands film strip on hover and slides image enlarger to the left", async(
     const thumbnailToClick = thumbnailElems.filter(thumbnail => 
         thumbnail.id === idForImageToEnlarge)[0];
 
-    await waitFor(() => user.click(thumbnailToClick));
+    await user.click(thumbnailToClick);
 
     expect(newStore.getState().sideFilmStrip.enlargeDoc).not.toBeNull();
     
@@ -484,7 +432,7 @@ test("expands film strip on hover and slides image enlarger to the left", async(
     const imageEnlargerMetadataContainer = screen.getByRole(
         'figure', { name: 'enlarged image with metadata' });
 
-    await waitFor(() => user.hover(filmStripElem));
+    await user.hover(filmStripElem);
     
     // Verify film strip expanded and image enlarger panel shifted.
     expect(filmStripElem).toHaveAttribute("aria-expanded", 'true');
@@ -493,12 +441,7 @@ test("expands film strip on hover and slides image enlarger to the left", async(
 
 
 test("scrolls image strip to top on timeline changes", async() => {
-    const newStore = setupStore(preloadedState);
-    render(
-        <Provider store={newStore}>
-            <SideFilmStrip />
-        </Provider>
-    );
+    const { newStore } = renderBoilerplate(preloadedState);
 
     expect(newStore.getState().timeline.selected.year).toEqual(2022);
 
@@ -514,12 +457,7 @@ test("scrolls image strip to top on timeline changes", async() => {
 
 
 test("flies map to marker position on film strip thumbnail clicks", async() => {
-    const newStore = setupStore(preloadedState);
-    render(
-        <Provider store={newStore}>
-            <SideFilmStrip />
-        </Provider>
-    );
+    const { newStore } = renderBoilerplate(preloadedState);
     
     // Get thumbnail to click.
     const idForImageToEnlarge = mockDefaultData.docs[0]._id;
@@ -527,7 +465,7 @@ test("flies map to marker position on film strip thumbnail clicks", async() => {
     const thumbnailToClick = thumbnailElems.filter(thumbnail => 
         thumbnail.id === idForImageToEnlarge)[0];
 
-    await waitFor(() => user.click(thumbnailToClick));
+    await user.click(thumbnailToClick);
 
     expect(newStore.getState().sideFilmStrip.enlargeDoc).not.toBeNull();
 
@@ -537,12 +475,7 @@ test("flies map to marker position on film strip thumbnail clicks", async() => {
 
 
 test("cycles through images on prev/next button clicks", async() => {
-    const newStore = setupStore(preloadedState);
-    render(
-        <Provider store={newStore}>
-            <SideFilmStrip />
-        </Provider>
-    );
+    const { newStore } = renderBoilerplate(preloadedState);
     
     // Get thumbnail to click.
     const idForImageToEnlarge = mockDefaultData.docs[10]._id;
@@ -550,7 +483,7 @@ test("cycles through images on prev/next button clicks", async() => {
     const thumbnailToClick = thumbnailElems.filter(thumbnail => 
         thumbnail.id === idForImageToEnlarge)[0];
 
-    await waitFor(() => user.click(thumbnailToClick));
+    await user.click(thumbnailToClick);
 
     expect(newStore.getState().sideFilmStrip.enlargeDoc).not.toBeNull();
 
@@ -558,12 +491,12 @@ test("cycles through images on prev/next button clicks", async() => {
     const nextImageButton = screen.getByRole('button', { name: 'show next image' });
     let imageIndexA = newStore.getState().sideFilmStrip.docIndex as number;
 
-    await waitFor(() => user.click(nextImageButton));
+    await user.click(nextImageButton);
     
     // Verify index is + 1.
     expect(newStore.getState().sideFilmStrip.docIndex).toEqual(imageIndexA + 1);
 
-    await waitFor(() => user.click(prevImageButton));
+    await user.click(prevImageButton);
 
     // Verify index is - 1, back to original.
     expect(newStore.getState().sideFilmStrip.docIndex).toEqual(imageIndexA);
@@ -571,12 +504,7 @@ test("cycles through images on prev/next button clicks", async() => {
 
 
 test("loops image doc if prev/next button leads to collection out of range", async() => {
-    const newStore = setupStore(preloadedState);
-    render(
-        <Provider store={newStore}>
-            <SideFilmStrip />
-        </Provider>
-    );
+    const { newStore } = renderBoilerplate(preloadedState);
     
     // Get thumbnail to click.
     const idForImageToEnlarge = mockDefaultData.docs[0]._id;
@@ -584,19 +512,19 @@ test("loops image doc if prev/next button leads to collection out of range", asy
     const thumbnailToClick = thumbnailElems.filter(thumbnail => 
         thumbnail.id === idForImageToEnlarge)[0];
 
-    await waitFor(() => user.click(thumbnailToClick));
+    await user.click(thumbnailToClick);
     expect(newStore.getState().sideFilmStrip.enlargeDoc).not.toBeNull();
 
     const prevImageButton = screen.getByRole('button', { name: 'show previous image' });
     const nextImageButton = screen.getByRole('button', { name: 'show next image' });
     const imageDocs = newStore.getState().timeline.imageDocs;
 
-    await waitFor(() => user.click(prevImageButton));
+    await user.click(prevImageButton);
     
     // Verify image doc looped to end of collection.
     expect(newStore.getState().sideFilmStrip.docIndex).toEqual(imageDocs!.length - 1);
 
-    await waitFor(() => user.click(nextImageButton));
+    await user.click(nextImageButton);
 
     // Verify image doc looped back to beginning of collection.
     expect(newStore.getState().sideFilmStrip.docIndex).toEqual(0);
@@ -605,12 +533,7 @@ test("loops image doc if prev/next button leads to collection out of range", asy
 
 test("opens slide viewer on clicking full screen button in image enlarger panel, \
     closes on clicking anywhere on slide viewer that's not nav button", async() => {
-    const newStore = setupStore(preloadedState);
-    render(
-        <Provider store={newStore}>
-            <SideFilmStrip />
-        </Provider>
-    );
+    const { newStore } = renderBoilerplate(preloadedState);
     
     const slideViewElement = screen.getByRole('img', { name: 'full screen slide view mode' });
     expect(slideViewElement).not.toHaveClass("show");
@@ -621,17 +544,17 @@ test("opens slide viewer on clicking full screen button in image enlarger panel,
     const thumbnailToClick = thumbnailElems.filter(thumbnail => 
         thumbnail.id === idForImageToEnlarge)[0];
 
-    await waitFor(() => user.click(thumbnailToClick));
+    await user.click(thumbnailToClick);
     expect(newStore.getState().sideFilmStrip.enlargeDoc).not.toBeNull();
 
     const fullScreenButton = screen.getByRole('button', { name: 'show image full screen' });
 
-    await waitFor(() => user.click(fullScreenButton));
+    await user.click(fullScreenButton);
     
     // Verify slide viewing mode opened.
     expect(slideViewElement).toHaveClass("show");
 
-    await waitFor(() => user.click(slideViewElement));
+    await user.click(slideViewElement);
     
     // Verify slide viewing mode closed.
     expect(slideViewElement).not.toHaveClass("show");
@@ -639,12 +562,7 @@ test("opens slide viewer on clicking full screen button in image enlarger panel,
 
 
 test("changes image in slide view mode on arrow button clicks", async() => {
-    const newStore = setupStore(preloadedState);
-    render(
-        <Provider store={newStore}>
-            <SideFilmStrip />
-        </Provider>
-    );
+    const { newStore } = renderBoilerplate(preloadedState);
     
     // Get thumbnail to click.
     const idForImageToEnlarge = mockDefaultData.docs[1]._id;
@@ -653,11 +571,11 @@ test("changes image in slide view mode on arrow button clicks", async() => {
         thumbnail.id === idForImageToEnlarge)[0];
 
     // Set up enlarger.
-    await waitFor(() => user.click(thumbnailToClick));
+    await user.click(thumbnailToClick);
     expect(newStore.getState().sideFilmStrip.enlargeDoc).not.toBeNull();
 
     const fullScreenButton = screen.getByRole('button', { name: 'show image full screen' });
-    await waitFor(() => user.click(fullScreenButton));
+    await user.click(fullScreenButton);
 
     // Get image nav buttons.
     const prevButton = screen.getByRole('button', { name: 'show previous slide image'} );
@@ -667,12 +585,12 @@ test("changes image in slide view mode on arrow button clicks", async() => {
     const slideImageElem = screen.getByRole('img', { name: 'enlarged image in full screen mode' } ) as HTMLImageElement;
     const slideImageA: string = slideImageElem.src;
 
-    await waitFor(() => user.click(prevButton));
+    await user.click(prevButton);
 
     // Verify image changed.
     expect(slideImageElem.src).not.toEqual(slideImageA);
 
-    await waitFor(() => user.click(nextButton));
+    await user.click(nextButton);
 
     // Verify image changed back to initial.
     expect(slideImageElem.src).toEqual(slideImageA);
@@ -680,12 +598,7 @@ test("changes image in slide view mode on arrow button clicks", async() => {
 
 
 test("loops slide image if prev/next button leads to collection out of range", async() => {
-    const newStore = setupStore(preloadedState);
-    render(
-        <Provider store={newStore}>
-            <SideFilmStrip />
-        </Provider>
-    );
+    const { newStore } = renderBoilerplate(preloadedState);
     
     // Get thumbnail to click.
     const idForImageToEnlarge = mockDefaultData.docs[0]._id;
@@ -694,11 +607,11 @@ test("loops slide image if prev/next button leads to collection out of range", a
         thumbnail.id === idForImageToEnlarge)[0];
 
     // Set up enlarger.
-    await waitFor(() => user.click(thumbnailToClick));
+    await user.click(thumbnailToClick);
     expect(newStore.getState().sideFilmStrip.enlargeDoc).not.toBeNull();
 
     const fullScreenButton = screen.getByRole('button', { name: 'show image full screen' });
-    await waitFor(() => user.click(fullScreenButton));
+    await user.click(fullScreenButton);
 
     // Get image nav buttons.
     const prevButton = screen.getByRole('button', { name: 'show previous slide image'} );
@@ -707,7 +620,7 @@ test("loops slide image if prev/next button leads to collection out of range", a
     // Get image element.
     const slideImageElem = screen.getByRole('img', { name: 'enlarged image in full screen mode' } ) as HTMLImageElement;
 
-    await waitFor(() => user.click(prevButton));
+    await user.click(prevButton);
 
     const firstImageSrc: string = mockDefaultData.docs[0].url;
     const lastImageSrc: string = mockDefaultData.docs[mockDefaultData.docs.length - 1].url;
@@ -715,7 +628,7 @@ test("loops slide image if prev/next button leads to collection out of range", a
     // Verify image looped to last image in collection.
     expect(slideImageElem.src).toEqual(lastImageSrc);
 
-    await waitFor(() => user.click(nextButton));
+    await user.click(nextButton);
 
     // Verify image changed back to initial, looped to beginning of collection.
     expect(slideImageElem.src).toEqual(firstImageSrc);
@@ -723,13 +636,8 @@ test("loops slide image if prev/next button leads to collection out of range", a
 
 
 test("changes enlargeDoc to that of last image viewed in slide view", async() => {
-    const newStore = setupStore(preloadedState);
-    render(
-        <Provider store={newStore}>
-            <SideFilmStrip />
-        </Provider>
-    );
-    
+    const { newStore } = renderBoilerplate(preloadedState);
+
     // Get thumbnail to click.
     const initImageToEnlarge = mockDefaultData.docs[0];
     const thumbnailElems = screen.getAllByRole('img', { name: 'thumbnail image container' });
@@ -737,11 +645,11 @@ test("changes enlargeDoc to that of last image viewed in slide view", async() =>
         thumbnail.id === initImageToEnlarge._id)[0];
 
     // Set up enlarger.
-    await waitFor(() => user.click(thumbnailToClick));
+    await user.click(thumbnailToClick);
     expect(newStore.getState().sideFilmStrip.enlargeDoc).not.toBeNull();
 
     const fullScreenButton = screen.getByRole('button', { name: 'show image full screen' });
-    await waitFor(() => user.click(fullScreenButton));
+    await user.click(fullScreenButton);
 
     const slideImageElem = screen.getByRole('img', { name: 'enlarged image in full screen mode' } ) as HTMLImageElement;
     
@@ -749,7 +657,7 @@ test("changes enlargeDoc to that of last image viewed in slide view", async() =>
     expect(slideImageElem.src).toEqual(initImageToEnlarge.url);
 
     const nextButton = screen.getByRole('button', { name: 'show next slide image'} );
-    await waitFor(() => user.click(nextButton));
+    await user.click(nextButton);
 
     // Verify slide image changed.
     expect(slideImageElem.src).not.toEqual(initImageToEnlarge.url);
@@ -760,7 +668,7 @@ test("changes enlargeDoc to that of last image viewed in slide view", async() =>
 
     
     const slideViewElement = screen.getByRole('img', { name: 'full screen slide view mode' });
-    await waitFor(() => user.click(slideViewElement));
+    await user.click(slideViewElement);
     
     // Verify slide viewing mode closed.
     expect(slideViewElement).not.toHaveClass("show");
@@ -771,13 +679,8 @@ test("changes enlargeDoc to that of last image viewed in slide view", async() =>
 
 
 test("presses on Esc key closes slide view mode", async() => {
-    const newStore = setupStore(preloadedState);
-    render(
-        <Provider store={newStore}>
-            <SideFilmStrip />
-        </Provider>
-    );
-    
+    const { newStore } = renderBoilerplate(preloadedState);
+
     // Get thumbnail to click.
     const initImageToEnlarge = mockDefaultData.docs[0];
     const thumbnailElems = screen.getAllByRole('img', { name: 'thumbnail image container' });
@@ -785,17 +688,17 @@ test("presses on Esc key closes slide view mode", async() => {
         thumbnail.id === initImageToEnlarge._id)[0];
 
     // Set up enlarger.
-    await waitFor(() => user.click(thumbnailToClick));
+    await user.click(thumbnailToClick);
     expect(newStore.getState().sideFilmStrip.enlargeDoc).not.toBeNull();
 
     const fullScreenButton = screen.getByRole('button', { name: 'show image full screen' });
-    await waitFor(() => user.click(fullScreenButton));
+    await user.click(fullScreenButton);
     
     // Verify slide view mode opened.
     expect(newStore.getState().sideFilmStrip.slideView).toEqual('on');
     expect(newStore.getState().toolbar.imageEnlarger).toEqual('hidden');
 
-    await waitFor(() => user.keyboard('[Escape]'));
+    await user.keyboard('[Escape]');
 
     // Verify slide view mode closed.
     expect(newStore.getState().sideFilmStrip.slideView).toEqual('off');
@@ -804,13 +707,8 @@ test("presses on Esc key closes slide view mode", async() => {
 
 
 test("presses on L/R arrow keys change enlarger image", async() => {
-    const newStore = setupStore(preloadedState);
-    render(
-        <Provider store={newStore}>
-            <SideFilmStrip />
-        </Provider>
-    );
-    
+    const { newStore } = renderBoilerplate(preloadedState);
+
     // Get thumbnail to click.
     const initImageToEnlarge = mockDefaultData.docs[0];
     const prevImageToEnlarge = mockDefaultData.docs[mockDefaultData.docs.length - 1];
@@ -819,15 +717,15 @@ test("presses on L/R arrow keys change enlarger image", async() => {
         thumbnail.id === initImageToEnlarge._id)[0];
     
     // Set up image enlarger.
-    await waitFor(() => user.click(thumbnailToClick));
+    await user.click(thumbnailToClick);
     expect(newStore.getState().sideFilmStrip.enlargeDoc).not.toBeNull();
 
-    await waitFor(() => user.keyboard('[ArrowLeft]'));
+    await user.keyboard('[ArrowLeft]');
 
     // Verify image enlarger cycled to previous image.
     expect(newStore.getState().sideFilmStrip.enlargeDoc!._id).toEqual(prevImageToEnlarge._id);
 
-    await waitFor(() => user.keyboard('[ArrowRight]'));
+    await user.keyboard('[ArrowRight]');
 
     // Verify image enlarger cycled to next image (initial image).
     expect(newStore.getState().sideFilmStrip.enlargeDoc!._id).toEqual(initImageToEnlarge._id);
@@ -835,13 +733,8 @@ test("presses on L/R arrow keys change enlarger image", async() => {
 
 
 test("presses on L/R arrow keys change slide viewer image", async() => {
-    const newStore = setupStore(preloadedState);
-    render(
-        <Provider store={newStore}>
-            <SideFilmStrip />
-        </Provider>
-    );
-    
+    const { newStore } = renderBoilerplate(preloadedState);
+
     // Get thumbnail to click.
     const initImageToEnlarge = mockDefaultData.docs[0];
     const thumbnailElems = screen.getAllByRole('img', { name: 'thumbnail image container' });
@@ -849,11 +742,11 @@ test("presses on L/R arrow keys change slide viewer image", async() => {
         thumbnail.id === initImageToEnlarge._id)[0];
 
     // Set up image enlarger.
-    await waitFor(() => user.click(thumbnailToClick));
+    await user.click(thumbnailToClick);
     expect(newStore.getState().sideFilmStrip.enlargeDoc).not.toBeNull();
 
     const fullScreenButton = screen.getByRole('button', { name: 'show image full screen' });
-    await waitFor(() => user.click(fullScreenButton));
+    await user.click(fullScreenButton);
     
     // Verify slide view mode opened.
     expect(newStore.getState().sideFilmStrip.slideView).toEqual('on');
@@ -864,13 +757,13 @@ test("presses on L/R arrow keys change slide viewer image", async() => {
     // const slideImageA: string = slideImageElem.src;
     expect(slideImageElem.src).toEqual(initImageToEnlarge.url);
 
-    await waitFor(() => user.keyboard('[ArrowRight]'));
+    await user.keyboard('[ArrowRight]');
 
     // Verify slide image cycled to next image.
     const nextImageToSlideView = mockDefaultData.docs[1];
     expect(slideImageElem.src).toEqual(nextImageToSlideView.url);
 
-    await waitFor(() => user.keyboard('[ArrowLeft]'));
+    await user.keyboard('[ArrowLeft]');
 
     // Verify image enlarger cycled to previous image (initial image).
     expect(slideImageElem.src).toEqual(initImageToEnlarge.url);
@@ -878,13 +771,8 @@ test("presses on L/R arrow keys change slide viewer image", async() => {
 
 
 test("presses on L/R arrow keys in slide viewer won't change base enlarger image", async() => {
-    const newStore = setupStore(preloadedState);
-    render(
-        <Provider store={newStore}>
-            <SideFilmStrip />
-        </Provider>
-    );
-    
+    const { newStore } = renderBoilerplate(preloadedState);
+
     // Get thumbnail to click.
     const initImageToEnlarge = mockDefaultData.docs[0];
     const thumbnailElems = screen.getAllByRole('img', { name: 'thumbnail image container' });
@@ -892,12 +780,12 @@ test("presses on L/R arrow keys in slide viewer won't change base enlarger image
         thumbnail.id === initImageToEnlarge._id)[0];
 
     // Set up image enlarger.
-    await waitFor(() => user.click(thumbnailToClick));
+    await user.click(thumbnailToClick);
     const enlargeDoc = newStore.getState().sideFilmStrip.enlargeDoc?._id;
     expect(enlargeDoc).toEqual(initImageToEnlarge._id);
 
     const fullScreenButton = screen.getByRole('button', { name: 'show image full screen' });
-    await waitFor(() => user.click(fullScreenButton));
+    await user.click(fullScreenButton);
     
     // Verify slide view mode opened.
     expect(newStore.getState().sideFilmStrip.slideView).toEqual('on');
@@ -908,7 +796,7 @@ test("presses on L/R arrow keys in slide viewer won't change base enlarger image
     // const slideImageA: string = slideImageElem.src;
     expect(slideImageElem.src).toEqual(initImageToEnlarge.url);
 
-    await waitFor(() => user.keyboard('[ArrowRight]'));
+    await user.keyboard('[ArrowRight]');
 
     // Verify slide image cycled to next image.
     const nextImageToSlideView = mockDefaultData.docs[1];
@@ -917,7 +805,7 @@ test("presses on L/R arrow keys in slide viewer won't change base enlarger image
     // Verify enlargeDoc unchanged.
     expect(enlargeDoc).toEqual(initImageToEnlarge._id);
 
-    await waitFor(() => user.keyboard('[ArrowLeft]'));
+    await user.keyboard('[ArrowLeft]');
 
     // Verify image enlarger cycled to previous image (initial image).
     expect(slideImageElem.src).toEqual(initImageToEnlarge.url);

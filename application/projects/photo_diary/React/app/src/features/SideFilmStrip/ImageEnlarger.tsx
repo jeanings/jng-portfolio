@@ -28,19 +28,19 @@ import './ImageEnlarger.css';
 ===================================================================== */
 const ImageEnlarger: React.FunctionComponent <ImageEnlargerProps> = (props: ImageEnlargerProps) => {
     const dispatch = useAppDispatch();
+    const [ metadataEdits, setMetadataEdits ] = useState<MetadataEditInputType>({});
+    const [ isFormatCorrect, setIsFormatCorrect ] = useState<MetadataCorrectnessType>({});
+    const [ showEditResponseMessage, setShowEditResponseMessage ] = useState<boolean>(false);
     const enlargeDoc = useAppSelector(state => state.sideFilmStrip.enlargeDoc);
     const docIndex = useAppSelector(state => state.sideFilmStrip.docIndex);
     const toolbarEnlarger = useAppSelector(state => state.toolbar.imageEnlarger);
     const timelineSelected = useAppSelector(state => state.timeline.selected);
     const imageDocs = useAppSelector(state => state.timeline.imageDocs);
-    const [ metadataEdits, setMetadataEdits ] = useState<MetadataEditInputType>({});
-    const [ isFormatCorrect, setIsFormatCorrect ] = useState<MetadataCorrectnessType>({});
     const metadataForm = useRef<HTMLFormElement | null>(null);
     const role: LoginProps['role'] = useAppSelector(state => state.login.role);
     const user: UserProps | null = useAppSelector(state => state.login.user);
     const isUserEditor: boolean = (role === 'editor') || (role === 'admin') ? true : false;
     const editor = useAppSelector(state => state.editor);
-    const [ showEditResponseMessage, setShowEditResponseMessage ] = useState<boolean>(false);
     const classBase: string = "image-enlarger";
     
     let imageSource: string = '';

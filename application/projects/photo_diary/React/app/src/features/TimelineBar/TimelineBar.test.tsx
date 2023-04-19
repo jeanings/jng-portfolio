@@ -1,6 +1,6 @@
 import React from 'react';
 import { Provider } from 'react-redux';
-import { setupStore } from '../../app/store';
+import { setupStore, RootState } from '../../app/store';
 import { 
     act,
     cleanup, 
@@ -17,6 +17,7 @@ import mock2022DataJun from '../../utils/mock2022DataJun.json';
 import TimelineBar from './TimelineBar';
 import { fetchDocs, ImageDocsRequestProps } from './timelineSlice';
 import { apiUrl } from '../../app/App';
+import preloadedState from '../../utils/testHelpers';
 
 
 var mockAxios = new MockAdapter(axios);
@@ -31,6 +32,19 @@ afterEach(() => {
     cleanup;
 });
 
+/* --------------------------------------
+    Boilerplate for rendering document.
+-------------------------------------- */
+function renderBoilerplate(preloadedState?: RootState) {
+    const newStore = setupStore(preloadedState);
+    const container = render(
+        <Provider store={newStore}>
+            <TimelineBar />
+        </Provider>
+    );
+    return { ...container, newStore };
+}
+
 
 /* =====================================================================
     Tests for initial rendering - async thunk, state-reliant elements.
@@ -39,7 +53,8 @@ describe("on initial renders", () => {
     beforeEach(() => {
         // Intercept get requests to live API, returning default local data.
         mockAxios = new MockAdapter(axios);
-        mockAxios.onGet(apiUrl, { params: { 'year': 'default' } })
+        mockAxios
+            .onGet(apiUrl, { params: { 'year': 'default' } })
             .reply(200, mockDefaultData);
     });
 
@@ -49,12 +64,7 @@ describe("on initial renders", () => {
     });
 
     test("updates store state with default data", async() => {
-        const newStore = setupStore();
-        render(
-            <Provider store={newStore}>
-                <TimelineBar />
-            </Provider>
-        );
+        const { newStore } = renderBoilerplate();
         
         // Confirm initialization fetch.
         expect(newStore.getState().timeline.responseStatus).toEqual('uninitialized');
@@ -64,7 +74,7 @@ describe("on initial renders", () => {
         await waitFor(() => expect(newStore.getState().timeline.initYear).toEqual(2022));
         expect(newStore.getState().timeline.responseStatus).toEqual('initialized');
    
-        screen.getByRole('menuitem', { name: 'selected year' });
+        await waitFor(() => screen.getByRole('menuitem', { name: 'selected year' }));
         const yearSelectedElem = screen.getByRole('menuitem', { name: 'selected year' });
         expect(yearSelectedElem).toHaveTextContent('2022');
 
@@ -77,42 +87,23 @@ describe("on initial renders", () => {
         Tests for year selector elements.
     ----------------------------------------------------*/
     test("renders year selector", () => {
-        const newStore = setupStore();
-        render(
-            <Provider store={newStore}>
-                <TimelineBar />
-            </Provider>
-        );
-
+        const { newStore } = renderBoilerplate(preloadedState);
         expect(screen.getByRole('menubar', { name: 'year selector' })).toBeInTheDocument();
     });
 
 
     test("renders selected year", () => {
-        const newStore = setupStore();
-        render(
-            <Provider store={newStore}>
-                <TimelineBar />
-            </Provider>
-        );
-
+        const { newStore } = renderBoilerplate(preloadedState);
         expect(screen.getByRole('menuitem', { name: 'selected year' })).toBeInTheDocument();
     });
 
 
     test("renders list of selectable years", async() => {
-        const newStore = setupStore();
-        render(
-            <Provider store={newStore}>
-                <TimelineBar />
-            </Provider>
-        );
+        const { newStore } = renderBoilerplate();
 
         // Initial API called successfully and populated list of selectable years.
-        await waitFor(() => {
-            expect(newStore.getState().timeline.responseStatus).toEqual('initialized');
-        });
-
+        await waitFor(() => expect(newStore.getState().timeline.responseStatus).toEqual('initialized'));
+        
         // Verify correct number of year items to render.
         const yearElems = screen.getAllByRole('menuitemradio', { name: 'year selector option'});
         const yearItems = newStore.getState().timeline.years;
@@ -124,25 +115,13 @@ describe("on initial renders", () => {
         Tests for month selector.
     ----------------------------------------------------*/
     test("renders month selector", () => {
-        const newStore = setupStore();
-        render(
-            <Provider store={newStore}>
-                <TimelineBar />
-            </Provider>
-        );
-
+        const { newStore } = renderBoilerplate(preloadedState);
         expect(screen.getByRole('menubar', { name: 'month selector' })).toBeInTheDocument();
     });
 
 
     test("renders list of selectable months", () => {
-        const newStore = setupStore();
-        render(
-            <Provider store={newStore}>
-                <TimelineBar />
-            </Provider>
-        );
-
+        const { newStore } = renderBoilerplate(preloadedState);
         const monthItems = screen.getAllByRole('menuitemradio', { name: 'month selector option' });
         expect(monthItems.length).toBeGreaterThanOrEqual(13);
     });
@@ -159,18 +138,14 @@ test("catches fetch request errors", async() => {
     -------------------------------------------------------- */
     // Mocked Axios calls.
     mockAxios = new MockAdapter(axios);
-    mockAxios.onGet(apiUrl, { params: { 'year': 'default' } })
+    mockAxios
+        .onGet(apiUrl, { params: { 'year': 'default' } })
         .reply(404, [])
     /* --------------------------------------------------------
         Mocks                                            end
     -------------------------------------------------------- */
 
-    const newStore = setupStore();
-    render(
-        <Provider store={newStore}>
-            <TimelineBar />
-        </Provider>
-    );
+    const { newStore } = renderBoilerplate();
 
     await waitFor(() => {
         // << timeline.initYear >> state remains null if fetch unsuccessful.
@@ -210,17 +185,13 @@ test("fetcher thunk parses queries into single string", async() => {
         Mocks                                            end
     -------------------------------------------------------- */
 
-    const newStore = setupStore();
-    render(
-        <Provider store={newStore}>
-        </Provider>
-    );
+    const { newStore } = renderBoilerplate();
 
     // Verify fetchDocs helper function parses strings correctly.
     // In: ["Kodak Gold 200", "Fujifilm Superia X-TRA 400"]
     // Out: "Kodak_Gold_200+Fujifilm_Superia_X-TRA_400"
     const response: AxiosResponse = await fetchDocs(apiUrl, request);
-    expect(response.status).toEqual(200);
+    await waitFor(() => expect(response.status).toEqual(200));
     expect(response.data).toEqual(mockDefaultData);
 });
         
@@ -247,12 +218,7 @@ describe("clicks on dropdown year selector elements", () => {
 
 
     test("dispatches action, changes state of selected year and gets new data", async() => {
-        const newStore = setupStore();
-        render(
-            <Provider store={newStore}>
-                <TimelineBar />
-            </Provider>
-        );
+        const { newStore } = renderBoilerplate();
 
         // Wait for initial fetch to render year selector items.
         await waitFor(() => screen.findAllByRole('menuitemradio', { name: 'year selector option' }));
@@ -260,7 +226,7 @@ describe("clicks on dropdown year selector elements", () => {
 
         // Click on a year.
         const yearSelectElem = yearElems.find(element => element.textContent === '2015') as HTMLElement;
-        await waitFor(() => user.click(yearSelectElem));
+        await user.click(yearSelectElem);
 
         await waitFor(() => {
             // Clicked element gets checked value and state is updated.
@@ -330,7 +296,7 @@ describe("clicks on dropdown year selector elements", () => {
         await waitFor(() => screen.findAllByRole('menuitemradio', { name: 'year selector option' }));
         const yearElems = screen.getAllByRole('menuitemradio', { name: 'year selector option' });
 
-        // // Get total image count on screen.
+        // Get total image count on screen.
         act(() => {
             jest.advanceTimersByTime(50);
         });
@@ -420,12 +386,7 @@ describe("clicks on dropdown year selector elements", () => {
             Mocks                                            end
         -------------------------------------------------------- */
         
-        const newStore = setupStore();
-        render(
-            <Provider store={newStore}>
-                <TimelineBar />
-            </Provider>
-        );
+        const { newStore } = renderBoilerplate();
         
         // Wait for year elements to render.
         await waitFor(() => screen.findAllByRole('menuitemradio', { name: 'year selector option' }))
@@ -440,7 +401,7 @@ describe("clicks on dropdown year selector elements", () => {
         const monthElemToSelect = monthElems.find(element => 
             element.textContent!.replace(/\d+/, "") === monthToSelect.toUpperCase()) as HTMLElement;
 
-        await waitFor(() => user.click(monthElemToSelect));
+        await user.click(monthElemToSelect);
             
         // Check for checked and style updates.
         expect(monthElemToSelect).toHaveAttribute('aria-checked', 'true');
@@ -448,7 +409,7 @@ describe("clicks on dropdown year selector elements", () => {
 
         // Select a year.
         const yearSelectElem = yearElems.find(element => element.textContent === '2015') as HTMLElement;
-        await waitFor(() => user.click(yearSelectElem));
+        await user.click(yearSelectElem);
         expect(newStore.getState().timeline.selected.year).toEqual(2015);
 
         // Check for checked and style updates.
@@ -459,11 +420,6 @@ describe("clicks on dropdown year selector elements", () => {
         expect(newStore.getState().timeline.selected.month).toEqual(monthAllName);
         expect(monthElemAll).toHaveAttribute('aria-checked', 'true');
         expect(monthElemAll).toHaveClass("active");
-
-        // Mocked June element.
-        // const mockedMonthElemToSelect = mockHTMLCollection[0]; 
-        // expect(mockedMonthElemToSelect).toHaveAttribute('aria-checked', 'false');
-        // expect(mockedMonthElemToSelect).not.toHaveClass("active");
     })
 });
 
@@ -495,12 +451,7 @@ test("resets << timeline.filteredSelectables >> to null", async() => {
         Mocks                                            end
     -------------------------------------------------------- */
 
-    const newStore = setupStore();
-    render(
-        <Provider store={newStore}>
-            <TimelineBar />
-        </Provider>
-    );
+    const { newStore } = renderBoilerplate();
     
     // Wait for year elements to render.
     await waitFor(() => screen.findAllByRole('menuitemradio', { name: 'year selector option' }))
@@ -515,7 +466,7 @@ test("resets << timeline.filteredSelectables >> to null", async() => {
     const monthElemToSelect = monthElems.find(element => 
         element.textContent!.replace(/\d+/, "") === monthToSelect.toUpperCase()) as HTMLElement;
     
-    await waitFor(() => user.click(monthElemToSelect));
+    await user.click(monthElemToSelect);
 
     // Verify succesful fetch.
     expect(newStore.getState().timeline.query).toEqual({ 'year': 2022, 'month': 6 });
@@ -527,7 +478,7 @@ test("resets << timeline.filteredSelectables >> to null", async() => {
     const yearElemToSelect = yearElems.find(element => 
         parseInt(element.textContent!) === yearToSelect) as HTMLElement;
 
-    await waitFor(() => user.click(yearElemToSelect));
+    await user.click(yearElemToSelect);
     
     // Verify << filteredSelectables >> reset to null.
     expect(newStore.getState().timeline.filteredSelectables).toBeNull();
@@ -566,12 +517,7 @@ describe("clicks on month selector elements", () => {
         /* --------------------------------------------------------
             Mocks                                            end
         -------------------------------------------------------- */
-        const newStore = setupStore();
-        render(
-            <Provider store={newStore}>
-                <TimelineBar />
-            </Provider>
-        );
+        const { newStore } = renderBoilerplate();
         
         // Confirm initialization fetch.
         expect(newStore.getState().timeline.responseStatus).toEqual('uninitialized');
@@ -585,8 +531,7 @@ describe("clicks on month selector elements", () => {
         const monthElemToSelect = monthElems.find(element => 
             element.textContent!.replace(/\d+/, "") === monthToSelect.toUpperCase()) as HTMLElement;
         
-        await waitFor(() => user.click(monthElemToSelect));
-        
+        await user.click(monthElemToSelect);
         expect(newStore.getState().timeline.selected.month).toEqual(monthToSelect);
 
         // Check for checked and style updates.
@@ -611,12 +556,7 @@ describe("clicks on month selector elements", () => {
         /* --------------------------------------------------------
             Mocks                                            end
         -------------------------------------------------------- */
-        const newStore = setupStore();
-        render(
-            <Provider store={newStore}>
-                <TimelineBar />
-            </Provider>
-        );
+        const { newStore } = renderBoilerplate();
 
         // Confirm initialization fetch.
         expect(newStore.getState().timeline.responseStatus).toEqual('uninitialized');
@@ -630,7 +570,7 @@ describe("clicks on month selector elements", () => {
         const monthElemToSelect = monthElems.find(element => 
             element.textContent!.replace(/\d+/, "") === monthToSelect.toUpperCase()) as HTMLElement;
 
-        await waitFor(() => user.click(monthElemToSelect));
+        await user.click(monthElemToSelect);
         
         expect(newStore.getState().timeline.selected.month).toEqual(monthToSelect);
 

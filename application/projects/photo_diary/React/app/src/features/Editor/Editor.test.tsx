@@ -275,6 +275,20 @@ test("enables clear edits button on input existence", async() => {
 
 
 test("dispatches action on form submission", async() => {
+    mockAxios = new MockAdapter(axios);
+    mockAxios
+            .onAny(updateUrl)
+            .reply(200, {
+                'updateStatus': 'successful',
+                'updatedDoc': {...preloadedStateEditorOwner.timeline.imageDocs![0],
+                    'format': {
+                        'medium': 'film',
+                        'type': 'some sheet'
+                    }
+                },
+                'updateMessage': 'All (mocked) edits OK!'
+            });
+
     const { newStore } = renderBoilerplate(preloadedStateEditorOwner);
 
     // Verify editor is owner of collection.
@@ -295,24 +309,21 @@ test("dispatches action on form submission", async() => {
     const formInputs = screen.queryAllByRole('textbox');
     await waitFor(() => expect(formInputs).not.toEqual(null));
 
-    // Verify submission displayed.
+    // Verify submission button displayed.
     const saveEditsButton = screen.getByRole('button', { name: 'save metadata edits on image' });
-    
+    // Verify update status idle.
+    expect(newStore.getState().editor.response).toEqual('idle');
+
     // Type in some input.
     const dateInput = formInputs[0] as HTMLInputElement;
     await user.type(dateInput, '2022/06');
-
-    // Mock dispatch function.
-    const useDispatchSpy = jest.spyOn(reactRedux, 'useDispatch');
-    const mockDispatch = jest.fn();
-    useDispatchSpy.mockReturnValue(mockDispatch);
 
     // Submit edit.
     await waitFor(() => expect(saveEditsButton.onclick).not.toEqual(null));
     await user.click(saveEditsButton);
     
-    // Verify dispatch.
-    await waitFor(() => expect(mockDispatch).toHaveBeenCalled());
+    // Verify dispatch/fetch.
+    await waitFor(() => expect(newStore.getState().editor.response).not.toEqual('idle'));
 });
 
 
@@ -851,4 +862,4 @@ describe("shows save status indicators on form submission", () => {
         await user.clear(filmInput);
         await waitFor(() => expect(filmInput).toHaveValue(''));
     });
-})
+});
