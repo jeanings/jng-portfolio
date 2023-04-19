@@ -11,7 +11,7 @@ export const preloadedState: RootState = {
         selected: { year: 2022, month: 'all' },
         years: mockDefaultData.years,
         counter: {
-            'all': 0,
+            'all': 40,
             'jan': 0, 'feb': 0, 'mar': 0,
             'apr': 0, 'may': 0, 'jun': 0,
             'jul': 0, 'aug': 0, 'sep': 0,
@@ -68,7 +68,7 @@ export const preloadedState: RootState = {
 };
 
 
-const mockUser = {
+export const mockUser = {
     "visitor": {
         "_id": 'some_visitor',
         "email": "test@gmail.com",
