@@ -605,7 +605,7 @@ function spiderfyClusters(event: any,
 /* =====================================================================
     Types.
 ===================================================================== */
-export type PaddingType = {
+export interface PaddingType {
     [index: string]: number,
     'top': number,
     'bottom': number,

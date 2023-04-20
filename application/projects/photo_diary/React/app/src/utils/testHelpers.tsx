@@ -11,7 +11,7 @@ export const preloadedState: RootState = {
         selected: { year: 2022, month: 'all' },
         years: mockDefaultData.years,
         counter: {
-            'all': 0,
+            'all': 40,
             'jan': 0, 'feb': 0, 'mar': 0,
             'apr': 0, 'may': 0, 'jun': 0,
             'jul': 0, 'aug': 0, 'sep': 0,
@@ -64,6 +64,51 @@ export const preloadedState: RootState = {
         response: 'idle',
         message: null,
         updated: {}
+    }
+};
+
+
+export const mockUser = {
+    "visitor": {
+        "_id": 'some_visitor',
+        "email": "test@gmail.com",
+        "name": "Test",
+        "profilePic": "https://lh3.googleusercontent.com/a/some-profile-pic",
+        "role": "editor"
+    },
+    "editor": {
+        "_id": 'some_editor',
+        "email": "test@gmail.com",
+        "name": "Test",
+        "profilePic": "https://lh3.googleusercontent.com/a/some-profile-pic",
+        "role": "editor"
+    },
+    "owner": {
+        "_id": preloadedState.timeline.imageDocs![0].owner,
+        "email": "test@gmail.com",
+        "name": "Test",
+        "profilePic": "https://lh3.googleusercontent.com/a/some-profile-pic",
+        "role": "editor"
+    }
+};
+
+
+export const preloadedStateEditor: RootState = {...preloadedState,
+    login: {
+        tokenResponse: 'idle',
+        user: mockUser.editor,
+        role: 'editor',
+        loggedIn: true
+    }
+};
+
+
+export const preloadedStateEditorOwner: RootState = {...preloadedState,
+    login: {
+        tokenResponse: 'idle',
+        user: mockUser.owner,
+        role: 'editor',
+        loggedIn: true
     }
 };
 

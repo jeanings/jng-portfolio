@@ -1,7 +1,7 @@
 import React from 'react';
 import * as reactRedux from 'react-redux';
 import { Provider } from 'react-redux';
-import { setupStore } from '../../app/store';
+import { setupStore, RootState } from '../../app/store';
 import {
     cleanup,
     render,
@@ -46,21 +46,33 @@ afterEach(() => {
 });
 
 
+/* --------------------------------------
+    Boilerplate for rendering document.
+-------------------------------------- */
+function renderBoilerplate(components: Array<string>, preloadedState?: RootState) {
+    const newStore = setupStore(preloadedState);
+    const container = render(
+        <Provider store={newStore}>
+            <Toolbar />
+            { components.includes('filter')
+                ? <FilterDrawer />
+                : <></> }
+            { components.includes('filmStrip')
+                ? <SideFilmStrip/>
+                : <></> }
+        </Provider>
+    );
+    return { ...container, newStore };
+}
+
+
 /* =====================================================================
     Tests for UI buttons on bottom of screen.
 ===================================================================== */
 test("renders bottom UI buttons", async() => {
-    const newStore = setupStore();
-    render(
-        <Provider store={newStore}>
-            <Toolbar />
-        </Provider>
-    );
+    const { newStore } = renderBoilerplate([]);
 
-    await waitFor(() => {
-        screen.findByRole('menu', { name: 'toolbar' });
-        screen.findAllByRole('button');
-    });
+    await waitFor(() => screen.findByRole('menu', { name: 'toolbar' }));
 
     // Verify toolbar is rendered.
     const toolbar = screen.getByRole('menu', { name: 'toolbar' });
@@ -73,17 +85,9 @@ test("renders bottom UI buttons", async() => {
 
 
 test("clicks on toolbar buttons updates pressed status, style, and switched on/off state", async() => {
-    const newStore = setupStore();
-    render(
-        <Provider store={newStore}>
-            <Toolbar />
-        </Provider>
-    );
+    const { newStore } = renderBoilerplate([]);
 
-    await waitFor(() => {
-        screen.findByRole('menu', { name: 'toolbar' })
-        screen.findAllByRole('button')
-    });
+    await waitFor(() => screen.findByRole('menu', { name: 'toolbar' }));
 
     // Verify toolbar is rendered.
     const toolbar = screen.getByRole('menu', { name: 'toolbar' });
@@ -98,7 +102,7 @@ test("clicks on toolbar buttons updates pressed status, style, and switched on/o
     expect(buttonToClick).toHaveAttribute('aria-pressed', 'false');
     expect(buttonToClick).not.toHaveClass("active");
 
-    await waitFor(() => user.click(buttonToClick));
+    await user.click(buttonToClick);
 
     // Verify button clicked.
     expect(newStore.getState().toolbar.filter).toEqual('on');
@@ -108,18 +112,9 @@ test("clicks on toolbar buttons updates pressed status, style, and switched on/o
 
 
 test("drawer button clicks reveal, hide filter elements", async() => {
-    const newStore = setupStore(preloadedState);
-    render(
-        <Provider store={newStore}>
-            <FilterDrawer />
-            <Toolbar />
-        </Provider>
-    );
+    const { newStore } = renderBoilerplate(['filter']);
 
-    await waitFor(() => {
-        screen.findByRole('menu', { name: 'toolbar' })
-        screen.findAllByRole('button')
-    });
+    await waitFor(() => screen.findByRole('menu', { name: 'toolbar' }));
 
     // Verify toolbar is rendered.
     const toolbar = screen.getByRole('menu', { name: 'toolbar' });
@@ -129,7 +124,7 @@ test("drawer button clicks reveal, hide filter elements", async() => {
     const toolbarFilterButton = screen.getByRole('button', { name: 'open filter drawer' });
 
     // Test opening of filter drawer.
-    await waitFor(() => user.click(toolbarFilterButton));
+    await user.click(toolbarFilterButton);
     expect(toolbarFilterButton.getAttribute('aria-pressed')).toEqual('true');
     expect(toolbarFilterButton).toHaveClass("active");
 
@@ -140,7 +135,7 @@ test("drawer button clicks reveal, hide filter elements", async() => {
     expect(filterDrawerElem).toHaveClass("show");
     
     // Test closing of filter drawer.
-    await waitFor(() => user.click(toolbarFilterButton));
+    await user.click(toolbarFilterButton);
     expect(toolbarFilterButton.getAttribute('aria-pressed')).toEqual('false');
     expect(toolbarFilterButton).not.toHaveClass("active");
 
@@ -150,22 +145,12 @@ test("drawer button clicks reveal, hide filter elements", async() => {
 
 
 test("clicks on either 'filter drawer' or 'image enlarger' button hides the other", async() => {
-    const newStore = setupStore(preloadedState);
-    render(
-        <Provider store={newStore}>
-            <FilterDrawer />
-            <SideFilmStrip />
-            <Toolbar />
-        </Provider>
-    );
+    const { newStore } = renderBoilerplate(['filter', 'filmStrip']);
 
-    await waitFor(() => {
-        screen.findByRole('menu', { name: 'toolbar' });
-        screen.findAllByRole('button');
-    });
-
+    await waitFor(() => screen.findByRole('menu', { name: 'toolbar' }));
     await waitFor(() => screen.findByRole('tab', { name: 'image enlarger' }));
     await waitFor(() => screen.findByRole('form', { name: 'filters menu' }));
+
     const imageEnlargerElem = screen.getByRole('tab', { name: 'image enlarger' });
     const filterDrawerElem = screen.getByRole('form', { name: 'filters menu' });
     expect(imageEnlargerElem).toBeInTheDocument();
@@ -182,39 +167,27 @@ test("clicks on either 'filter drawer' or 'image enlarger' button hides the othe
    
     await waitFor(() => user.click(imageEnlargerButton));
 
-    await waitFor(() => {
-        expect(newStore.getState().toolbar.imageEnlarger).toEqual('on');
-        expect(newStore.getState().toolbar.filter).toEqual('off');
-    });
+    expect(newStore.getState().toolbar.imageEnlarger).toEqual('on');
+    expect(newStore.getState().toolbar.filter).toEqual('off');
     expect(imageEnlargerElem).toHaveClass("show");
     expect(filterDrawerElem).not.toHaveClass("show");
     
     // Repeat for filter drawer button.
     const filterDrawerButton = screen.getByRole('button', { name: 'open filter drawer' });
    
-    await waitFor(() => user.click(filterDrawerButton));
+    await user.click(filterDrawerButton);
     
-    await waitFor(() => {
-        expect(newStore.getState().toolbar.filter).toEqual('on');
-        expect(newStore.getState().toolbar.imageEnlarger).toEqual('off');
-    });
+    expect(newStore.getState().toolbar.filter).toEqual('on');
+    expect(newStore.getState().toolbar.imageEnlarger).toEqual('off');
     expect(filterDrawerElem).toHaveClass("show");
     expect(imageEnlargerElem).not.toHaveClass("show");
 });
 
 
 test("disables image enlarger button if no film strip image clicked", async() => {
-    const newStore = setupStore(preloadedState);
-    render(
-        <Provider store={newStore}>
-            <SideFilmStrip />
-            <Toolbar />
-        </Provider>
-    );
+    const { newStore } = renderBoilerplate(['filmStrip'], preloadedState);
 
-    await waitFor(() => {
-        screen.findByRole('menu', { name: 'toolbar' })
-    });
+    await waitFor(() => screen.findByRole('menu', { name: 'toolbar' }));
 
     // Verify << enlargeDoc >> state is null.
     expect(newStore.getState().sideFilmStrip.enlargeDoc).toBeNull();
@@ -244,32 +217,21 @@ test("bounds button calls mapbox's fitBounds method", async() => {
         Mocks                                            end
     -------------------------------------------------------- */
 
-    const newStore = setupStore(preloadedState);
-        render(
-            <Provider store={newStore}>
-                <Toolbar />
-            </Provider>
-        );
+    const { newStore } = renderBoilerplate([], preloadedState);
     
-    // Wait for fetch.
-    await waitFor(() => {
-        screen.findByRole('main', { name: 'map' });
-        expect(newStore.getState().timeline.bounds).not.toBeNull();
-    });
-
     // Mock dispatches for layer-adding conditions.
     newStore.dispatch(setStyleLoadStatus(true));
     newStore.dispatch(cleanupMarkerSource('idle'));
     newStore.dispatch(setSourceStatus('loaded'));
     
     // Verify states are updated.
-    expect(newStore.getState().mapCanvas).toEqual({
+    await waitFor(() => expect(newStore.getState().mapCanvas).toEqual({
         'styleLoaded': true,
         'markersStatus': 'idle', 
         'sourceStatus': 'loaded',
         'fitBoundsButton': 'idle',
         'markerLocator': 'idle'
-    });
+    }));
 
     // Verify individual toolbar buttons are rendered.
     const toolbarButtons = screen.getAllByRole('button');
@@ -279,9 +241,9 @@ test("bounds button calls mapbox's fitBounds method", async() => {
     const toolbarBoundsButton = screen.getByRole('button', { name: 'reset map bounds' });
 
     // Mock dispatch request to fitBounds.
-    await waitFor(() => user.click(toolbarBoundsButton));
+    await user.click(toolbarBoundsButton);
     newStore.dispatch(handleBoundsButton('clicked'));
 
     // Verify state updated.
-    expect(newStore.getState().mapCanvas.fitBoundsButton).toEqual('clicked');
+    await waitFor(() => expect(newStore.getState().mapCanvas.fitBoundsButton).toEqual('clicked'));
 });

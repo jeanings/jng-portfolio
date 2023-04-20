@@ -2,7 +2,8 @@ import {
     createSlice, 
     createAsyncThunk,
     Action,
-    AnyAction } from '@reduxjs/toolkit';
+    AnyAction,
+    isRejectedWithValue } from '@reduxjs/toolkit';
 import axios, { AxiosError, AxiosResponse } from 'axios';
 import { RootState } from '../../app/store';
 import { loginUrl, logoutUrl } from '../../app/App';
@@ -142,7 +143,7 @@ const loginSlice = createSlice({
             ------------------------------------- */
             .addCase(exchangeOAuthCodeToken.fulfilled, (state, action) => {
                 const data = action.payload;
-
+                
                 if (data.user === 'unauthorized') {
                     state.tokenResponse = 'error';
                     state.user = null;
@@ -167,10 +168,10 @@ const loginSlice = createSlice({
                     state.loggedIn = false;
                 }
             })
-            /* --------------------------------------- 
-                Catches errors on fetching from API.
-            --------------------------------------- */
-            .addMatcher(isRejectedAction, (state, action) => {
+            /* ------------------------------------
+                Catches errors on authentication.
+            ------------------------------------ */
+            .addMatcher(isRejectedWithValue(exchangeOAuthCodeToken), (state, action) => {
                 state.tokenResponse = 'error';
                 state.user = null;
                 state.role = 'viewer';

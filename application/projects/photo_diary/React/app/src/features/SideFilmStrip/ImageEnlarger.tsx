@@ -28,19 +28,19 @@ import './ImageEnlarger.css';
 ===================================================================== */
 const ImageEnlarger: React.FunctionComponent <ImageEnlargerProps> = (props: ImageEnlargerProps) => {
     const dispatch = useAppDispatch();
+    const [ metadataEdits, setMetadataEdits ] = useState<MetadataEditInputType>({});
+    const [ isFormatCorrect, setIsFormatCorrect ] = useState<MetadataCorrectnessType>({});
+    const [ showEditResponseMessage, setShowEditResponseMessage ] = useState<boolean>(false);
     const enlargeDoc = useAppSelector(state => state.sideFilmStrip.enlargeDoc);
     const docIndex = useAppSelector(state => state.sideFilmStrip.docIndex);
     const toolbarEnlarger = useAppSelector(state => state.toolbar.imageEnlarger);
     const timelineSelected = useAppSelector(state => state.timeline.selected);
     const imageDocs = useAppSelector(state => state.timeline.imageDocs);
-    const [ metadataEdits, setMetadataEdits ] = useState<MetadataEditInputType>({});
-    const [ isFormatCorrect, setIsFormatCorrect ] = useState<MetadataCorrectnessType>({});
     const metadataForm = useRef<HTMLFormElement | null>(null);
     const role: LoginProps['role'] = useAppSelector(state => state.login.role);
     const user: UserProps | null = useAppSelector(state => state.login.user);
     const isUserEditor: boolean = (role === 'editor') || (role === 'admin') ? true : false;
     const editor = useAppSelector(state => state.editor);
-    const [ showEditResponseMessage, setShowEditResponseMessage ] = useState<boolean>(false);
     const classBase: string = "image-enlarger";
     
     let imageSource: string = '';
@@ -618,6 +618,9 @@ class MetadataInput {
             case 'Coordinates':
                 this.passes = this.isCoordinatesInputCorrect(this.value);
                 break;
+            default:
+                // Film, Lens, Tags strings don't need checking.
+                this.passes = true;
         }
     }
 
@@ -657,12 +660,11 @@ class MetadataInput {
         
         if (date) {
             const [ year, month, day ] = date.split('/').map(unit => parseInt(unit));
-            
             if (year && month) {                      
                 if (year < 1920 || year > thisYear) {
                     return false;
                 }
-                if (month < 0 || month > 12) {
+                if (month < 1 || month > 12) {
                     return false;
                 }
                 if (year === thisYear && month > thisMonth) {
@@ -670,10 +672,13 @@ class MetadataInput {
                     return false;
                 }
                 if (day) {
-                    if (day < 0 || day > 31) {
+                    if (day < 1 || day > 31) {
                         // Very simplified, but this isn't a critical app...
                         return false;
                     }
+                }
+                else if (day === 0) {
+                    return false;
                 }
             }
             else {
@@ -699,8 +704,8 @@ class MetadataInput {
         if (setOfCoords) {
             // Check range of latitude, longitude values.
             let [lat, lng] = coords;
-            const latOK = parseFloat(lat) >= -90 && parseFloat(lat) <= 90 ? true : false;
-            const lngOK = parseFloat(lng) >= -180 == parseFloat(lng) <= 180 ? true : false; 
+            const latOK = (parseFloat(lat) >= -90) && (parseFloat(lat) <= 90) ? true : false;
+            const lngOK = (parseFloat(lng) >= -180) && (parseFloat(lng) <= 180) ? true : false; 
 
             return (latOK && lngOK);
         }
@@ -788,7 +793,7 @@ export interface ImageEnlargerProps {
     'baseClassName': string
 };
 
-export type ImageInfoType = {
+export interface ImageInfoType {
     [index: string]: string | number | Array<string> | null
     'Title': string | null,
     'Date': string,
@@ -803,7 +808,7 @@ export type ImageInfoType = {
     'Coordinates': string | null
 };
 
-export type MetadataEditInputType = {
+export interface MetadataEditInputType {
     [index: string]: string | undefined
     'Title'?: string | undefined,
     'Date'?: string | undefined,
@@ -818,7 +823,7 @@ export type MetadataEditInputType = {
     'Coordinates'?: string | undefined
 };
 
-type MetadataCorrectnessType = {
+interface MetadataCorrectnessType {
     [index: string]: boolean | undefined
     'Title'?: boolean | undefined,
     'Date'?: boolean | undefined,

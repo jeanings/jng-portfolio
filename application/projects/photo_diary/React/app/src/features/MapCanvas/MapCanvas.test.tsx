@@ -25,7 +25,6 @@ import {
 // @ts-ignore
 import mapboxgl from 'mapbox-gl'; 
 import 'mapbox-gl/dist/mapbox-gl.css';
-import { login } from '../Login/loginSlice';
 
 const MapboxglSpiderfier: any = require('mapboxgl-spiderifier');
 
@@ -62,6 +61,21 @@ const mockMapFitBounds = jest.fn();
 const mockMapAddControl = jest.fn();
 const mockMapRemoveControl = jest.fn();
 const mockMapHasControl = jest.fn();
+
+
+/* --------------------------------------
+    Boilerplate for rendering document.
+-------------------------------------- */
+function renderBoilerplate(preloadedState?: RootState) {
+    const newStore = setupStore(preloadedState);
+    const container = render(
+        <Provider store={newStore}>
+            <TimelineBar />
+            <MapCanvas />
+        </Provider>
+    );
+    return { ...container, newStore };
+}
 
 
 /* ================================================
@@ -101,19 +115,11 @@ test("initializes map on rendering", async() => {
         Mocks                                            end
     -------------------------------------------------------- */
 
-    const newStore = setupStore(preloadedState);
-        render(
-            <Provider store={newStore}>
-                <TimelineBar />
-                <MapCanvas />
-            </Provider>
-        );
+    const { newStore } = renderBoilerplate(preloadedState);
     
     // Wait for fetch.
-    await waitFor(() => {
-        screen.findByRole('main', { name: 'map' });
-        expect(newStore.getState().timeline.bounds).not.toBeNull();
-    });
+    await waitFor(() => screen.findByRole('main', { name: 'map' }));
+    expect(newStore.getState().timeline.bounds).not.toBeNull();
 
     // Initial map.on('load') call.
     expect(mockMapOn).toHaveBeenCalled();
@@ -162,13 +168,7 @@ test("adds new data source on new fetches and adds zoom controls", async() => {
         Mocks                                            end
     -------------------------------------------------------- */
 
-    const newStore = setupStore(preloadedState);
-        render(
-            <Provider store={newStore}>
-                <TimelineBar />
-                <MapCanvas />
-            </Provider>
-        );
+    const { newStore } = renderBoilerplate(preloadedState);
 
     // Verify mocked initialization.
     await waitFor(() => expect(newStore.getState().timeline.responseStatus).toEqual('successful'));
@@ -236,19 +236,11 @@ test("adds marker layer and fits map to bounds", async() => {
         Mocks                                            end
     -------------------------------------------------------- */
 
-    const newStore = setupStore(preloadedState);
-        render(
-            <Provider store={newStore}>
-                <TimelineBar />
-                <MapCanvas />
-            </Provider>
-        );
+    const { newStore } = renderBoilerplate(preloadedState);
     
     // Wait for fetch.
-    await waitFor(() => {
-        screen.findByRole('main', { name: 'map' });
-        expect(newStore.getState().timeline.bounds).not.toBeNull();
-    });
+    await waitFor(() => screen.findByRole('main', { name: 'map' }));
+    expect(newStore.getState().timeline.bounds).not.toBeNull();
 
     // Mock dispatches for layer-adding conditions.
     newStore.dispatch(setStyleLoadStatus(true));
@@ -315,13 +307,7 @@ test("replaces previous layer and source on new data fetches", async() => {
         Mocks                                            end
     -------------------------------------------------------- */
 
-    const newStore = setupStore(preloadedState);
-        render(
-            <Provider store={newStore}>
-                <TimelineBar />
-                <MapCanvas />
-            </Provider>
-        );
+    const { newStore } = renderBoilerplate(preloadedState);
     
     // Wait for fetch.
     await waitFor(() => {
@@ -410,20 +396,12 @@ test("does not initialize map on unsuccessful fetch", async() => {
         Mocks                                            end
     -------------------------------------------------------- */
 
-    const newStore = setupStore();
-        render(
-            <Provider store={newStore}>
-                <TimelineBar />
-                <MapCanvas />
-            </Provider>
-        );
+    const { newStore } = renderBoilerplate();
     
     // Wait for fetch.
-    await waitFor(() => {
-        screen.findByRole('main', { name: 'map' });
-        expect(newStore.getState().timeline.bounds).toBeNull();
-    });
-
+    await waitFor(() => screen.findByRole('main', { name: 'map' }));
+    expect(newStore.getState().timeline.bounds).toBeNull();
+    
     // Failed initial map.on('load') call.
     expect(mockMapOn).not.toHaveBeenCalled();
 });

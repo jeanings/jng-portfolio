@@ -1,7 +1,7 @@
 import React from 'react';
 import * as reactRedux from 'react-redux';
 import { Provider } from 'react-redux';
-import { setupStore } from '../../app/store';
+import { setupStore, RootState } from '../../app/store';
 import { 
     cleanup, 
     render, 
@@ -12,23 +12,17 @@ import axios from 'axios';
 import MockAdapter from 'axios-mock-adapter';
 import { loginUrl, logoutUrl } from '../../app/App';
 import '@testing-library/jest-dom';
-import preloadedState from '../../utils/testHelpers';
+import { preloadedState, mockUser } from '../../utils/testHelpers';
 import Login from './Login';
-import { useGoogleLogin } from '@react-oauth/google';
 import { exchangeOAuthCodeToken, logoutUser } from './loginSlice';
 
 
 var mockAxios = new MockAdapter(axios);
 var user = userEvent.setup();
-
-const mockCredentials = {
-    "user": {
-        "email": "app.dev@gmail.com",
-        "name": "App Dev",
-        "profilePic": "https://lh3.googleusercontent.com/a/some-profile-pic"
-    }
-};
-
+const mockCredentials = { "user": mockUser.owner };
+// _id is double encoded from backend, hacky fix.
+const idFromBackend = JSON.stringify(mockCredentials.user._id)
+mockCredentials.user._id = idFromBackend;
 
 beforeEach(() => {
     mockAxios = new MockAdapter(axios);
@@ -40,6 +34,20 @@ afterEach(() => {
     jest.restoreAllMocks();
     cleanup;
 });
+
+
+/* --------------------------------------
+    Boilerplate for rendering document.
+-------------------------------------- */
+function renderBoilerplate(preloadedState: RootState) {
+    const newStore = setupStore(preloadedState);
+    const container = render(
+        <Provider store={newStore}>
+            <Login />
+        </Provider>
+    );
+    return { ...container, newStore };
+}
 
 
 /* -----------------------
@@ -97,12 +105,7 @@ test("gets login credentials on successful sign-ins", async() => {
         Mocks                                            end
     -------------------------------------------------------- */
 
-    const newStore = setupStore(preloadedState);
-        render(
-            <Provider store={newStore}>
-                <Login />
-            </Provider>
-        );
+    const { newStore } = renderBoilerplate(preloadedState);
 
     // Verify mocked initialization.
     await waitFor(() => expect(newStore.getState().timeline.responseStatus).toEqual('successful'));
@@ -116,7 +119,7 @@ test("gets login credentials on successful sign-ins", async() => {
     expect(newStore.getState().login.loggedIn).toEqual(false);
 
     // Click to mock sign-in.
-    await waitFor(() => user.click(oAuthButton));
+    await user.click(oAuthButton);
     expect(mockOnLoginSuccess).toHaveBeenCalled();
     expect(mockDispatch).toHaveBeenCalled();
 
@@ -190,12 +193,7 @@ test("logout sets user to 'visitor' and response from backend removes access tok
         Mocks                                            end
     -------------------------------------------------------- */
 
-    const newStore = setupStore(preloadedState);
-        render(
-            <Provider store={newStore}>
-                <Login />
-            </Provider>
-        );
+    const { newStore } = renderBoilerplate(preloadedState);
 
     // Verify mocked initialization.
     await waitFor(() => expect(newStore.getState().timeline.responseStatus).toEqual('successful'));
@@ -228,7 +226,7 @@ test("logout sets user to 'visitor' and response from backend removes access tok
     expect(typeof newStore.getState().login.user).toEqual('object');
 
     // Logout using OAuth button.
-    await waitFor(() => user.click(oAuthButton));
+    await user.click(oAuthButton);
     // Mock dispatch to thunk.
     await waitFor(() => {
         newStore.dispatch(logoutUser({ 'user': 'logout' }));
@@ -280,12 +278,7 @@ test("error from auth code to access token exchange keeps user in visitor role",
         Mocks                                            end
     -------------------------------------------------------- */
 
-    const newStore = setupStore(preloadedState);
-        render(
-            <Provider store={newStore}>
-                <Login />
-            </Provider>
-        );
+    const { newStore } = renderBoilerplate(preloadedState);
 
     // Verify mocked initialization.
     await waitFor(() => expect(newStore.getState().timeline.responseStatus).toEqual('successful'));

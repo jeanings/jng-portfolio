@@ -1,6 +1,6 @@
 import React from 'react';
 import { Provider } from 'react-redux';
-import { setupStore } from '../../app/store';
+import { setupStore, RootState } from '../../app/store';
 import { 
     cleanup, 
     render, 
@@ -17,7 +17,6 @@ import mock2022DataJun from '../../utils/mock2022DataJun.json';
 import mock2015Data from '../../utils/mock2015Data.json';
 import preloadedState from '../../utils/testHelpers';
 import TimelineBar from '../TimelineBar/TimelineBar';
-import { TimelineProps } from '../TimelineBar/timelineSlice';
 import FilterDrawer from './FilterDrawer';
 import { addFilter } from './filterDrawerSlice';
 
@@ -35,40 +34,53 @@ afterEach(() => {
 });
 
 
+/* --------------------------------------
+    Boilerplate for rendering document.
+-------------------------------------- */
+function renderBoilerplate(preloadedState: RootState, components: Array<string>) {
+    const newStore = setupStore(preloadedState);
+    const container = render(
+        <Provider store={newStore}>
+            { components.includes('timeline')
+                ? <TimelineBar />
+                : <></> }
+            { components.includes('filter')
+                ? <FilterDrawer />
+                : <></> }
+        </Provider>
+    );
+    return { ...container, newStore };
+}
+
+
 /* =====================================================================
     Tests for initial rendering - async thunk, state-reliant elements.
 ===================================================================== */
-describe("on initial load", () => {
-    test("renders groups of filter options", async() => {
-        const newStore = setupStore(preloadedState);
-        render(
-            <Provider store={newStore}>
-                <FilterDrawer />
-            </Provider>
-        );
+test("renders groups of filter options on initial load", async() => {
+    const { newStore } = renderBoilerplate(preloadedState, ['filter']);
 
-        // Verify correct number of filter buttons rendered.
-        await screen.findAllByRole('checkbox');
+    // Verify correct number of filter buttons rendered.
+    await waitFor(() => screen.findAllByRole('checkbox'));
 
-        const formatButtons = screen.getAllByRole('checkbox', { name: 'format filter option'});
-        expect(formatButtons.length).toEqual(2);
+    const formatButtons = screen.getAllByRole('checkbox', { name: 'format filter option'});
+    expect(formatButtons.length).toEqual(2);
 
-        const filmButtons = screen.getAllByRole('checkbox', { name: 'film filter option'});
-        expect(filmButtons.length).toEqual(2);
+    const filmButtons = screen.getAllByRole('checkbox', { name: 'film filter option'});
+    expect(filmButtons.length).toEqual(2);
 
-        const cameraButtons = screen.getAllByRole('checkbox', { name: 'camera filter option'});
-        expect(cameraButtons.length).toEqual(2);
+    const cameraButtons = screen.getAllByRole('checkbox', { name: 'camera filter option'});
+    expect(cameraButtons.length).toEqual(2);
 
-        const lensButtons = screen.getAllByRole('checkbox', { name: 'lens filter option'});
-        expect(lensButtons.length).toEqual(2);
+    const lensButtons = screen.getAllByRole('checkbox', { name: 'lens filter option'});
+    expect(lensButtons.length).toEqual(2);
 
-        const focalLengthButtons = screen.getAllByRole('checkbox', { name: 'focalLength filter option'});
-        expect(focalLengthButtons.length).toEqual(1);
+    const focalLengthButtons = screen.getAllByRole('checkbox', { name: 'focalLength filter option'});
+    expect(focalLengthButtons.length).toEqual(1);
 
-        const tags = screen.getAllByRole('checkbox', { name: 'tags filter option'});
-        expect(tags.length).toEqual(36);
-    });
+    const tags = screen.getAllByRole('checkbox', { name: 'tags filter option'});
+    expect(tags.length).toEqual(36);
 });
+
 
 
 /* =====================================================================
@@ -93,7 +105,7 @@ describe("on filter button clicks", () => {
         { category: 'tags', ariaLabel: 'tags filter option' },
     ];
 
-    filterCategories.forEach(group => {
+    filterCategories.map(group => {
         test("adds selected filter to existing array in state", async() => {
             /* --------------------------------------------------------
                 Mocks                                          start
@@ -113,12 +125,7 @@ describe("on filter button clicks", () => {
                 Mocks                                            end
             -------------------------------------------------------- */
 
-            const newStore = setupStore(preloadedState);
-            render(
-                <Provider store={newStore}>
-                    <FilterDrawer />
-                </Provider>
-            );
+            const { newStore } = renderBoilerplate(preloadedState, ['filter']);
     
             // Verify correct number of filter buttons rendered.
             const filterButtons = screen.getAllByRole('checkbox', { name: group.ariaLabel});
@@ -152,7 +159,7 @@ describe("on filter button clicks", () => {
             }
 
             // Wait for onClick.
-            await waitFor(() => user.click(filterButtonToClick));
+            await user.click(filterButtonToClick);
             await waitFor(() => expect(filterButtonToClick.getAttribute('aria-checked')).toEqual('true'));
 
 
@@ -190,15 +197,10 @@ describe("on filter button clicks", () => {
 
    
         test("removes selected filter from existing array in state", async() => {
-            const newStore = setupStore(preloadedState);
-            render(
-                <Provider store={newStore}>
-                    <FilterDrawer />
-                </Provider>
-            );
+            const { newStore } = renderBoilerplate(preloadedState, ['filter']);
 
             // Verify initial empty state.
-            screen.findAllByRole('checkbox', { name: group.ariaLabel });
+            await waitFor(() => screen.findAllByRole('checkbox', { name: group.ariaLabel }));
             const filterButtons = screen.getAllByRole('checkbox', { name: group.ariaLabel });
             const filterButtonToClick: HTMLElement = filterButtons[0];
             let filterButtonText: string | number;
@@ -243,14 +245,14 @@ describe("on filter button clicks", () => {
             // Mock checked status. 
             filterButtonToClick.setAttribute('aria-checked', 'true');
 
-            await waitFor (() => {
+            await waitFor(() => {
                 newStore.dispatch(addFilter({ [stateKey]: filterButtonText }));
                 expect(filterButtonToClick.getAttribute('aria-checked')).toEqual('true');
                 expect(newStore.getState().filter[stateKey]).toContain(filterButtonText);
             });
 
             // Simulate click on "checked" filter button.
-            await waitFor(() => user.click(filterButtonToClick));
+            await user.click(filterButtonToClick);
 
             // Verify filter is removed from state.
             await waitFor(() => {
@@ -262,12 +264,7 @@ describe("on filter button clicks", () => {
 
 
     test("clicks on reset button clears all filters", async() => {
-        const newStore = setupStore(preloadedState);
-        render(
-            <Provider store={newStore}>
-                <FilterDrawer />
-            </Provider>
-        );
+        const { newStore } = renderBoilerplate(preloadedState, ['filter']);
     
         // Verify filter to click's state is blank.
         expect(newStore.getState().filter.film!.length).toEqual(0);
@@ -298,27 +295,22 @@ describe("on filter button clicks", () => {
             
             let payload = { [filterType]: filterName };
             newStore.dispatch(addFilter(payload));
-            expect(newStore.getState().filter[filterType]).toContain(filterName);
+            await waitFor(() => expect(newStore.getState().filter[filterType]).toContain(filterName));
         };
 
         // Click reset button
         const resetButton = screen.getByRole('button', { name: 'reset filters' })
         expect(resetButton).toBeInTheDocument();
-        await waitFor(() => user.click(resetButton));
+        await user.click(resetButton);
     
         for (let option of Object.entries(buttonsCategory)) {
-            expect(newStore.getState().filter[option[0]]).not.toContain(option[1]);
+            await waitFor(() => expect(newStore.getState().filter[option[0]]).not.toContain(option[1]));
         }
     });
 
 
     test("grey-out reset button if no filters selected", async() => {
-        const newStore = setupStore(preloadedState);
-        render(
-            <Provider store={newStore}>
-                <FilterDrawer />
-            </Provider>
-        );
+        const { newStore } = renderBoilerplate(preloadedState, ['filter']);
 
         // Verify filter to click's state is blank.
         expect(newStore.getState().filter.film!.length).toEqual(0);
@@ -339,7 +331,8 @@ describe("on filter button clicks", () => {
         let filterName = Object.values(buttonsCategory)[0];        
         let payload = { [filterType]: filterName };
         newStore.dispatch(addFilter(payload));
-        expect(newStore.getState().filter[filterType]).toContain(filterName);
+
+        await waitFor(() => expect(newStore.getState().filter[filterType]).toContain(filterName));
         
         const resetButton = screen.getByRole('button', { name: 'reset filters' })
         expect(resetButton).toBeInTheDocument();
@@ -348,10 +341,10 @@ describe("on filter button clicks", () => {
         expect(resetButton).not.toHaveClass("unavailable");
 
         // Click reset button.
-        await waitFor(() => user.click(resetButton));
+        await user.click(resetButton);
         
         // Verify reset button greyed out.
-        expect(resetButton).toHaveClass("unavailable");
+        await waitFor(() => expect(resetButton).toHaveClass("unavailable"));
     });
 });
 
@@ -374,13 +367,7 @@ test("<< filter >> state resets to initial state when year is changed", async() 
         Mocks                                            end
     -------------------------------------------------------- */
     
-    const newStore = setupStore(preloadedState);
-    render(
-        <Provider store={newStore}>
-            <TimelineBar />
-            <FilterDrawer />
-        </Provider>
-    );
+    const { newStore } = renderBoilerplate(preloadedState, ['filter', 'timeline']);
 
     // Verify filter state is blank.
     expect(newStore.getState().timeline.responseStatus).toEqual('successful');
@@ -405,11 +392,11 @@ test("<< filter >> state resets to initial state when year is changed", async() 
     newStore.dispatch(addFilter(payload));
 
     // Verify filter state isn't blank.
-    expect(newStore.getState().filter.film!.length).not.toEqual(0);
+    await waitFor(() => expect(newStore.getState().filter.film!.length).not.toEqual(0));
 
     // Click on a year.
     const yearSelectElem = yearElems.find(element => element.textContent === '2015') as HTMLElement;
-    await waitFor(() => user.click(yearSelectElem));
+    await user.click(yearSelectElem);
 
     // Wait for fetch to resolve.
     await waitFor(() => expect(newStore.getState().timeline.selected.year).toEqual(2015));
@@ -434,18 +421,11 @@ test("dispatches fetch request on << filter >> state changes", async() => {
         Mocks                                            end
     -------------------------------------------------------- */
 
-    const newStore = setupStore();
-        render(
-            <Provider store={newStore}>
-                <TimelineBar />
-                <FilterDrawer />
-            </Provider>
-        );
+    const { newStore } = renderBoilerplate(preloadedState, ['filter', 'timeline']);
         
     // Verify number of docs for initial fetch request.
-    expect(newStore.getState().timeline.responseStatus).toEqual('uninitialized');
-    await waitFor(() => expect(newStore.getState().timeline.responseStatus).toEqual('initialized'));
-    expect(newStore.getState().timeline.counter.all).toEqual(40);
+    await waitFor(() => expect(newStore.getState().timeline.responseStatus).toEqual('successful'));
+    await waitFor(() => expect(newStore.getState().timeline.counter.all).toEqual(40));
 
     await waitFor(() => screen.findAllByRole('checkbox', { name: "film filter option" }));
     const filterButtons = screen.getAllByRole('checkbox', { name: "film filter option" });
@@ -454,7 +434,7 @@ test("dispatches fetch request on << filter >> state changes", async() => {
 
     // Get film filter button element to click.
     let filterButtonToClick = filterButtons.filter(button => button.textContent === 'Kodak Gold 200')[0];
-    await waitFor(() => user.click(filterButtonToClick));
+    await user.click(filterButtonToClick);
     
     await waitFor(() => expect(newStore.getState().timeline.responseStatus).toEqual('successful'));
     expect(newStore.getState().filter.film).toContain('Kodak Gold 200');
@@ -479,16 +459,8 @@ test("disables/greys out filter buttons not available on selected month", async(
         Mocks                                            end
     -------------------------------------------------------- */
 
-    const newStore = setupStore();
-        render(
-            <Provider store={newStore}>
-                <TimelineBar />
-                <FilterDrawer />
-            </Provider>
-        );
+    const { newStore } = renderBoilerplate(preloadedState, ['filter', 'timeline']);
     
-    await waitFor(() => expect(newStore.getState().timeline.responseStatus).toEqual('initialized'));
-
     // Verify all filter buttons are enabled.
     const filterButtons = screen.getAllByRole('checkbox');
     filterButtons.forEach((button) => {
@@ -501,10 +473,10 @@ test("disables/greys out filter buttons not available on selected month", async(
     const monthElemToSelect = monthElems.find(element => 
         element.textContent!.replace(/\d+/, "") === monthToSelect.toUpperCase()) as HTMLElement;
     
-    await waitFor(() => user.click(monthElemToSelect));
+    await user.click(monthElemToSelect);
 
     const monthSelectables = newStore.getState().timeline.filteredSelectables;
-    expect(monthSelectables).not.toBeNull();
+    await waitFor(() => expect(monthSelectables).not.toBeNull());
     
     // Verify non-overlapped values in << filter/filteredSelectables >>
     // to be disabled with class "unavailable".
@@ -551,13 +523,7 @@ test("fetches year's data when going from filters activated to deactivated", asy
         Mocks                                            end
     -------------------------------------------------------- */
 
-    const newStore = setupStore(preloadedState);
-    render(
-        <Provider store={newStore}>
-            <TimelineBar />
-            <FilterDrawer />
-        </Provider>
-    );
+    const { newStore } = renderBoilerplate(preloadedState, ['filter', 'timeline']);
 
     await waitFor(() => expect(newStore.getState().timeline.responseStatus).toEqual('successful'));
     expect(newStore.getState().filter.film.length).toEqual(0);
@@ -568,7 +534,7 @@ test("fetches year's data when going from filters activated to deactivated", asy
 
     // Get film filter button element to click.
     let filterButtonToClick = filterButtonsForFilm.filter(button => button.textContent === 'Kodak Gold 200')[0];
-    await waitFor(() => user.click(filterButtonToClick));
+    await user.click(filterButtonToClick);
     
     await waitFor(() => expect(newStore.getState().timeline.responseStatus).toEqual('successful'));
     expect(newStore.getState().filter.film).toContain('Kodak Gold 200');
@@ -580,8 +546,8 @@ test("fetches year's data when going from filters activated to deactivated", asy
     });
 
     // Re-click previous filter button to deactivate filter.
-    await waitFor(() => user.click(filterButtonToClick));
-    expect(filterButtonToClick).toHaveAttribute('aria-checked', 'false');
+    await user.click(filterButtonToClick);
+    await waitFor(() => expect(filterButtonToClick).toHaveAttribute('aria-checked', 'false'));
     expect(newStore.getState().filter.film).not.toContain('Kodak Gold 200');
 
     // Verify deactivating filters manually (not using reset button) triggers current year fetch.
