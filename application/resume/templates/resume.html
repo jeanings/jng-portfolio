@@ -22,8 +22,8 @@
 
                     <a 
                         id="header-email"
-                        href="mailto:{{ contact.email }}">
-                        {{ contact.email }}
+                        href="mailto:{{ contact['email'] }}">
+                        {{ contact['email'] }}
                     </a>
                 </div>
             
@@ -35,8 +35,8 @@
 
                 <a
                     id="header-website" 
-                    href="{{ 'https://' + contact.url }}" target="_blank">
-                    {{ contact.url }}
+                    href="{{ 'https://' + contact['url'] }}" target="_blank">
+                    {{ contact['url'] }}
                 </a>
             </div>
 
@@ -48,15 +48,15 @@
 
                 <a 
                     id="header-git" 
-                    href="{{ 'https://' + contact.github }}" target="_blank">
-                    {{ contact.github }}
+                    href="{{ 'https://' + contact['github'] }}" target="_blank">
+                    {{ contact['github'] }}
                 </a>
             </div>
         </div>
 
         <span 
             id="header-location">
-            {{ contact.location|upper }}
+            {{ contact['location']|upper }}
         </span>
     </div>
 
@@ -87,7 +87,10 @@
                                 {%- for list_item in item[skill_type] -%}
                                     <li 
                                         class="Resume__section__item__stack__backend__item">
-                                        {{ list_item }}
+                                        <span
+                                            class="Resume__section__item__list__item__container">
+                                            {{ list_item }}
+                                        </span>
                                     </li>
                                 {%- endfor -%}
                             </div>
@@ -111,20 +114,34 @@
                         class="Resume__section__item__header">
                         <h3 
                             class="Resume__section__item__header__name">
-                            {{ project.title }}
+                            {{ project['title'] }}
                         </h3>
 
                         <h4 
                             class="Resume__section__item__header__date">
-                            {{ project.date }}
+                            {{ project['date'] }}
                         </h4>
         
                         <div 
                             class="Resume__section__item__header__links">
-                            <a 
-                                href="{{ project.url }}">
-                                {{ project.url }}
-                            </a>
+                            {%- for substring in project['url'].split('{') -%}
+                                {%- if 'href' not in substring -%}
+                                <a 
+                                    href="{{ substring }}">
+                                    {{ substring }}
+                                </a>
+                                {%- else -%}
+                                    <a
+                                        id="external-url-icon"
+                                        href="{{ project['href'][substring.replace('href:', '').replace('}', '')] }}">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+                                            <path d="m13 3 3.293 3.293-7 7 1.414 1.414 7-7L21 11V3z"/>
+                                            <path d="M19 19H5V5h7l-2-2H5c-1.103 0-2 .897-2 2v14c0 1.103.897 2 2 2h14c1.103 0 2-.897 2-2v-5l-2-2v7z"/>
+                                        </svg>
+                                    </a>
+                                {%- endif -%}
+                            {%- endfor -%}
+                           
                         </div>
                     </div>
 
@@ -132,16 +149,19 @@
                         class="Resume__section__item__summary">
                         <span 
                             class="Resume__section__item__summary__objectives">
-                            Objectives — {{ project.objectives }}
+                            Objectives — {{ project['objectives'] }}
                         </span>  
                     </div>
 
                     <ul 
                         class="Resume__section__item__list">
-                        {%- for item in project.description -%}
+                        {%- for item in project['description'] -%}
                             <li 
                                 class="Resume__section__item__list__item">
-                                {{ item }}
+                                <span
+                                    class="Resume__section__item__list__item__container">
+                                    {{ item }}
+                                </span>
                             </li>
                         {%- endfor -%}
                     </ul>
@@ -164,31 +184,62 @@
                             class="Resume__section__item__header">
                             <h3 
                                 class="Resume__section__item__header__name">
-                                {{ name }}
+                                {%- for substring in name.split('{') -%}
+                                    {%- if 'href' not in substring -%}
+                                        {{ substring }}
+                                    {%- else -%}
+                                        <a
+                                            id="external-url-icon"
+                                            href="{{ institute[name]['href'][substring.replace('href:', '').replace('}', '')] }}">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+                                                <path d="m13 3 3.293 3.293-7 7 1.414 1.414 7-7L21 11V3z"/>
+                                                <path d="M19 19H5V5h7l-2-2H5c-1.103 0-2 .897-2 2v14c0 1.103.897 2 2 2h14c1.103 0 2-.897 2-2v-5l-2-2v7z"/>
+                                            </svg>
+                                        </a>
+                                    {%- endif -%}
+                                {%- endfor -%}
                             </h3>
 
                             <h4 
                                 class="Resume__section__item__header__title">
-                                {{ institute[name].title }}
+                                {{ institute[name]['title'] }}
                             </h4>
 
                             <h4 
                                 class="Resume__section__item__header__date">
-                                {{ institute[name].date }}
+                                {{ institute[name]['date'] }}
                             </h4>
 
                             <h4 
                                 class="Resume__section__item__header__location">
-                                {{ institute[name].location }}
+                                {{ institute[name]['location'] }}
                             </h4>
                         </div>
 
                         <ul 
                             class="Resume__section__item__list">
-                            {%- for line in institute[name].description -%}
+                            {%- for line in institute[name]['description'] -%}
                                 <li 
                                     class="Resume__section__item__list__item">
-                                    {{ line }}
+                                    <span
+                                        class="Resume__section__item__list__item__container">
+                                        {%- for split_fwd in line.split('{') -%}
+                                            {%- for substring in split_fwd.split('}') -%}
+                                                {%- if 'href' not in substring -%}
+                                                    {{ substring }}
+                                                {%- else -%}
+                                                    <a
+                                                        id="external-url-icon"
+                                                        href="{{ institute[name]['href'][substring.replace('href:', '').replace('}', '')] }}">
+                                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+                                                            <path d="m13 3 3.293 3.293-7 7 1.414 1.414 7-7L21 11V3z"/>
+                                                            <path d="M19 19H5V5h7l-2-2H5c-1.103 0-2 .897-2 2v14c0 1.103.897 2 2 2h14c1.103 0 2-.897 2-2v-5l-2-2v7z"/>
+                                                        </svg>
+                                                    </a>
+                                                {%- endif -%}
+                                            {%- endfor -%}
+                                        {%- endfor -%}
+                                    </span>
                                 </li>
                             {%- endfor -%}
                         </ul>
@@ -213,31 +264,60 @@
                             class="Resume__section__item__header">
                             <h3 
                                 class="Resume__section__item__header__name">
-                                {{ company }}
+                                {%- for substring in company.split('{') -%}
+                                    {%- if 'href' not in substring -%}
+                                        {{ substring }}
+                                    {%- else -%}
+                                        <a
+                                            id="external-url-icon"
+                                            href="{{ job[company]['href'][substring.replace('href:', '').replace('}', '')] }}">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+                                                <path d="m13 3 3.293 3.293-7 7 1.414 1.414 7-7L21 11V3z"/>
+                                                <path d="M19 19H5V5h7l-2-2H5c-1.103 0-2 .897-2 2v14c0 1.103.897 2 2 2h14c1.103 0 2-.897 2-2v-5l-2-2v7z"/>
+                                            </svg>
+                                        </a>
+                                    {%- endif -%}
+                                {%- endfor -%}
                             </h3>
 
                             <h4 
                                 class="Resume__section__item__header__title">
-                                {{ job[company].title }}
+                                {%- for substring in job[company].title.split('{') -%}
+                                    {%- if 'href' not in substring -%}
+                                        {{ substring }}
+                                    {%- else -%}
+                                        <a
+                                            id="external-url-icon"
+                                            href="{{ job[company]['href'][substring.replace('href:', '').replace('}', '')] }}">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+                                                <path d="m13 3 3.293 3.293-7 7 1.414 1.414 7-7L21 11V3z"/>
+                                                <path d="M19 19H5V5h7l-2-2H5c-1.103 0-2 .897-2 2v14c0 1.103.897 2 2 2h14c1.103 0 2-.897 2-2v-5l-2-2v7z"/>
+                                            </svg>
+                                        </a>
+                                    {%- endif -%}
+                                {%- endfor -%}
                             </h4>
 
                             <h4 
                                 class="Resume__section__item__header__date">
-                                {{ job[company].date }}
+                                {{ job[company]['date'] }}
                             </h4>
 
                             <h4 
                                 class="Resume__section__item__header__location">
-                                {{ job[company].location }}
+                                {{ job[company]['location'] }}
                             </h4>
                         </div>
 
                         <ul 
                             class="Resume__section__item__list">
-                            {%- for line in job[company].description -%}
+                            {%- for line in job[company]['description'] -%}
                                 <li 
                                     class="Resume__section__item__list__item">
-                                    {{ line }}
+                                    <span
+                                        class="Resume__section__item__list__item__container">
+                                        {{ line }}
+                                    </span>
                                 </li>
                             {%- endfor -%}
                         </ul>
