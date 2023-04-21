@@ -137,6 +137,17 @@ h4 {
             row-gap: 5mm;
         }
 
+            #external-url-icon {
+                display: inline-flex;
+                fill: var(--text-accent-primary);
+            }
+                #external-url-icon svg {
+                    width: 3.5mm;
+                    height: 3.5mm;
+                    align-self: center;
+                    pointer-events: none;
+                }
+
             .Resume__section {
                 display: grid;
                 grid-template-rows: 10mm auto;
@@ -166,6 +177,8 @@ h4 {
                         .Resume__section__item__header__name {
                             grid-column: 1 / 2;
                             grid-row: 1 / 2;
+                            display: flex;
+                            column-gap: 0.5mm;
                             color: var(--text-accent-primary);
                             font-weight: 400;
                             align-self: center;
@@ -174,14 +187,18 @@ h4 {
                         .Resume__section__item__header__title {
                             grid-column: 1 / 2;
                             grid-row: 2 / -1;
+                            display: inline-flex;
+                            column-gap: 0.5mm;
                             font-style: italic;
                             font-weight: 400;
+                            align-self: center;
                         }
 
                         .Resume__section__item__header__links {
                             grid-column: 1 / -1;
                             grid-row: 2 / 3;
-                            display: flex;
+                            display: inline-flex;
+                            column-gap: 0.5mm;
                             align-self: baseline;
                             z-index: 2;
                         }
@@ -267,6 +284,10 @@ h4 {
                             font-size: 3.75mm;
                             line-height: 5.75mm;
                         }
+
+                            .Resume__section__item__list__item__container {
+                                display: inline-flex;
+                            }
 
 /* Cover letter template */
     
