@@ -200,6 +200,7 @@
 .FilterDrawer.mobile.port {
     grid-column: 1 / -1;
     grid-row: 2 / 3;
+    pointer-events: all;
 }
 
 .FilterDrawer.mobile.port.show {
@@ -208,10 +209,15 @@
 }
 
     .FilterDrawer__parameters-container.mobile.port {
-        grid-template-columns: 30% 70%;
-        grid-template-rows: 15% calc(100% - 15%);
+        grid-template-columns: 40% 60%;
+        grid-template-rows: 15% calc(100% - 15% - 16rem);
         column-gap: 1rem;
+        padding-right: 2rem;
     }
+
+        .FilterDrawer__parameters.mobile.port {
+            overflow-y: auto;
+        }
 
     /* Disable camera, film, local length filters (get space for tags) */
     #camera.mobile.port,

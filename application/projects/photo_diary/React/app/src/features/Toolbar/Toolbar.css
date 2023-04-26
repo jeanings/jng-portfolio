@@ -29,6 +29,7 @@
 ------------------------------------------- */
 .Toolbar.mobile.port {
     grid-row: 3 / -1;
+    grid-template-columns: repeat(4, 1fr);
     align-self: center;
 }
 
