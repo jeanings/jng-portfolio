@@ -2,7 +2,8 @@ import React from 'react';
 import * as reactRedux from 'react-redux';
 import { Provider } from 'react-redux';
 import { setupStore, RootState } from '../../app/store';
-import { 
+import {
+    act,
     cleanup, 
     render, 
     screen, 
@@ -492,14 +493,12 @@ test("cycles through images on prev/next button clicks", async() => {
     let imageIndexA = newStore.getState().sideFilmStrip.docIndex as number;
 
     await user.click(nextImageButton);
-    
-    // Verify index is + 1.
-    expect(newStore.getState().sideFilmStrip.docIndex).toEqual(imageIndexA + 1);
+    // Verify index is + 1, wait for debounce.
+    await waitFor(() => expect(newStore.getState().sideFilmStrip.docIndex).toEqual(imageIndexA + 1));
 
     await user.click(prevImageButton);
-
-    // Verify index is - 1, back to original.
-    expect(newStore.getState().sideFilmStrip.docIndex).toEqual(imageIndexA);
+    // Verify index is - 1, back to original, wait for debounce.
+    await waitFor(() => expect(newStore.getState().sideFilmStrip.docIndex).toEqual(imageIndexA));
 });
 
 
@@ -520,14 +519,12 @@ test("loops image doc if prev/next button leads to collection out of range", asy
     const imageDocs = newStore.getState().timeline.imageDocs;
 
     await user.click(prevImageButton);
-    
-    // Verify image doc looped to end of collection.
-    expect(newStore.getState().sideFilmStrip.docIndex).toEqual(imageDocs!.length - 1);
+    // Verify image doc looped to end of collection, wait for debounce.
+    await waitFor(() => expect(newStore.getState().sideFilmStrip.docIndex).toEqual(imageDocs!.length - 1));
 
     await user.click(nextImageButton);
-
-    // Verify image doc looped back to beginning of collection.
-    expect(newStore.getState().sideFilmStrip.docIndex).toEqual(0);
+    // Verify image doc looped back to beginning of collection, wait for debounce.
+    await waitFor(() => expect(newStore.getState().sideFilmStrip.docIndex).toEqual(0));
 });
 
 
@@ -562,20 +559,40 @@ test("opens slide viewer on clicking full screen button in image enlarger panel,
 
 
 test("changes image in slide view mode on arrow button clicks", async() => {
-    const { newStore } = renderBoilerplate(preloadedState);
+    // Faked timers.
+    jest.useFakeTimers();
+
+    const newStore = setupStore(preloadedState);
+    act(() => {
+        render(
+            <Provider store={newStore}>
+                <SideFilmStrip />
+            </Provider>
+        );
+    });
     
     // Get thumbnail to click.
     const idForImageToEnlarge = mockDefaultData.docs[1]._id;
     const thumbnailElems = screen.getAllByRole('img', { name: 'thumbnail image container' });
     const thumbnailToClick = thumbnailElems.filter(thumbnail => 
         thumbnail.id === idForImageToEnlarge)[0];
+    await act(async() => {
+        jest.advanceTimersByTime(500);
+    });
 
     // Set up enlarger.
-    await user.click(thumbnailToClick);
+    await waitFor(() => user.click(thumbnailToClick));
+    await act(async() => {
+        jest.advanceTimersByTime(500);
+    });
     expect(newStore.getState().sideFilmStrip.enlargeDoc).not.toBeNull();
 
     const fullScreenButton = screen.getByRole('button', { name: 'show image full screen' });
-    await user.click(fullScreenButton);
+    
+    await waitFor(() => user.click(fullScreenButton));
+    await act(async() => {
+        jest.advanceTimersByTime(500);
+    });
 
     // Get image nav buttons.
     const prevButton = screen.getByRole('button', { name: 'show previous slide image'} );
@@ -585,20 +602,39 @@ test("changes image in slide view mode on arrow button clicks", async() => {
     const slideImageElem = screen.getByRole('img', { name: 'enlarged image in full screen mode' } ) as HTMLImageElement;
     const slideImageA: string = slideImageElem.src;
 
-    await user.click(prevButton);
-
-    // Verify image changed.
+    // await user.click(prevButton);
+    
+    await waitFor(() => user.click(prevButton));
+    await act(async() => {
+        jest.advanceTimersByTime(500);
+    });
+    // Verify image changed, wait for debounce.
     expect(slideImageElem.src).not.toEqual(slideImageA);
 
-    await user.click(nextButton);
-
-    // Verify image changed back to initial.
+    await waitFor(() => user.click(nextButton));
+    await act(async() => {
+        jest.advanceTimersByTime(500);
+    });
+    // Verify image changed, wait for debounce.
     expect(slideImageElem.src).toEqual(slideImageA);
+    
+    // Cleanup.
+    jest.useRealTimers();
 });
 
 
 test("loops slide image if prev/next button leads to collection out of range", async() => {
-    const { newStore } = renderBoilerplate(preloadedState);
+    // Faked timers.
+    jest.useFakeTimers();
+
+    const newStore = setupStore(preloadedState);
+    act(() => {
+        render(
+            <Provider store={newStore}>
+                <SideFilmStrip />
+            </Provider>
+        );
+    });
     
     // Get thumbnail to click.
     const idForImageToEnlarge = mockDefaultData.docs[0]._id;
@@ -607,11 +643,18 @@ test("loops slide image if prev/next button leads to collection out of range", a
         thumbnail.id === idForImageToEnlarge)[0];
 
     // Set up enlarger.
-    await user.click(thumbnailToClick);
+    await waitFor(() => user.click(thumbnailToClick));
+    await act(async() => {
+        jest.advanceTimersByTime(500);
+    });
+
     expect(newStore.getState().sideFilmStrip.enlargeDoc).not.toBeNull();
 
     const fullScreenButton = screen.getByRole('button', { name: 'show image full screen' });
-    await user.click(fullScreenButton);
+    await waitFor(() => user.click(fullScreenButton));
+    await act(async() => {
+        jest.advanceTimersByTime(500);
+    });
 
     // Get image nav buttons.
     const prevButton = screen.getByRole('button', { name: 'show previous slide image'} );
@@ -620,7 +663,10 @@ test("loops slide image if prev/next button leads to collection out of range", a
     // Get image element.
     const slideImageElem = screen.getByRole('img', { name: 'enlarged image in full screen mode' } ) as HTMLImageElement;
 
-    await user.click(prevButton);
+    await waitFor(() => user.click(prevButton));
+    await act(async() => {
+        jest.advanceTimersByTime(500);
+    });
 
     const firstImageSrc: string = mockDefaultData.docs[0].url;
     const lastImageSrc: string = mockDefaultData.docs[mockDefaultData.docs.length - 1].url;
@@ -628,15 +674,30 @@ test("loops slide image if prev/next button leads to collection out of range", a
     // Verify image looped to last image in collection.
     expect(slideImageElem.src).toEqual(lastImageSrc);
 
-    await user.click(nextButton);
-
-    // Verify image changed back to initial, looped to beginning of collection.
+    await waitFor(() => user.click(nextButton));
+    await act(async() => {
+        jest.advanceTimersByTime(500);
+    });
+    // Verify image changed back to initial, looped to beginning of collection, wait for debounce.
     expect(slideImageElem.src).toEqual(firstImageSrc);
+
+    // Cleanup.
+    jest.useRealTimers();
 });
 
 
 test("changes enlargeDoc to that of last image viewed in slide view", async() => {
-    const { newStore } = renderBoilerplate(preloadedState);
+    // Faked timers.
+    jest.useFakeTimers();
+
+    const newStore = setupStore(preloadedState);
+    act(() => {
+        render(
+            <Provider store={newStore}>
+                <SideFilmStrip />
+            </Provider>
+        );
+    });
 
     // Get thumbnail to click.
     const initImageToEnlarge = mockDefaultData.docs[0];
@@ -645,11 +706,18 @@ test("changes enlargeDoc to that of last image viewed in slide view", async() =>
         thumbnail.id === initImageToEnlarge._id)[0];
 
     // Set up enlarger.
-    await user.click(thumbnailToClick);
+    await waitFor(() => user.click(thumbnailToClick));
+    await act(async() => {
+        jest.advanceTimersByTime(500);
+    });
+
     expect(newStore.getState().sideFilmStrip.enlargeDoc).not.toBeNull();
 
     const fullScreenButton = screen.getByRole('button', { name: 'show image full screen' });
-    await user.click(fullScreenButton);
+    await waitFor(() => user.click(fullScreenButton));
+    await act(async() => {
+        jest.advanceTimersByTime(500);
+    });
 
     const slideImageElem = screen.getByRole('img', { name: 'enlarged image in full screen mode' } ) as HTMLImageElement;
     
@@ -657,29 +725,47 @@ test("changes enlargeDoc to that of last image viewed in slide view", async() =>
     expect(slideImageElem.src).toEqual(initImageToEnlarge.url);
 
     const nextButton = screen.getByRole('button', { name: 'show next slide image'} );
-    await user.click(nextButton);
+    await waitFor(() => user.click(nextButton));
+    await act(async() => {
+        jest.advanceTimersByTime(500);
+    });
 
-    // Verify slide image changed.
+    // Verify slide image changed, wait for debounce.
     expect(slideImageElem.src).not.toEqual(initImageToEnlarge.url);
 
     // Get expected new enlarge doc on slide view closing.
     const expectedNewEnlargeDoc = newStore.getState().timeline.imageDocs!.filter(doc => 
         doc.url === slideImageElem.src)[0];
-
     
     const slideViewElement = screen.getByRole('img', { name: 'full screen slide view mode' });
-    await user.click(slideViewElement);
+    await waitFor(() => user.click(slideViewElement));
+    await act(async() => {
+        jest.advanceTimersByTime(500);
+    });
     
     // Verify slide viewing mode closed.
     expect(slideViewElement).not.toHaveClass("show");
 
     // Verify enlarge doc changed to last viewed in slide mode.
     expect(newStore.getState().sideFilmStrip.enlargeDoc).toEqual(expectedNewEnlargeDoc);
+
+    // Cleanup.
+    jest.useRealTimers();
 });
 
 
 test("presses on Esc key closes slide view mode", async() => {
-    const { newStore } = renderBoilerplate(preloadedState);
+    // Faked timers.
+    jest.useFakeTimers();
+
+    const newStore = setupStore(preloadedState);
+    act(() => {
+        render(
+            <Provider store={newStore}>
+                <SideFilmStrip />
+            </Provider>
+        );
+    });
 
     // Get thumbnail to click.
     const initImageToEnlarge = mockDefaultData.docs[0];
@@ -688,26 +774,49 @@ test("presses on Esc key closes slide view mode", async() => {
         thumbnail.id === initImageToEnlarge._id)[0];
 
     // Set up enlarger.
-    await user.click(thumbnailToClick);
+    await waitFor(() => user.click(thumbnailToClick));
+    await act(async() => {
+        jest.advanceTimersByTime(500);
+    });
+
     expect(newStore.getState().sideFilmStrip.enlargeDoc).not.toBeNull();
 
     const fullScreenButton = screen.getByRole('button', { name: 'show image full screen' });
-    await user.click(fullScreenButton);
-    
+    await waitFor(() => user.click(fullScreenButton));
+    await act(async() => {
+        jest.advanceTimersByTime(500);
+    });
+
     // Verify slide view mode opened.
     expect(newStore.getState().sideFilmStrip.slideView).toEqual('on');
     expect(newStore.getState().toolbar.imageEnlarger).toEqual('hidden');
 
-    await user.keyboard('[Escape]');
+    await waitFor(() => user.keyboard('[Escape]'));
+    await act(async() => {
+        jest.advanceTimersByTime(500);
+    });
 
     // Verify slide view mode closed.
     expect(newStore.getState().sideFilmStrip.slideView).toEqual('off');
     expect(newStore.getState().toolbar.imageEnlarger).toEqual('on');
+
+    // Cleanup.
+    jest.useRealTimers();
 });
 
 
 test("presses on L/R arrow keys change enlarger image", async() => {
-    const { newStore } = renderBoilerplate(preloadedState);
+    // Faked timers.
+    jest.useFakeTimers();
+
+    const newStore = setupStore(preloadedState);
+    act(() => {
+        render(
+            <Provider store={newStore}>
+                <SideFilmStrip />
+            </Provider>
+        );
+    });
 
     // Get thumbnail to click.
     const initImageToEnlarge = mockDefaultData.docs[0];
@@ -717,15 +826,25 @@ test("presses on L/R arrow keys change enlarger image", async() => {
         thumbnail.id === initImageToEnlarge._id)[0];
     
     // Set up image enlarger.
-    await user.click(thumbnailToClick);
+    await waitFor(() => user.click(thumbnailToClick));
+    await act(async() => {
+        jest.advanceTimersByTime(500);
+    });
+
     expect(newStore.getState().sideFilmStrip.enlargeDoc).not.toBeNull();
 
-    await user.keyboard('[ArrowLeft]');
+    await waitFor(() => user.keyboard('[ArrowLeft]'));
+    await act(async() => {
+        jest.advanceTimersByTime(500);
+    });
 
     // Verify image enlarger cycled to previous image.
     expect(newStore.getState().sideFilmStrip.enlargeDoc!._id).toEqual(prevImageToEnlarge._id);
 
-    await user.keyboard('[ArrowRight]');
+    await waitFor(() => user.keyboard('[ArrowRight]'));
+    await act(async() => {
+        jest.advanceTimersByTime(500);
+    });
 
     // Verify image enlarger cycled to next image (initial image).
     expect(newStore.getState().sideFilmStrip.enlargeDoc!._id).toEqual(initImageToEnlarge._id);
@@ -733,7 +852,17 @@ test("presses on L/R arrow keys change enlarger image", async() => {
 
 
 test("presses on L/R arrow keys change slide viewer image", async() => {
-    const { newStore } = renderBoilerplate(preloadedState);
+    // Faked timers.
+    jest.useFakeTimers();
+
+    const newStore = setupStore(preloadedState);
+    act(() => {
+        render(
+            <Provider store={newStore}>
+                <SideFilmStrip />
+            </Provider>
+        );
+    });
 
     // Get thumbnail to click.
     const initImageToEnlarge = mockDefaultData.docs[0];
@@ -742,12 +871,19 @@ test("presses on L/R arrow keys change slide viewer image", async() => {
         thumbnail.id === initImageToEnlarge._id)[0];
 
     // Set up image enlarger.
-    await user.click(thumbnailToClick);
+    await waitFor(() => user.click(thumbnailToClick));
+    await act(async() => {
+        jest.advanceTimersByTime(500);
+    });
     expect(newStore.getState().sideFilmStrip.enlargeDoc).not.toBeNull();
 
+    // Open slide view.
     const fullScreenButton = screen.getByRole('button', { name: 'show image full screen' });
-    await user.click(fullScreenButton);
-    
+    await waitFor(() => user.click(fullScreenButton));
+    await act(async() => {
+        jest.advanceTimersByTime(500);
+    });
+
     // Verify slide view mode opened.
     expect(newStore.getState().sideFilmStrip.slideView).toEqual('on');
     expect(newStore.getState().toolbar.imageEnlarger).toEqual('hidden');
@@ -757,21 +893,42 @@ test("presses on L/R arrow keys change slide viewer image", async() => {
     // const slideImageA: string = slideImageElem.src;
     expect(slideImageElem.src).toEqual(initImageToEnlarge.url);
 
-    await user.keyboard('[ArrowRight]');
+    // Advance to next image.
+    await waitFor(() => user.keyboard('[ArrowRight]'));
+    await act(async() => {
+        jest.advanceTimersByTime(500);
+    });
 
     // Verify slide image cycled to next image.
     const nextImageToSlideView = mockDefaultData.docs[1];
     expect(slideImageElem.src).toEqual(nextImageToSlideView.url);
 
-    await user.keyboard('[ArrowLeft]');
+    // Return to previous image.
+    await waitFor(() => user.keyboard('[ArrowLeft]'));
+    await act(async() => {
+        jest.advanceTimersByTime(500);
+    });
 
     // Verify image enlarger cycled to previous image (initial image).
     expect(slideImageElem.src).toEqual(initImageToEnlarge.url);
+    
+    // Cleanup.
+    jest.useRealTimers();
 });
 
 
 test("presses on L/R arrow keys in slide viewer won't change base enlarger image", async() => {
-    const { newStore } = renderBoilerplate(preloadedState);
+    // Faked timers.
+    jest.useFakeTimers();
+
+    const newStore = setupStore(preloadedState);
+    act(() => {
+        render(
+            <Provider store={newStore}>
+                <SideFilmStrip />
+            </Provider>
+        );
+    });
 
     // Get thumbnail to click.
     const initImageToEnlarge = mockDefaultData.docs[0];
@@ -780,12 +937,18 @@ test("presses on L/R arrow keys in slide viewer won't change base enlarger image
         thumbnail.id === initImageToEnlarge._id)[0];
 
     // Set up image enlarger.
-    await user.click(thumbnailToClick);
+    await waitFor(() => user.click(thumbnailToClick));
+    await act(async() => {
+        jest.advanceTimersByTime(500);
+    });
     const enlargeDoc = newStore.getState().sideFilmStrip.enlargeDoc?._id;
     expect(enlargeDoc).toEqual(initImageToEnlarge._id);
 
     const fullScreenButton = screen.getByRole('button', { name: 'show image full screen' });
-    await user.click(fullScreenButton);
+    await waitFor(() => user.click(fullScreenButton));
+    await act(async() => {
+        jest.advanceTimersByTime(500);
+    });
     
     // Verify slide view mode opened.
     expect(newStore.getState().sideFilmStrip.slideView).toEqual('on');
@@ -796,7 +959,10 @@ test("presses on L/R arrow keys in slide viewer won't change base enlarger image
     // const slideImageA: string = slideImageElem.src;
     expect(slideImageElem.src).toEqual(initImageToEnlarge.url);
 
-    await user.keyboard('[ArrowRight]');
+    await waitFor(() =>user.keyboard('[ArrowRight]'));
+    await act(async() => {
+        jest.advanceTimersByTime(500);
+    });
 
     // Verify slide image cycled to next image.
     const nextImageToSlideView = mockDefaultData.docs[1];
@@ -805,11 +971,17 @@ test("presses on L/R arrow keys in slide viewer won't change base enlarger image
     // Verify enlargeDoc unchanged.
     expect(enlargeDoc).toEqual(initImageToEnlarge._id);
 
-    await user.keyboard('[ArrowLeft]');
+    await waitFor(() => user.keyboard('[ArrowLeft]'));
+    await act(async() => {
+        jest.advanceTimersByTime(500);
+    });
 
     // Verify image enlarger cycled to previous image (initial image).
     expect(slideImageElem.src).toEqual(initImageToEnlarge.url);
 
     // Verify enlargeDoc unchanged.
     expect(enlargeDoc).toEqual(initImageToEnlarge._id);
+
+    // Cleanup.
+    jest.useRealTimers();
 });

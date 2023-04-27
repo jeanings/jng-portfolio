@@ -5,7 +5,9 @@ import React, {
 import { 
     useAppDispatch, 
     useAppSelector, 
-    useMediaQueries } from '../../common/hooks';
+    useMediaQueries,
+    useDebounceCallback,
+    useThrottleCallback } from '../../common/hooks';
 import { handleToolbarButtons, ToolbarProps } from '../Toolbar/toolbarSlice';
 import { handleMarkerLocator } from '../MapCanvas/mapCanvasSlice';
 import { 
@@ -204,6 +206,40 @@ const ImageEnlarger: React.FunctionComponent <ImageEnlargerProps> = (props: Imag
         setShowEditResponseMessage(!showEditResponseMessage);
     };
 
+    /* -------------------------------------------------
+        Handles clicks on enlarger navigation buttons. 
+    ------------------------------------------------- */
+    const onEnlargerNavButtonClicks = useDebounceCallback((event: React.SyntheticEvent) => {
+        const button = event.target as HTMLButtonElement;
+        const currentDocIndex = docIndex as number;
+        let changeDocIndexTo: number = currentDocIndex;
+
+        switch(button.id) {
+            case 'enlarger-border-previous':
+                changeDocIndexTo = currentDocIndex - 1;
+                break;
+            case 'enlarger-border-next':
+                changeDocIndexTo = currentDocIndex + 1;
+                break;
+        }
+
+        if (imageDocs) {
+            // Allow for previous/next cycling even at end of ranges.
+            let newDocIndex: number = changeDocIndexTo > imageDocs.length - 1
+                ? 0                          // Cycle back to left end.
+                : changeDocIndexTo < 0
+                    ? imageDocs.length - 1   // Cycle to right end. 
+                    : changeDocIndexTo;      // Default case.
+            
+            const payloadEnlarger: SideFilmStripProps = {
+                'enlargeDoc': imageDocs[newDocIndex],  // Triggers image change.
+                'docIndex': newDocIndex
+            };
+
+            dispatch(handleEnlarger(payloadEnlarger));
+        }
+    }, 200);
+
 
     /* ------------------------------------------------------------------
         Prepare object for image info taken from << enlargeDoc >> state.
@@ -322,40 +358,6 @@ const ImageEnlarger: React.FunctionComponent <ImageEnlargerProps> = (props: Imag
         );
     };
 
-    /* -------------------------------------------------
-        Handles clicks on enlarger navigation buttons. 
-    ------------------------------------------------- */
-    const onEnlargerNavButtonClicks = (event: React.SyntheticEvent) => {
-        const button = event.target as HTMLButtonElement;
-        const currentDocIndex = docIndex as number;
-        let changeDocIndexTo: number = currentDocIndex;
-
-        switch(button.id) {
-            case 'enlarger-border-previous':
-                changeDocIndexTo = currentDocIndex - 1;
-                break;
-            case 'enlarger-border-next':
-                changeDocIndexTo = currentDocIndex + 1;
-                break;
-        }
-
-        if (imageDocs) {
-            // Allow for previous/next cycling even at end of ranges.
-            let newDocIndex: number = changeDocIndexTo > imageDocs.length - 1
-                ? 0                          // Cycle back to left end.
-                : changeDocIndexTo < 0
-                    ? imageDocs.length - 1   // Cycle to right end. 
-                    : changeDocIndexTo;      // Default case.
-            
-            const payloadEnlarger: SideFilmStripProps = {
-                'enlargeDoc': imageDocs[newDocIndex],  // Triggers image change.
-                'docIndex': newDocIndex
-            };
-
-            dispatch(handleEnlarger(payloadEnlarger));
-        }
-    };
-    
 
     /* ----------------------------------------------------------
         Prepare image stats categories for generating elements.
@@ -583,6 +585,23 @@ const ImageEnlarger: React.FunctionComponent <ImageEnlargerProps> = (props: Imag
 /* =====================================================================
     Helper functions.
 ===================================================================== */
+
+/* ---------------------------------------------------------------
+    Debounce function to delay unnecessary rapid-clicked events.
+--------------------------------------------------------------- */ 
+export function debounceThis(callback: Function, delay: number) {
+    let timeout: ReturnType<typeof setTimeout>;
+    
+    return (...args: any[]) => {
+        clearTimeout(timeout);
+        timeout = setTimeout(() => {
+            callback(...args)
+        }, delay);
+    };
+}
+
+
+
 
 /* --------------------------------------------------------------
     Class for validating inputs being sent to update docs in db.

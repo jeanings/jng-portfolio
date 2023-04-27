@@ -4,7 +4,8 @@ import React, {
 import {
     useAppDispatch, 
     useAppSelector, 
-    useMediaQueries, 
+    useMediaQueries,
+    useThrottleCallback, 
     useWindowSize } from '../../common/hooks';
 import { 
     setStyleLoadStatus, 
@@ -77,6 +78,7 @@ const MapCanvas: React.FunctionComponent = () => {
                     doubleClickZoom: true,
                     dragPan: true,
                     dragRotate: false,
+                    keyboard: false
                 });
             }
         }
