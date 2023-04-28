@@ -5,7 +5,6 @@ import {
     useAppDispatch, 
     useAppSelector, 
     useMediaQueries,
-    useThrottleCallback, 
     useWindowSize } from '../../common/hooks';
 import { 
     setStyleLoadStatus, 
@@ -423,7 +422,13 @@ const MapCanvas: React.FunctionComponent = () => {
         
         // Explode marker cluster into individual markers.
         map.current.on('click', 'imageMarkersClusters', (event: any) => 
-            spiderfyClusters(event, map, spiderfier)
+            spiderfyClusters(
+                event, 
+                map, 
+                spiderfier, 
+                toolbarImageEnlarger as 'on' | 'off', 
+                windowSize
+            )
         );
 
         // Close branches on zooming.
@@ -452,7 +457,9 @@ const MapCanvas: React.FunctionComponent = () => {
     Get padding/offset for map animate methods,
     calculated off of window size.
 ---------------------------------------------- */
-function getMapPaddingOffset(mode: string, windowSize: { [index: string]: number }) {
+function getMapPaddingOffset(
+    mode: 'bound' | 'fly', 
+    windowSize: { [index: string]: number }) {
     let padding: PaddingType = {
         'top': 0,
         'bottom': 0,
@@ -557,8 +564,12 @@ function removeMapLayerSource(map: React.MutableRefObject<any>, objectType: stri
     Draws and animates exploding of marker cluster layer
     on click of clusters.  
 -------------------------------------------------------- */
-function spiderfyClusters(event: any, 
-    map: React.MutableRefObject<any>, spiderfier: React.MutableRefObject<any>) {
+function spiderfyClusters(
+    event: any, 
+    map: React.MutableRefObject<any>, 
+    spiderfier: React.MutableRefObject<any>,
+    imageEnlargerSwitched: 'on' | 'off',
+    windowSize: {[index: string]: number}) {
     const spiderfyZoomLevel = 10;
     const features = map.current.queryRenderedFeatures(
         event.point, {
@@ -574,8 +585,15 @@ function spiderfyClusters(event: any,
         return;
     } 
     else if (map.current.getZoom() < spiderfyZoomLevel) {
+        let offset: Array<number> = [ 0, 0 ];
+
+        if (imageEnlargerSwitched === 'on') {
+            offset = getMapPaddingOffset('fly', windowSize) as Array<number>;
+        }
+
         map.current.easeTo({
             center: event.lngLat,
+            offset: offset, 
             zoom: map.current.getZoom() + 2,
             duration: 1500
         });
