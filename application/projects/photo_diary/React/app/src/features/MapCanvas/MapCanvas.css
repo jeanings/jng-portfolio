@@ -71,3 +71,7 @@
 .MapCanvas.mobile.port.mapboxgl-map .mapboxgl-ctrl-bottom-left {
     display: none;
 }
+
+a.mapboxgl-ctrl-logo {
+    display: none !important;
+}

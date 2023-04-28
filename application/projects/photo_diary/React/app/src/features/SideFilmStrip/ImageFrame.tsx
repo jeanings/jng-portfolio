@@ -1,5 +1,9 @@
 import React from 'react';
-import { useAppDispatch, useAppSelector, useMediaQueries } from '../../common/hooks';
+import { 
+    useAppDispatch, 
+    useAppSelector, 
+    useMediaQueries,
+    useThrottleCallback } from '../../common/hooks';
 import { ImageDocTypes } from '../TimelineBar/timelineSlice';
 import { handleEnlarger, SideFilmStripProps } from './sideFilmStripSlice';
 import { handleToolbarButtons, ToolbarProps } from '../Toolbar/toolbarSlice';

@@ -5,7 +5,9 @@ import React, {
 import { 
     useAppDispatch, 
     useAppSelector, 
-    useMediaQueries } from '../../common/hooks';
+    useMediaQueries,
+    useDebounceCallback,
+    useThrottleCallback } from '../../common/hooks';
 import { ImageDocTypes } from '../TimelineBar/timelineSlice';
 import { 
     handleEnlarger, 
@@ -155,7 +157,7 @@ const SideFilmStrip: React.FunctionComponent = () => {
     /* ----------------------------------------------
         Keypress listener (conventional DOM).
     ---------------------------------------------- */
-    const onKeyPress = (event: KeyboardEvent) => {
+    const onKeyPress = useDebounceCallback((event: KeyboardEvent) => {
         const keyPress = event;
         const isFocusOnInput: boolean = document.activeElement?.tagName === 'INPUT' ? true : false; 
         // Key listeners.
@@ -194,7 +196,7 @@ const SideFilmStrip: React.FunctionComponent = () => {
                 }
                 break;
         }
-    };
+    }, 200);
 
 
     /* ---------------------------------------------------------------------
@@ -213,15 +215,15 @@ const SideFilmStrip: React.FunctionComponent = () => {
     /* ------------------------------------------------------
         Handle expand/contract of film strip on hover/touch.
     ------------------------------------------------------ */
-    const onImageHover = (event: React.SyntheticEvent) => {
+    const onImageHover = useThrottleCallback((event: React.SyntheticEvent) => {
         filmStripHovered === true
             ? setFilmStripHovered(false)
             : setFilmStripHovered(true);
-        
+
         if (imageEnlarger === 'on') {
             setFilmStripHovered(true);
         }
-    };
+    }, 250);
 
 
     /* ----------------------------------------------------------
@@ -251,6 +253,7 @@ const SideFilmStrip: React.FunctionComponent = () => {
                 id={ `slide-mode-nav-${name}` }
                 aria-label={ `show ${name} slide image` }
                 onClick={ onSlideViewNavButtonClick }>
+
                 { getBorderSVG[name] }
             </button>
         );
@@ -259,10 +262,9 @@ const SideFilmStrip: React.FunctionComponent = () => {
     /* -----------------------------------------
         Handle previous/next slide image click.
     ----------------------------------------- */
-    const onSlideViewNavButtonClick = (event: React.SyntheticEvent) => {
+    const onSlideViewNavButtonClick = useThrottleCallback((event: React.SyntheticEvent) => {
         // Prevent onSlideViewClick from bubbling up.
         event.stopPropagation()
-
         // Cycle slide image without changing base imageDoc, avoiding unnecessary
         // and non-visible changes while in slide view.
         const button = event.target as HTMLButtonElement;
@@ -289,7 +291,7 @@ const SideFilmStrip: React.FunctionComponent = () => {
                     ? setSlideImageIndex(imageDocs.length - 1)  // Cycle to right end. 
                     : setSlideImageIndex(newSlideIndex);        // Default case.
         }
-    };
+    }, 100);
 
     /* --------------------------------------
         Handle closing slide view on click.

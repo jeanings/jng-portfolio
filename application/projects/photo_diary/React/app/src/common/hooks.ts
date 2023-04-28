@@ -1,4 +1,7 @@
-import { useState, useEffect } from 'react';
+import { 
+    useState, 
+    useEffect,
+    useRef } from 'react';
 import { 
     TypedUseSelectorHook, 
     useDispatch, 
@@ -14,35 +17,124 @@ export const useAppDispatch = () => useDispatch<AppDispatch>();
 export const useAppSelector: TypedUseSelectorHook<RootState> = useSelector;
 
 
+/* -----------------------------------------------
+    Debouncing hook to catch rapid-fire events.
+----------------------------------------------- */
+export function useDebounceCallback<A extends any[]>(
+    callback: (...args: A) => void, delayMs: number) {
+    // Track timeout and args on repeated calls.
+    const timeout = useRef<ReturnType<typeof setTimeout>>();
+    const argsRef = useRef<A>();
+
+    function cleanup() {
+        if (timeout.current) {
+            clearTimeout(timeout.current);
+        }
+    }
+
+    // Cleanup on unmount.
+    useEffect(() => {
+        cleanup();
+    }, []);
+
+    return (...args: A) => {
+        // Get current args.
+        argsRef.current = args;
+        // Clear timer.
+        cleanup();
+
+        // Restart timer.
+        timeout.current = setTimeout(() => {
+            if (argsRef.current) {
+                callback(...argsRef.current);
+            }
+        }, delayMs);
+    };
+};
+
+
+/* -----------------------------------------------
+    Throttling hook to filter rapid-fire events.
+----------------------------------------------- */
+export function useThrottleCallback<A extends any[]>(
+    callback: (...args: A) => void, delayMs: number) {
+    // Track delay state and args on repeated calls.
+    const [ shouldDelayCall, setShouldDelayCall ] = useState<boolean>();
+    const argsRef = useRef<A>();
+
+    useEffect(() => {
+        setShouldDelayCall(false);
+        
+        // Cleanup on unmount.
+        return () => setShouldDelayCall(undefined);
+    }, []);
+
+    return (...args: A) => {
+        // Get current args.
+        argsRef.current = args;
+
+        // Ignore call if timeout hasn't passed.
+        if (shouldDelayCall) {
+            return;
+        }
+
+        // Immediately call the function.
+        callback(...argsRef.current);
+        // Delay subsequent calls if timeout hasn't passed. 
+        setShouldDelayCall(true);
+
+        setTimeout(() => {
+            setShouldDelayCall(false);
+            callback(...args);
+        }, delayMs);
+    };
+}
+
+
 /* --------------------------------------------
     Get size of window, updates with resizing.
 -------------------------------------------- */
 export function useWindowSize() {
-    let windowState: { [index: string]: number } = { 
-        width: 0, 
-        height: 0
-    };
+    let windowState: { [index: string]: number } = { width: window.innerWidth, height: window.innerHeight };
+    const timeout = useRef<ReturnType<typeof setTimeout>>();
+    const windowSize = useRef<typeof windowState>(windowState);
 
-    const [ windowSize, setWindowSize ] = useState(windowState);
+    function cleanup() {
+        if (timeout.current) {
+            clearTimeout(timeout.current);
+        }
+    }
+
+    /* ------------------------------
+        Debounced resizing handler.
+    ------------------------------ */
+    function handleResize() {
+        // Clear timer.
+        cleanup();
+
+        let newWindowSize = {
+            width: window.innerWidth,
+            height: window.innerHeight
+        };
+
+        // Restart timer on clicks under 400ms.
+        timeout.current = setTimeout(() => {
+            if (newWindowSize !== windowSize.current) {
+                windowSize.current = newWindowSize;
+            }
+        }, 400);
+    }
 
     useEffect(() => {
-        const handleResize = () => {
-            setWindowSize({
-                width: window.innerWidth,
-                height: window.innerHeight
-            });
-        }
-        
         window.addEventListener('resize', handleResize);
-
-        // Call handler right away so state gets updated with initial window size
         handleResize();
         
-        // Remove event listener on cleanup
+        // Cleanup on unmount.
+        cleanup();
         return () => window.removeEventListener('resize', handleResize);
     }, []);
 
-    return windowSize;
+    return windowSize.current;
 };
 
 

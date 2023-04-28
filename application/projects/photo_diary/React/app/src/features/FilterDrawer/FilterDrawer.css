@@ -200,17 +200,38 @@
 .FilterDrawer.mobile.port {
     grid-column: 1 / -1;
     grid-row: 2 / 3;
-    padding-bottom: 12rem;
+    pointer-events: all;
 }
 
 .FilterDrawer.mobile.port.show {
     grid-column: 1 / -1;
     grid-row: 2 / 3;
-    padding-bottom: 12rem;
 }
 
     .FilterDrawer__parameters-container.mobile.port {
-        grid-template-rows: 15% 22% 15% calc(100% - 15% - 22% - 15%);
+        grid-template-columns: 40% 60%;
+        grid-template-rows: 15% calc(100% - 15% - 16rem);
+        column-gap: 1rem;
+        padding-right: 2rem;
+    }
+
+        .FilterDrawer__parameters.mobile.port {
+            overflow-y: auto;
+        }
+
+    /* Disable camera, film, local length filters (get space for tags) */
+    #camera.mobile.port,
+    #film.mobile.port,
+    #focalLength.mobile.port {
+        display: none;
+    }
+
+    #lens.mobile.port {
+        grid-row: 1 / 2;
+    }
+
+    #tags.mobile.port {
+        grid-row: 2 / 3;
     }
 
     .FilterDrawer__reset.mobile.port {
