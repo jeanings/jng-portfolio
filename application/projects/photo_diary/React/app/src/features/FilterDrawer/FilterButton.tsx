@@ -62,19 +62,21 @@ const FilterButton: React.FunctionComponent<FilterButtonProps> = (props: FilterB
         let buttonsToDisable: Array<string | number | null> = [];
         let classNameAddOn: string = '';
 
-        if (yearSelectables !== null) {
+        if (yearSelectables) {
             for (let filter of Object.entries(yearSelectables)) {
                 const category = filter[0];
                 const itemList = filter[1] as Array<any>;
-        
-                if (monthSelectables !== null) {
-                    let difference = itemList.filter(x => 
-                        !monthSelectables[category]!.includes(x)
-                    );
-                    
-                    // Append non-intersecting values of base/month selectables.
-                    buttonsToDisable = [...buttonsToDisable, ...difference];
+
+                if (monthSelectables === null) {
+                    continue;
                 }
+        
+                let difference = itemList.filter(x => 
+                    !monthSelectables[category]!.includes(x)
+                );
+                
+                // Append non-intersecting values of base/month selectables.
+                buttonsToDisable = [...buttonsToDisable, ...difference];
             }
         }
             

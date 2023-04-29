@@ -61,7 +61,7 @@ const MapCanvas: React.FunctionComponent = () => {
         Initialize map once data is successfully fetched.
     ---------------------------------------------------- */
     useEffect(() => {
-        if (bounds !== null) {
+        if (bounds) {
             // Initialize map.
             if (map.current === null) {
                 map.current = new mapboxgl.Map({
@@ -89,7 +89,7 @@ const MapCanvas: React.FunctionComponent = () => {
     ---------------------------------------------------------------------- */
     useEffect(() => {
         // Set loaded status and add controls once map initialized.
-        if (bounds !== null && map.current && styleLoaded === false) {
+        if (bounds && map.current && styleLoaded === false) {
             map.current.on('load', () => {
                 dispatch(setStyleLoadStatus(true));
             });
@@ -102,7 +102,7 @@ const MapCanvas: React.FunctionComponent = () => {
     -------------------------------------------------------------------- */
     useEffect(() => {
         // Add or refresh marker source.
-        if (bounds !== null && map.current && styleLoaded === true) {
+        if (bounds && map.current && styleLoaded) {
             // Reset spiderfy ref.
             if (spiderfier.current) {
                 spiderfier.current.unspiderfy();
@@ -140,7 +140,7 @@ const MapCanvas: React.FunctionComponent = () => {
         Add map zoom controls to bottom left corner on loaded map.
     ------------------------------------------------------------ */
     useEffect(() => {
-        if (map.current && styleLoaded === true) {
+        if (map.current && styleLoaded) {
             // Only add controls for larger, non-mobile screens.
             const controlAdded: boolean = map.current.hasControl(mapControl.current);
             const shouldAddControls: boolean = windowSize.width >= 800
@@ -149,13 +149,13 @@ const MapCanvas: React.FunctionComponent = () => {
                     : false;
 
             // Add map zoom controls.
-            if (shouldAddControls === true) {
+            if (shouldAddControls) {
                 if (controlAdded === false) {
                     map.current.addControl(mapControl.current, 'bottom-left');
                 }
             }
             else {
-                if (controlAdded === true) {
+                if (controlAdded) {
                     map.current.removeControl(mapControl.current);
                 }
             }
@@ -169,7 +169,7 @@ const MapCanvas: React.FunctionComponent = () => {
     useEffect(() => {
         if (sourceStatus === 'loaded'
             && fitBoundsButton === 'clicked'
-            && bounds !== null
+            && bounds
             && map.current) {
             
             // Adjust and zoom map to fit all markers. 
@@ -197,7 +197,7 @@ const MapCanvas: React.FunctionComponent = () => {
     useEffect(() => {
         if (sourceStatus === 'loaded'
             && markerLocator === 'clicked'
-            && enlargeDoc !== null
+            && enlargeDoc
             && map.current) {
             // Fly map to marker with offset to the left for image enlarger.
             const markerCoords: Array<number> = [
@@ -240,7 +240,7 @@ const MapCanvas: React.FunctionComponent = () => {
     ------------------------------------------- */
     if (sourceStatus === 'loaded'
         && markersStatus === 'idle'
-        && bounds !== null
+        && bounds
         && map.current) {
 
             // Create new photo marker layer.
@@ -356,7 +356,7 @@ const MapCanvas: React.FunctionComponent = () => {
         film strip to clicked marker image.
     ---------------------------------------------------------------------------- */
     function handleImageMarkerClicks(markerDocId: string) {
-        const enlargeDocId: string = enlargeDoc !== null    
+        const enlargeDocId: string = enlargeDoc    
             ? enlargeDoc._id
             : '';
 
@@ -392,7 +392,7 @@ const MapCanvas: React.FunctionComponent = () => {
         Handle various marker events.
     --------------------------------- */
     if (markersStatus === 'loaded' 
-        && spiderfier.current !== null
+        && spiderfier.current
         && map.current) {
         // Change cursor when hovering over image markers.
         map.current.on('mouseenter', 'imageMarkers', () => 
