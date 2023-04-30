@@ -137,7 +137,7 @@ def photo_diary_data():
         format_type = request.args.get('format-type')
         film = request.args.get('film')
         camera = request.args.get('camera')
-        lenses = request.args.get('lenses')
+        lens = request.args.get('lens')
         focal_length = request.args.get('focal-length')
         tags = request.args.get('tags')
 
@@ -162,12 +162,12 @@ def photo_diary_data():
 
     raw_queries = {
         'month': month, 'format_medium': format_medium, 'format_type': format_type, 'film': film,
-        'camera': camera, 'lenses': lenses, 'focal_length': focal_length, 'tags': tags
+        'camera': camera, 'lens': lens, 'focal_length': focal_length, 'tags': tags
     }
 
     # Parse queries: month as is, the rest into lists.  
     queries = {}
-    whitespaced_keywords = ['camera', 'film', 'lenses', 'tags']
+    whitespaced_keywords = ['camera', 'film', 'lens', 'tags']
 
     for key, val in raw_queries.items():
         if val:

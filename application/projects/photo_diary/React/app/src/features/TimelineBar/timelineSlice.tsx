@@ -56,22 +56,33 @@ export const fetchDocs = (apiUrl: string, request: ImageDocsRequestProps) => {
             parsedRequest[parameter] = request[parameter];
         }
         else {
-            let parsedArrayToString: string = '';
             // Join all parameters in each array into one query string.
             // Whitespace converts to '_' and all values in array concatenated with '+'.
-            request[parameter].forEach((item: string | number) => {
-                let parsed: string;
-                if (typeof item === 'string') {
-                    parsed = item.replace(/\s/g, '_');
+            const paramItemsToString = (combinedString: string, currentItem: string | number) => {
+                let partialString: string = '';
+                switch(typeof currentItem) {
+                    case 'string': 
+                        // White spaces to underscores.
+                        partialString = currentItem.replace(/\s/g, '_');
+                        break;
+                    case 'number':
+                        // Stringify numbers (focal length, iso).
+                        partialString = currentItem.toString();
+                        break;
+                    default:
+                        break;
                 }
-                else {
-                    parsed = item.toString();
-                }
-                parsedArrayToString = parsedArrayToString === ''
-                    ? parsed
-                    : parsedArrayToString.concat('+', parsed);
-            });
 
+                let parsedString = combinedString + "+" + partialString;
+                if (parsedString[0] === '+') {
+                    // Strip '+' in initial iteration.
+                    parsedString = parsedString.slice(1);
+                }
+
+                return parsedString;
+            };
+            
+            let parsedArrayToString: string = request[parameter].reduce(paramItemsToString, '');
             parsedRequest[parameter] = parsedArrayToString;
         }
     }
