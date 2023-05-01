@@ -106,7 +106,7 @@ describe("on filter button clicks", () => {
     ];
 
     filterCategories.map(group => {
-        test("adds selected filter to existing array in state", async() => {
+        test(`adds selected filter (${group['category']}) to existing array in state`, async() => {
             /* --------------------------------------------------------
                 Mocks                                          start
             -------------------------------------------------------- */
@@ -177,14 +177,11 @@ describe("on filter button clicks", () => {
             }
             else if (group.category === 'camera') {
                 const make: string = (filterButtonText! as string).split(' ', 1)[0];
-                const modelStrings: Array<string> = (filterButtonText! as string).split(' ')
-                    .filter(model => !model.includes(make));
-                let camera: string = '';
-                
-                // Reconstruct camera model if it contains multiple parts of text.
-                modelStrings.forEach(modelString =>
-                    camera = camera.concat(' ', modelString).trim()
-                );
+                const modelString: string = (filterButtonText! as string)
+                    .split(' ')
+                    .filter(model => !model.includes(make))
+                    .join(' ');
+                expect(newStore.getState().filter[group.category]).toContain(modelString);
             }
             else if (group.category === 'focalLength') {
                 expect(newStore.getState().timeline.query).toHaveProperty('focal-length');
@@ -196,7 +193,7 @@ describe("on filter button clicks", () => {
         });
 
    
-        test("removes selected filter from existing array in state", async() => {
+        test(`removes selected filter (${group['category']}) from existing array in state`, async() => {
             const { newStore } = renderBoilerplate(preloadedState, ['filter']);
 
             // Verify initial empty state.
@@ -225,16 +222,12 @@ describe("on filter button clicks", () => {
             else if (group.category === 'camera') {
                 stateKey = group.category;
                 const make: string = (filterButtonToClick.textContent! as string).split(' ', 1)[0];
-                const modelStrings: Array<string> = (filterButtonToClick.textContent! as string).split(' ')
-                    .filter(model => !model.includes(make));
-                let camera: string = '';
-                
-                // Reconstruct camera model if it contains multiple parts of text.
-                modelStrings.forEach(modelString =>
-                    camera = camera.concat(' ', modelString).trim()
-                );
+                const modelString: string = (filterButtonToClick.textContent! as string)
+                    .split(' ')
+                    .filter(model => !model.includes(make))
+                    .join(' ');
 
-                filterButtonText = camera;
+                filterButtonText = modelString;
             }
             else {
                 stateKey = group.category;

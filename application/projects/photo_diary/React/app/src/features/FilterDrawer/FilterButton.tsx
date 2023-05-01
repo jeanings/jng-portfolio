@@ -20,8 +20,8 @@ const FilterButton: React.FunctionComponent<FilterButtonProps> = (props: FilterB
     const dispatch = useAppDispatch();
     const filterState = useAppSelector(state => state.filter);
     const selectedTimeline = useAppSelector(state => state.timeline.selected);
-    const yearSelectables = useAppSelector(state => state.timeline.filterSelectables);
-    const monthSelectables = useAppSelector(state => state.timeline.filteredSelectables);
+    const selectablesForYear = useAppSelector(state => state.timeline.filterSelectables);
+    const selectablesForQueried = useAppSelector(state => state.timeline.filteredSelectables);
 
     // Get corresponding category in filter state (may be different than props one).
     let filterCategory: string = props.categoryName;
@@ -39,15 +39,12 @@ const FilterButton: React.FunctionComponent<FilterButtonProps> = (props: FilterB
             // Get cleaned selectableName for filter state.
             const cameraMakeModel = props.selectableName as string;
             const make: string = cameraMakeModel.split(' ', 1)[0];
-            const modelStrings: Array<string> = cameraMakeModel.split(' ')
-                .filter(model => !model.includes(make));
-            let cameraModelOnlyName: string = '';
-            
             // Reconstruct camera model if it contains multiple parts of text.
-            modelStrings.forEach(modelString =>
-                cameraModelOnlyName = cameraModelOnlyName.concat(' ', modelString).trim()
-            );
-            selectable = cameraModelOnlyName;
+            const model: string = cameraMakeModel
+                .split(' ')
+                .filter((makeModel: string) => !makeModel.includes(make))
+                .join(' ');
+            selectable = model;
             break;
     };
 
@@ -62,18 +59,29 @@ const FilterButton: React.FunctionComponent<FilterButtonProps> = (props: FilterB
         let buttonsToDisable: Array<string | number | null> = [];
         let classNameAddOn: string = '';
 
-        if (yearSelectables) {
-            for (let filter of Object.entries(yearSelectables)) {
+        if (selectablesForYear) {
+            for (let filter of Object.entries(selectablesForYear)) {
                 const category = filter[0];
                 const itemList = filter[1] as Array<any>;
 
-                if (monthSelectables === null) {
+                if (selectablesForQueried === null) {
                     continue;
                 }
-        
-                let difference = itemList.filter(x => 
-                    !monthSelectables[category]!.includes(x)
-                );
+                
+                let difference = [];
+
+                try {
+                    if (selectablesForQueried[category]) {
+                        difference = itemList.filter(x => 
+                            !selectablesForQueried[category]?.includes(x)
+                        );
+                    }
+                }
+                catch (TypeError) {
+                    // 
+                }
+                
+                
                 
                 // Append non-intersecting values of base/month selectables.
                 buttonsToDisable = [...buttonsToDisable, ...difference];

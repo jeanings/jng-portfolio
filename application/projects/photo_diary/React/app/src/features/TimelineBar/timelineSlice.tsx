@@ -219,21 +219,26 @@ const timelineSlice = createSlice({
     
                 // Assign list of years in the collection.
                 state.years = years;
-                
-                // For non-month queries, update counter and clear filteredSelectables.
-                if (args['month'] === undefined) {
-                    state.counter = {...counter, 'previous': state.counter.previous};
-                    state.filteredSelectables = null;
-                }
-                // Only assign filteredSelectables if year-month query.
-                else if (Object.keys(args).length === 2 
-                    && args['month'] !== undefined) {
-                    state.filteredSelectables = filteredSelectables;
-                }
-                
+
                 // Set main selectables only on single 'year' queries.
                 if (Object.keys(args).length === 1) {
                     state.filterSelectables = filterSelectables;
+                }
+                
+                // For non-month queries, update counter.
+                if (args['month'] === undefined) {
+                    state.counter = {...counter, 'previous': state.counter.previous};
+                }
+                                
+                // Assign available selectable filter parameters for all queries.
+                // Example: 
+                //  -> if 'film' queried, 'digital' and all other parameters available only to 
+                //     'digital' docs will be greyed out.  Exclusive filters.
+                if (filteredSelectables && Object.keys(filteredSelectables).length > 0) {
+                    state.filteredSelectables = filteredSelectables;
+                }
+                else {
+                    state.filteredSelectables = null;
                 }
 
                 // Sort docs by descending order.
