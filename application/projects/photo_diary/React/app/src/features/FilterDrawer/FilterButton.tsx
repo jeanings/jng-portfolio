@@ -69,7 +69,6 @@ const FilterButton: React.FunctionComponent<FilterButtonProps> = (props: FilterB
                 }
                 
                 let difference = [];
-
                 try {
                     if (selectablesForQueried[category]) {
                         difference = itemList.filter(x => 
@@ -78,10 +77,8 @@ const FilterButton: React.FunctionComponent<FilterButtonProps> = (props: FilterB
                     }
                 }
                 catch (TypeError) {
-                    // 
+                    // No differences found.
                 }
-                
-                
                 
                 // Append non-intersecting values of base/month selectables.
                 buttonsToDisable = [...buttonsToDisable, ...difference];
