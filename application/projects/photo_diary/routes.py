@@ -137,7 +137,7 @@ def photo_diary_data():
         format_type = request.args.get('format-type')
         film = request.args.get('film')
         camera = request.args.get('camera')
-        lenses = request.args.get('lenses')
+        lens = request.args.get('lens')
         focal_length = request.args.get('focal-length')
         tags = request.args.get('tags')
 
@@ -162,12 +162,12 @@ def photo_diary_data():
 
     raw_queries = {
         'month': month, 'format_medium': format_medium, 'format_type': format_type, 'film': film,
-        'camera': camera, 'lenses': lenses, 'focal_length': focal_length, 'tags': tags
+        'camera': camera, 'lens': lens, 'focal_length': focal_length, 'tags': tags
     }
 
     # Parse queries: month as is, the rest into lists.  
     queries = {}
-    whitespaced_keywords = ['camera', 'film', 'lenses', 'tags']
+    whitespaced_keywords = ['camera', 'film', 'lens', 'tags']
 
     for key, val in raw_queries.items():
         if val:
@@ -197,6 +197,7 @@ def photo_diary_data():
     if len(queries) == 0:
         # For query with just 'year'.
         docs = list(collection.find({'owner': account['_id']}))
+        filtered_selectables = []
     else:
         # For other queries.
         match_stage = create_match_stage(account['_id'])
@@ -207,17 +208,19 @@ def photo_diary_data():
         filtered_query = collection.aggregate([match_stage, facet_stage, projection_stage])
         docs = list(filtered_query)[0]['intersect']
 
+        # Build dict of selectable buttons for each query.
+        # Example:
+        #   ->  year-only queries will have all buttons available.
+        #   -> '35mm' filtered will only include all unique selectable parameters for further filtering.
+        #       ->  'digital' button, if exists, will be greyed out in front-end, etc.
+        filtered_selectables = get_filtered_selectables(docs)
+
     # Get image counts for each month.
     counter = get_image_counts(docs)
 
     # Get unique values from each field for displaying in filter component buttons.
     # Uses data from images for the whole year.
     filter_selectables = list(collection.aggregate(get_selectables_pipeline(account['_id'])))
-    # For month queries, build separate dict.
-    if month:
-        filtered_selectables = get_filtered_selectables(docs)
-    else:
-        filtered_selectables = []
 
     # Build geojson collection.
     feature_collection = build_geojson_collection(docs)

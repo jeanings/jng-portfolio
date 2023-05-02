@@ -56,22 +56,33 @@ export const fetchDocs = (apiUrl: string, request: ImageDocsRequestProps) => {
             parsedRequest[parameter] = request[parameter];
         }
         else {
-            let parsedArrayToString: string = '';
             // Join all parameters in each array into one query string.
             // Whitespace converts to '_' and all values in array concatenated with '+'.
-            request[parameter].forEach((item: string | number) => {
-                let parsed: string;
-                if (typeof item === 'string') {
-                    parsed = item.replace(/\s/g, '_');
+            const paramItemsToString = (combinedString: string, currentItem: string | number) => {
+                let partialString: string = '';
+                switch(typeof currentItem) {
+                    case 'string': 
+                        // White spaces to underscores.
+                        partialString = currentItem.replace(/\s/g, '_');
+                        break;
+                    case 'number':
+                        // Stringify numbers (focal length, iso).
+                        partialString = currentItem.toString();
+                        break;
+                    default:
+                        break;
                 }
-                else {
-                    parsed = item.toString();
-                }
-                parsedArrayToString = parsedArrayToString === ''
-                    ? parsed
-                    : parsedArrayToString.concat('+', parsed);
-            });
 
+                let parsedString = combinedString + "+" + partialString;
+                if (parsedString[0] === '+') {
+                    // Strip '+' in initial iteration.
+                    parsedString = parsedString.slice(1);
+                }
+
+                return parsedString;
+            };
+            
+            let parsedArrayToString: string = request[parameter].reduce(paramItemsToString, '');
             parsedRequest[parameter] = parsedArrayToString;
         }
     }
@@ -208,21 +219,26 @@ const timelineSlice = createSlice({
     
                 // Assign list of years in the collection.
                 state.years = years;
-                
-                // For non-month queries, update counter and clear filteredSelectables.
-                if (args['month'] === undefined) {
-                    state.counter = {...counter, 'previous': state.counter.previous};
-                    state.filteredSelectables = null;
-                }
-                // Only assign filteredSelectables if year-month query.
-                else if (Object.keys(args).length === 2 
-                    && args['month'] !== undefined) {
-                    state.filteredSelectables = filteredSelectables;
-                }
-                
+
                 // Set main selectables only on single 'year' queries.
                 if (Object.keys(args).length === 1) {
                     state.filterSelectables = filterSelectables;
+                }
+                
+                // For non-month queries, update counter.
+                if (args['month'] === undefined) {
+                    state.counter = {...counter, 'previous': state.counter.previous};
+                }
+                                
+                // Assign available selectable filter parameters for all queries.
+                // Example: 
+                //  -> if 'film' queried, 'digital' and all other parameters available only to 
+                //     'digital' docs will be greyed out.  Exclusive filters.
+                if (filteredSelectables && Object.keys(filteredSelectables).length > 0) {
+                    state.filteredSelectables = filteredSelectables;
+                }
+                else {
+                    state.filteredSelectables = null;
                 }
 
                 // Sort docs by descending order.

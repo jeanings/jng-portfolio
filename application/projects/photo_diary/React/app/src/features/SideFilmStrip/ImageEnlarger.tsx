@@ -196,6 +196,7 @@ const ImageEnlarger: React.FunctionComponent <ImageEnlargerProps> = (props: Imag
         if (metadataForm.current) {
             metadataForm.current.reset();
             setMetadataEdits({});
+            setIsFormatCorrect({});
         }
     };
 

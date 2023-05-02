@@ -204,7 +204,7 @@ const SideFilmStrip: React.FunctionComponent = () => {
     --------------------------------------------------------------------- */
     let imageFrameElems: Array<JSX.Element> = [];
     
-    if (imageDocs !== null) {
+    if (imageDocs) {
         imageDocs.map((doc, index) => (
             imageFrameElems.push(
                 createImageFrames(classBase, doc, index)
@@ -233,7 +233,7 @@ const SideFilmStrip: React.FunctionComponent = () => {
     let imageSource: string = ''
     if (imageDocs) {
         imageSource = slideImageIndex !== null
-            ? imageDocs[slideImageIndex as number].url  // Use slide viewer's indexing
+            ? imageDocs[slideImageIndex as number].url    // Use slide viewer's indexing
             : enlargeDoc?.url as string;                  // Else use base index from enlarger.
     }
     
@@ -274,7 +274,6 @@ const SideFilmStrip: React.FunctionComponent = () => {
 
         // Set doc index in current slide view mode.
         if (slideImageIndex !== null && imageDocs) {
-            
             switch(button.id) {
                 case 'slide-mode-nav-previous':
                     newSlideIndex = slideImageIndex - 1;

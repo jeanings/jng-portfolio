@@ -113,9 +113,8 @@ export const requestLogout = (logoutUrl: string, request: LogoutType) => {
 /* -------------------------------
     Handles authenticating user.
 ------------------------------- */
-// State for initial render.
 const DEV_USER = {
-    '_id': '',
+    '_id': process.env.REACT_APP_OWNER_ID,
     'name': 'Dev',
     'email': 'dev@email.com',
     'profilePic': '',
