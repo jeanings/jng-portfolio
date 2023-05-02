@@ -34,11 +34,12 @@
         grid-column: 1 / 2;
         grid-row: 1;
         position: relative;
-        width: 100%;
+        width: 85%;
         display: grid;      /*                  bottom toolbar spacing buffer */ 
         grid-template-rows: calc(100% - 5.5rem) 5.5rem;
-        grid-template-columns: 90%;
+        grid-template-columns: auto;
         justify-content: flex-end;
+        justify-self: flex-end;
         pointer-events: none;
         animation-name: hide-strip-panel;
         animation-duration: 300ms;
@@ -259,8 +260,7 @@
         Disable styling related to 2-column film strip.
     ---------------------------------------------------*/
     .SideFilmStrip__image-enlarger-container.port {
-        /* grid-template-columns: 15rem calc(100% - 24rem); */
-        grid-template-columns: 90%;
+        grid-template-columns: 15rem calc(100% - 24rem);
         animation-name: none;
     }
     
