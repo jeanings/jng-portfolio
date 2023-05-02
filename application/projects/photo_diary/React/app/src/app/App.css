@@ -6,14 +6,17 @@
 .App {
     --column2to3: calc(50vw - 10.5rem - 1.5rem);
     --column3to5: calc((50vw - 1.5rem * 2) / 3);
+    --app-grid-top-row: 3.5rem;
+    --app-grid-bottom-row: 3.5rem;
+    --app-grid-row-gap: 2rem;
     grid-column: 1 / -1;
     grid-row: 1 / -1;
     min-height: 100%;
     display: grid;
     grid-template-columns: 8rem var(--column2to3) repeat(2, var(--column3to5)) auto;
-    grid-template-rows: 3.5rem auto 3.5rem;
+    grid-template-rows: var(--app-grid-top-row) auto var(--app-grid-bottom-row);
     column-gap: 1.5rem;
-    row-gap: 2rem;
+    row-gap: var(--app-grid-row-gap);
     background-color: var(--colour-background);
     color: var(--colour-text-inactive);
     overflow: hidden;
