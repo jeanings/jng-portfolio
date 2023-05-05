@@ -34,11 +34,12 @@
         grid-column: 1 / 2;
         grid-row: 1;
         position: relative;
-        width: 100%;
+        width: 85%;
         display: grid;      /*                  bottom toolbar spacing buffer */ 
         grid-template-rows: calc(100% - 5.5rem) 5.5rem;
-        grid-template-columns: 15rem calc(70% - 16rem);
+        grid-template-columns: auto;
         justify-content: flex-end;
+        justify-self: flex-end;
         pointer-events: none;
         animation-name: hide-strip-panel;
         animation-duration: 300ms;
