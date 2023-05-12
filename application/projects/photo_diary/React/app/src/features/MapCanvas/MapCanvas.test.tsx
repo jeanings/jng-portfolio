@@ -7,11 +7,12 @@ import {
     render, 
     screen, 
     waitFor } from '@testing-library/react';
+import '@testing-library/jest-dom';
+import { MemoryRouter } from 'react-router-dom';
 import userEvent from '@testing-library/user-event';
 import axios from 'axios';
 import MockAdapter from 'axios-mock-adapter';
 import { apiUrl } from '../../app/App';
-import '@testing-library/jest-dom';
 import mockDefaultData from '../../utils/mockDefaultData.json';
 import mock2015Data from '../../utils/mock2015Data.json';
 import preloadedState from '../../utils/testHelpers';
@@ -70,8 +71,10 @@ function renderBoilerplate(preloadedState?: RootState) {
     const newStore = setupStore(preloadedState);
     const container = render(
         <Provider store={newStore}>
-            <TimelineBar />
-            <MapCanvas />
+            <MemoryRouter>
+                <TimelineBar />
+                <MapCanvas />
+            </MemoryRouter>
         </Provider>
     );
     return { ...container, newStore };

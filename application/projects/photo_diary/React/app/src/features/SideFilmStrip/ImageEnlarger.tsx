@@ -6,8 +6,7 @@ import {
     useAppDispatch, 
     useAppSelector, 
     useMediaQueries,
-    useDebounceCallback,
-    useThrottleCallback } from '../../common/hooks';
+    useDebounceCallback } from '../../common/hooks';
 import { handleToolbarButtons, ToolbarProps } from '../Toolbar/toolbarSlice';
 import { handleMarkerLocator } from '../MapCanvas/mapCanvasSlice';
 import { 

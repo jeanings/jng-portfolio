@@ -7,11 +7,12 @@ import {
     render, 
     screen, 
     waitFor } from '@testing-library/react';
+import '@testing-library/jest-dom';
+import { MemoryRouter } from 'react-router-dom';
 import userEvent from '@testing-library/user-event';
 import axios from 'axios';
 import MockAdapter from 'axios-mock-adapter';
 import { updateUrl } from '../../app/App';
-import '@testing-library/jest-dom';
 import { 
     preloadedState, 
     preloadedStateEditor,
@@ -71,7 +72,9 @@ function renderBoilerplate(preloadedState: RootState) {
     const newStore = setupStore(preloadedState);
     const container = render(
         <Provider store={newStore}>
-            <SideFilmStrip />
+            <MemoryRouter>
+                <SideFilmStrip />
+            </MemoryRouter>
         </Provider>
     );
     return { ...container, newStore };

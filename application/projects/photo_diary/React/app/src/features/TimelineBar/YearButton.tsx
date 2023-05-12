@@ -1,41 +1,19 @@
 import React from 'react';
-import { 
-    useAppDispatch, 
-    useAppSelector, 
-    useMediaQueries } from '../../common/hooks';
-import { 
-    handleYearSelect, 
-    fetchImagesData,
-    ImageDocsRequestProps } from './timelineSlice';
+import { useAppSelector, useMediaQueries } from '../../common/hooks';
+import { Link } from 'react-router-dom';
+import { routePrefixYear } from './TimelineBar';
 import './YearButton.css';
 
 
 /* =============================================================================
-    Button constructor for dropdown menu of year items.  Clicks will dispatch 
-    fetch request to async thunk, getting new image data for the clicked year. 
+    Button constructor for dropdown menu of year items.  Clicks will navigate 
+    to corresponding year route, fetching request to async thunk and
+    getting new image data for the clicked year. 
 ============================================================================= */
 const YearButton: React.FunctionComponent<YearButtonProps> = (props: YearButtonProps) => {
-    const dispatch = useAppDispatch();
     const selectedYear = useAppSelector(state => state.timeline.selected.year);
-
-    /* -------------------------------------------------------------------------
-        Clicks on year selector items will update << timeline.selected.year >>
-        and fetch data for clicked year. 
-    ------------------------------------------------------------------------- */
-    const onYearSelect = (event: React.SyntheticEvent) => {
-        const payloadYearSelected: number = parseInt(props.year);
-
-        // Update selected year.
-        dispatch(handleYearSelect(payloadYearSelected));
-
-        // Dispatch fetch request for newly selected year.
-        let payloadFetchYear: ImageDocsRequestProps = { 
-            'year': payloadYearSelected
-        };
-        dispatch(fetchImagesData(payloadFetchYear));
-    };
+    const routePrefix = routePrefixYear;
     
-
     return (
         <li 
             className={ useMediaQueries(`${props.baseClassName}__${props.className}`) 
@@ -43,20 +21,27 @@ const YearButton: React.FunctionComponent<YearButtonProps> = (props: YearButtonP
                 (selectedYear === parseInt(props.year)
                     ? " " + "active"
                     : "" ) }
-            id={ `${props.className}-${props.year}` }
-            role="menuitemradio" 
-            aria-label={ "year selector option" }
-            aria-checked={
-                selectedYear === parseInt(props.year)
-                    ? "true"
-                    : "false" }
-            onClick={ onYearSelect }>
+            id={ `${props.className}-${props.year}` }>
+            
+                <Link 
+                    to={ `${routePrefix}/${props.year}` }
+                    className={ useMediaQueries(`${props.baseClassName}__${props.className}__link`) 
+                        +   // Add "active" styling if selected.
+                        (selectedYear === parseInt(props.year)
+                            ? " " + "active"
+                            : "" ) }
+                    role="menuitemradio" 
+                    aria-label={ "year selector option" }
+                    aria-checked={ selectedYear === parseInt(props.year) 
+                        ? "true" 
+                        : "false" }>
 
-                {/* Year text. */
-                    props.year }
+                    { props.year }
+
+                </Link>
         </li>
     );
-}
+};
 
 
 /* =====================================================================

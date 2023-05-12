@@ -8,10 +8,11 @@ import {
     render, 
     screen, 
     waitFor } from '@testing-library/react';
+import '@testing-library/jest-dom';
+import { MemoryRouter } from 'react-router-dom';
 import userEvent from '@testing-library/user-event';
 import axios from 'axios';
 import MockAdapter from 'axios-mock-adapter';
-import '@testing-library/jest-dom';
 import mockDefaultData from '../../utils/mockDefaultData.json';
 import preloadedState from '../../utils/testHelpers';
 import { handleYearSelect, handleMonthSelect } from '../TimelineBar/timelineSlice';
@@ -67,7 +68,9 @@ function renderBoilerplate(preloadedState: RootState) {
     const newStore = setupStore(preloadedState);
     const container = render(
         <Provider store={newStore}>
-            <SideFilmStrip />
+            <MemoryRouter>
+                <SideFilmStrip />
+            </MemoryRouter>
         </Provider>
     );
     return { ...container, newStore };
@@ -390,7 +393,6 @@ test("closes image enlarger on year or month selection", async() => {
     await user.click(thumbnailToClick);
 
     // Verify enlarger opened.
-
     await waitFor(() => {
         expect(imageEnlargerElem).toHaveAttribute("aria-expanded", 'true');
         expect(imageEnlargerElem).toHaveClass("show");

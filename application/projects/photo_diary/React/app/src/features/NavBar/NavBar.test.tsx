@@ -6,8 +6,9 @@ import {
     render, 
     screen, 
     waitFor } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
 import '@testing-library/jest-dom';
+import { BrowserRouter } from 'react-router-dom';
+import userEvent from '@testing-library/user-event';
 import NavBar from './NavBar';
 
 var user = userEvent.setup();
@@ -24,7 +25,9 @@ function renderBoilerplate(preloadedState?: RootState) {
     const newStore = setupStore(preloadedState);
     const container = render(
         <Provider store={newStore}>
-            <NavBar />
+            <BrowserRouter>
+                <NavBar />
+            </BrowserRouter>
         </Provider>
     );
     return { ...container, newStore };

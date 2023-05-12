@@ -5,8 +5,12 @@ import {
     useAppDispatch, 
     useAppSelector, 
     useMediaQueries } from '../../common/hooks';
+import {
+    Route, 
+    Routes } from 'react-router-dom';
 import { fetchImagesData, ImageDocsRequestProps } from '../../features/TimelineBar/timelineSlice';
 import YearButton from './YearButton';
+import YearRoute from './YearRoute';
 import MonthButton from './MonthButton';
 import './TimelineBar.css';
 
@@ -20,7 +24,7 @@ const TimelineBar: React.FunctionComponent = () => {
     const [ isYearSelectorHovered, setYearSelectorHovered ] = useState(false);
     const initYear = useAppSelector(state => state.timeline.initYear);
     const collectionYears = useAppSelector(state => state.timeline.years);
-    const selectedYear = useAppSelector(state => state.timeline.selected.year);
+    const selected = useAppSelector(state => state.timeline.selected);
     const classBase: string = "TimelineBar";
 
     /* ------------------------------------------
@@ -46,8 +50,18 @@ const TimelineBar: React.FunctionComponent = () => {
         [...selectableYears].reverse().map((year, index) => (
             yearElems.push(createYearButton(year, index, classBase))
         ));
-    }
-
+    } 
+    
+    // Build routes for each year element.
+    const yearElemRoutes = yearElems.map((elem: JSX.Element, index: number) => {
+        return (
+            <Route
+                path={ `${routePrefixYear}/${elem.props.year}` }
+                element={ <YearRoute year={ elem.props.year } baseClassName={''} className={''} /> }
+                key={`key-routed-years_${index}`}
+            />
+        );
+    });
     
     // Build month items.
     const months: Array<string> = [
@@ -74,43 +88,51 @@ const TimelineBar: React.FunctionComponent = () => {
 
 
     return (
-        <div 
-            className={ useMediaQueries(classBase) }
-            role="menu"
-            aria-label="timeline selector">
-            
+        <>
             <div 
-                className={ useMediaQueries(`${classBase}__year-selector`) 
-                    +   // Add "dropdown" styling on hover
-                    (isYearSelectorHovered === false
-                        ? ""
-                        : " " + "dropdown")}
-                role="menubar"
-                aria-label="year selector"
-                onMouseEnter={ onYearSelectorHover }
-                onMouseLeave={ onYearSelectorHover }>
-
+                className={ useMediaQueries(classBase) }
+                role="menu"
+                aria-label="timeline selector">
+                
                 <div 
-                    className={ useMediaQueries(`${classBase}__year-selected`) }
-                    role="menuitem"
-                    aria-label="selected year">
-                    
-                    { selectedYear }
+                    className={ useMediaQueries(`${classBase}__year-selector`) 
+                        +   // Add "dropdown" styling on hover
+                        (isYearSelectorHovered === false
+                            ? ""
+                            : " " + "dropdown")}
+                    role="menubar"
+                    aria-label="year selector"
+                    onMouseEnter={ onYearSelectorHover }
+                    onMouseLeave={ onYearSelectorHover }>
+
+                    <div 
+                        className={ useMediaQueries(`${classBase}__year-selected`) }
+                        role="menuitem"
+                        aria-label="selected year">
+                        
+                        { selected.year }
+                    </div>
+
+                    {/* Dropdown menu of selectable years based on db collections. */}
+                    { yearElems }
+
+                    {/* Nested routes for each available year in dataset. */}
+                    { <Routes>
+                        { yearElemRoutes }
+                    </Routes> }
                 </div>
 
-                {/* Dropdown menu of selectable years based on db collections. */
-                    yearElems }
+                <div
+                    className={ useMediaQueries(`${classBase}__month-selector`) }
+                    role="menubar"
+                    aria-label="month selector">
+                    
+                    {/* Months selection labels: JAN, FEB, etc. */ }
+                    { monthElems }
+                </div>
             </div>
-
-            <div
-                className={ useMediaQueries(`${classBase}__month-selector`) }
-                role="menubar"
-                aria-label="month selector">
-                
-                {/* Months selection labels: JAN, FEB, etc. */
-                    monthElems }
-            </div>
-        </div>
+        </>
+        
     );
 }
 
@@ -133,9 +155,9 @@ function createYearButton(year: string, index: number, classBase: string) {
             key={ `key-year_${index.toString()}` }
         />
     );
-
+    
     return yearButton;
-};
+}
 
 
 /* -----------------------------------------------
@@ -155,7 +177,9 @@ function createMonthButton(month: string, index: number, classBase: string) {
     );
 
     return monthButton;
-};
+}
+
+export const routePrefixYear: string = 'reflect-on';
 
 
 export default TimelineBar;
