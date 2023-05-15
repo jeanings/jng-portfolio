@@ -223,7 +223,7 @@ describe("clicks on dropdown year selector elements", () => {
     });
 
 
-    test.only("re-routes, dispatches action, changes state of selected year and gets new data", async() => {
+    test("re-routes, dispatches action, changes state of selected year and gets new data", async() => {
         const { newStore } = renderBoilerplate();
 
         // Wait for initial fetch to render year selector items.

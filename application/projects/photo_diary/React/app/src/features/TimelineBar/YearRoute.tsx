@@ -31,7 +31,7 @@ const YearRoute: React.FunctionComponent<YearButtonProps> = (props: YearButtonPr
             };
             dispatch(fetchImagesData(payloadFetchYear));
         }
-    }, [ selected, props.year ]);
+    }, [selected, props.year]);
     
     return (
         // Not rendering anything, just dispatching action.

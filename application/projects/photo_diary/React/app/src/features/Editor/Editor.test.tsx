@@ -92,8 +92,8 @@ test("shows edit form, input if user is editor and owner of doc", async() => {
     expect(mockUser?._id).toEqual(docOwner);
     
     // Enlarge an image.
-    await waitFor(() => screen.findAllByRole('img', { name: 'thumbnail image container' }));
-    const imageFrameElems = screen.getAllByRole('img', { name: 'thumbnail image container' });
+    await waitFor(() => screen.findAllByRole('img', { name: 'thumbnail image' }));
+    const imageFrameElems = screen.getAllByRole('img', { name: 'thumbnail image' });
     const imageToClick = imageFrameElems[0];
     await user.click(imageToClick);
 
@@ -119,8 +119,8 @@ test("shows edit UI buttons if user is editor and owner of doc", async() => {
     expect(mockUser?._id).toEqual(docOwner);
     
     // Enlarge an image.
-    await waitFor(() => screen.findAllByRole('img', { name: 'thumbnail image container' }));
-    const imageFrameElems = screen.getAllByRole('img', { name: 'thumbnail image container' });
+    await waitFor(() => screen.findAllByRole('img', { name: 'thumbnail image' }));
+    const imageFrameElems = screen.getAllByRole('img', { name: 'thumbnail image' });
     const imageToClick = imageFrameElems[0];
     await user.click(imageToClick);
 
@@ -150,8 +150,8 @@ test("does not show edit form if user is editor but not owner of doc", async() =
     expect(mockUser?._id).not.toEqual(docOwner);
     
     // Enlarge an image.
-    await waitFor(() => screen.findAllByRole('img', { name: 'thumbnail image container' }));
-    const imageFrameElems = screen.getAllByRole('img', { name: 'thumbnail image container' });
+    await waitFor(() => screen.findAllByRole('img', { name: 'thumbnail image' }));
+    const imageFrameElems = screen.getAllByRole('img', { name: 'thumbnail image' });
     const imageToClick = imageFrameElems[0];
     await user.click(imageToClick);
 
@@ -169,8 +169,8 @@ test("does not show edit form if user is not editor", async() => {
     expect(newStore.getState().login.role).toEqual('viewer');
     
     // Enlarge an image.
-    await waitFor(() => screen.findAllByRole('img', { name: 'thumbnail image container' }));
-    const imageFrameElems = screen.getAllByRole('img', { name: 'thumbnail image container' });
+    await waitFor(() => screen.findAllByRole('img', { name: 'thumbnail image' }));
+    const imageFrameElems = screen.getAllByRole('img', { name: 'thumbnail image' });
     const imageToClick = imageFrameElems[0];
     await user.click(imageToClick);
 
@@ -188,8 +188,8 @@ test("does not show edit UI buttons if user is viewer", async() => {
     expect(newStore.getState().login.role).toEqual('viewer');
     
     // Enlarge an image.
-    await waitFor(() => screen.findAllByRole('img', { name: 'thumbnail image container' }));
-    const imageFrameElems = screen.getAllByRole('img', { name: 'thumbnail image container' });
+    await waitFor(() => screen.findAllByRole('img', { name: 'thumbnail image' }));
+    const imageFrameElems = screen.getAllByRole('img', { name: 'thumbnail image' });
     const imageToClick = imageFrameElems[0];
     await user.click(imageToClick);
 
@@ -212,8 +212,8 @@ test("enables submit button on input existence", async() => {
     expect(mockUser?._id).toEqual(docOwner);
     
     // Enlarge an image.
-    await waitFor(() => screen.findAllByRole('img', { name: 'thumbnail image container' }));
-    const imageFrameElems = screen.getAllByRole('img', { name: 'thumbnail image container' });
+    await waitFor(() => screen.findAllByRole('img', { name: 'thumbnail image' }));
+    const imageFrameElems = screen.getAllByRole('img', { name: 'thumbnail image' });
     const imageToClick = imageFrameElems[0];
     await user.click(imageToClick);
 
@@ -249,8 +249,8 @@ test("enables clear edits button on input existence", async() => {
     expect(mockUser?._id).toEqual(docOwner);
     
     // Enlarge an image.
-    await waitFor(() => screen.findAllByRole('img', { name: 'thumbnail image container' }));
-    const imageFrameElems = screen.getAllByRole('img', { name: 'thumbnail image container' });
+    await waitFor(() => screen.findAllByRole('img', { name: 'thumbnail image' }));
+    const imageFrameElems = screen.getAllByRole('img', { name: 'thumbnail image' });
     const imageToClick = imageFrameElems[0];
     await user.click(imageToClick);
 
@@ -302,8 +302,8 @@ test("dispatches action on form submission", async() => {
     expect(mockUser?._id).toEqual(docOwner);
     
     // Enlarge an image.
-    await waitFor(() => screen.findAllByRole('img', { name: 'thumbnail image container' }));
-    const imageFrameElems = screen.getAllByRole('img', { name: 'thumbnail image container' });
+    await waitFor(() => screen.findAllByRole('img', { name: 'thumbnail image' }));
+    const imageFrameElems = screen.getAllByRole('img', { name: 'thumbnail image' });
     const imageToClick = imageFrameElems[0];
     await user.click(imageToClick);
 
@@ -341,8 +341,8 @@ test("clears inputs on changing enlarged image", async() => {
     expect(mockUser?._id).toEqual(docOwner);
     
     // Enlarge an image.
-    await waitFor(() => screen.findAllByRole('img', { name: 'thumbnail image container' }));
-    const imageFrameElems = screen.getAllByRole('img', { name: 'thumbnail image container' });
+    await waitFor(() => screen.findAllByRole('img', { name: 'thumbnail image' }));
+    const imageFrameElems = screen.getAllByRole('img', { name: 'thumbnail image' });
     const imageToClick = imageFrameElems[0];
     await user.click(imageToClick);
 
@@ -376,7 +376,7 @@ describe("on input blur, input formatting gets checked", () => {
         const docOwner = newStore.getState().timeline.imageDocs![0].owner;
         expect(mockUser?._id).toEqual(docOwner);
 
-        const imageToClick = screen.getAllByRole('img', { name: 'thumbnail image container'})[0];
+        const imageToClick = screen.getAllByRole('img', { name: 'thumbnail image'})[0];
         return { imageToClick };
     };
 
@@ -636,7 +636,7 @@ describe("shows save status indicators on form submission", () => {
         const docOwner = newStore.getState().timeline.imageDocs![0].owner;
         expect(mockUser?._id).toEqual(docOwner);
 
-        const imageToClick = screen.getAllByRole('img', { name: 'thumbnail image container'})[0];
+        const imageToClick = screen.getAllByRole('img', { name: 'thumbnail image'})[0];
         return { imageToClick };
     };
 

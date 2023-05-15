@@ -1,7 +1,7 @@
 import React from 'react';
 import { useAppSelector, useMediaQueries } from '../../common/hooks';
 import { Link } from 'react-router-dom';
-import { routePrefixYear } from './TimelineBar';
+import { routePrefixForYears } from './TimelineBar';
 import './YearButton.css';
 
 
@@ -12,7 +12,7 @@ import './YearButton.css';
 ============================================================================= */
 const YearButton: React.FunctionComponent<YearButtonProps> = (props: YearButtonProps) => {
     const selectedYear = useAppSelector(state => state.timeline.selected.year);
-    const routePrefix = routePrefixYear;
+    const routePrefix = routePrefixForYears;
     
     return (
         <li 

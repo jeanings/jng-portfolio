@@ -1,11 +1,12 @@
 import React from 'react';
 import { 
-    useAppDispatch, 
     useAppSelector, 
-    useMediaQueries,
-    useThrottleCallback } from '../../common/hooks';
+    useAppDispatch,
+    useMediaQueries } from '../../common/hooks';
+import { Link } from 'react-router-dom';
 import { ImageDocTypes } from '../TimelineBar/timelineSlice';
-import { handleEnlarger, SideFilmStripProps } from './sideFilmStripSlice';
+import { routePrefixForThumbs } from './SideFilmStrip';
+import { handleMarkerLocator } from '../MapCanvas/mapCanvasSlice';
 import { handleToolbarButtons, ToolbarProps } from '../Toolbar/toolbarSlice';
 import './ImageFrame.css';
 
@@ -14,35 +15,27 @@ import './ImageFrame.css';
     Constructor for rendering images in << timeline.imageDocs >>
     state, sets them in container for styling.
 =============================================================== */
-const ImageFrame: React.FunctionComponent <ImageFrameProps> = (props: ImageFrameProps) => {
+const ImageFrame: React.FunctionComponent<ImageFrameProps> = (props: ImageFrameProps) => {
     const dispatch = useAppDispatch();
     const enlargeDoc = useAppSelector(state => state.sideFilmStrip.enlargeDoc);
     const toolbarImageEnlarger = useAppSelector(state => state.toolbar.imageEnlarger);
     const classBase: string = "ImageFrame";   
 
-    /* ---------------------------------------------------------------
-        Clicks on image dispatches action to change << enlargeDoc >>
-        state, so an enlarged version with stats will be shown 
-        in a panel to the left of film strip.
-    --------------------------------------------------------------- */
-    const onImageClick = (event: React.SyntheticEvent) => {
-        if (props.imageDoc !== enlargeDoc) {
-            const payloadImageDoc: SideFilmStripProps = {
-                'enlargeDoc': props.imageDoc,
-                'docIndex': props.docIndex
-            };
-            dispatch(handleEnlarger(payloadImageDoc));
-        }
-        else if (props.imageDoc === enlargeDoc) {
-            // Show image enlarger if same image clicked.
+    /* ------------------------------------------------------------------------
+        Handles same-image clicks, separate from image thumb route redirects.
+    ------------------------------------------------------------------------ */
+    const onImageClick = (event: React.SyntheticEvent) => {     
+        if (toolbarImageEnlarger !== 'on'
+            && props.imageDoc._id === enlargeDoc?._id) {
+            // Show image enlarger (if closed) if same image clicked.
             const payloadToolbarButtons: ToolbarProps = {
                 'filter': 'off',
                 'imageEnlarger': 'on'
             };
-            
-            if (toolbarImageEnlarger !== 'on') {
-                dispatch(handleToolbarButtons(payloadToolbarButtons));
-            }
+            dispatch(handleToolbarButtons(payloadToolbarButtons));
+
+            // Zoom map to marker.
+            dispatch(handleMarkerLocator('clicked'));
         }
     };
 
@@ -50,22 +43,25 @@ const ImageFrame: React.FunctionComponent <ImageFrameProps> = (props: ImageFrame
     return (
         <div 
             className={ useMediaQueries(classBase) }
-            id={ props.imageDoc._id }
             role="img"
             aria-label="thumbnail image container"
             onClick={ onImageClick }>
 
-            <img 
-                className={ useMediaQueries(`${classBase}__image`) 
-                    +   // Add class styling to indicate selected state
-                    (enlargeDoc?._id === props.imageDoc._id
-                        ? " " + "selected"
-                        : "") }
-                src={ props.imageDoc.url_thumb }
-                aria-label="thumbnail image"
-                draggable="false"
-            />
-            
+            {/* Redirect to image routes, where all the state logic resides. */}
+            <Link to={ `${props.routeExisting}/${routePrefixForThumbs}/${props.imageDoc._id}` }>
+                <img 
+                    className={ useMediaQueries(`${classBase}__image`) 
+                        +   // Add class styling to indicate selected state
+                        (enlargeDoc?._id === props.imageDoc._id
+                            ? " " + "selected"
+                            : "") }
+                    id={ props.imageDoc._id }
+                    src={ props.imageDoc.url_thumb }
+                    aria-label="thumbnail image"
+                    draggable="false"
+                />
+            </Link>
+           
         </div>
     );
 };
@@ -78,7 +74,8 @@ export interface ImageFrameProps {
     [index: string]: string | ImageDocTypes | number
     'baseClassName': string,
     'imageDoc': ImageDocTypes,
-    'docIndex': number
+    'docIndex': number,
+    'routeExisting': string
 };
 
 

@@ -24,7 +24,7 @@ const FilterDrawer: React.FunctionComponent = () => {
     const dispatch = useAppDispatch();
     const filterState = useAppSelector(state => state.filter);
     const filterables = useAppSelector(state => state.timeline.filterSelectables);
-    const selectedTimeline = useAppSelector(state => state.timeline.selected);
+    const timeline = useAppSelector(state => state.timeline.selected);
     const toolbarFilterSwitch = useAppSelector(state => state.toolbar.filter);
     const classBase: string = "FilterDrawer";
     const classNames: ClassNameTypes = {
@@ -38,10 +38,10 @@ const FilterDrawer: React.FunctionComponent = () => {
         Clear all filters on selected timeline changes. 
     ------------------------------------------------- */
     useEffect(() => {
-        if (selectedTimeline.year) {
+        if (timeline.year) {
             dispatch(clearFilters("RESET TO INIT STATE"));
         }
-    }, [selectedTimeline]);
+    }, [timeline]);
 
 
     // Prep fetched data for the filter groups.
@@ -78,11 +78,11 @@ const FilterDrawer: React.FunctionComponent = () => {
 
         // "Return" to unfiltered data state by fetching for selected timeline.
         const payloadFetchBaseTimeline: ImageDocsRequestProps = {
-            'year': selectedTimeline.year as number
+            'year': timeline.year as number
         };
 
-        if (selectedTimeline.month !== 'all') {
-            payloadFetchBaseTimeline['month'] = getNumericalMonth(selectedTimeline.month as TimelineMonthTypes);
+        if (timeline.month !== 'all') {
+            payloadFetchBaseTimeline['month'] = getNumericalMonth(timeline.month as TimelineMonthTypes);
         }
 
         dispatch(fetchImagesData(payloadFetchBaseTimeline));

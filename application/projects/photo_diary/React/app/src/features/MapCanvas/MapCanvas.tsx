@@ -31,6 +31,7 @@ const MapboxglSpiderfier: any = require('mapboxgl-spiderifier');
 ================================================================ */
 const MapCanvas: React.FunctionComponent = () => {
     const dispatch = useAppDispatch();
+    const windowSize = useWindowSize();
     const geojson = useAppSelector(state => state.timeline.geojson);
     const bounds = useAppSelector(state => state.timeline.bounds);
     const styleLoaded = useAppSelector(state => state.mapCanvas.styleLoaded);
@@ -41,7 +42,6 @@ const MapCanvas: React.FunctionComponent = () => {
     const enlargeDoc = useAppSelector(state => state.sideFilmStrip.enlargeDoc);
     const toolbarImageEnlarger = useAppSelector(state => state.toolbar.imageEnlarger);
     const markerLocator = useAppSelector(state => state.mapCanvas.markerLocator);
-    const windowSize = useWindowSize();
     const classBase: string = "MapCanvas";
     // Mapbox variables.
     const MAPBOX_ACCESS_TOKEN = process.env.REACT_APP_MAPBOX;
@@ -102,7 +102,9 @@ const MapCanvas: React.FunctionComponent = () => {
     -------------------------------------------------------------------- */
     useEffect(() => {
         // Add or refresh marker source.
-        if (bounds && map.current && styleLoaded) {
+        if (bounds 
+            && map.current 
+            && styleLoaded) {
             // Reset spiderfy ref.
             if (spiderfier.current) {
                 spiderfier.current.unspiderfy();
@@ -168,9 +170,9 @@ const MapCanvas: React.FunctionComponent = () => {
     ------------------------------------------------- */
     useEffect(() => {
         if (sourceStatus === 'loaded'
-            && fitBoundsButton === 'clicked'
             && bounds
-            && map.current) {
+            && map.current
+            && fitBoundsButton === 'clicked') {
             
             // Adjust and zoom map to fit all markers. 
             map.current.fitBounds(
@@ -196,9 +198,9 @@ const MapCanvas: React.FunctionComponent = () => {
     ------------------------------------------------ */
     useEffect(() => {
         if (sourceStatus === 'loaded'
-            && markerLocator === 'clicked'
+            && map.current
             && enlargeDoc
-            && map.current) {
+            && markerLocator === 'clicked') {
             // Fly map to marker with offset to the left for image enlarger.
             const markerCoords: Array<number> = [
                 enlargeDoc.gps.lng, enlargeDoc.gps.lat
@@ -232,7 +234,7 @@ const MapCanvas: React.FunctionComponent = () => {
             // Reset button state.
             dispatch(handleMarkerLocator('idle'));
         }
-    }, [markerLocator])
+    }, [markerLocator, sourceStatus])
 
     
     /* -------------------------------------------

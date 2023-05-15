@@ -5,9 +5,7 @@ import {
     useAppDispatch, 
     useAppSelector, 
     useMediaQueries } from '../../common/hooks';
-import {
-    Route, 
-    Routes } from 'react-router-dom';
+import { Route, Routes } from 'react-router-dom';
 import { fetchImagesData, ImageDocsRequestProps } from '../../features/TimelineBar/timelineSlice';
 import YearButton from './YearButton';
 import YearRoute from './YearRoute';
@@ -24,7 +22,7 @@ const TimelineBar: React.FunctionComponent = () => {
     const [ isYearSelectorHovered, setYearSelectorHovered ] = useState(false);
     const initYear = useAppSelector(state => state.timeline.initYear);
     const collectionYears = useAppSelector(state => state.timeline.years);
-    const selected = useAppSelector(state => state.timeline.selected);
+    const timeline = useAppSelector(state => state.timeline.selected);
     const classBase: string = "TimelineBar";
 
     /* ------------------------------------------
@@ -40,30 +38,41 @@ const TimelineBar: React.FunctionComponent = () => {
         }
     }, []);
 
-
-    // Build list of selectable years, based on collections in db.
+    /* --------------------------------------------------------------
+        Build list of selectable years, based on collections in db.
+    -------------------------------------------------------------- */
     let selectableYears: Array<string> = [];
     let yearElems: Array<JSX.Element> = [];
     selectableYears = collectionYears as Array<string>;
 
     if (selectableYears) {
-        [...selectableYears].reverse().map((year, index) => (
-            yearElems.push(createYearButton(year, index, classBase))
-        ));
+        yearElems = [...selectableYears].reverse().map((year, index) => 
+            createYearButton(year, index, classBase)
+        );
     } 
     
-    // Build routes for each year element.
+    /* --------------------------------------------
+        Build routes for each year element above.
+    -------------------------------------------- */
     const yearElemRoutes = yearElems.map((elem: JSX.Element, index: number) => {
         return (
             <Route
-                path={ `${routePrefixYear}/${elem.props.year}` }
-                element={ <YearRoute year={ elem.props.year } baseClassName={''} className={''} /> }
-                key={`key-routed-years_${index}`}
+                path={ `${routePrefixForYears}/${elem.props.year}` }
+                element={ 
+                    <YearRoute 
+                        year={ elem.props.year } 
+                        baseClassName={''} 
+                        className={''} 
+                    /> 
+                }
+                key={ `key-routed-years_${index}` }
             />
         );
     });
     
-    // Build month items.
+    /* --------------------------------------
+        Build month elements for filtering.
+    -------------------------------------- */
     const months: Array<string> = [
         'all',
         'jan', 'feb', 'mar', 'apr',
@@ -110,7 +119,7 @@ const TimelineBar: React.FunctionComponent = () => {
                         role="menuitem"
                         aria-label="selected year">
                         
-                        { selected.year }
+                        { timeline.year }
                     </div>
 
                     {/* Dropdown menu of selectable years based on db collections. */}
@@ -179,7 +188,7 @@ function createMonthButton(month: string, index: number, classBase: string) {
     return monthButton;
 }
 
-export const routePrefixYear: string = 'reflect-on';
+export const routePrefixForYears: string = 'reflect-on';
 
 
 export default TimelineBar;

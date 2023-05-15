@@ -8,14 +8,17 @@ import {
     useMediaQueries,
     useDebounceCallback,
     useThrottleCallback } from '../../common/hooks';
-import { ImageDocTypes } from '../TimelineBar/timelineSlice';
 import { 
-    handleEnlarger, 
-    handleSlideView, 
-    SideFilmStripProps } from './sideFilmStripSlice';
+    Route, 
+    Routes,
+    useNavigate } from 'react-router-dom';
+import { routePrefixForYears } from '../TimelineBar/TimelineBar';
+import { ImageDocTypes } from '../TimelineBar/timelineSlice';
+import { handleSlideView, SideFilmStripProps } from './sideFilmStripSlice';
 import { handleToolbarButtons, ToolbarProps } from '../Toolbar/toolbarSlice';
 import ImageFrame from './ImageFrame';
 import ImageEnlarger, { getBorderSVG } from './ImageEnlarger';
+import ImageThumbRoute from './ImageThumbRoute';
 import './SideFilmStrip.css';
 
 
@@ -26,6 +29,7 @@ import './SideFilmStrip.css';
 ======================================================================= */
 const SideFilmStrip: React.FunctionComponent = () => {
     const dispatch = useAppDispatch();
+    const navigate = useNavigate();
     const [ filmStripHovered, setFilmStripHovered ] = useState(false);
     const [ slideImageIndex, setSlideImageIndex ] = useState<number | null>(null);
     const [ isImageViewableInFilmStrip, setIsImageViewableInFilmStrip ] = useState(true);
@@ -35,8 +39,12 @@ const SideFilmStrip: React.FunctionComponent = () => {
     const docIndex = useAppSelector(state => state.sideFilmStrip.docIndex);
     const slideView = useAppSelector(state => state.sideFilmStrip.slideView);
     const imageEnlarger = useAppSelector(state => state.toolbar.imageEnlarger);
+    const timeline = useAppSelector(state => state.timeline.selected);
     const filmStripRef = useRef<HTMLDivElement>(null);
     const filmStripObserverRef = useRef<IntersectionObserver | null>(null);
+    const routeExisting: string = window.location.pathname.includes(routePrefixForYears)
+        ? routePrefixForYears + '/' + timeline.year
+        : '';
     const classBase: string = "SideFilmStrip";
 
 
@@ -64,22 +72,14 @@ const SideFilmStrip: React.FunctionComponent = () => {
     ------------------------------------------------------- */
     useEffect(() => {
         if (imageDocs) {
-            // On slide view exit, change enlarger image 
-            // and reset local slide image index.
+            // On slide view exit, change enlarger image and reset local slide image index.
             if (slideView === 'off') {
-                const payloadEnlarger: SideFilmStripProps = {
-                    'enlargeDoc': imageDocs![slideImageIndex as number],    // Triggers image change.
-                    'docIndex': slideImageIndex as number
-                };
-                dispatch(handleEnlarger(payloadEnlarger));
-
-                if (imageEnlarger === 'hidden') {
-                    const payloadToolbar: ToolbarProps = {
-                        'imageEnlarger': 'on'
-                    };
-                    dispatch(handleToolbarButtons(payloadToolbar));
-                }
+                const newDocId: string = imageDocs[slideImageIndex as number]._id;
+                const newRoute: string = `${routeExisting}/${routePrefixForThumbs}/${newDocId}`;
+                console.log(newRoute)
+                // Redirect to image thumb's route, triggering actions.
                 setSlideImageIndex(null);
+                navigate(newRoute);
             }
             // On slide view open, set local slide image index.
             else if (slideView === 'on') {
@@ -150,7 +150,7 @@ const SideFilmStrip: React.FunctionComponent = () => {
         // Clean up after consuming.
         return () => {
             document.removeEventListener('keydown', onKeyPress);
-        } 
+        };
     });
 
 
@@ -202,15 +202,32 @@ const SideFilmStrip: React.FunctionComponent = () => {
     /* ---------------------------------------------------------------------
         Generate thumbnail image frame elements for array of MongoDB docs.
     --------------------------------------------------------------------- */
-    let imageFrameElems: Array<JSX.Element> = [];
-    
+    let imageFrameElems: Array<JSX.Element> = [];    
     if (imageDocs) {
-        imageDocs.map((doc, index) => (
-            imageFrameElems.push(
-                createImageFrames(classBase, doc, index)
-            )
-        ));
+        imageFrameElems = imageDocs.map((doc, index) => 
+            createImageFrames(classBase, doc, routeExisting, index)
+        );
     }
+
+    /* ---------------------------------------------------
+        Build routes for all image frame elements above.
+    --------------------------------------------------- */  
+    const imageThumbElemRoutes = imageFrameElems.map((elem: JSX.Element) => {
+        return (
+            <Route
+                path={ `${routeExisting}/${routePrefixForThumbs}/${elem.props.imageDoc._id}` }
+                element={
+                    <ImageThumbRoute 
+                        imageDoc={ elem.props.imageDoc } 
+                        baseClassName={ elem.props.baseClassName } 
+                        docIndex={ elem.props.docIndex }
+                        routeExisting={ elem.props.routeExisting }
+                    />
+                }
+                key={ `key-routed-thumbs_${elem.props.imageDoc._id}` }
+            />
+        )
+    });
 
     /* ------------------------------------------------------
         Handle expand/contract of film strip on hover/touch.
@@ -230,7 +247,7 @@ const SideFilmStrip: React.FunctionComponent = () => {
         Generate elements for full-screen slide viewer overlay.
     ---------------------------------------------------------- */
     // Create image element for slide view.
-    let imageSource: string = ''
+    let imageSource: string = '';
     if (imageDocs) {
         imageSource = slideImageIndex !== null
             ? imageDocs[slideImageIndex as number].url    // Use slide viewer's indexing
@@ -324,8 +341,7 @@ const SideFilmStrip: React.FunctionComponent = () => {
                     role="figure"
                     aria-label="enlarged image with metadata">
 
-                    <ImageEnlarger 
-                        baseClassName={ classBase }/>
+                    <ImageEnlarger baseClassName={ classBase } routeExisting={ routeExisting} />
                 </div>
 
                 {/* "Film strip" showing image collection in columnar form. */}
@@ -346,8 +362,13 @@ const SideFilmStrip: React.FunctionComponent = () => {
                     onMouseEnter={ onImageHover }
                     onMouseLeave={ onImageHover }>
 
-                    { /* Image containers for all docs in collection. */
-                        imageFrameElems }
+                    { /* Image containers for all docs in collection. */ }
+                    { imageFrameElems }
+
+                    {/* Nested routes for each image (thumbnail) in dataset. */}
+                    { <Routes>
+                        { imageThumbElemRoutes }    
+                    </Routes> }
                 </div>
 
             </aside>
@@ -382,20 +403,23 @@ const SideFilmStrip: React.FunctionComponent = () => {
 /* -------------------------------------------------------------------------
     Constructor for 'frames' for each individual image in docs collection.
 ------------------------------------------------------------------------- */
-function createImageFrames(classBase: string, imageDoc: ImageDocTypes, index: number) {
-    let imageFrame: JSX.Element;
-    
-    imageFrame = (
+function createImageFrames(
+    classBase: string, 
+    imageDoc: ImageDocTypes, 
+    routeExisting: string, 
+    index: number) {
+    return (
         <ImageFrame
             baseClassName={ classBase }
             imageDoc={ imageDoc }
-            docIndex= { index }
+            docIndex={ index }
+            routeExisting= { routeExisting }
             key={ `key_${classBase}_${index.toString()}` }
         />
     );
-    
-    return imageFrame;
 }
+
+export const routePrefixForThumbs: string = 'revisit';
 
 
 export default SideFilmStrip;
