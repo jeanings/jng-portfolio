@@ -20,7 +20,6 @@ const YearRoute: React.FunctionComponent<YearButtonProps> = (props: YearButtonPr
     ---------------------------- */
     useEffect(() => {
         const payloadYearSelected: number = parseInt(props.year);
-
         if (selected.year !== payloadYearSelected || selected.month) {
             // Update selected year.
             dispatch(handleYearSelect(payloadYearSelected));
@@ -31,7 +30,7 @@ const YearRoute: React.FunctionComponent<YearButtonProps> = (props: YearButtonPr
             };
             dispatch(fetchImagesData(payloadFetchYear));
         }
-    }, [selected, props.year]);
+    }, [props.year]);
     
     return (
         // Not rendering anything, just dispatching action.
