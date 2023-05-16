@@ -18,7 +18,7 @@ import './FilterButton.css';
 ==================================================================== */
 const FilterButton: React.FunctionComponent<FilterButtonProps> = (props: FilterButtonProps) => {
     const dispatch = useAppDispatch();
-    const filterState = useAppSelector(state => state.filter);
+    const filtered = useAppSelector(state => state.filter);
     const timeline = useAppSelector(state => state.timeline.selected);
     const selectablesForYear = useAppSelector(state => state.timeline.filterSelectables);
     const selectablesForQueried = useAppSelector(state => state.timeline.filteredSelectables);
@@ -102,7 +102,7 @@ const FilterButton: React.FunctionComponent<FilterButtonProps> = (props: FilterB
     const onFilterClick = (event: React.SyntheticEvent) => {
         // Get current payload for fetch.
         // returns object structured as { year: 2022, film: 'Kodak Gold 200' } etc. 
-        let payloadFilteredQuery = getPayloadForFilteredQuery(filterState, timeline);
+        let payloadFilteredQuery = getPayloadForFilteredQuery(filtered, timeline);
 
         // Prepare payload for updating << filter >> state.
         let payloadFilter: FilterPayloadType = {

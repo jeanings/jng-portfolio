@@ -3,6 +3,7 @@ import {
     useAppSelector, 
     useAppDispatch, 
     useMediaQueries } from '../../common/hooks';
+import { useSearchParams } from 'react-router-dom';
 import FilterButton from './FilterButton';
 import { clearFilters } from './filterDrawerSlice';
 import {
@@ -22,7 +23,8 @@ import './FilterDrawer.css';
 ===================================================================== */
 const FilterDrawer: React.FunctionComponent = () => {
     const dispatch = useAppDispatch();
-    const filterState = useAppSelector(state => state.filter);
+    const [ searchParams, setSearchParams ] = useSearchParams();
+    const filtered = useAppSelector(state => state.filter);
     const filterables = useAppSelector(state => state.timeline.filterSelectables);
     const timeline = useAppSelector(state => state.timeline.selected);
     const toolbarFilterSwitch = useAppSelector(state => state.toolbar.filter);
@@ -41,7 +43,43 @@ const FilterDrawer: React.FunctionComponent = () => {
         if (timeline.year) {
             dispatch(clearFilters("RESET TO INIT STATE"));
         }
-    }, [timeline]);
+    }, [timeline.year]);
+
+
+    /* -----------------------------------------------
+        Set search params (filter queries) for route. 
+    ----------------------------------------------- */
+    useEffect(() => {
+        const setTheseCategories = Object.keys(filtered).filter(category => filtered[category].length > 0);
+        setTheseCategories.map(category => {
+            let tags: Array<string> = [];
+            for(let param in filtered[category]) {
+                // Parse spaces into underscores.
+                const keyword: string = filtered[category][param].toString().split(' ').join('_');
+                if (category === 'tags') {
+                    // Build 'tags' search params array.
+                    tags.push(keyword);
+                }
+                else {
+                    // Immediately set search params (no multiple params for category).
+                    searchParams.set(category, keyword);
+                }
+            }
+            // Set 'tags' params.
+            if (category === 'tags') {
+                searchParams.set(category, tags.join('+'));
+            }
+        });
+
+        const clearTheseCategories = Object.keys(filtered).filter(category => filtered[category].length === 0);
+        for (let category of clearTheseCategories) {
+            searchParams.delete(category);            
+        };
+        
+        // Update search params.
+        setSearchParams(searchParams);
+        
+    }, [filtered]);
 
 
     // Prep fetched data for the filter groups.
@@ -97,7 +135,7 @@ const FilterDrawer: React.FunctionComponent = () => {
         let filtersActive: boolean | null = null;
         let resetAvailablity: string = '';
 
-        for (let filters of Object.entries(filterState)) {
+        for (let filters of Object.entries(filtered)) {
             const queries = filters[1];
             
             if (queries?.length > 0) {
@@ -266,10 +304,10 @@ export function getPayloadForFilteredQuery(filterState: FilterableTypes, selecte
 /* ------------------------------------------
     Get de/activated status of << filter >>
 ------------------------------------------ */
-export function getFilterStateStatus(filterState: FilterableTypes) {
+export function getFilterStateStatus(filtered: FilterableTypes) {
     let filteredStatus: boolean = false;
-    for (let category in filterState) {
-        if (filterState[category]!.length > 0) {
+    for (let category in filtered) {
+        if (filtered[category]!.length > 0) {
             filteredStatus = true;
             break;
         }
