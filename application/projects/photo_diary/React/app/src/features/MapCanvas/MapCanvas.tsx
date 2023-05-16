@@ -6,6 +6,7 @@ import {
     useAppSelector, 
     useMediaQueries,
     useWindowSize } from '../../common/hooks';
+import { useNavigate } from 'react-router-dom';
 import { 
     setStyleLoadStatus, 
     setSourceStatus, 
@@ -14,8 +15,8 @@ import {
     handleBoundsButton, 
     handleMarkerLocator } from './mapCanvasSlice';
 import { ImageDocTypes } from '../TimelineBar/timelineSlice';
-import { handleEnlarger, SideFilmStripProps } from '../SideFilmStrip/sideFilmStripSlice';
 import { handleToolbarButtons, ToolbarProps } from '../Toolbar/toolbarSlice';
+import { getExistingRoute, routePrefixForThumbs } from '../SideFilmStrip/SideFilmStrip';
 import { FeatureCollection } from 'geojson';
 import './MapCanvas.css';
 import 'mapboxgl-spiderifier/index.css';
@@ -32,6 +33,8 @@ const MapboxglSpiderfier: any = require('mapboxgl-spiderifier');
 const MapCanvas: React.FunctionComponent = () => {
     const dispatch = useAppDispatch();
     const windowSize = useWindowSize();
+    const navigate = useNavigate();
+    const timeline = useAppSelector(state => state.timeline.selected);
     const geojson = useAppSelector(state => state.timeline.geojson);
     const bounds = useAppSelector(state => state.timeline.bounds);
     const styleLoaded = useAppSelector(state => state.mapCanvas.styleLoaded);
@@ -52,6 +55,7 @@ const MapCanvas: React.FunctionComponent = () => {
     const markerIconImage: string = 'image-sharp';
     const markerIconPin: string ='images-sharp';
     const spiderfier = useRef<any | null>(null);
+    const routeExisting = getExistingRoute(timeline.year);
     const bbox: Array<Array<number>> = bounds !== null
         ? [ [ bounds!.lng[0], bounds!.lat[0] ],     // min bound coords
             [ bounds!.lng[1], bounds!.lat[1] ] ]    // max bound coords
@@ -88,8 +92,10 @@ const MapCanvas: React.FunctionComponent = () => {
         Once map initialized and data fetched, add data source for markers.
     ---------------------------------------------------------------------- */
     useEffect(() => {
-        // Set loaded status and add controls once map initialized.
-        if (bounds && map.current && styleLoaded === false) {
+        if (bounds 
+            && map.current 
+            && styleLoaded === false) {
+            // Set loaded status and add controls once map initialized.
             map.current.on('load', () => {
                 dispatch(setStyleLoadStatus(true));
             });
@@ -135,7 +141,7 @@ const MapCanvas: React.FunctionComponent = () => {
             // Set 'loaded' state to trigger addLayers.
             dispatch(setSourceStatus('loaded'));
         }        
-    }, [bounds, styleLoaded, map.current])
+    }, [bounds, styleLoaded, map.current]);
 
 
     /* ------------------------------------------------------------
@@ -162,7 +168,7 @@ const MapCanvas: React.FunctionComponent = () => {
                 }
             }
         }
-    }, [styleLoaded, windowSize, mapControl.current, map.current])
+    }, [styleLoaded, windowSize, mapControl.current, map.current]);
 
 
     /* -------------------------------------------------
@@ -190,12 +196,12 @@ const MapCanvas: React.FunctionComponent = () => {
             // Reset button state.
             dispatch(handleBoundsButton('idle'));
         }
-    }, [fitBoundsButton])
+    }, [fitBoundsButton]);
 
 
-    /* ------------------------------------------------
-        Map marker locator for use in image enlarger.
-    ------------------------------------------------ */
+    /* --------------------------------------------------------------
+        Map marker locator as effect from action in image enlarger.
+    -------------------------------------------------------------- */
     useEffect(() => {
         if (sourceStatus === 'loaded'
             && map.current
@@ -234,7 +240,74 @@ const MapCanvas: React.FunctionComponent = () => {
             // Reset button state.
             dispatch(handleMarkerLocator('idle'));
         }
-    }, [markerLocator, sourceStatus])
+    }, [markerLocator, sourceStatus]);
+
+
+    /* ---------------------------------------------------------------
+        Assign up to date enlargeDoc state to marker click listener.
+    --------------------------------------------------------------- */
+    useEffect(() => {
+        /* -------------------------------
+            Marker click event function.
+        ------------------------------- */
+        function onMarkerClick(event: any) {
+            const markerDocId = event.features[0].properties.doc_id;
+            if (markerDocId) {
+                handleImageMarkerClicks(markerDocId, enlargeDoc?._id);
+            }
+        }
+
+        // Refresh Mapbox marker click listeners.
+        if (markersStatus === 'loaded'
+            && imageDocs
+            && spiderfier.current
+            && map.current) {
+            // Clicks on single image markers
+            map.current.on('click', 'imageMarkers', (event: mapboxgl.MapMouseEvent) => {
+                onMarkerClick(event);
+            });
+        }
+
+        // Clean up listeners.
+        return () => {
+            if (map.current) {
+                map.current.off('click', 'imageMarkers', (event: any) => {
+                    onMarkerClick(event);
+                })
+            }
+        };
+    }, [imageDocs, enlargeDoc, sourceStatus, spiderfier.current]);
+    
+
+    /* ---------------------------------------------------------------------------- 
+        Click event listener on markers with same functionality as film strip
+        thumbnail clicks.  Reroutes to image thumbnail route:
+            - opens image enlarger
+            - scrolls film strip to clicked marker image
+    ---------------------------------------------------------------------------- */
+    function handleImageMarkerClicks(markerDocId: string, enlargeDocId: string | undefined ) {
+        // Dispatch new doc ID to enlarger, triggering  loading and opening of enlarger.
+        if (markerDocId !== enlargeDocId) {
+            // Find index and doc.
+            const docIndex: number = imageDocs!.findIndex(doc => doc._id === markerDocId);
+            const markerImageDoc = imageDocs![docIndex];
+
+            if (markerImageDoc) {
+                const newRoute: string = `${routeExisting}/${routePrefixForThumbs}/${markerImageDoc._id}`;
+                
+                // Redirect to image thumb's route, triggering actions.
+                navigate(newRoute);
+            }
+        }
+        // Just open image enlarger if same image clicked.
+        else if (markerDocId === enlargeDocId && toolbarImageEnlarger !== 'on') {
+            const payloadToolbarButtons: ToolbarProps = {
+                'filter': 'off',
+                'imageEnlarger': 'on'
+            };
+            dispatch(handleToolbarButtons(payloadToolbarButtons));
+        }
+    }
 
     
     /* -------------------------------------------
@@ -244,8 +317,7 @@ const MapCanvas: React.FunctionComponent = () => {
         && markersStatus === 'idle'
         && bounds
         && map.current) {
-
-            // Create new photo marker layer.
+        // Create new (single) imqge marker layer.
         map.current.addLayer({
             'id': 'imageMarkers',
             'type': 'symbol',
@@ -263,7 +335,7 @@ const MapCanvas: React.FunctionComponent = () => {
             }
         });
 
-        // Create cluster layer (for spiderfying/branching).
+        // Create cluster layer (for spiderfying/branching multi-marker points).
         map.current.addLayer({
             'id': 'imageMarkersClusters',
             'type': 'symbol',
@@ -301,6 +373,7 @@ const MapCanvas: React.FunctionComponent = () => {
         });
 
         // Initialize marker cluster-expanding 'spiderfy' module.
+        // On new data fetches, cleared and re-initialized.
         spiderfier.current = new MapboxglSpiderfier(map.current, {
             animate: true,
             animationSpeed: 500,
@@ -310,12 +383,10 @@ const MapCanvas: React.FunctionComponent = () => {
             spiralLengthStart: 55,
             spiralLengthFactor: 10,
             initializeLeg: ((branch: any) => {
-                // Assign variables for each branch.
                 const leafElem: HTMLElement = branch.elements.pin;
-                const feature = branch.feature;
-                const leafDocId: string = feature.doc_id;
+                const leafDocId: string = branch.feature.doc_id;
                 leafElem.appendChild(getLeafSvgIconElem());
-                
+
                 // Get matching MongoDB doc with id.
                 const dbDoc = imageDocs?.filter(doc => doc._id === leafDocId)[0] as ImageDocTypes;
                 if (!dbDoc) {
@@ -323,15 +394,17 @@ const MapCanvas: React.FunctionComponent = () => {
                 }
 
                 // Add docId as id as identifier.
-                leafElem.id = `spider-pin__${dbDoc._id}`; 
-
-                // Clicks on leaves same as single markers, film strip clicks. 
-                leafElem.addEventListener('click', () => {
-                    if (leafDocId) {
-                        handleImageMarkerClicks(leafDocId);
-                    }
-                });
-            })
+                leafElem.id = `spider-pin__${dbDoc._id}`;
+            }),
+            onClick: (event: PointerEvent, branch: any) => {
+                // Clicks on leaves same as single markers, film strip clicks.
+                const leafDocId: string = branch.feature.doc_id;
+                const enlargedImageId = window.location.pathname.split('revisit/')[1];
+                handleImageMarkerClicks(leafDocId, enlargedImageId);
+                // if (leafDocId === enlargedImageId) {
+                //     console.log('spidered image same as enlarger image')
+                // }
+            }
         });
 
         // Adjust and zoom map to fit all markers. 
@@ -352,44 +425,6 @@ const MapCanvas: React.FunctionComponent = () => {
     }   
 
 
-    /* ---------------------------------------------------------------------------- 
-        Click event listener on markers with same functionality as film strip
-        thumbnail clicks.  Opens image enlarger, with added function of scrolling
-        film strip to clicked marker image.
-    ---------------------------------------------------------------------------- */
-    function handleImageMarkerClicks(markerDocId: string) {
-        const enlargeDocId: string = enlargeDoc    
-            ? enlargeDoc._id
-            : '';
-
-        // Dispatch new doc ID to enlarger, triggering loading and opening of enlarger.
-        if (markerDocId !== enlargeDocId) {
-            // Find index and doc.
-            const docIndex: number = imageDocs!.findIndex(doc => doc._id === markerDocId);
-            const markerImageDoc = imageDocs![docIndex];
-
-            if (markerImageDoc) {
-                const payloadImageDoc: SideFilmStripProps = {
-                    'enlargeDoc': markerImageDoc,
-                    'docIndex': docIndex
-                };
-                dispatch(handleEnlarger(payloadImageDoc));
-            }
-        }
-        // Just open image enlarger if same image clicked.
-        else if (markerDocId === enlargeDocId) {
-            const payloadToolbarButtons: ToolbarProps = {
-                'filter': 'off',
-                'imageEnlarger': 'on'
-            };
-            
-            if (toolbarImageEnlarger !== 'on') {
-                dispatch(handleToolbarButtons(payloadToolbarButtons));
-            }
-        }
-    };
-
-
     /* --------------------------------- 
         Handle various marker events.
     --------------------------------- */
@@ -404,14 +439,14 @@ const MapCanvas: React.FunctionComponent = () => {
             map.current!.getCanvas().style.cursor = ''
         );
 
-        // Clicks on single image markers
-        map.current.on('click', 'imageMarkers', (event: any) => {
-            const markerDocId = event.features[0].properties.doc_id;
+        // // Clicks on single image markers
+        // map.current.on('click', 'imageMarkers', (event: any) => {
+        //     const markerDocId = event.features[0].properties.doc_id;
             
-            if (markerDocId) {
-                handleImageMarkerClicks(markerDocId);
-            }               
-        });
+        //     if (markerDocId) {
+        //         handleImageMarkerClicks(markerDocId);
+        //     }               
+        // });
 
 
         // Change cursor when hovering over image clusters.
@@ -422,7 +457,7 @@ const MapCanvas: React.FunctionComponent = () => {
             map.current!.getCanvas().style.cursor = ''
         );
         
-        // Explode marker cluster into individual markers.
+        // Expand marker cluster into individual markers.
         map.current.on('click', 'imageMarkersClusters', (event: any) => 
             spiderfyClusters(
                 event, 
@@ -514,7 +549,7 @@ function getMapPaddingOffset(
             offset = [ xAxisOffset, yAxisOffset ];
             return offset;
     }
-};
+}
 
 
 /* --------------------------------------------------
@@ -559,7 +594,7 @@ function removeMapLayerSource(map: React.MutableRefObject<any>, objectType: stri
             }
             break;
     }
-};
+}
 
 
 /* --------------------------------------------------------
@@ -579,7 +614,7 @@ function spiderfyClusters(
         }
     );
     
-    // Contracts currently exploded cluster.
+    // Contracts currently expanded cluster.
     spiderfier.current.unspiderfy();
 
     if (!features.length) {
@@ -621,7 +656,7 @@ function spiderfyClusters(
             }
         );
     }
-};
+}
 
 
 /* =====================================================================

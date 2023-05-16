@@ -12,7 +12,7 @@ const ImageThumbRoute: React.FunctionComponent<ImageFrameProps> = (props: ImageF
     const dispatch = useAppDispatch();
     const enlargeDoc = useAppSelector(state => state.sideFilmStrip.enlargeDoc);
     const markerLocator = useAppSelector(state => state.mapCanvas.markerLocator);
-    
+
     /* ------------------------------------------------------
         Handles opening image enlarger and marker locating.
     ------------------------------------------------------ */

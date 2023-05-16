@@ -42,9 +42,7 @@ const SideFilmStrip: React.FunctionComponent = () => {
     const timeline = useAppSelector(state => state.timeline.selected);
     const filmStripRef = useRef<HTMLDivElement>(null);
     const filmStripObserverRef = useRef<IntersectionObserver | null>(null);
-    const routeExisting: string = window.location.pathname.includes(routePrefixForYears)
-        ? routePrefixForYears + '/' + timeline.year
-        : '';
+    const routeExisting = getExistingRoute(timeline.year);
     const classBase: string = "SideFilmStrip";
 
 
@@ -213,15 +211,16 @@ const SideFilmStrip: React.FunctionComponent = () => {
         Build routes for all image frame elements above.
     --------------------------------------------------- */  
     const imageThumbElemRoutes = imageFrameElems.map((elem: JSX.Element) => {
+        let path: string = `${routeExisting}/${routePrefixForThumbs}/${elem.props.imageDoc._id}`;
         return (
             <Route
-                path={ `${routeExisting}/${routePrefixForThumbs}/${elem.props.imageDoc._id}` }
+                path={ path }
                 element={
                     <ImageThumbRoute 
                         imageDoc={ elem.props.imageDoc } 
                         baseClassName={ elem.props.baseClassName } 
                         docIndex={ elem.props.docIndex }
-                        routeExisting={ elem.props.routeExisting }
+                        path={ path }
                     />
                 }
                 key={ `key-routed-thumbs_${elem.props.imageDoc._id}` }
@@ -413,10 +412,23 @@ function createImageFrames(
             baseClassName={ classBase }
             imageDoc={ imageDoc }
             docIndex={ index }
-            routeExisting= { routeExisting }
+            path= { `${routeExisting}/${routePrefixForThumbs}/${imageDoc._id}` }
             key={ `key_${classBase}_${index.toString()}` }
         />
     );
+}
+
+/* --------------------------------------------------------------------------
+    Gets route path preceding /revisit.
+    Default (init) loads for latest year doesn't include /reflect-on,
+    but requests on different years add /reflect-on, this is helper for it.
+-------------------------------------------------------------------------- */
+export function getExistingRoute(timelineYear: number | null) {
+    const year: string | number = timelineYear ? timelineYear : '';
+    const existingRoutePath: string = window.location.pathname.includes(routePrefixForYears)
+        ? routePrefixForYears + '/' + year
+        : '';
+    return existingRoutePath;
 }
 
 export const routePrefixForThumbs: string = 'revisit';

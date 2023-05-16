@@ -51,6 +51,7 @@ jest.mock('mapbox-gl');
 
 // Mocked Mapbox methods.
 const mockMapOn = jest.fn();
+const mockMapOff = jest.fn();
 const mockMapGetCanvas = jest.fn();
 const mockMapAddSource = jest.fn();
 const mockMapGetSource = jest.fn();
@@ -101,6 +102,7 @@ test("initializes map on rendering", async() => {
         .mockImplementation(() => {
             return {
                 on: mockMapOn,
+                off: mockMapOff,
                 getCanvas: mockMapGetCanvas,
                 addSource: mockMapAddSource,
                 addLayer: mockMapAddLayer,
@@ -145,6 +147,7 @@ test("adds new data source on new fetches and adds zoom controls", async() => {
         .mockImplementation(() => {
             return {
                 on: mockMapOn,
+                off: mockMapOff,
                 getCanvas: mockMapGetCanvas,
                 addSource: mockMapAddSource,
                 addLayer: mockMapAddLayer,
@@ -217,6 +220,7 @@ test("adds marker layer and fits map to bounds", async() => {
         .mockImplementation(() => {
             return {
                 on: mockMapOn,
+                off: mockMapOff,
                 getCanvas: mockMapGetCanvas,
                 addSource: mockMapAddSource,
                 addLayer: mockMapAddLayer,
@@ -285,6 +289,7 @@ test("replaces previous layer and source on new data fetches", async() => {
         .mockImplementation(() => {
             return {
                 on: mockMapOn,
+                off: mockMapOff,
                 getCanvas: mockMapGetCanvas,
                 addSource: mockMapAddSource,
                 addLayer: mockMapAddLayer,
@@ -377,6 +382,7 @@ test("does not initialize map on unsuccessful fetch", async() => {
         .mockImplementation(() => {
             return {
                 on: mockMapOn,
+                off: mockMapOff,
                 getCanvas: mockMapGetCanvas,
                 addSource: mockMapAddSource,
                 addLayer: mockMapAddLayer,

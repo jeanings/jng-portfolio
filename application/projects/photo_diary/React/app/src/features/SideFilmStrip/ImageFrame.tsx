@@ -5,7 +5,6 @@ import {
     useMediaQueries } from '../../common/hooks';
 import { Link } from 'react-router-dom';
 import { ImageDocTypes } from '../TimelineBar/timelineSlice';
-import { routePrefixForThumbs } from './SideFilmStrip';
 import { handleMarkerLocator } from '../MapCanvas/mapCanvasSlice';
 import { handleToolbarButtons, ToolbarProps } from '../Toolbar/toolbarSlice';
 import './ImageFrame.css';
@@ -48,7 +47,7 @@ const ImageFrame: React.FunctionComponent<ImageFrameProps> = (props: ImageFrameP
             onClick={ onImageClick }>
 
             {/* Redirect to image routes, where all the state logic resides. */}
-            <Link to={ `${props.routeExisting}/${routePrefixForThumbs}/${props.imageDoc._id}` }>
+            <Link to={ props.path }>
                 <img 
                     className={ useMediaQueries(`${classBase}__image`) 
                         +   // Add class styling to indicate selected state
@@ -75,7 +74,7 @@ export interface ImageFrameProps {
     'baseClassName': string,
     'imageDoc': ImageDocTypes,
     'docIndex': number,
-    'routeExisting': string
+    'path': string
 };
 
 
