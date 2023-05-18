@@ -18,6 +18,7 @@ import {
     preloadedStateEditor,
     preloadedStateEditorOwner } from '../../utils/testHelpers';
 import SideFilmStrip from '../SideFilmStrip/SideFilmStrip';
+import TimelineBar from '../TimelineBar/TimelineBar';
 import { EnhancedStore } from '@reduxjs/toolkit';
 
 var mockAxios = new MockAdapter(axios);
@@ -122,6 +123,8 @@ test("shows edit UI buttons if user is editor and owner of doc", async() => {
     await waitFor(() => screen.findAllByRole('img', { name: 'thumbnail image' }));
     const imageFrameElems = screen.getAllByRole('img', { name: 'thumbnail image' });
     const imageToClick = imageFrameElems[0];
+    const imageToClickId = imageToClick.getAttribute('id');
+    console.log(imageToClickId);
     await user.click(imageToClick);
 
     // Verify form is enabled/exists.

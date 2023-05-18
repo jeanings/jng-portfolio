@@ -2,13 +2,11 @@ import React from 'react';
 import { 
     useAppDispatch, 
     useAppSelector, 
-    useMediaQueries } from '../../common/hooks';
-import { getPayloadForFilteredQuery } from './FilterDrawer';
+    useMediaQueries, } from '../../common/hooks';
 import { 
     addFilter, 
     removeFilter, 
     FilterPayloadType } from './filterDrawerSlice';
-import { fetchImagesData } from '../TimelineBar/timelineSlice';
 import './FilterButton.css';
 
 
@@ -18,14 +16,13 @@ import './FilterButton.css';
 ==================================================================== */
 const FilterButton: React.FunctionComponent<FilterButtonProps> = (props: FilterButtonProps) => {
     const dispatch = useAppDispatch();
-    const filtered = useAppSelector(state => state.filter);
-    const timeline = useAppSelector(state => state.timeline.selected);
     const selectablesForYear = useAppSelector(state => state.timeline.filterSelectables);
     const selectablesForQueried = useAppSelector(state => state.timeline.filteredSelectables);
 
     // Get corresponding category in filter state (may be different than props one).
     let filterCategory: string = props.categoryName;
     let selectable: string | number = props.selectableName;
+
     // Process and clean categoryName and selectableName.
     switch(props.categoryName) {
         case 'format':
@@ -95,58 +92,19 @@ const FilterButton: React.FunctionComponent<FilterButtonProps> = (props: FilterB
     
 
     /* --------------------------------------------------------------------------------
-        Handle clicks on filter buttons. 
-        Updates << filter >> state on clicked status.
-        Dispatches fetch request on updated << filter >> state.
+        Handle clicks on filter buttons. Updates << filter >> state on clicked status.
+        FilterDrawer handles actual fetches for filtered queries.
     -------------------------------------------------------------------------------- */
     const onFilterClick = (event: React.SyntheticEvent) => {
-        // Get current payload for fetch.
-        // returns object structured as { year: 2022, film: 'Kodak Gold 200' } etc. 
-        let payloadFilteredQuery = getPayloadForFilteredQuery(filtered, timeline);
-
         // Prepare payload for updating << filter >> state.
         let payloadFilter: FilterPayloadType = {
             [filterCategory]: selectable
         };
 
-        let clickAction: 'add' | 'remove' = 'add';
-
         // Filter addition.
-        if (activeFiltersInCategory.includes(selectable) === false) {
-            clickAction = 'add';
-            dispatch(addFilter(payloadFilter));
-        }
-        // Filter removal.
-        else {
-            clickAction = 'remove';
-            dispatch(removeFilter(payloadFilter));
-        }
-
-        // Re-assign category key to match backend's.
-        filterCategory = categoryKeysCamelToHyphen(filterCategory);
-
-        // Update payload for fetching for clicked filter.
-        // Add to existing actively filtered category.
-        if (Object.keys(payloadFilteredQuery).includes(filterCategory)) {
-            const updatedFilteredCategory: Array<FilterPayloadType> = clickAction === 'add'
-                ? [...payloadFilteredQuery[filterCategory], selectable]     // add clicked filter
-                : payloadFilteredQuery[filterCategory].filter(              // remove clicked filter
-                    (filteredItem: string | number) => filteredItem !== selectable);
-                        
-            payloadFilteredQuery[filterCategory] = updatedFilteredCategory;
-        }
-        // Create new filter parameter object. 
-        else {
-            // By default, must be clickAction 'add'.
-            payloadFilteredQuery[filterCategory] = [selectable]
-        }
-
-        // Delete filter category if it's now empty (deactivated)
-        if (payloadFilteredQuery[filterCategory].length === 0) {
-            delete payloadFilteredQuery[filterCategory];
-        }
-
-        dispatch(fetchImagesData(payloadFilteredQuery));
+        activeFiltersInCategory.includes(selectable) === false
+            ? dispatch(addFilter(payloadFilter))
+            : dispatch(removeFilter(payloadFilter));
     };
 
    
@@ -172,68 +130,6 @@ const FilterButton: React.FunctionComponent<FilterButtonProps> = (props: FilterB
         </button>
     );
 }
-
-/* =====================================================================
-    Helper functions.
-===================================================================== */
-
-/* --------------------------------------------------------------------
-    Convert parameter keys from camel case to hyphenated for backend. 
--------------------------------------------------------------------- */
-function categoryKeysCamelToHyphen(filterCategory: string) {
-    const upperCaseIndices: Array<number> = [];
-    let hyphenatedCategoryKey: string = filterCategory;
-    let processedStringParts: Array<string> = [];
-
-    // Find all upper case characters in key string.
-    for (let charIndex = 0; charIndex < filterCategory.length; charIndex++) {
-        // Get index of upper case characters.
-        if (filterCategory.charAt(charIndex) === filterCategory.charAt(charIndex).toUpperCase()) {
-            upperCaseIndices.push(charIndex);
-        }
-    }
-
-    // Break out early if hyphenating not needed.
-    if (upperCaseIndices.length === 0) {
-        return filterCategory;
-    }
-
-    // Loop through the upper case indices to get all replacement string parts.
-    for (let index = 0; index < upperCaseIndices.length; index++) {
-        let left: number;
-        let right: number;
-
-        switch(index === 0) {
-            // Example with 'formatMediumType' with [6, 12]
-            case true:
-                left = 0;                           //  [0] -> | formatMediumType
-                right = upperCaseIndices[index];    //  [6] -> format | MediumType
-                break;
-            case false:
-                left = upperCaseIndices[index];     //  [6] -> format | MediumType
-                right = upperCaseIndices[index + 1] !== undefined
-                    ? upperCaseIndices[index + 1]   //  [12] -> formatMedium | Type
-                    : filterCategory.length;        //  formatMediumType |
-                break;
-        }
-
-        processedStringParts.push(
-            filterCategory.slice(left, right).toLowerCase(),
-        );
-        
-        // Add the rightmost part on final iteration.
-        if (index === upperCaseIndices.length - 1) {
-            processedStringParts.push(
-                filterCategory.slice(right, filterCategory.length).toLowerCase()
-            );
-        }        
-    }
-
-    hyphenatedCategoryKey = processedStringParts.join("-");
-    
-    return hyphenatedCategoryKey;
-};
-
 
 
 /* =====================================================================

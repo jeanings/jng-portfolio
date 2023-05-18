@@ -9,8 +9,10 @@ import {
     useDebounceCallback,
     useThrottleCallback } from '../../common/hooks';
 import { 
+    Location,
     Route, 
     Routes,
+    useLocation,
     useNavigate } from 'react-router-dom';
 import { routePrefixForYears } from '../TimelineBar/TimelineBar';
 import { ImageDocTypes } from '../TimelineBar/timelineSlice';
@@ -29,6 +31,7 @@ import './SideFilmStrip.css';
 ======================================================================= */
 const SideFilmStrip: React.FunctionComponent = () => {
     const dispatch = useAppDispatch();
+    const locate = useLocation();
     const navigate = useNavigate();
     const [ filmStripHovered, setFilmStripHovered ] = useState(false);
     const [ slideImageIndex, setSlideImageIndex ] = useState<number | null>(null);
@@ -42,7 +45,7 @@ const SideFilmStrip: React.FunctionComponent = () => {
     const timeline = useAppSelector(state => state.timeline.selected);
     const filmStripRef = useRef<HTMLDivElement>(null);
     const filmStripObserverRef = useRef<IntersectionObserver | null>(null);
-    const routeExisting = getExistingRoute(timeline.year);
+    const routeExisting = getExistingRoute(timeline.year, locate);
     const classBase: string = "SideFilmStrip";
 
 
@@ -74,7 +77,6 @@ const SideFilmStrip: React.FunctionComponent = () => {
             if (slideView === 'off') {
                 const newDocId: string = imageDocs[slideImageIndex as number]._id;
                 const newRoute: string = `${routeExisting}/${routePrefixForThumbs}/${newDocId}`;
-                console.log(newRoute)
                 // Redirect to image thumb's route, triggering actions.
                 setSlideImageIndex(null);
                 navigate(newRoute);
@@ -99,7 +101,7 @@ const SideFilmStrip: React.FunctionComponent = () => {
         imageEnlarger === 'on'
             ? setFilmStripHovered(true)
             : setFilmStripHovered(false);
-    }, [imageEnlarger])
+    }, [imageEnlarger]);
 
 
     /* -----------------------------------------------------------------
@@ -136,7 +138,7 @@ const SideFilmStrip: React.FunctionComponent = () => {
                 imageFrame.scrollIntoView({ behavior: 'smooth' });
             }
         }
-    }, [enlargeDoc, isImageViewableInFilmStrip])
+    }, [enlargeDoc, isImageViewableInFilmStrip]);
     
 
     /* ---------------------------------------
@@ -211,16 +213,18 @@ const SideFilmStrip: React.FunctionComponent = () => {
         Build routes for all image frame elements above.
     --------------------------------------------------- */  
     const imageThumbElemRoutes = imageFrameElems.map((elem: JSX.Element) => {
-        let path: string = `${routeExisting}/${routePrefixForThumbs}/${elem.props.imageDoc._id}`;
+        // let path: string = `${routeExisting}/${routePrefixForThumbs}/${elem.props.imageDoc._id}`;
+        let path: string = `${routeExisting}/${routePrefixForThumbs}`;
+
         return (
             <Route
-                path={ path }
+                path={ `${path}/:docId` }
                 element={
                     <ImageThumbRoute 
-                        imageDoc={ elem.props.imageDoc } 
-                        baseClassName={ elem.props.baseClassName } 
-                        docIndex={ elem.props.docIndex }
-                        path={ path }
+                        // imageDoc={ elem.props.imageDoc } 
+                        // baseClassName={ elem.props.baseClassName } 
+                        // docIndex={ elem.props.docIndex }
+                        // path={ path }
                     />
                 }
                 key={ `key-routed-thumbs_${elem.props.imageDoc._id}` }
@@ -423,11 +427,12 @@ function createImageFrames(
     Default (init) loads for latest year doesn't include /reflect-on,
     but requests on different years add /reflect-on, this is helper for it.
 -------------------------------------------------------------------------- */
-export function getExistingRoute(timelineYear: number | null) {
+export function getExistingRoute(timelineYear: number | null, locate: Location) {
     const year: string | number = timelineYear ? timelineYear : '';
     const existingRoutePath: string = window.location.pathname.includes(routePrefixForYears)
         ? routePrefixForYears + '/' + year
         : '';
+    // console.log({'window': window.location.pathname, 'existing': existingRoutePath, 'locate': locate})
     return existingRoutePath;
 }
 

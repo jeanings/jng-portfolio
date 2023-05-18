@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react';
-import { useAppDispatch, useAppSelector,  } from '../../common/hooks';
+import { useAppDispatch, useAppSelector } from '../../common/hooks';
+import { useLocation } from 'react-router-dom';
 import { 
     handleYearSelect,
     fetchImagesData,
@@ -13,6 +14,7 @@ import { YearButtonProps } from './YearButton';
 ================================================================================= */
 const YearRoute: React.FunctionComponent<YearButtonProps> = (props: YearButtonProps) => {
     const dispatch = useAppDispatch();
+    const { search } = useLocation();
     const selected = useAppSelector(state => state.timeline.selected);
 
     /* ----------------------------
@@ -20,7 +22,14 @@ const YearRoute: React.FunctionComponent<YearButtonProps> = (props: YearButtonPr
     ---------------------------- */
     useEffect(() => {
         const payloadYearSelected: number = parseInt(props.year);
-        if (selected.year !== payloadYearSelected || selected.month) {
+        const isFiltered: boolean = search !== '' ? true : false;
+
+        if (isFiltered) {
+            return;
+        }
+
+        if (selected.year !== payloadYearSelected 
+            || selected.month) {
             // Update selected year.
             dispatch(handleYearSelect(payloadYearSelected));
 
@@ -30,7 +39,8 @@ const YearRoute: React.FunctionComponent<YearButtonProps> = (props: YearButtonPr
             };
             dispatch(fetchImagesData(payloadFetchYear));
         }
-    }, [props.year]);
+    }, [props.year, search]);
+    
     
     return (
         // Not rendering anything, just dispatching action.

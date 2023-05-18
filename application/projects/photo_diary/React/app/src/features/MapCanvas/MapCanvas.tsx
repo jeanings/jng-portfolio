@@ -6,7 +6,7 @@ import {
     useAppSelector, 
     useMediaQueries,
     useWindowSize } from '../../common/hooks';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { 
     setStyleLoadStatus, 
     setSourceStatus, 
@@ -33,6 +33,7 @@ const MapboxglSpiderfier: any = require('mapboxgl-spiderifier');
 const MapCanvas: React.FunctionComponent = () => {
     const dispatch = useAppDispatch();
     const windowSize = useWindowSize();
+    const locate = useLocation();
     const navigate = useNavigate();
     const timeline = useAppSelector(state => state.timeline.selected);
     const geojson = useAppSelector(state => state.timeline.geojson);
@@ -55,7 +56,7 @@ const MapCanvas: React.FunctionComponent = () => {
     const markerIconImage: string = 'image-sharp';
     const markerIconPin: string ='images-sharp';
     const spiderfier = useRef<any | null>(null);
-    const routeExisting = getExistingRoute(timeline.year);
+    const routeExisting = getExistingRoute(timeline.year, locate);
     const bbox: Array<Array<number>> = bounds !== null
         ? [ [ bounds!.lng[0], bounds!.lat[0] ],     // min bound coords
             [ bounds!.lng[1], bounds!.lat[1] ] ]    // max bound coords

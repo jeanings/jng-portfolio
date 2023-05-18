@@ -3,17 +3,21 @@ import {
     useAppSelector, 
     useAppDispatch, 
     useMediaQueries } from '../../common/hooks';
-import { useSearchParams } from 'react-router-dom';
+import { 
+    useLocation, 
+    useNavigate,
+    useSearchParams } from 'react-router-dom';
 import FilterButton from './FilterButton';
-import { clearFilters } from './filterDrawerSlice';
+import { clearFilters, FilterProps } from './filterDrawerSlice';
 import {
+    fetchImagesData,
+    FilterableTypes,
     ImageDocsRequestProps, 
     ImageDocFormatTypes,
     TimelineProps,
-    TimelineMonthTypes, 
-    FilterableTypes, 
-    fetchImagesData} from '../TimelineBar/timelineSlice';
+    TimelineMonthTypes } from '../TimelineBar/timelineSlice';
 import { getNumericalMonth } from '../TimelineBar/MonthButton';
+import { routePrefixForYears } from '../TimelineBar/TimelineBar';
 import './FilterDrawer.css';
 
 
@@ -23,6 +27,8 @@ import './FilterDrawer.css';
 ===================================================================== */
 const FilterDrawer: React.FunctionComponent = () => {
     const dispatch = useAppDispatch();
+    const navigate = useNavigate();
+    const { search } = useLocation();
     const [ searchParams, setSearchParams ] = useSearchParams();
     const filtered = useAppSelector(state => state.filter);
     const filterables = useAppSelector(state => state.timeline.filterSelectables);
@@ -45,41 +51,43 @@ const FilterDrawer: React.FunctionComponent = () => {
         }
     }, [timeline.year]);
 
-
-    /* -----------------------------------------------
-        Set search params (filter queries) for route. 
-    ----------------------------------------------- */
+    
+    /* ---------------------------------------------------
+        Set search params (filter queries) for route.
+    -------------------------------------------------- */
     useEffect(() => {
-        const setTheseCategories = Object.keys(filtered).filter(category => filtered[category].length > 0);
-        setTheseCategories.map(category => {
-            let tags: Array<string> = [];
-            for(let param in filtered[category]) {
-                // Parse spaces into underscores.
-                const keyword: string = filtered[category][param].toString().split(' ').join('_');
-                if (category === 'tags') {
-                    // Build 'tags' search params array.
-                    tags.push(keyword);
-                }
-                else {
-                    // Immediately set search params (no multiple params for category).
-                    searchParams.set(category, keyword);
-                }
-            }
-            // Set 'tags' params.
-            if (category === 'tags') {
-                searchParams.set(category, tags.join('+'));
-            }
-        });
+        const buildFilterParams = new FilterParams(filtered, searchParams, timeline.month);
+        const updatedParams = buildFilterParams.apply();
+        setSearchParams(updatedParams);
 
-        const clearTheseCategories = Object.keys(filtered).filter(category => filtered[category].length === 0);
-        for (let category of clearTheseCategories) {
-            searchParams.delete(category);            
-        };
+        const yearRoute: string = `${routePrefixForYears}/${timeline.year}`;
+        // Get current payload for fetch.
+        // returns object structured as { year: 2022, film: 'Kodak Gold 200' } etc. 
+        let payloadFilteredQuery = getPayloadForFilteredQuery(filtered, timeline);
         
-        // Update search params.
-        setSearchParams(searchParams);
-        
-    }, [filtered]);
+        // Re-assign category key to match backend's.
+        for (let category in filtered) {
+            const parsedCategoryKey = categoryKeysCamelToHyphen(category);
+            
+            // Don't add empty filters.
+            if (filtered[category].length === 0) {
+                continue;
+            }
+
+            payloadFilteredQuery[parsedCategoryKey] = filtered[category];
+        }
+
+        // Only fetch if filter queries exist.
+        if (Object.keys(payloadFilteredQuery).length > 1) {
+            dispatch(fetchImagesData(payloadFilteredQuery));
+        }
+        // Reroute to year route if filters cleared.
+        else {
+            if (timeline.year) {
+                navigate(yearRoute);
+            }
+        }
+    }, [filtered, timeline.month]);
 
 
     // Prep fetched data for the filter groups.
@@ -246,6 +254,64 @@ function createCategory(
 }
 
 
+/* --------------------------------------------------------------------
+    Convert parameter keys from camel case to hyphenated for backend. 
+-------------------------------------------------------------------- */
+function categoryKeysCamelToHyphen(filterCategory: string) {
+    const upperCaseIndices: Array<number> = [];
+    let hyphenatedCategoryKey: string = filterCategory;
+    let processedStringParts: Array<string> = [];
+
+    // Find all upper case characters in key string.
+    for (let charIndex = 0; charIndex < filterCategory.length; charIndex++) {
+        // Get index of upper case characters.
+        if (filterCategory.charAt(charIndex) === filterCategory.charAt(charIndex).toUpperCase()) {
+            upperCaseIndices.push(charIndex);
+        }
+    }
+
+    // Break out early if hyphenating not needed.
+    if (upperCaseIndices.length === 0) {
+        return filterCategory;
+    }
+
+    // Loop through the upper case indices to get all replacement string parts.
+    for (let index = 0; index < upperCaseIndices.length; index++) {
+        let left: number;
+        let right: number;
+
+        switch(index === 0) {
+            // Example with 'formatMediumType' with [6, 12]
+            case true:
+                left = 0;                           //  [0] -> | formatMediumType
+                right = upperCaseIndices[index];    //  [6] -> format | MediumType
+                break;
+            case false:
+                left = upperCaseIndices[index];     //  [6] -> format | MediumType
+                right = upperCaseIndices[index + 1] !== undefined
+                    ? upperCaseIndices[index + 1]   //  [12] -> formatMedium | Type
+                    : filterCategory.length;        //  formatMediumType |
+                break;
+        }
+
+        processedStringParts.push(
+            filterCategory.slice(left, right).toLowerCase(),
+        );
+        
+        // Add the rightmost part on final iteration.
+        if (index === upperCaseIndices.length - 1) {
+            processedStringParts.push(
+                filterCategory.slice(right, filterCategory.length).toLowerCase()
+            );
+        }        
+    }
+
+    hyphenatedCategoryKey = processedStringParts.join("-");
+    
+    return hyphenatedCategoryKey;
+}
+
+
 /* ---------------------------------------------
     Builds fetch payload for filtered queries.
 --------------------------------------------- */
@@ -298,7 +364,61 @@ export function getPayloadForFilteredQuery(filterState: FilterableTypes, selecte
     }
 
     return filteredQuery;
-};
+}
+
+
+// filtered: FilterProps, searchParams: URLSearchParams
+// updateSearchParams.add()
+export class FilterParams {
+    filtered: FilterProps;
+    searchParams: URLSearchParams;
+    month: string | null;
+
+    constructor(filtered: FilterProps, searchParams: URLSearchParams, month: string | null) {
+        this.filtered = filtered;
+        this.searchParams = searchParams;
+        this.month = month;
+    }
+
+    apply() {
+        const setParams = Object.keys(this.filtered).filter(category => this.filtered[category].length > 0);
+    
+        setParams.map(category => {
+            let tags: Array<string> = [];
+            for (let param in this.filtered[category]) {
+                // Parse spaces into underscores.
+                const keyword: string = this.filtered[category][param].toString().split(' ').join('_');
+                if (category === 'tags') {
+                    // Build 'tags' search params array.
+                    tags.push(keyword);
+                }
+                else {
+                    // Immediately set search params (no multiple params for category).
+                    this.searchParams.set(category, keyword);
+                }
+            }
+            // Set 'tags' params.
+            if (category === 'tags') {
+                this.searchParams.set(category, tags.join('+'));
+            }
+        });
+
+        const clearParams = Object.keys(this.filtered).filter(category => this.filtered[category].length === 0);
+        for (let category of clearParams) {
+            this.searchParams.delete(category);            
+        };
+
+        // Only set 'month' param for actual months.
+        if (this.month && this.month !== 'all') {
+            this.searchParams.set('month', this.month);
+        }
+        else if (this.month) {
+            this.searchParams.delete('month');
+        }
+
+        return this.searchParams;
+    }
+}
 
 
 /* ------------------------------------------

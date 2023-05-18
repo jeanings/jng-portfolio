@@ -40,6 +40,7 @@ const ImageEnlarger: React.FunctionComponent <ImageEnlargerProps> = (props: Imag
     const toolbarEnlarger = useAppSelector(state => state.toolbar.imageEnlarger);
     const timeline = useAppSelector(state => state.timeline.selected);
     const imageDocs = useAppSelector(state => state.timeline.imageDocs);
+    const filtered = useAppSelector(state => state.filter);
     const metadataForm = useRef<HTMLFormElement | null>(null);
     const role: LoginProps['role'] = useAppSelector(state => state.login.role);
     const user: UserProps | null = useAppSelector(state => state.login.user);
@@ -91,9 +92,9 @@ const ImageEnlarger: React.FunctionComponent <ImageEnlargerProps> = (props: Imag
     }, [enlargeDoc]);
 
 
-    /* -----------------------------------------------------------------
-        Year or month selection triggers image enlarger panel to close.
-    ----------------------------------------------------------------- */
+    /* ------------------------------------------------------------------------
+        Year or month selection clears enlarger image, closes enlarger panel.
+    ------------------------------------------------------------------------ */
     useEffect(() => {
         // Reset image enlarger state.
         const payloadEnlarger: SideFilmStripProps = {
@@ -106,14 +107,19 @@ const ImageEnlarger: React.FunctionComponent <ImageEnlargerProps> = (props: Imag
 
 
     /* -------------------------------------------------------------
-        Clear store's << editor.updated >> state on new db fetches. 
+        On newly fetched image docs:
+        - clear store's << editor.updated >> state
+        - redirect back to base route
     ------------------------------------------------------------- */
     useEffect(() => {
-        if (Object.keys(editor.updated).length > 0) {
-            const payloadResetUpdatedDocs: ClearUpdatedDocsType = {
-                'msg': 'clear updated docs'
-            };
-            dispatch(handleUpdatedDocsClear(payloadResetUpdatedDocs));
+        // Clear editor state.
+        if (role === 'admin' || role === 'editor') {
+            if (Object.keys(editor.updated).length > 0) {
+                const payloadResetUpdatedDocs: ClearUpdatedDocsType = {
+                    'msg': 'clear updated docs'
+                };
+                dispatch(handleUpdatedDocsClear(payloadResetUpdatedDocs));
+            }
         }
     }, [imageDocs]);
 
