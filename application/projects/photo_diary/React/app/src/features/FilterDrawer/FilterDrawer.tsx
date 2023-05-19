@@ -115,23 +115,14 @@ const FilterDrawer: React.FunctionComponent = () => {
         : [];
 
 
-    /* --------------------------------------------------------
+    /* -----------------------------------------------
         Handle button for resetting of filter state.
-        Clears << filter >> and triggers fetch via useEffect.
-    -------------------------------------------------------- */
+    ----------------------------------------------- */
     const onResetClick = (event: React.SyntheticEvent) => {
         dispatch(clearFilters("RESET TO INIT STATE"));
 
-        // "Return" to unfiltered data state by fetching for selected timeline.
-        const payloadFetchBaseTimeline: ImageDocsRequestProps = {
-            'year': timeline.year as number
-        };
-
-        if (timeline.month !== 'all') {
-            payloadFetchBaseTimeline['month'] = getNumericalMonth(timeline.month as TimelineMonthTypes);
-        }
-
-        dispatch(fetchImagesData(payloadFetchBaseTimeline));
+        const yearRoute: string = `${routePrefixForYears}/${timeline.year}`;
+        navigate(yearRoute);
     };
 
 
