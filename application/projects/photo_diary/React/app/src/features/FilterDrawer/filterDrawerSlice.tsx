@@ -31,8 +31,19 @@ const filterSlice = createSlice({
         addFilter: (state, action: PayloadAction<FilterPayloadType>) => {
             const filterRequest = Object.entries(action.payload);
 
-            for (let [key, val] of filterRequest) {
-                state[key]!.push(val as string | number)
+            for (let [category, param] of filterRequest) {
+                state[category]!.push(param as string | number)
+            }
+        },
+        /* ---------------------------------------------------
+            Handles adding filter to existing array in state.
+        --------------------------------------------------- */
+        addBulkFilters: (state, action: PayloadAction<FilterPayloadType>) => {
+            const filterRequest = action.payload;
+
+            for (let [category, params] of Object.entries(filterRequest)) {
+                console.log(category, params)
+                state[category] = params as any;
             }
         },
         /* -------------------------------------------------------
@@ -41,10 +52,10 @@ const filterSlice = createSlice({
         removeFilter: (state, action: PayloadAction<FilterPayloadType>) => {
             const filterRequest = Object.entries(action.payload);
             
-            for (let [key, val] of filterRequest) {
-                if (state[key]!.includes(val as string | number)){
-                    let updatedArray = state[key]!.filter(x => x !== val);
-                    state[key] = updatedArray;
+            for (let [category, param] of filterRequest) {
+                if (state[category]!.includes(param as string | number)){
+                    let updatedArray = state[category]!.filter(x => x !== param);
+                    state[category] = updatedArray;
                 }
             }
         },
@@ -93,5 +104,5 @@ export const filterSelection = (state: RootState) => state.filter;
 
 // Export actions, reducers.
 const { actions, reducer } = filterSlice;
-export const { addFilter, removeFilter, clearFilters } = actions;
+export const { addFilter, addBulkFilters, removeFilter, clearFilters } = actions;
 export default reducer;

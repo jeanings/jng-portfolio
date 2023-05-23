@@ -302,7 +302,7 @@ test("renders image to be enlarged based on << enlargeDoc >> state", async() => 
 
 
 test("reveals/hides enlarger depending on state availability", async() => {
-    const { newStore } = renderBoilerplate(preloadedState, ['sidefilmstrip']);
+    const { newStore } = renderBoilerplate(preloadedState, ['timeline', 'sidefilmstrip']);
     
     // "Reset" << enlargeDoc >> to null, unclicked state.
     newStore.dispatch(handleEnlarger({
@@ -318,15 +318,15 @@ test("reveals/hides enlarger depending on state availability", async() => {
     expect(imageEnlargerElem).not.toHaveClass("show");
 
     // Verify enlarger panel becomes visible on imageDoc existence.
-    newStore.dispatch(handleEnlarger({
-        'enlargeDoc': mockDefaultData.docs[0],
-        'docIndex': 0
-    }));
-    await waitFor(() => {
-        expect(newStore.getState().sideFilmStrip.enlargeDoc).not.toBeNull();
-        expect(imageEnlargerElem).toHaveAttribute("aria-expanded", 'true');
-        expect(imageEnlargerElem).toHaveClass("show");
-    });
+    const thumbnailElems = screen.getAllByRole('img', { name: 'thumbnail image' });
+    const thumbnailToClick = thumbnailElems[0];
+    await user.click(thumbnailToClick);
+
+    await waitFor(() => expect(newStore.getState().sideFilmStrip.enlargeDoc).not.toBeNull());
+    expect(newStore.getState().toolbar.imageEnlarger).toEqual('on');
+    expect(imageEnlargerElem).toHaveAttribute("aria-expanded", 'true');
+    expect(imageEnlargerElem).toHaveClass("show");
+    
 });
 
 

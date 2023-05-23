@@ -35,12 +35,12 @@ const ImageEnlarger: React.FunctionComponent <ImageEnlargerProps> = (props: Imag
     const [ metadataEdits, setMetadataEdits ] = useState<MetadataEditInputType>({});
     const [ isFormatCorrect, setIsFormatCorrect ] = useState<MetadataCorrectnessType>({});
     const [ showEditResponseMessage, setShowEditResponseMessage ] = useState<boolean>(false);
+    const responseStatus = useAppSelector(state => state.timeline.responseStatus);
+    const timeline = useAppSelector(state => state.timeline.selected);
+    const imageDocs = useAppSelector(state => state.timeline.imageDocs);
     const enlargeDoc = useAppSelector(state => state.sideFilmStrip.enlargeDoc);
     const docIndex = useAppSelector(state => state.sideFilmStrip.docIndex);
     const toolbarEnlarger = useAppSelector(state => state.toolbar.imageEnlarger);
-    const timeline = useAppSelector(state => state.timeline.selected);
-    const imageDocs = useAppSelector(state => state.timeline.imageDocs);
-    const filtered = useAppSelector(state => state.filter);
     const metadataForm = useRef<HTMLFormElement | null>(null);
     const role: LoginProps['role'] = useAppSelector(state => state.login.role);
     const user: UserProps | null = useAppSelector(state => state.login.user);
@@ -67,7 +67,8 @@ const ImageEnlarger: React.FunctionComponent <ImageEnlargerProps> = (props: Imag
         Handles showing image enlarger only if << enlargeDoc >> state set.
     ------------------------------------------------------------------- */
     useEffect(() => {
-        if (enlargeDoc !== null) {
+        if (enlargeDoc !== null
+            && responseStatus !== 'uninitialized') {
             // Zoom map to marker.
             dispatch(handleMarkerLocator('clicked'));
 
@@ -96,6 +97,10 @@ const ImageEnlarger: React.FunctionComponent <ImageEnlargerProps> = (props: Imag
         Year or month selection clears enlarger image, closes enlarger panel.
     ------------------------------------------------------------------------ */
     useEffect(() => {
+        if (responseStatus === 'uninitialized') {
+            return;
+        }
+
         // Reset image enlarger state.
         const payloadEnlarger: SideFilmStripProps = {
             'enlargeDoc': null,

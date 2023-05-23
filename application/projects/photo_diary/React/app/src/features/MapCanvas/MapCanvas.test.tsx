@@ -177,7 +177,7 @@ test("adds new data source on new fetches and adds zoom controls", async() => {
     const { newStore } = renderBoilerplate(preloadedState);
 
     // Verify mocked initialization.
-    await waitFor(() => expect(newStore.getState().timeline.responseStatus).toEqual('successful'));
+    await waitFor(() => expect(newStore.getState().timeline.responseStatus).toEqual('idle'));
     // Assert no initial API call, since initYear isn't null (store has preloaded state).
     expect(mockDispatch).toHaveBeenCalledTimes(0);
 
@@ -345,7 +345,7 @@ test("replaces previous layer and source on new data fetches", async() => {
     newStore.dispatch(handleYearSelect(2015));
 
     await waitFor(() => {
-        expect(newStore.getState().timeline.responseStatus).toEqual('successful');
+        expect(newStore.getState().timeline.responseStatus).toEqual('idle');
         expect(newStore.getState().timeline.selected.year).toEqual(2015);
     });
 

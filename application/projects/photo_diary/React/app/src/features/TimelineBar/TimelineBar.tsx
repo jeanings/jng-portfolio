@@ -5,11 +5,21 @@ import {
     useAppDispatch, 
     useAppSelector, 
     useMediaQueries } from '../../common/hooks';
-import { Route, Routes } from 'react-router-dom';
-import { fetchImagesData, ImageDocsRequestProps } from '../../features/TimelineBar/timelineSlice';
+import { 
+    Location,
+    Route,
+    Routes,
+    useLocation } from 'react-router-dom';
+import { 
+    fetchImagesData, 
+    FilterableTypes, 
+    handleResponseStatus, 
+    ImageDocsRequestProps } from '../../features/TimelineBar/timelineSlice';
 import YearButton from './YearButton';
 import YearRoute from './YearRoute';
 import MonthButton from './MonthButton';
+import { routePrefixForThumbs } from '../SideFilmStrip/SideFilmStrip';
+import { getPayloadForFilteredQuery } from '../FilterDrawer/FilterDrawer';
 import './TimelineBar.css';
 
 
@@ -19,7 +29,9 @@ import './TimelineBar.css';
 ===============================================================*/
 const TimelineBar: React.FunctionComponent = () => {
     const dispatch = useAppDispatch();
+    const location = useLocation();
     const [ isYearSelectorHovered, setYearSelectorHovered ] = useState(false);
+    const responseStatus = useAppSelector(state => state.timeline.responseStatus);
     const initYear = useAppSelector(state => state.timeline.initYear);
     const collectionYears = useAppSelector(state => state.timeline.years);
     const timeline = useAppSelector(state => state.timeline.selected);
@@ -29,14 +41,70 @@ const TimelineBar: React.FunctionComponent = () => {
         Get default data set on initial render.
     ------------------------------------------ */
     useEffect(() => {
-        const payloadInit: ImageDocsRequestProps = {
-            'year': 'default'
-        };
-        
-        if (initYear === null) {
+        const routedWith: RouteInitType = identifyRouteSource(location);
+        const yearFromPath: number = parseInt(location.pathname.split(`${routePrefixForYears}/`)[1]);
+        let payloadInit: ImageDocsRequestProps = { 'year': 'default' };
+
+        switch(routedWith) {
+            case 'filters':
+                // Routed with filters queries.
+                const initTimeline = { year: yearFromPath, month: 'all' };
+                const queryPairs = location.search.split('?')[1].split('&');
+
+                let initQueries = {}
+                initQueries = queryPairs.reduce((queries, query) => {
+                    const [ key, val ] = query.split('=');
+                    const vals = val.split('%2B');
+
+                    if (key === 'month') {
+                        initTimeline.month = val;
+                        return queries;
+                    }
+                    
+                    vals.length === 1
+                        ? queries[key] = [val]
+                        : queries[key] = vals
+                    return queries;
+                }, {} as FilterableTypes);
+                payloadInit = getPayloadForFilteredQuery(initQueries, initTimeline);
+                break;
+
+            case 'revisit':
+                // Routed with image parameter.
+                if (yearFromPath) {
+                    payloadInit.year = yearFromPath
+                }               
+                break;
+
+            case 'reflect-on':
+                // Routed with year parameter.
+                if (yearFromPath) {
+                    payloadInit.year = yearFromPath
+                }
+                break;
+
+            default:
+                // Default root route, fetch latest dataset.
+                break;
+        }
+
+        if (initYear === null && responseStatus === 'uninitialized') {
             dispatch(fetchImagesData(payloadInit));
         }
     }, []);
+
+
+    /* --------------------------------------------------------
+        Update response status to ready-state 'idle' to allow
+        for various effects in other components to function.
+    -------------------------------------------------------- */
+    useEffect(() => {
+        if (responseStatus === 'successful') {
+            const payloadRespStatus: string = 'idle';
+            dispatch(handleResponseStatus(payloadRespStatus));
+        }
+    }, [responseStatus])
+
 
     /* --------------------------------------------------------------
         Build list of selectable years, based on collections in db.
@@ -149,6 +217,27 @@ const TimelineBar: React.FunctionComponent = () => {
 /* =====================================================================
     Helper functions.
 ===================================================================== */
+/* -----------------------------------------------------------------------
+    Identifies where browser is routing from, to determine init fetches.
+----------------------------------------------------------------------- */
+function identifyRouteSource(location: Location) {
+    if (location.search) {
+        return 'filters';
+    }
+
+    if (location.pathname.includes(routePrefixForThumbs)) {
+        return 'revisit';
+    }
+
+    if (location.pathname.includes(routePrefixForYears)) {
+        return 'reflect-on';
+    }
+
+    if (location.pathname === '/') {
+        return 'root';
+    }
+}
+
 
 /* -------------------------------------------------------
     Wrapper for creating selectable year dropdown items.
@@ -187,6 +276,13 @@ function createMonthButton(month: string, index: number, classBase: string) {
 
     return monthButton;
 }
+
+
+/* =====================================================================
+    Types.
+===================================================================== */
+type RouteInitType = "filters" | "revisit" | "reflect-on" | "root" | undefined;
+
 
 export const routePrefixForYears: string = 'reflect-on';
 

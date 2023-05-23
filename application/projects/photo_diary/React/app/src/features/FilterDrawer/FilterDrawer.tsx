@@ -3,12 +3,13 @@ import {
     useAppSelector, 
     useAppDispatch, 
     useMediaQueries } from '../../common/hooks';
-import { 
-    useLocation, 
-    useNavigate,
-    useSearchParams } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import FilterButton from './FilterButton';
-import { clearFilters, FilterProps } from './filterDrawerSlice';
+import {
+    addBulkFilters, 
+    clearFilters, 
+    FilterPayloadType, 
+    FilterProps } from './filterDrawerSlice';
 import {
     fetchImagesData,
     FilterableTypes,
@@ -28,11 +29,12 @@ import './FilterDrawer.css';
 const FilterDrawer: React.FunctionComponent = () => {
     const dispatch = useAppDispatch();
     const navigate = useNavigate();
-    const { search } = useLocation();
     const [ searchParams, setSearchParams ] = useSearchParams();
     const filtered = useAppSelector(state => state.filter);
     const filterables = useAppSelector(state => state.timeline.filterSelectables);
+    const responseStatus = useAppSelector(state => state.timeline.responseStatus);
     const timeline = useAppSelector(state => state.timeline.selected);
+    const queried = useAppSelector(state => state.timeline.query);
     const toolbarFilterSwitch = useAppSelector(state => state.toolbar.filter);
     const classBase: string = "FilterDrawer";
     const classNames: ClassNameTypes = {
@@ -42,11 +44,60 @@ const FilterDrawer: React.FunctionComponent = () => {
         'base': classBase
     };
 
+
+    /* ------------------------------------------------------
+        For init renders with filters accessed through URL.  Updates to missing << filter >> state.
+        Direct (init) route access with queries bypasses normal behaviour of adding filters to state. 
+    ------------------------------------------------------ */
+    useEffect(() => {
+        if (responseStatus !== 'initialized') {
+            return;
+        }
+        
+        const isFiltersInState: boolean = checkFiltersInStateExist(filtered);
+
+        if (responseStatus === 'initialized'
+            && queried 
+            && isFiltersInState === false) {    // no filters in state yet if accessed from URL.
+            // Exit out of init renders with only 'year' as query.
+            if (Object.keys(queried).length === 1) {
+                return;
+            }
+
+            // Parse queries to match format of << filter >> parameters.
+            const payloadQueryToFilters = Object.entries(queried).reduce((addInitQueriesToFilters, filter) => {
+                const [ category, params ] = filter
+                
+                if (category === 'year' || category === 'month') {
+                    return addInitQueriesToFilters;
+                }
+
+                const parsedParams = params.map((param: string | number) => {
+                    if (typeof param === 'string') {
+                        const parsedParam = param.split('_').join(' ');
+                        return parsedParam;
+                    }
+                });
+
+                addInitQueriesToFilters[category] = parsedParams
+                return addInitQueriesToFilters;
+            }, {} as FilterPayloadType);
+
+            dispatch(addBulkFilters(payloadQueryToFilters));
+        }
+    }, [responseStatus]);
+
+
     /* -------------------------------------------------
         Clear all filters on selected timeline changes. 
     ------------------------------------------------- */
     useEffect(() => {
-        if (timeline.year) {
+        if (responseStatus === 'uninitialized' ) {
+            return;
+        }
+
+        const isFiltersInState: boolean = checkFiltersInStateExist(filtered);
+        if (isFiltersInState) {
             dispatch(clearFilters("RESET TO INIT STATE"));
         }
     }, [timeline.year]);
@@ -56,35 +107,34 @@ const FilterDrawer: React.FunctionComponent = () => {
         Set search params (filter queries) for route.
     -------------------------------------------------- */
     useEffect(() => {
-        const buildFilterParams = new FilterParams(filtered, searchParams, timeline.month);
-        const updatedParams = buildFilterParams.apply();
-        setSearchParams(updatedParams);
+        if (responseStatus === 'initialized' || responseStatus === 'idle') {
+            const buildFilterParams = new FilterParams(filtered, searchParams, timeline.month);
+            const updatedParams = buildFilterParams.apply();
+            setSearchParams(updatedParams);
 
-        const yearRoute: string = `${routePrefixForYears}/${timeline.year}`;
-        // Get current payload for fetch.
-        // returns object structured as { year: 2022, film: 'Kodak Gold 200' } etc. 
-        let payloadFilteredQuery = getPayloadForFilteredQuery(filtered, timeline);
-        
-        // Re-assign category key to match backend's.
-        for (let category in filtered) {
-            const parsedCategoryKey = categoryKeysCamelToHyphen(category);
+            // Get current payload for fetch.
+            // Returns object structured as { year: 2022, film: 'Kodak Gold 200' } etc. 
+            let payloadFilteredQuery = getPayloadForFilteredQuery(filtered, timeline);
             
-            // Don't add empty filters.
-            if (filtered[category].length === 0) {
-                continue;
+            // Re-assign category key to match backend's.
+            for (let category in filtered) {
+                const parsedCategoryKey = categoryKeysCamelToHyphen(category);
+                // Don't add empty filters.
+                if (filtered[category].length === 0) {
+                    continue;
+                }
+                payloadFilteredQuery[parsedCategoryKey] = filtered[category];
             }
 
-            payloadFilteredQuery[parsedCategoryKey] = filtered[category];
-        }
-
-        // Only fetch if filter queries exist.
-        if (Object.keys(payloadFilteredQuery).length > 1) {
-            dispatch(fetchImagesData(payloadFilteredQuery));
-        }
-        // Reroute to year route if filters cleared.
-        else {
-            if (timeline.year) {
-                navigate(yearRoute);
+            // Fetch if filter queries exist.
+            if (Object.keys(payloadFilteredQuery).length > 1) {
+                dispatch(fetchImagesData(payloadFilteredQuery));    // 'month' queries too
+            }
+            // Handles resetting month to 'all' fetches.
+            else {
+                if (responseStatus !== 'initialized' || timeline.month === 'all') {
+                    dispatch(fetchImagesData(payloadFilteredQuery))
+                }
             }
         }
     }, [filtered, timeline.month]);
@@ -120,7 +170,7 @@ const FilterDrawer: React.FunctionComponent = () => {
     ----------------------------------------------- */
     const onResetClick = (event: React.SyntheticEvent) => {
         dispatch(clearFilters("RESET TO INIT STATE"));
-
+        // Let YearRoute handle fetch dispatch.
         const yearRoute: string = `${routePrefixForYears}/${timeline.year}`;
         navigate(yearRoute);
     };
@@ -296,9 +346,7 @@ function categoryKeysCamelToHyphen(filterCategory: string) {
             );
         }        
     }
-
     hyphenatedCategoryKey = processedStringParts.join("-");
-    
     return hyphenatedCategoryKey;
 }
 
@@ -306,60 +354,58 @@ function categoryKeysCamelToHyphen(filterCategory: string) {
 /* ---------------------------------------------
     Builds fetch payload for filtered queries.
 --------------------------------------------- */
-export function getPayloadForFilteredQuery(filterState: FilterableTypes, selectedTimeline: TimelineProps['selected']) {
+export function getPayloadForFilteredQuery(filtered: FilterableTypes, timeline: TimelineProps['selected']) {
+    const isFiltered = checkFiltersInStateExist(filtered);
+
     // Start with year parameter as base.
-    let filteredQuery: ImageDocsRequestProps= {
-        'year': selectedTimeline.year as number
-    };
+    let filteredQuery: ImageDocsRequestProps= { 'year': timeline.year as number };
 
     // Add month if selected.
-    if (selectedTimeline.month !== 'all') {
-        filteredQuery['month'] = getNumericalMonth(selectedTimeline.month as TimelineMonthTypes);
+    if (timeline.month !== 'all') {
+        filteredQuery['month'] = getNumericalMonth(timeline.month as TimelineMonthTypes);
     }
-
-    const isFiltered = getFilterStateStatus(filterState);
 
     if (isFiltered === false) {
         return filteredQuery;
     }
 
     // Assign correct string for keys.
-    for (let category in filterState) {
-        if (filterState[category]!.length === 0) {
+    for (let category in filtered) {
+        if (filtered[category]!.length === 0) {
             continue;
         }
 
         switch(category) {
             case 'formatMedium':
-                filteredQuery['format-medium'] = filterState[category] as Array<ImageDocFormatTypes['medium']>
+                filteredQuery['format-medium'] = filtered[category] as Array<ImageDocFormatTypes['medium']>
                 break;
             case 'formatType': 
-                filteredQuery['format-type'] = filterState[category] as Array<ImageDocFormatTypes['type']>
+                filteredQuery['format-type'] = filtered[category] as Array<ImageDocFormatTypes['type']>
                 break;
             case 'film':
-                filteredQuery['film'] = filterState[category] as Array<string>
+                filteredQuery['film'] = filtered[category] as Array<string>
                 break;
             case 'camera':
-                filteredQuery['camera'] = filterState[category]
+                filteredQuery['camera'] = filtered[category]
                 break;
             case 'lens':
-                filteredQuery['lens'] = filterState[category]
+                filteredQuery['lens'] = filtered[category]
                 break;
             case 'focalLength':
-                filteredQuery['focal-length'] = filterState[category] as Array<number>
+                filteredQuery['focal-length'] = filtered[category] as Array<number>
                 break;
             case 'tags':
-                filteredQuery['tags'] = filterState[category]
+                filteredQuery['tags'] = filtered[category]
                 break;
         }
     }
-
     return filteredQuery;
 }
 
 
-// filtered: FilterProps, searchParams: URLSearchParams
-// updateSearchParams.add()
+/* -----------------------------------------------
+    Class for setting search params for filters.
+----------------------------------------------- */
 export class FilterParams {
     filtered: FilterProps;
     searchParams: URLSearchParams;
@@ -415,15 +461,16 @@ export class FilterParams {
 /* ------------------------------------------
     Get de/activated status of << filter >>
 ------------------------------------------ */
-export function getFilterStateStatus(filtered: FilterableTypes) {
-    let filteredStatus: boolean = false;
-    for (let category in filtered) {
-        if (filtered[category]!.length > 0) {
-            filteredStatus = true;
-            break;
-        }
-    }
-    return filteredStatus;
+export function checkFiltersInStateExist(filtered: FilterableTypes) {
+    const anyFiltersInState = Object.entries(filtered).reduce((result, item) => {
+        const [ category, params ] = item; 
+        result = params!.length === 0
+            ? result
+            : true;
+        return result;
+    }, false);
+
+    return anyFiltersInState;
 }
 
 
