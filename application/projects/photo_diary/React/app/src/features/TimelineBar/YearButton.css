@@ -10,6 +10,27 @@
     transition: 350ms all;
 }
 
+    .TimelineBar__year-item__link {
+        text-decoration: none;
+        font-family: 'Barlow Semi Condensed', sans-serif;
+        color: var(--colour-text-inactive);
+        font-size: 2.85rem;
+    }
+
+        .TimelineBar__year-item__link:visited {
+            color: var(--colour-text-inactive);
+        }
+
+        .TimelineBar__year-item__link.active {
+            color: var(--colour-accent-primary);
+            transition: 350ms all;
+        } 
+
+        .TimelineBar__year-item__link:hover {
+            color: var(--colour-accent-secondary);
+            transition: 350ms all;
+        }
+
     .TimelineBar__year-item:hover {
         color: var(--colour-accent-secondary);
         transition: 350ms all;

@@ -6,10 +6,11 @@ import {
     useAppDispatch, 
     useAppSelector, 
     useMediaQueries,
-    useDebounceCallback,
-    useThrottleCallback } from '../../common/hooks';
+    useDebounceCallback } from '../../common/hooks';
+import { useNavigate } from 'react-router-dom';
 import { handleToolbarButtons, ToolbarProps } from '../Toolbar/toolbarSlice';
 import { handleMarkerLocator } from '../MapCanvas/mapCanvasSlice';
+import { routePrefixForThumbs } from './SideFilmStrip';
 import { 
     handleEnlarger, 
     handleSlideView, 
@@ -30,14 +31,16 @@ import './ImageEnlarger.css';
 ===================================================================== */
 const ImageEnlarger: React.FunctionComponent <ImageEnlargerProps> = (props: ImageEnlargerProps) => {
     const dispatch = useAppDispatch();
+    const navigate = useNavigate();
     const [ metadataEdits, setMetadataEdits ] = useState<MetadataEditInputType>({});
     const [ isFormatCorrect, setIsFormatCorrect ] = useState<MetadataCorrectnessType>({});
     const [ showEditResponseMessage, setShowEditResponseMessage ] = useState<boolean>(false);
+    const responseStatus = useAppSelector(state => state.timeline.responseStatus);
+    const timeline = useAppSelector(state => state.timeline.selected);
+    const imageDocs = useAppSelector(state => state.timeline.imageDocs);
     const enlargeDoc = useAppSelector(state => state.sideFilmStrip.enlargeDoc);
     const docIndex = useAppSelector(state => state.sideFilmStrip.docIndex);
     const toolbarEnlarger = useAppSelector(state => state.toolbar.imageEnlarger);
-    const timelineSelected = useAppSelector(state => state.timeline.selected);
-    const imageDocs = useAppSelector(state => state.timeline.imageDocs);
     const metadataForm = useRef<HTMLFormElement | null>(null);
     const role: LoginProps['role'] = useAppSelector(state => state.login.role);
     const user: UserProps | null = useAppSelector(state => state.login.user);
@@ -64,7 +67,8 @@ const ImageEnlarger: React.FunctionComponent <ImageEnlargerProps> = (props: Imag
         Handles showing image enlarger only if << enlargeDoc >> state set.
     ------------------------------------------------------------------- */
     useEffect(() => {
-        if (enlargeDoc !== null) {
+        if (enlargeDoc !== null
+            && responseStatus !== 'uninitialized') {
             // Zoom map to marker.
             dispatch(handleMarkerLocator('clicked'));
 
@@ -89,29 +93,38 @@ const ImageEnlarger: React.FunctionComponent <ImageEnlargerProps> = (props: Imag
     }, [enlargeDoc]);
 
 
-    /* -----------------------------------------------------------------
-        Year or month selection triggers image enlarger panel to close.
-    ----------------------------------------------------------------- */
+    /* ------------------------------------------------------------------------
+        Year or month selection clears enlarger image, closes enlarger panel.
+    ------------------------------------------------------------------------ */
     useEffect(() => {
+        if (responseStatus === 'uninitialized') {
+            return;
+        }
+
         // Reset image enlarger state.
         const payloadEnlarger: SideFilmStripProps = {
             'enlargeDoc': null,
             'docIndex': null
         };
-
+        
         dispatch(handleEnlarger(payloadEnlarger));
-    }, [timelineSelected]);
+    }, [timeline]);
 
 
     /* -------------------------------------------------------------
-        Clear store's << editor.updated >> state on new db fetches. 
+        On newly fetched image docs:
+        - clear store's << editor.updated >> state
+        - redirect back to base route
     ------------------------------------------------------------- */
     useEffect(() => {
-        if (Object.keys(editor.updated).length > 0) {
-            const payloadResetUpdatedDocs: ClearUpdatedDocsType = {
-                'msg': 'clear updated docs'
-            };
-            dispatch(handleUpdatedDocsClear(payloadResetUpdatedDocs));
+        // Clear editor state.
+        if (role === 'admin' || role === 'editor') {
+            if (Object.keys(editor.updated).length > 0) {
+                const payloadResetUpdatedDocs: ClearUpdatedDocsType = {
+                    'msg': 'clear updated docs'
+                };
+                dispatch(handleUpdatedDocsClear(payloadResetUpdatedDocs));
+            }
         }
     }, [imageDocs]);
 
@@ -231,13 +244,11 @@ const ImageEnlarger: React.FunctionComponent <ImageEnlargerProps> = (props: Imag
                 : changeDocIndexTo < 0
                     ? imageDocs.length - 1   // Cycle to right end. 
                     : changeDocIndexTo;      // Default case.
+            const newDocId: string = imageDocs[newDocIndex]._id;
+            const newRoute: string = `${props.routeExisting}/${routePrefixForThumbs}/${newDocId}`;
             
-            const payloadEnlarger: SideFilmStripProps = {
-                'enlargeDoc': imageDocs[newDocIndex],  // Triggers image change.
-                'docIndex': newDocIndex
-            };
-
-            dispatch(handleEnlarger(payloadEnlarger));
+            // Redirect to image thumb's route, triggering actions.
+            navigate(newRoute);
         }
     }, 200);
 
@@ -382,7 +393,11 @@ const ImageEnlarger: React.FunctionComponent <ImageEnlargerProps> = (props: Imag
                 // For editor role, show everything available to edit.
                 return true;
             }
-        })   
+            else {
+                // Above conditions should catch all cases, but return false as default.
+                return false;
+            }
+        })
         .map(category => {
             // Create JSX element for each category and store in array.
             const categoryName = category[0];
@@ -430,7 +445,6 @@ const ImageEnlarger: React.FunctionComponent <ImageEnlargerProps> = (props: Imag
                 { /* List of image stats. */
                     infoElems }
             </figcaption>
-            
     );
 
 
@@ -518,6 +532,7 @@ const ImageEnlarger: React.FunctionComponent <ImageEnlargerProps> = (props: Imag
         return metaDataSpan;
     }
 
+
     return (
         <div 
             className={ useMediaQueries(`${props.baseClassName}__${classBase}`) 
@@ -533,12 +548,14 @@ const ImageEnlarger: React.FunctionComponent <ImageEnlargerProps> = (props: Imag
                 toolbarEnlarger === 'off'
                     ? "false"
                     : "true" }>
-            
+
+            {/* Metadata panel */}
             { imageInfoElem }
 
             <div
                 className={ useMediaQueries(`${props.baseClassName}__${classBase}__image`) }
                 id="enlarged-image-container">
+
                 {/* Regular enlarged image. */}
                 { enlargedImageElem }
             </div>
@@ -572,7 +589,8 @@ const ImageEnlarger: React.FunctionComponent <ImageEnlargerProps> = (props: Imag
                         { createImageBorderButton('clear-edits') }
                     </>)
                     : "" }
-                {/* Standard icons. */}
+
+                {/* Standard border button icons. */}
                 { createImageBorderButton('previous') }
                 { createImageBorderButton('full-screen') }
                 { createImageBorderButton('next') }
@@ -586,23 +604,6 @@ const ImageEnlarger: React.FunctionComponent <ImageEnlargerProps> = (props: Imag
 /* =====================================================================
     Helper functions.
 ===================================================================== */
-
-/* ---------------------------------------------------------------
-    Debounce function to delay unnecessary rapid-clicked events.
---------------------------------------------------------------- */ 
-export function debounceThis(callback: Function, delay: number) {
-    let timeout: ReturnType<typeof setTimeout>;
-    
-    return (...args: any[]) => {
-        clearTimeout(timeout);
-        timeout = setTimeout(() => {
-            callback(...args)
-        }, delay);
-    };
-}
-
-
-
 
 /* --------------------------------------------------------------
     Class for validating inputs being sent to update docs in db.
@@ -802,7 +803,7 @@ function getCategoryData(categoryName: string, categoryData: string | number | A
     };
 
     return content;
-};
+}
 
 
 /* =====================================================================
@@ -810,7 +811,8 @@ function getCategoryData(categoryName: string, categoryData: string | number | A
 ===================================================================== */
 export interface ImageEnlargerProps {
     [index: string]: string,
-    'baseClassName': string
+    'baseClassName': string,
+    'routeExisting': string
 };
 
 export interface ImageInfoType {

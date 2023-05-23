@@ -37,7 +37,7 @@
      
         /* Hovering on year selector extends list of years */
         .TimelineBar__year-selector.dropdown
-        > .TimelineBar__year-item {
+        > .TimelineBar__year-item, a {
             cursor: pointer;
             display: inline-block;
             animation-name: list-drawer-fade-in;

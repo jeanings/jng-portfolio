@@ -5,7 +5,7 @@ import { GeojsonFeatureCollectionProps, BboxType } from '../features/TimelineBar
 
 export const preloadedState: RootState = {
     timeline: {
-        responseStatus: 'successful',
+        responseStatus: 'idle',
         query: { year: 2022 },
         initYear: 2022,
         selected: { year: 2022, month: 'all' },

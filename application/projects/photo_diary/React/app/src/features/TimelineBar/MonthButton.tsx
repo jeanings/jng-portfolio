@@ -3,11 +3,7 @@ import {
     useAppDispatch, 
     useAppSelector,
     useMediaQueries } from '../../common/hooks';
-import { 
-    handleMonthSelect,
-    fetchImagesData,
-    ImageDocsRequestProps,
-    TimelineMonthTypes } from './timelineSlice';
+import { handleMonthSelect } from './timelineSlice';
 import MonthCounter from './MonthCounter';
 import './MonthButton.css';
 
@@ -18,7 +14,7 @@ import './MonthButton.css';
 ============================================================= */
 const MonthButton: React.FunctionComponent<MonthButtonProps> = (props: MonthButtonProps) => {
     const dispatch = useAppDispatch();
-    const selectedTimeline = useAppSelector(state => state.timeline.selected);
+    const timeline = useAppSelector(state => state.timeline.selected);
 
     /* ---------------------------------------------------------------------------
         Clicks on month selector items will update << timeline.selected.month >>
@@ -28,16 +24,6 @@ const MonthButton: React.FunctionComponent<MonthButtonProps> = (props: MonthButt
         // Update selected month.
         const payloadMonthSelected: string = props.month;
         dispatch(handleMonthSelect(payloadMonthSelected));
-
-        // Prepare fetch payload.
-        let payloadFetchMonth: ImageDocsRequestProps = { 
-            'year': selectedTimeline.year as number
-        };
-        // month value in fetch request needs to be numerical.
-        const month = getNumericalMonth(props.month as TimelineMonthTypes);
-        payloadFetchMonth['month'] = month;
-
-        dispatch(fetchImagesData(payloadFetchMonth));
     };
   
     
@@ -45,14 +31,14 @@ const MonthButton: React.FunctionComponent<MonthButtonProps> = (props: MonthButt
         <div 
             className={ useMediaQueries(`${props.baseClassName}__${props.className}`) 
                 +   // Add "active" styling for selected element.
-                (selectedTimeline.month === props.month
+                (timeline.month === props.month
                     ? " " + "active"
                     : "") }
             id={ `${props.className}-${props.month}` }
             role="menuitemradio" 
             aria-label={ "month selector option" }
             aria-checked={// Changed pressed state based on selected element.
-                selectedTimeline.month === props.month 
+                timeline.month === props.month 
                     ? "true"
                     : "false" }
             onClick={ onMonthSelect }>

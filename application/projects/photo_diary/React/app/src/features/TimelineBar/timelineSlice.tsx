@@ -3,7 +3,7 @@ import {
     createAsyncThunk,
     Action,
     AnyAction, 
-    isRejectedWithValue} from '@reduxjs/toolkit';
+    isRejectedWithValue } from '@reduxjs/toolkit';
 import axios, { AxiosError, AxiosResponse } from 'axios';
 import { RootState } from '../../app/store';
 import { apiUrl } from '../../app/App';
@@ -220,10 +220,8 @@ const timelineSlice = createSlice({
                 // Assign list of years in the collection.
                 state.years = years;
 
-                // Set main selectables only on single 'year' queries.
-                if (Object.keys(args).length === 1) {
-                    state.filterSelectables = filterSelectables;
-                }
+                // Set main selectables.
+                state.filterSelectables = filterSelectables;
                 
                 // For non-month queries, update counter.
                 if (args['month'] === undefined) {
@@ -279,7 +277,7 @@ const timelineSlice = createSlice({
 ===================================================================== */
 export interface TimelineProps {
     [index: string]: string | any,
-    'responseStatus': 'uninitialized' | 'initialized' | 'pending' | 'successful' | 'error',
+    'responseStatus': 'uninitialized' | 'initialized' | 'pending' | 'successful' | 'idle' | 'error',
     'query': ImageDocsRequestProps | null,
     'initYear': number | null,
     'selected': {

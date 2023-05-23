@@ -108,7 +108,7 @@ test("gets login credentials on successful sign-ins", async() => {
     const { newStore } = renderBoilerplate(preloadedState);
 
     // Verify mocked initialization.
-    await waitFor(() => expect(newStore.getState().timeline.responseStatus).toEqual('successful'));
+    await waitFor(() => expect(newStore.getState().timeline.responseStatus).toEqual('idle'));
     
     // Check sign-in button exists.
     await screen.findByRole('button', { name: "login using Google OAuth" });
@@ -196,7 +196,7 @@ test("logout sets user to 'visitor' and response from backend removes access tok
     const { newStore } = renderBoilerplate(preloadedState);
 
     // Verify mocked initialization.
-    await waitFor(() => expect(newStore.getState().timeline.responseStatus).toEqual('successful'));
+    await waitFor(() => expect(newStore.getState().timeline.responseStatus).toEqual('idle'));
     
     // Check sign-in button exists.
     await screen.findByRole('button', { name: "login using Google OAuth" });
@@ -281,7 +281,7 @@ test("error from auth code to access token exchange keeps user in visitor role",
     const { newStore } = renderBoilerplate(preloadedState);
 
     // Verify mocked initialization.
-    await waitFor(() => expect(newStore.getState().timeline.responseStatus).toEqual('successful'));
+    await waitFor(() => expect(newStore.getState().timeline.responseStatus).toEqual('idle'));
     
     // Check sign-in button exists.
     await screen.findByRole('button', { name: "login using Google OAuth" });

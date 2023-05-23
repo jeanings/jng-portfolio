@@ -1,5 +1,9 @@
 import React from 'react';
 import { useAppSelector, useMediaQueries } from '../common/hooks';
+import { 
+    Outlet,
+    Route,
+    Routes } from 'react-router-dom';
 import TimelineBar from '../features/TimelineBar/TimelineBar';
 import FilterDrawer from '../features/FilterDrawer/FilterDrawer';
 import MapCanvas from '../features/MapCanvas/MapCanvas';
@@ -89,22 +93,47 @@ const App: React.FunctionComponent = () => {
             break;
     };
 
+
+    const Layout: React.FunctionComponent = () => {
+        return (
+            <>
+                <NavBar />
+                <Toolbar />
+                <Login />
+            </>
+        );
+    };
     
+
     return (
-        <div 
-            className={ useMediaQueries(classBase) 
-                +   // Add styling for loading: hidden if initial fetch not loaded 
-                (isLoaded === 'uninitialized'
-                    ? " " + "loading"
-                    : "") }>
-            <NavBar />
-            <TimelineBar />
-            <FilterDrawer />
-            <MapCanvas />
-            <SideFilmStrip />
-            <Toolbar />
-            <Login />
-        </div>
+        <Routes>
+            {/* Main App container. */}
+            <Route element={ 
+                <div 
+                    className={ useMediaQueries(classBase) 
+                        +   // Add styling for loading: hidden if initial fetch not loaded 
+                        (isLoaded === 'uninitialized'
+                            ? " " + "loading"
+                            : "") }>
+                    {/* The main, static-like UI components. */}
+                    <Layout />
+                    {/* Where nested routes are rendered. */}
+                    <Outlet />
+                </div>
+            }>
+                {/* Nested routes, rendered into Outlet. */}
+                <Route path='/*' element={
+                    <>
+                        <TimelineBar />
+                        <SideFilmStrip />
+                        <MapCanvas />
+                        <FilterDrawer />
+                    </>
+                }/>
+                             
+                {/* <Route path='*' element={ <Navigate to='/'/> } /> */}
+            </Route>
+        </Routes>
     );
 };
 

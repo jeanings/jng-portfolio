@@ -5,6 +5,7 @@ import './index.css';
 import App from './app/App';
 import { store } from './app/store';
 import { GoogleOAuthProvider } from '@react-oauth/google';
+import { BrowserRouter } from 'react-router-dom';
 import * as serviceWorker from './serviceWorker';
 
 
@@ -14,7 +15,9 @@ ReactDOM.render(
     <React.StrictMode>
         <Provider store={ store }>
             <GoogleOAuthProvider clientId={ GAE_OAUTH_CLIENT_ID }>
-                <App />
+                <BrowserRouter>
+                    <App />
+                </BrowserRouter>
             </GoogleOAuthProvider>
         </Provider>
     </React.StrictMode>,
