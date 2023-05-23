@@ -14,6 +14,9 @@ import Login from '../features/Login/Login';
 import './App.css';
 
 export const DEV_MODE = process.env.REACT_APP_DEV_MODE;
+export const appPath: string = DEV_MODE === 'True'
+    ? ''
+    : process.env.REACT_APP_PATH as string;
 export const apiUrl: string = DEV_MODE === 'True'
     ? process.env.REACT_APP_API_URL_DEV!
     : process.env.REACT_APP_API_URL!;
@@ -122,7 +125,7 @@ const App: React.FunctionComponent = () => {
                 </div>
             }>
                 {/* Nested routes, rendered into Outlet. */}
-                <Route path='/*' element={
+                <Route path={`${appPath}/*`} element={
                     <>
                         <TimelineBar />
                         <SideFilmStrip />
