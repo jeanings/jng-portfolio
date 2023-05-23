@@ -136,6 +136,7 @@
 
         .FilterDrawer__reset.unavailable {
             cursor: no-drop;
+            pointer-events: none;
         }
 
         .FilterDrawer__reset.unavailable svg {

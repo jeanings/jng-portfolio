@@ -3,16 +3,22 @@ import {
     useAppSelector, 
     useAppDispatch, 
     useMediaQueries } from '../../common/hooks';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import FilterButton from './FilterButton';
-import { clearFilters } from './filterDrawerSlice';
 import {
+    addBulkFilters, 
+    clearFilters, 
+    FilterPayloadType, 
+    FilterProps } from './filterDrawerSlice';
+import {
+    fetchImagesData,
+    FilterableTypes,
     ImageDocsRequestProps, 
     ImageDocFormatTypes,
     TimelineProps,
-    TimelineMonthTypes, 
-    FilterableTypes, 
-    fetchImagesData} from '../TimelineBar/timelineSlice';
+    TimelineMonthTypes } from '../TimelineBar/timelineSlice';
 import { getNumericalMonth } from '../TimelineBar/MonthButton';
+import { routePrefixForYears } from '../TimelineBar/TimelineBar';
 import './FilterDrawer.css';
 
 
@@ -22,9 +28,13 @@ import './FilterDrawer.css';
 ===================================================================== */
 const FilterDrawer: React.FunctionComponent = () => {
     const dispatch = useAppDispatch();
-    const filterState = useAppSelector(state => state.filter);
+    const navigate = useNavigate();
+    const [ searchParams, setSearchParams ] = useSearchParams();
+    const filtered = useAppSelector(state => state.filter);
     const filterables = useAppSelector(state => state.timeline.filterSelectables);
-    const selectedTimeline = useAppSelector(state => state.timeline.selected);
+    const responseStatus = useAppSelector(state => state.timeline.responseStatus);
+    const timeline = useAppSelector(state => state.timeline.selected);
+    const queried = useAppSelector(state => state.timeline.query);
     const toolbarFilterSwitch = useAppSelector(state => state.toolbar.filter);
     const classBase: string = "FilterDrawer";
     const classNames: ClassNameTypes = {
@@ -34,14 +44,100 @@ const FilterDrawer: React.FunctionComponent = () => {
         'base': classBase
     };
 
+
+    /* ------------------------------------------------------
+        For init renders with filters accessed through URL.  Updates to missing << filter >> state.
+        Direct (init) route access with queries bypasses normal behaviour of adding filters to state. 
+    ------------------------------------------------------ */
+    useEffect(() => {
+        if (responseStatus !== 'initialized') {
+            return;
+        }
+        
+        const isFiltersInState: boolean = checkFiltersInStateExist(filtered);
+
+        if (responseStatus === 'initialized'
+            && queried 
+            && isFiltersInState === false) {    // no filters in state yet if accessed from URL.
+            // Exit out of init renders with only 'year' as query.
+            if (Object.keys(queried).length === 1) {
+                return;
+            }
+
+            // Parse queries to match format of << filter >> parameters.
+            const payloadQueryToFilters = Object.entries(queried).reduce((addInitQueriesToFilters, filter) => {
+                const [ category, params ] = filter
+                
+                if (category === 'year' || category === 'month') {
+                    return addInitQueriesToFilters;
+                }
+
+                const parsedParams = params.map((param: string | number) => {
+                    if (typeof param === 'string') {
+                        const parsedParam = param.split('_').join(' ');
+                        return parsedParam;
+                    }
+                });
+
+                addInitQueriesToFilters[category] = parsedParams
+                return addInitQueriesToFilters;
+            }, {} as FilterPayloadType);
+
+            dispatch(addBulkFilters(payloadQueryToFilters));
+        }
+    }, [responseStatus]);
+
+
     /* -------------------------------------------------
         Clear all filters on selected timeline changes. 
     ------------------------------------------------- */
     useEffect(() => {
-        if (selectedTimeline.year) {
+        if (responseStatus === 'uninitialized' ) {
+            return;
+        }
+
+        const isFiltersInState: boolean = checkFiltersInStateExist(filtered);
+        if (isFiltersInState) {
             dispatch(clearFilters("RESET TO INIT STATE"));
         }
-    }, [selectedTimeline]);
+    }, [timeline.year]);
+
+    
+    /* ---------------------------------------------------
+        Set search params (filter queries) for route.
+    -------------------------------------------------- */
+    useEffect(() => {
+        if (responseStatus === 'initialized' || responseStatus === 'idle') {
+            const buildFilterParams = new FilterParams(filtered, searchParams, timeline.month);
+            const updatedParams = buildFilterParams.apply();
+            setSearchParams(updatedParams);
+
+            // Get current payload for fetch.
+            // Returns object structured as { year: 2022, film: 'Kodak Gold 200' } etc. 
+            let payloadFilteredQuery = getPayloadForFilteredQuery(filtered, timeline);
+            
+            // Re-assign category key to match backend's.
+            for (let category in filtered) {
+                const parsedCategoryKey = categoryKeysCamelToHyphen(category);
+                // Don't add empty filters.
+                if (filtered[category].length === 0) {
+                    continue;
+                }
+                payloadFilteredQuery[parsedCategoryKey] = filtered[category];
+            }
+
+            // Fetch if filter queries exist.
+            if (Object.keys(payloadFilteredQuery).length > 1) {
+                dispatch(fetchImagesData(payloadFilteredQuery));    // 'month' queries too
+            }
+            // Handles resetting month to 'all' fetches.
+            else {
+                if (responseStatus !== 'initialized' || timeline.month === 'all') {
+                    dispatch(fetchImagesData(payloadFilteredQuery))
+                }
+            }
+        }
+    }, [filtered, timeline.month]);
 
 
     // Prep fetched data for the filter groups.
@@ -69,23 +165,14 @@ const FilterDrawer: React.FunctionComponent = () => {
         : [];
 
 
-    /* --------------------------------------------------------
+    /* -----------------------------------------------
         Handle button for resetting of filter state.
-        Clears << filter >> and triggers fetch via useEffect.
-    -------------------------------------------------------- */
+    ----------------------------------------------- */
     const onResetClick = (event: React.SyntheticEvent) => {
         dispatch(clearFilters("RESET TO INIT STATE"));
-
-        // "Return" to unfiltered data state by fetching for selected timeline.
-        const payloadFetchBaseTimeline: ImageDocsRequestProps = {
-            'year': selectedTimeline.year as number
-        };
-
-        if (selectedTimeline.month !== 'all') {
-            payloadFetchBaseTimeline['month'] = getNumericalMonth(selectedTimeline.month as TimelineMonthTypes);
-        }
-
-        dispatch(fetchImagesData(payloadFetchBaseTimeline));
+        // Let YearRoute handle fetch dispatch.
+        const yearRoute: string = `${routePrefixForYears}/${timeline.year}`;
+        navigate(yearRoute);
     };
 
 
@@ -97,7 +184,7 @@ const FilterDrawer: React.FunctionComponent = () => {
         let filtersActive: boolean | null = null;
         let resetAvailablity: string = '';
 
-        for (let filters of Object.entries(filterState)) {
+        for (let filters of Object.entries(filtered)) {
             const queries = filters[1];
             
             if (queries?.length > 0) {
@@ -208,73 +295,182 @@ function createCategory(
 }
 
 
+/* --------------------------------------------------------------------
+    Convert parameter keys from camel case to hyphenated for backend. 
+-------------------------------------------------------------------- */
+function categoryKeysCamelToHyphen(filterCategory: string) {
+    const upperCaseIndices: Array<number> = [];
+    let hyphenatedCategoryKey: string = filterCategory;
+    let processedStringParts: Array<string> = [];
+
+    // Find all upper case characters in key string.
+    for (let charIndex = 0; charIndex < filterCategory.length; charIndex++) {
+        // Get index of upper case characters.
+        if (filterCategory.charAt(charIndex) === filterCategory.charAt(charIndex).toUpperCase()) {
+            upperCaseIndices.push(charIndex);
+        }
+    }
+
+    // Break out early if hyphenating not needed.
+    if (upperCaseIndices.length === 0) {
+        return filterCategory;
+    }
+
+    // Loop through the upper case indices to get all replacement string parts.
+    for (let index = 0; index < upperCaseIndices.length; index++) {
+        let left: number;
+        let right: number;
+
+        switch(index === 0) {
+            // Example with 'formatMediumType' with [6, 12]
+            case true:
+                left = 0;                           //  [0] -> | formatMediumType
+                right = upperCaseIndices[index];    //  [6] -> format | MediumType
+                break;
+            case false:
+                left = upperCaseIndices[index];     //  [6] -> format | MediumType
+                right = upperCaseIndices[index + 1] !== undefined
+                    ? upperCaseIndices[index + 1]   //  [12] -> formatMedium | Type
+                    : filterCategory.length;        //  formatMediumType |
+                break;
+        }
+
+        processedStringParts.push(
+            filterCategory.slice(left, right).toLowerCase(),
+        );
+        
+        // Add the rightmost part on final iteration.
+        if (index === upperCaseIndices.length - 1) {
+            processedStringParts.push(
+                filterCategory.slice(right, filterCategory.length).toLowerCase()
+            );
+        }        
+    }
+    hyphenatedCategoryKey = processedStringParts.join("-");
+    return hyphenatedCategoryKey;
+}
+
+
 /* ---------------------------------------------
     Builds fetch payload for filtered queries.
 --------------------------------------------- */
-export function getPayloadForFilteredQuery(filterState: FilterableTypes, selectedTimeline: TimelineProps['selected']) {
+export function getPayloadForFilteredQuery(filtered: FilterableTypes, timeline: TimelineProps['selected']) {
+    const isFiltered = checkFiltersInStateExist(filtered);
+
     // Start with year parameter as base.
-    let filteredQuery: ImageDocsRequestProps= {
-        'year': selectedTimeline.year as number
-    };
+    let filteredQuery: ImageDocsRequestProps= { 'year': timeline.year as number };
 
     // Add month if selected.
-    if (selectedTimeline.month !== 'all') {
-        filteredQuery['month'] = getNumericalMonth(selectedTimeline.month as TimelineMonthTypes);
+    if (timeline.month !== 'all') {
+        filteredQuery['month'] = getNumericalMonth(timeline.month as TimelineMonthTypes);
     }
-
-    const isFiltered = getFilterStateStatus(filterState);
 
     if (isFiltered === false) {
         return filteredQuery;
     }
 
     // Assign correct string for keys.
-    for (let category in filterState) {
-        if (filterState[category]!.length === 0) {
+    for (let category in filtered) {
+        if (filtered[category]!.length === 0) {
             continue;
         }
 
         switch(category) {
             case 'formatMedium':
-                filteredQuery['format-medium'] = filterState[category] as Array<ImageDocFormatTypes['medium']>
+                filteredQuery['format-medium'] = filtered[category] as Array<ImageDocFormatTypes['medium']>
                 break;
             case 'formatType': 
-                filteredQuery['format-type'] = filterState[category] as Array<ImageDocFormatTypes['type']>
+                filteredQuery['format-type'] = filtered[category] as Array<ImageDocFormatTypes['type']>
                 break;
             case 'film':
-                filteredQuery['film'] = filterState[category] as Array<string>
+                filteredQuery['film'] = filtered[category] as Array<string>
                 break;
             case 'camera':
-                filteredQuery['camera'] = filterState[category]
+                filteredQuery['camera'] = filtered[category]
                 break;
             case 'lens':
-                filteredQuery['lens'] = filterState[category]
+                filteredQuery['lens'] = filtered[category]
                 break;
             case 'focalLength':
-                filteredQuery['focal-length'] = filterState[category] as Array<number>
+                filteredQuery['focal-length'] = filtered[category] as Array<number>
                 break;
             case 'tags':
-                filteredQuery['tags'] = filterState[category]
+                filteredQuery['tags'] = filtered[category]
                 break;
         }
     }
-
     return filteredQuery;
-};
+}
+
+
+/* -----------------------------------------------
+    Class for setting search params for filters.
+----------------------------------------------- */
+export class FilterParams {
+    filtered: FilterProps;
+    searchParams: URLSearchParams;
+    month: string | null;
+
+    constructor(filtered: FilterProps, searchParams: URLSearchParams, month: string | null) {
+        this.filtered = filtered;
+        this.searchParams = searchParams;
+        this.month = month;
+    }
+
+    apply() {
+        const setParams = Object.keys(this.filtered).filter(category => this.filtered[category].length > 0);
+    
+        setParams.map(category => {
+            let tags: Array<string> = [];
+            for (let param in this.filtered[category]) {
+                // Parse spaces into underscores.
+                const keyword: string = this.filtered[category][param].toString().split(' ').join('_');
+                if (category === 'tags') {
+                    // Build 'tags' search params array.
+                    tags.push(keyword);
+                }
+                else {
+                    // Immediately set search params (no multiple params for category).
+                    this.searchParams.set(category, keyword);
+                }
+            }
+            // Set 'tags' params.
+            if (category === 'tags') {
+                this.searchParams.set(category, tags.join('+'));
+            }
+        });
+
+        const clearParams = Object.keys(this.filtered).filter(category => this.filtered[category].length === 0);
+        for (let category of clearParams) {
+            this.searchParams.delete(category);            
+        };
+
+        // Only set 'month' param for actual months.
+        if (this.month && this.month !== 'all') {
+            this.searchParams.set('month', this.month);
+        }
+        else if (this.month) {
+            this.searchParams.delete('month');
+        }
+
+        return this.searchParams;
+    }
+}
 
 
 /* ------------------------------------------
     Get de/activated status of << filter >>
 ------------------------------------------ */
-export function getFilterStateStatus(filterState: FilterableTypes) {
-    let filteredStatus: boolean = false;
-    for (let category in filterState) {
-        if (filterState[category]!.length > 0) {
-            filteredStatus = true;
-            break;
-        }
-    }
-    return filteredStatus;
+export function checkFiltersInStateExist(filtered: FilterableTypes) {
+    const anyFiltersInState = Object.entries(filtered).reduce((result, item) => {
+        const [ category, params ] = item; 
+        result = params!.length === 0
+            ? result
+            : true;
+        return result;
+    }, false);
+
+    return anyFiltersInState;
 }
 
 

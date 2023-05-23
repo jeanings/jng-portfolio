@@ -5,10 +5,11 @@ import {
     cleanup,
     render,
     screen } from '@testing-library/react';
+import '@testing-library/jest-dom';
+import { MemoryRouter } from 'react-router-dom';
 import axios from 'axios';
 import MockAdapter from 'axios-mock-adapter';
 import { GoogleOAuthProvider } from '@react-oauth/google';
-import '@testing-library/jest-dom';
 import App, { apiUrl } from './App';
 
 var mockAxios = new MockAdapter(axios);
@@ -48,7 +49,9 @@ test("renders all features on initial load", () => {
     render(
         <Provider store={newStore}>
             <GoogleOAuthProvider clientId={ 'some-client-id' }>
-                <App />
+                <MemoryRouter>
+                    <App />
+                </MemoryRouter>
             </GoogleOAuthProvider>
         </Provider>
     );

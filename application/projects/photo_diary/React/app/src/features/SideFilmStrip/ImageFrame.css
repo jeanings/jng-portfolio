@@ -1,5 +1,7 @@
 .ImageFrame {
     display: flex;
+    width: 8rem;
+    height: 8rem;
     pointer-events: all;
     user-select: all;
     cursor: pointer;
@@ -26,14 +28,19 @@
 /* -------------------------------------------
                     Mobile
 ------------------------------------------- */
-.ImageFrame.mobile.port 
-    .ImageFrame__image {
+.ImageFrame.mobile.port {
     width: 8rem;
     height: 8rem;
-    border-radius: 0.75rem;
 }
 
     .ImageFrame.mobile.port 
-        .ImageFrame__image.selected {
-        border-radius: 4rem;
+        .ImageFrame__image {
+        width: 8rem;
+        height: 8rem;
+        border-radius: 0.75rem;
     }
+
+        .ImageFrame.mobile.port 
+            .ImageFrame__image.selected {
+            border-radius: 4rem;
+        }

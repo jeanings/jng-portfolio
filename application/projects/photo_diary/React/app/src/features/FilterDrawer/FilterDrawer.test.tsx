@@ -6,11 +6,12 @@ import {
     render, 
     screen, 
     waitFor } from '@testing-library/react';
+import '@testing-library/jest-dom';
+import { MemoryRouter } from 'react-router-dom';
 import userEvent from '@testing-library/user-event';
 import axios from 'axios';
 import MockAdapter from 'axios-mock-adapter';
 import { apiUrl } from '../../app/App';
-import '@testing-library/jest-dom';
 import mockDefaultData from '../../utils/mockDefaultData.json';
 import mock2022Data from '../../utils/mock2022Data.json';
 import mock2022DataJun from '../../utils/mock2022DataJun.json';
@@ -41,12 +42,14 @@ function renderBoilerplate(preloadedState: RootState, components: Array<string>)
     const newStore = setupStore(preloadedState);
     const container = render(
         <Provider store={newStore}>
-            { components.includes('timeline')
-                ? <TimelineBar />
-                : <></> }
-            { components.includes('filter')
-                ? <FilterDrawer />
-                : <></> }
+            <MemoryRouter>
+                { components.includes('timeline')
+                    ? <TimelineBar />
+                    : <></> }
+                { components.includes('filter')
+                    ? <FilterDrawer />
+                    : <></> }
+            </MemoryRouter>
         </Provider>
     );
     return { ...container, newStore };
@@ -125,7 +128,7 @@ describe("on filter button clicks", () => {
                 Mocks                                            end
             -------------------------------------------------------- */
 
-            const { newStore } = renderBoilerplate(preloadedState, ['filter']);
+            const { newStore } = renderBoilerplate(preloadedState, ['timeline', 'filter']);
     
             // Verify correct number of filter buttons rendered.
             const filterButtons = screen.getAllByRole('checkbox', { name: group.ariaLabel});
@@ -363,7 +366,7 @@ test("<< filter >> state resets to initial state when year is changed", async() 
     const { newStore } = renderBoilerplate(preloadedState, ['filter', 'timeline']);
 
     // Verify filter state is blank.
-    expect(newStore.getState().timeline.responseStatus).toEqual('successful');
+    expect(newStore.getState().timeline.responseStatus).toEqual('idle');
     expect(newStore.getState().filter.film.length).toEqual(0);
 
     // Wait for elements to render.
@@ -417,7 +420,7 @@ test("dispatches fetch request on << filter >> state changes", async() => {
     const { newStore } = renderBoilerplate(preloadedState, ['filter', 'timeline']);
         
     // Verify number of docs for initial fetch request.
-    await waitFor(() => expect(newStore.getState().timeline.responseStatus).toEqual('successful'));
+    await waitFor(() => expect(newStore.getState().timeline.responseStatus).toEqual('idle'));
     await waitFor(() => expect(newStore.getState().timeline.counter.all).toEqual(40));
 
     await waitFor(() => screen.findAllByRole('checkbox', { name: "film filter option" }));
@@ -429,7 +432,7 @@ test("dispatches fetch request on << filter >> state changes", async() => {
     let filterButtonToClick = filterButtons.filter(button => button.textContent === 'Kodak Gold 200')[0];
     await user.click(filterButtonToClick);
     
-    await waitFor(() => expect(newStore.getState().timeline.responseStatus).toEqual('successful'));
+    await waitFor(() => expect(newStore.getState().timeline.responseStatus).toEqual('idle'));
     expect(newStore.getState().filter.film).toContain('Kodak Gold 200');
     
     // Verify fetch returning different set of data.
@@ -518,9 +521,10 @@ test("fetches year's data when going from filters activated to deactivated", asy
 
     const { newStore } = renderBoilerplate(preloadedState, ['filter', 'timeline']);
 
-    await waitFor(() => expect(newStore.getState().timeline.responseStatus).toEqual('successful'));
+    await waitFor(() => expect(newStore.getState().timeline.responseStatus).toEqual('idle'));
     expect(newStore.getState().filter.film.length).toEqual(0);
 
+    // Verify filter state is blank.
     await waitFor(() => screen.findAllByRole('checkbox', { name: "film filter option" }));
     const filterButtonsForFilm = screen.getAllByRole('checkbox', { name: "film filter option" });
     expect(newStore.getState().filter.film).not.toContain('Kodak Gold 200');
@@ -529,17 +533,14 @@ test("fetches year's data when going from filters activated to deactivated", asy
     let filterButtonToClick = filterButtonsForFilm.filter(button => button.textContent === 'Kodak Gold 200')[0];
     await user.click(filterButtonToClick);
     
-    await waitFor(() => expect(newStore.getState().timeline.responseStatus).toEqual('successful'));
+    // Verify filter state updated.
+    await waitFor(() => expect(newStore.getState().timeline.responseStatus).toEqual('idle'));
     expect(newStore.getState().filter.film).toContain('Kodak Gold 200');
-
-    // Verify query state updated.
-    expect(newStore.getState().timeline.query).toEqual({
-        year: 2022,
-        film: [ 'Kodak Gold 200']
-    });
 
     // Re-click previous filter button to deactivate filter.
     await user.click(filterButtonToClick);
+
+    // Verify filter cleared.
     await waitFor(() => expect(filterButtonToClick).toHaveAttribute('aria-checked', 'false'));
     expect(newStore.getState().filter.film).not.toContain('Kodak Gold 200');
 

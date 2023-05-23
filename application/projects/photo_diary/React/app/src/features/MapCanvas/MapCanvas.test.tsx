@@ -7,11 +7,12 @@ import {
     render, 
     screen, 
     waitFor } from '@testing-library/react';
+import '@testing-library/jest-dom';
+import { MemoryRouter } from 'react-router-dom';
 import userEvent from '@testing-library/user-event';
 import axios from 'axios';
 import MockAdapter from 'axios-mock-adapter';
 import { apiUrl } from '../../app/App';
-import '@testing-library/jest-dom';
 import mockDefaultData from '../../utils/mockDefaultData.json';
 import mock2015Data from '../../utils/mock2015Data.json';
 import preloadedState from '../../utils/testHelpers';
@@ -50,6 +51,7 @@ jest.mock('mapbox-gl');
 
 // Mocked Mapbox methods.
 const mockMapOn = jest.fn();
+const mockMapOff = jest.fn();
 const mockMapGetCanvas = jest.fn();
 const mockMapAddSource = jest.fn();
 const mockMapGetSource = jest.fn();
@@ -70,8 +72,10 @@ function renderBoilerplate(preloadedState?: RootState) {
     const newStore = setupStore(preloadedState);
     const container = render(
         <Provider store={newStore}>
-            <TimelineBar />
-            <MapCanvas />
+            <MemoryRouter>
+                <TimelineBar />
+                <MapCanvas />
+            </MemoryRouter>
         </Provider>
     );
     return { ...container, newStore };
@@ -98,6 +102,7 @@ test("initializes map on rendering", async() => {
         .mockImplementation(() => {
             return {
                 on: mockMapOn,
+                off: mockMapOff,
                 getCanvas: mockMapGetCanvas,
                 addSource: mockMapAddSource,
                 addLayer: mockMapAddLayer,
@@ -142,6 +147,7 @@ test("adds new data source on new fetches and adds zoom controls", async() => {
         .mockImplementation(() => {
             return {
                 on: mockMapOn,
+                off: mockMapOff,
                 getCanvas: mockMapGetCanvas,
                 addSource: mockMapAddSource,
                 addLayer: mockMapAddLayer,
@@ -171,7 +177,7 @@ test("adds new data source on new fetches and adds zoom controls", async() => {
     const { newStore } = renderBoilerplate(preloadedState);
 
     // Verify mocked initialization.
-    await waitFor(() => expect(newStore.getState().timeline.responseStatus).toEqual('successful'));
+    await waitFor(() => expect(newStore.getState().timeline.responseStatus).toEqual('idle'));
     // Assert no initial API call, since initYear isn't null (store has preloaded state).
     expect(mockDispatch).toHaveBeenCalledTimes(0);
 
@@ -214,6 +220,7 @@ test("adds marker layer and fits map to bounds", async() => {
         .mockImplementation(() => {
             return {
                 on: mockMapOn,
+                off: mockMapOff,
                 getCanvas: mockMapGetCanvas,
                 addSource: mockMapAddSource,
                 addLayer: mockMapAddLayer,
@@ -282,6 +289,7 @@ test("replaces previous layer and source on new data fetches", async() => {
         .mockImplementation(() => {
             return {
                 on: mockMapOn,
+                off: mockMapOff,
                 getCanvas: mockMapGetCanvas,
                 addSource: mockMapAddSource,
                 addLayer: mockMapAddLayer,
@@ -337,7 +345,7 @@ test("replaces previous layer and source on new data fetches", async() => {
     newStore.dispatch(handleYearSelect(2015));
 
     await waitFor(() => {
-        expect(newStore.getState().timeline.responseStatus).toEqual('successful');
+        expect(newStore.getState().timeline.responseStatus).toEqual('idle');
         expect(newStore.getState().timeline.selected.year).toEqual(2015);
     });
 
@@ -374,6 +382,7 @@ test("does not initialize map on unsuccessful fetch", async() => {
         .mockImplementation(() => {
             return {
                 on: mockMapOn,
+                off: mockMapOff,
                 getCanvas: mockMapGetCanvas,
                 addSource: mockMapAddSource,
                 addLayer: mockMapAddLayer,
