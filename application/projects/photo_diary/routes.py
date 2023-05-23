@@ -75,9 +75,9 @@ photo_diary_bp = Blueprint('photo_diary_bp', __name__,
 
 
 # Photo diary main route.
-@photo_diary_bp.route('/photo-diary', methods=['GET'])
-@photo_diary_bp.route('/photo-diary/', methods=['GET'])
-def photo_diary():
+@photo_diary_bp.route('/photo-diary/', defaults={'path': ''}, methods=['GET'])
+@photo_diary_bp.route('/photo-diary/<path:path>')   # catches paths and allows frontend to handle routing.
+def photo_diary(path):
     return send_from_directory(react_abs, 'photo_diary.html')
 
 
@@ -599,3 +599,5 @@ def auto_refresh_expiring_jwt(response):
         )
         return response
        
+
+# Todo add catch-all for front end to handle reflect, revisit routes
