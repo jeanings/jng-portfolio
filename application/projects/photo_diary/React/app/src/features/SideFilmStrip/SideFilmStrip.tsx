@@ -429,7 +429,7 @@ export function getExistingRoute(timelineYear: number | null, appPath: string) {
     const year: string | number = timelineYear ? timelineYear : '';
     const existingRoutePath: string = window.location.pathname.includes(routePrefixForYears)
         ? appPath + routePrefixForYears + '/' + year
-        : '';
+        : appPath;
     return existingRoutePath;
 }
 
