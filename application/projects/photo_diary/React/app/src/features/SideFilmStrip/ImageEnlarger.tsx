@@ -245,7 +245,9 @@ const ImageEnlarger: React.FunctionComponent <ImageEnlargerProps> = (props: Imag
                     ? imageDocs.length - 1   // Cycle to right end. 
                     : changeDocIndexTo;      // Default case.
             const newDocId: string = imageDocs[newDocIndex]._id;
-            const newRoute: string = `${props.routeExisting}/${routePrefixForThumbs}/${newDocId}`;
+            const newRoute: string = props.routeExisting
+                ? `${props.routeExisting}/${routePrefixForThumbs}/${newDocId}`
+                : `${routePrefixForThumbs}/${newDocId}`;
             
             // Redirect to image thumb's route, triggering actions.
             navigate(newRoute);
@@ -810,9 +812,9 @@ function getCategoryData(categoryName: string, categoryData: string | number | A
     Types.
 ===================================================================== */
 export interface ImageEnlargerProps {
-    [index: string]: string,
+    [index: string]: string | null,
     'baseClassName': string,
-    'routeExisting': string
+    'routeExisting': string | null
 };
 
 export interface ImageInfoType {

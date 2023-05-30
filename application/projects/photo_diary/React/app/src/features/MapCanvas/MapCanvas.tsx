@@ -56,7 +56,7 @@ const MapCanvas: React.FunctionComponent = () => {
     const markerIconImage: string = 'image-sharp';
     const markerIconPin: string ='images-sharp';
     const spiderfier = useRef<any | null>(null);
-    const routeExisting = getExistingRoute(timeline.year, appPath);
+    const routeExisting = getExistingRoute(timeline.year);
     const bbox: Array<Array<number>> = bounds !== null
         ? [ [ bounds!.lng[0], bounds!.lat[0] ],     // min bound coords
             [ bounds!.lng[1], bounds!.lat[1] ] ]    // max bound coords
@@ -294,7 +294,9 @@ const MapCanvas: React.FunctionComponent = () => {
             const markerImageDoc = imageDocs![docIndex];
 
             if (markerImageDoc) {
-                const newRoute: string = `${routeExisting}/${routePrefixForThumbs}/${markerImageDoc._id}`;
+                const newRoute: string = routeExisting
+                    ? `${routeExisting}/${routePrefixForThumbs}/${markerImageDoc._id}`
+                    : `${routePrefixForThumbs}/${markerImageDoc._id}`;
                 
                 // Redirect to image thumb's route, triggering actions.
                 navigate(newRoute);

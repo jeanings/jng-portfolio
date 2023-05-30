@@ -12,7 +12,6 @@ import {
     Route, 
     Routes,
     useNavigate } from 'react-router-dom';
-import { appPath } from '../../app/App';
 import { routePrefixForYears } from '../TimelineBar/TimelineBar';
 import { ImageDocTypes } from '../TimelineBar/timelineSlice';
 import { handleSlideView, SideFilmStripProps } from './sideFilmStripSlice';
@@ -43,7 +42,7 @@ const SideFilmStrip: React.FunctionComponent = () => {
     const timeline = useAppSelector(state => state.timeline.selected);
     const filmStripRef = useRef<HTMLDivElement>(null);
     const filmStripObserverRef = useRef<IntersectionObserver | null>(null);
-    const routeExisting = getExistingRoute(timeline.year, appPath);
+    const routeExisting = getExistingRoute(timeline.year);
     const classBase: string = "SideFilmStrip";
 
 
@@ -74,7 +73,9 @@ const SideFilmStrip: React.FunctionComponent = () => {
             // On slide view exit, change enlarger image and reset local slide image index.
             if (slideView === 'off') {
                 const newDocId: string = imageDocs[slideImageIndex as number]._id;
-                const newRoute: string = `${routeExisting}/${routePrefixForThumbs}/${newDocId}`;
+                const newRoute: string = routeExisting 
+                    ? `${routeExisting}/${routePrefixForThumbs}/${newDocId}`
+                    : `${routePrefixForThumbs}/${newDocId}`;
                 // Redirect to image thumb's route, triggering actions.
                 setSlideImageIndex(null);
                 navigate(newRoute);
@@ -203,7 +204,7 @@ const SideFilmStrip: React.FunctionComponent = () => {
     let imageFrameElems: Array<JSX.Element> = [];    
     if (imageDocs) {
         imageFrameElems = imageDocs.map((doc, index) => 
-            createImageFrames(classBase, doc, routeExisting, index)
+            createImageFrames(classBase, doc, index)
         );
     }
 
@@ -211,20 +212,14 @@ const SideFilmStrip: React.FunctionComponent = () => {
         Build routes for all image frame elements above.
     --------------------------------------------------- */  
     const imageThumbElemRoutes = imageFrameElems.map((elem: JSX.Element) => {
-        // let path: string = `${routeExisting}/${routePrefixForThumbs}/${elem.props.imageDoc._id}`;
-        let path: string = `${routeExisting}/${routePrefixForThumbs}`;
-
+        let path: string = routeExisting
+            ? `${routeExisting}/${routePrefixForThumbs}`
+            : `${routePrefixForThumbs}`;
+        
         return (
             <Route
                 path={ `${path}/:docId` }
-                element={
-                    <ImageThumbRoute 
-                        // imageDoc={ elem.props.imageDoc } 
-                        // baseClassName={ elem.props.baseClassName } 
-                        // docIndex={ elem.props.docIndex }
-                        // path={ path }
-                    />
-                }
+                element={ <ImageThumbRoute /> }
                 key={ `key-routed-thumbs_${elem.props.imageDoc._id}` }
             />
         )
@@ -342,7 +337,7 @@ const SideFilmStrip: React.FunctionComponent = () => {
                     role="figure"
                     aria-label="enlarged image with metadata">
 
-                    <ImageEnlarger baseClassName={ classBase } routeExisting={ routeExisting} />
+                    <ImageEnlarger baseClassName={ classBase } routeExisting={ routeExisting } />
                 </div>
 
                 {/* "Film strip" showing image collection in columnar form. */}
@@ -407,14 +402,12 @@ const SideFilmStrip: React.FunctionComponent = () => {
 function createImageFrames(
     classBase: string, 
     imageDoc: ImageDocTypes, 
-    routeExisting: string, 
     index: number) {
     return (
         <ImageFrame
             baseClassName={ classBase }
             imageDoc={ imageDoc }
             docIndex={ index }
-            path= { `${routeExisting}/${routePrefixForThumbs}/${imageDoc._id}` }
             key={ `key_${classBase}_${index.toString()}` }
         />
     );
@@ -425,11 +418,11 @@ function createImageFrames(
     Default (init) loads for latest year doesn't include /reflect-on,
     but requests on different years add /reflect-on, this is helper for it.
 -------------------------------------------------------------------------- */
-export function getExistingRoute(timelineYear: number | null, appPath: string) {
+export function getExistingRoute(timelineYear: number | null) {
     const year: string | number = timelineYear ? timelineYear : '';
-    const existingRoutePath: string = window.location.pathname.includes(routePrefixForYears)
-        ? appPath + routePrefixForYears + '/' + year
-        : appPath;
+    const existingRoutePath: string | null = window.location.pathname.includes(routePrefixForYears)
+        ? routePrefixForYears + '/' + year
+        : null;
     return existingRoutePath;
 }
 

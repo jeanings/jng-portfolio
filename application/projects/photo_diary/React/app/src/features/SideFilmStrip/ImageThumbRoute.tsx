@@ -9,8 +9,7 @@ import { FilterParams } from '../FilterDrawer/FilterDrawer';
 /* =================================================================================
     Routes for each image doc in current dataset.
 ================================================================================= */
-// const ImageThumbRoute: React.FunctionComponent<ImageFrameProps> = (props: ImageFrameProps) => {
-    const ImageThumbRoute: React.FunctionComponent<any> = (props: any) => {
+const ImageThumbRoute: React.FunctionComponent = () => {
     const dispatch = useAppDispatch();
     const { docId } = useParams();
     const [ searchParams, setSearchParams ] = useSearchParams();

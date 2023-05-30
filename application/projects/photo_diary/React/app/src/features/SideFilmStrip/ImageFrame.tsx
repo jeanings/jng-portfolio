@@ -7,6 +7,7 @@ import { Link } from 'react-router-dom';
 import { ImageDocTypes } from '../TimelineBar/timelineSlice';
 import { handleMarkerLocator } from '../MapCanvas/mapCanvasSlice';
 import { handleToolbarButtons, ToolbarProps } from '../Toolbar/toolbarSlice';
+import { getExistingRoute, routePrefixForThumbs } from './SideFilmStrip';
 import './ImageFrame.css';
 
 
@@ -16,8 +17,10 @@ import './ImageFrame.css';
 =============================================================== */
 const ImageFrame: React.FunctionComponent<ImageFrameProps> = (props: ImageFrameProps) => {
     const dispatch = useAppDispatch();
+    const timeline = useAppSelector(state => state.timeline.selected);
     const enlargeDoc = useAppSelector(state => state.sideFilmStrip.enlargeDoc);
     const toolbarImageEnlarger = useAppSelector(state => state.toolbar.imageEnlarger);
+    const routeExisting = getExistingRoute(timeline.year);
     const classBase: string = "ImageFrame";   
 
     /* ------------------------------------------------------------------------
@@ -47,7 +50,9 @@ const ImageFrame: React.FunctionComponent<ImageFrameProps> = (props: ImageFrameP
             onClick={ onImageClick }>
 
             {/* Redirect to image routes, where all the state logic resides. */}
-            <Link to={ props.path }>
+            <Link to={ routeExisting
+                ? `${routeExisting}/${routePrefixForThumbs}/${props.imageDoc._id}`
+                : `${routePrefixForThumbs}/${props.imageDoc._id}` }>
                 <img 
                     className={ useMediaQueries(`${classBase}__image`) 
                         +   // Add class styling to indicate selected state
@@ -73,8 +78,7 @@ export interface ImageFrameProps {
     [index: string]: string | ImageDocTypes | number
     'baseClassName': string,
     'imageDoc': ImageDocTypes,
-    'docIndex': number,
-    'path': string
+    'docIndex': number
 };
 
 

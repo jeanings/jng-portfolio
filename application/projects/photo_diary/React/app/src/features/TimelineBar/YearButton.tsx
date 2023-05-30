@@ -12,7 +12,7 @@ import './YearButton.css';
 ============================================================================= */
 const YearButton: React.FunctionComponent<YearButtonProps> = (props: YearButtonProps) => {
     const selectedYear = useAppSelector(state => state.timeline.selected.year);
-    const routePrefix = routePrefixForYears;
+    
     
     return (
         <li 
@@ -24,7 +24,7 @@ const YearButton: React.FunctionComponent<YearButtonProps> = (props: YearButtonP
             id={ `${props.className}-${props.year}` }>
             
                 <Link 
-                    to={ `${routePrefix}/${props.year}` }
+                    to={ `${routePrefixForYears}/${props.year}` }
                     className={ useMediaQueries(`${props.baseClassName}__${props.className}__link`) 
                         +   // Add "active" styling if selected.
                         (selectedYear === parseInt(props.year)
