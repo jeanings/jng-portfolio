@@ -19,6 +19,7 @@ module.exports = {
     "\\.(css|sass)$": "identity-obj-proxy",
   },
   resetMocks: true,
+  setupFiles: ["<rootDir>/src/setupTestEnv.js"],
   setupFilesAfterEnv: ["<rootDir>/src/setupTests.ts"]
 };
 

@@ -9,11 +9,10 @@ import {
     useDebounceCallback,
     useThrottleCallback } from '../../common/hooks';
 import { 
-    Location,
     Route, 
     Routes,
-    useLocation,
     useNavigate } from 'react-router-dom';
+import { appPath } from '../../app/App';
 import { routePrefixForYears } from '../TimelineBar/TimelineBar';
 import { ImageDocTypes } from '../TimelineBar/timelineSlice';
 import { handleSlideView, SideFilmStripProps } from './sideFilmStripSlice';
@@ -31,7 +30,6 @@ import './SideFilmStrip.css';
 ======================================================================= */
 const SideFilmStrip: React.FunctionComponent = () => {
     const dispatch = useAppDispatch();
-    const locate = useLocation();
     const navigate = useNavigate();
     const [ filmStripHovered, setFilmStripHovered ] = useState(false);
     const [ slideImageIndex, setSlideImageIndex ] = useState<number | null>(null);
@@ -45,7 +43,7 @@ const SideFilmStrip: React.FunctionComponent = () => {
     const timeline = useAppSelector(state => state.timeline.selected);
     const filmStripRef = useRef<HTMLDivElement>(null);
     const filmStripObserverRef = useRef<IntersectionObserver | null>(null);
-    const routeExisting = getExistingRoute(timeline.year, locate);
+    const routeExisting = getExistingRoute(timeline.year, appPath);
     const classBase: string = "SideFilmStrip";
 
 
@@ -427,12 +425,11 @@ function createImageFrames(
     Default (init) loads for latest year doesn't include /reflect-on,
     but requests on different years add /reflect-on, this is helper for it.
 -------------------------------------------------------------------------- */
-export function getExistingRoute(timelineYear: number | null, locate: Location) {
+export function getExistingRoute(timelineYear: number | null, appPath: string) {
     const year: string | number = timelineYear ? timelineYear : '';
     const existingRoutePath: string = window.location.pathname.includes(routePrefixForYears)
-        ? routePrefixForYears + '/' + year
+        ? appPath + routePrefixForYears + '/' + year
         : '';
-    // console.log({'window': window.location.pathname, 'existing': existingRoutePath, 'locate': locate})
     return existingRoutePath;
 }
 
