@@ -297,6 +297,7 @@
     row-gap: 2.5rem;
 }
     .SideFilmStrip__image-enlarger-container.mobile.port {
+        width: 100%;
         max-height: 60%;
         grid-template-columns: unset;
         grid-template-rows: 100%;
@@ -307,6 +308,7 @@
     .SideFilmStrip__film-strip.mobile.port {
         grid-column: 1 / -1;
         grid-row: 2 / -1;
+        padding: 0;
         flex-direction: row;
         flex-wrap: nowrap;
         animation-name: none;
