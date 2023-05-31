@@ -114,7 +114,7 @@ const FilterDrawer: React.FunctionComponent = () => {
 
             // Get current payload for fetch.
             // Returns object structured as { year: 2022, film: 'Kodak Gold 200' } etc. 
-            let payloadFilteredQuery = getPayloadForFilteredQuery(filtered, timeline);
+            let payloadFilteredQuery = getPayloadForFilteredQuery(filtered, timeline, undefined);
             
             // Re-assign category key to match backend's.
             for (let category in filtered) {
@@ -354,15 +354,22 @@ function categoryKeysCamelToHyphen(filterCategory: string) {
 /* ---------------------------------------------
     Builds fetch payload for filtered queries.
 --------------------------------------------- */
-export function getPayloadForFilteredQuery(filtered: FilterableTypes, timeline: TimelineProps['selected']) {
+export function getPayloadForFilteredQuery(
+    filtered: FilterableTypes,
+    timeline?: TimelineProps['selected'],
+    initTimeline?: ImageDocsRequestProps) {
     const isFiltered = checkFiltersInStateExist(filtered);
 
     // Start with year parameter as base.
-    let filteredQuery: ImageDocsRequestProps= { 'year': timeline.year as number };
-
+    let filteredQuery: ImageDocsRequestProps = timeline?.year
+        ? { 'year': timeline.year as number }
+        : { 'year': initTimeline?.year as number | 'default' };
     // Add month if selected.
-    if (timeline.month !== 'all') {
-        filteredQuery['month'] = getNumericalMonth(timeline.month as TimelineMonthTypes);
+    if (timeline?.month !== 'all') {
+        filteredQuery['month'] = getNumericalMonth(timeline?.month as TimelineMonthTypes);
+    }
+    else if (initTimeline?.month) {
+        filteredQuery['month'] = initTimeline.month
     }
 
     if (isFiltered === false) {

@@ -6,7 +6,7 @@ import {
     useAppSelector, 
     useMediaQueries,
     useWindowSize } from '../../common/hooks';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { 
     setStyleLoadStatus, 
     setSourceStatus, 
@@ -14,6 +14,7 @@ import {
     cleanupMarkerSource,
     handleBoundsButton, 
     handleMarkerLocator } from './mapCanvasSlice';
+import { appPath } from '../../app/App';
 import { ImageDocTypes } from '../TimelineBar/timelineSlice';
 import { handleToolbarButtons, ToolbarProps } from '../Toolbar/toolbarSlice';
 import { getExistingRoute, routePrefixForThumbs } from '../SideFilmStrip/SideFilmStrip';
@@ -33,7 +34,6 @@ const MapboxglSpiderfier: any = require('mapboxgl-spiderifier');
 const MapCanvas: React.FunctionComponent = () => {
     const dispatch = useAppDispatch();
     const windowSize = useWindowSize();
-    const locate = useLocation();
     const navigate = useNavigate();
     const timeline = useAppSelector(state => state.timeline.selected);
     const geojson = useAppSelector(state => state.timeline.geojson);
@@ -56,7 +56,7 @@ const MapCanvas: React.FunctionComponent = () => {
     const markerIconImage: string = 'image-sharp';
     const markerIconPin: string ='images-sharp';
     const spiderfier = useRef<any | null>(null);
-    const routeExisting = getExistingRoute(timeline.year, locate);
+    const routeExisting = getExistingRoute(timeline.year);
     const bbox: Array<Array<number>> = bounds !== null
         ? [ [ bounds!.lng[0], bounds!.lat[0] ],     // min bound coords
             [ bounds!.lng[1], bounds!.lat[1] ] ]    // max bound coords
@@ -294,7 +294,9 @@ const MapCanvas: React.FunctionComponent = () => {
             const markerImageDoc = imageDocs![docIndex];
 
             if (markerImageDoc) {
-                const newRoute: string = `${routeExisting}/${routePrefixForThumbs}/${markerImageDoc._id}`;
+                const newRoute: string = routeExisting
+                    ? `${routeExisting}/${routePrefixForThumbs}/${markerImageDoc._id}`
+                    : `${routePrefixForThumbs}/${markerImageDoc._id}`;
                 
                 // Redirect to image thumb's route, triggering actions.
                 navigate(newRoute);

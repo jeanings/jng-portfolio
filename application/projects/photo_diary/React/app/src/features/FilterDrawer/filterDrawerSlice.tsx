@@ -42,7 +42,6 @@ const filterSlice = createSlice({
             const filterRequest = action.payload;
 
             for (let [category, params] of Object.entries(filterRequest)) {
-                console.log(category, params)
                 state[category] = params as any;
             }
         },

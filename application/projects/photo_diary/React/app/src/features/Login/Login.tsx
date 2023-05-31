@@ -50,7 +50,7 @@ const Login: React.FunctionComponent = () => {
             className={ useMediaQueries(classBase) }>
             <button 
                 className={ useMediaQueries(`${classBase}__button`)
-                +   // Change styling based on logged status.
+                    +   // Change styling based on logged status.
                     (isLoggedIn === true
                         ? " " + "authorized"
                         : "") }

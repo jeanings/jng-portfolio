@@ -44,6 +44,7 @@ test("renders all features on initial load", () => {
     /* --------------------------------------------------------
         Mocks                                            end
     -------------------------------------------------------- */
+    expect(process.env.REACT_APP_DEV_MODE).toEqual('True');
     
     const newStore = setupStore();
     render(
@@ -56,10 +57,14 @@ test("renders all features on initial load", () => {
         </Provider>
     );
     
+    // Layout components.
     expect(screen.getByRole('menubar', { name: 'main site navigation menu' })).toBeInTheDocument();
+    expect(screen.getByRole('menu', { name: 'toolbar' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'login using Google OAuth' })).toBeInTheDocument();
+    // Main components.
     expect(screen.getByRole('menu', { name: 'timeline selector' })).toBeInTheDocument();
     expect(screen.getByRole('form', { name: 'filters menu'} )).toBeInTheDocument();
     expect(screen.getByRole('main', { name: 'map'} )).toBeInTheDocument();
     expect(screen.getByRole('main', { name: 'images panel'} )).toBeInTheDocument();
-    expect(screen.getByRole('menu', { name: 'toolbar'} )).toBeInTheDocument();
+    
 });

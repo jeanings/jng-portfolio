@@ -14,10 +14,11 @@ import {
     fetchImagesData, 
     FilterableTypes, 
     handleResponseStatus, 
-    ImageDocsRequestProps } from '../../features/TimelineBar/timelineSlice';
+    ImageDocsRequestProps,
+    TimelineMonthTypes } from '../../features/TimelineBar/timelineSlice';
 import YearButton from './YearButton';
 import YearRoute from './YearRoute';
-import MonthButton from './MonthButton';
+import MonthButton, { getNumericalMonth } from './MonthButton';
 import { routePrefixForThumbs } from '../SideFilmStrip/SideFilmStrip';
 import { getPayloadForFilteredQuery } from '../FilterDrawer/FilterDrawer';
 import './TimelineBar.css';
@@ -42,22 +43,32 @@ const TimelineBar: React.FunctionComponent = () => {
     ------------------------------------------ */
     useEffect(() => {
         const routedWith: RouteInitType = identifyRouteSource(location);
-        const yearFromPath: number = parseInt(location.pathname.split(`${routePrefixForYears}/`)[1]);
+        const parsedYearFromPath: number = parseInt(location.pathname.split(`${routePrefixForYears}/`)[1]);
+        const yearFromPath: number | 'default' = isNaN(parsedYearFromPath)
+            ? 'default'
+            : parsedYearFromPath;
         let payloadInit: ImageDocsRequestProps = { 'year': 'default' };
 
         switch(routedWith) {
             case 'filters':
-                // Routed with filters queries.
-                const initTimeline = { year: yearFromPath, month: 'all' };
+                // Routed with filters queries.              
                 const queryPairs = location.search.split('?')[1].split('&');
+                const initTimeline: {
+                    [index: string]: number | 'default' | null,
+                    year: number | 'default', 
+                    month: number | null } = { 
+                    year: yearFromPath,
+                    month: null 
+                };
 
+                // Parse URL arguments.
                 let initQueries = {}
                 initQueries = queryPairs.reduce((queries, query) => {
                     const [ key, val ] = query.split('=');
                     const vals = val.split('%2B');
 
                     if (key === 'month') {
-                        initTimeline.month = val;
+                        initTimeline.month = getNumericalMonth(val as TimelineMonthTypes);
                         return queries;
                     }
                     
@@ -66,21 +77,17 @@ const TimelineBar: React.FunctionComponent = () => {
                         : queries[key] = vals
                     return queries;
                 }, {} as FilterableTypes);
-                payloadInit = getPayloadForFilteredQuery(initQueries, initTimeline);
+                payloadInit = getPayloadForFilteredQuery(initQueries, undefined, initTimeline);
                 break;
 
             case 'revisit':
                 // Routed with image parameter.
-                if (yearFromPath) {
-                    payloadInit.year = yearFromPath
-                }               
+                payloadInit.year = yearFromPath
                 break;
 
             case 'reflect-on':
                 // Routed with year parameter.
-                if (yearFromPath) {
-                    payloadInit.year = yearFromPath
-                }
+                payloadInit.year = yearFromPath
                 break;
 
             default:
