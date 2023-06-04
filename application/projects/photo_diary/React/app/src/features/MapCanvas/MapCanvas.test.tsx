@@ -63,6 +63,7 @@ const mockMapFitBounds = jest.fn();
 const mockMapAddControl = jest.fn();
 const mockMapRemoveControl = jest.fn();
 const mockMapHasControl = jest.fn();
+const mockMapLoadImage = jest.fn();
 
 
 /* --------------------------------------
@@ -103,6 +104,7 @@ test("initializes map on rendering", async() => {
             return {
                 on: mockMapOn,
                 off: mockMapOff,
+                loadImage: mockMapLoadImage,
                 getCanvas: mockMapGetCanvas,
                 addSource: mockMapAddSource,
                 addLayer: mockMapAddLayer,
@@ -148,6 +150,7 @@ test("adds new data source on new fetches and adds zoom controls", async() => {
             return {
                 on: mockMapOn,
                 off: mockMapOff,
+                loadImage: mockMapLoadImage,
                 getCanvas: mockMapGetCanvas,
                 addSource: mockMapAddSource,
                 addLayer: mockMapAddLayer,
@@ -221,6 +224,7 @@ test("adds marker layer and fits map to bounds", async() => {
             return {
                 on: mockMapOn,
                 off: mockMapOff,
+                loadImage: mockMapLoadImage,
                 getCanvas: mockMapGetCanvas,
                 addSource: mockMapAddSource,
                 addLayer: mockMapAddLayer,
@@ -290,6 +294,7 @@ test("replaces previous layer and source on new data fetches", async() => {
             return {
                 on: mockMapOn,
                 off: mockMapOff,
+                loadImage: mockMapLoadImage,
                 getCanvas: mockMapGetCanvas,
                 addSource: mockMapAddSource,
                 addLayer: mockMapAddLayer,
@@ -383,6 +388,7 @@ test("does not initialize map on unsuccessful fetch", async() => {
             return {
                 on: mockMapOn,
                 off: mockMapOff,
+                loadImage: mockMapLoadImage,
                 getCanvas: mockMapGetCanvas,
                 addSource: mockMapAddSource,
                 addLayer: mockMapAddLayer,
