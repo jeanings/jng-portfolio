@@ -287,6 +287,12 @@ const MapCanvas: React.FunctionComponent = () => {
                         click: false
                     }
                 );
+
+                // Clear spidered marker styling.
+                if (spiderMarkerClicked.current) {
+                    spiderMarkerClicked.current.classList.remove('active');
+                    spiderfier.current.unspiderfy();
+                }
             }
 
             if (marker.id) {
