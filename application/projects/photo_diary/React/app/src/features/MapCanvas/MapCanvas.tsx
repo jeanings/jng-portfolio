@@ -261,7 +261,6 @@ const MapCanvas: React.FunctionComponent = () => {
                 dispatch(handleMarkerLocatorEventSource(null));
                 return;
             }
-            console.log('imageEnlarger marker effect kicked in')
 
             setTimeout(() => {
                 if (map.current === null) {
