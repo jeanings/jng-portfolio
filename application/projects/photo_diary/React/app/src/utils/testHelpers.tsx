@@ -44,7 +44,8 @@ export const preloadedState: RootState = {
         sourceStatus: 'idle',
         markersStatus: 'idle',
         fitBoundsButton: 'idle',
-        markerLocator: 'idle'
+        markerLocator: 'idle',
+        markerLocatorEventSource: null
     },
     sideFilmStrip: {
         enlargeDoc: null,

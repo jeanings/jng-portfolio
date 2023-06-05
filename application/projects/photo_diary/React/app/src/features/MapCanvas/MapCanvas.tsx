@@ -13,7 +13,8 @@ import {
     setMarkersStatus, 
     cleanupMarkerSource,
     handleBoundsButton, 
-    handleMarkerLocator } from './mapCanvasSlice';
+    handleMarkerLocator,
+    handleMarkerLocatorEventSource } from './mapCanvasSlice';
 import { ImageDocTypes } from '../TimelineBar/timelineSlice';
 import { handleToolbarButtons, ToolbarProps } from '../Toolbar/toolbarSlice';
 import { getExistingRoute, routePrefixForThumbs } from '../SideFilmStrip/SideFilmStrip';
@@ -45,6 +46,7 @@ const MapCanvas: React.FunctionComponent = () => {
     const enlargeDoc = useAppSelector(state => state.sideFilmStrip.enlargeDoc);
     const toolbarImageEnlarger = useAppSelector(state => state.toolbar.imageEnlarger);
     const markerLocator = useAppSelector(state => state.mapCanvas.markerLocator);
+    const markerLocatorEvent = useAppSelector(state => state.mapCanvas.markerLocatorEventSource);
     const classBase: string = "MapCanvas";
     // Mapbox variables.
     const MAPBOX_ACCESS_TOKEN = process.env.REACT_APP_MAPBOX;
@@ -62,7 +64,7 @@ const MapCanvas: React.FunctionComponent = () => {
     const colourAccentSecondary: string = '#fddf58';
     const spiderfier = useRef<any | null>(null);
     const routeExisting = getExistingRoute(timeline.year);
-    const bbox: mapboxgl.LngLatBoundsLike  = bounds !== null
+    const bbox: mapboxgl.LngLatBoundsLike = bounds !== null
         ? [ 
             [bounds!.lng[0], bounds!.lat[0]],   // min bound coords
             [bounds!.lng[1], bounds!.lat[1]]    // max bound coords
@@ -203,17 +205,14 @@ const MapCanvas: React.FunctionComponent = () => {
             && map.current
             && fitBoundsButton === 'clicked') {
             // Adjust and zoom map to fit all markers. 
-            map.current.fitBounds(
-                bbox,
-                {
-                    padding: getMapPaddingOffset('bound', windowSize) as mapboxgl.PaddingOptions,
-                    linear: false,
-                    animate: true,
-                    duration: 1500,
-                    curve: 1.2,
-                    maxZoom: 13
-                }
-            );
+            map.current.fitBounds(bbox, {
+                padding: getMapPaddingOffset('bound', windowSize) as mapboxgl.PaddingOptions,
+                linear: false,
+                animate: true,
+                duration: 1500,
+                curve: 1.2,
+                maxZoom: 13
+            });
             // Reset button state.
             dispatch(handleBoundsButton('idle'));
         }
@@ -228,15 +227,14 @@ const MapCanvas: React.FunctionComponent = () => {
             && map.current
             && enlargeDoc
             && markerLocator === 'clicked') {
-            // Fly map to marker with offset to the left for image enlarger.
-            const markerCoords: mapboxgl.LngLatLike = [ enlargeDoc.gps.lng, enlargeDoc.gps.lat ]; 
-
             // Get current zoom level and only flyTo that zoom if lower value.
             // Eliminates cases where clicks on neighbouring markers while 
             // navigating using the map would kick into lower level zoom.
             let currentZoomLevel: number = map.current.getZoom();
             const toZoomLevel: number = 12;
 
+            // Fly map to marker with offset to the left for image enlarger.
+            const markerCoords: mapboxgl.LngLatLike = [ enlargeDoc.gps.lng, enlargeDoc.gps.lat ]; 
             if (currentZoomLevel < toZoomLevel) {
                 map.current.flyTo({
                     center: markerCoords,
@@ -255,9 +253,80 @@ const MapCanvas: React.FunctionComponent = () => {
                     zoom: currentZoomLevel,
                 });
             }
+            spiderfier.current.unspiderfy();
 
-            // Reset button state.
+            if (markerLocatorEvent === 'mapClick') {
+                // Reset states.
+                dispatch(handleMarkerLocator('idle'));
+                dispatch(handleMarkerLocatorEventSource(null));
+                return;
+            }
+            console.log('imageEnlarger marker effect kicked in')
+
+            setTimeout(() => {
+                if (map.current === null) {
+                    return;
+                }
+
+                const features = map.current.querySourceFeatures('imageSource');
+
+                // Find marker id matching image coordinates.
+                const marker: mapboxgl.MapboxGeoJSONFeature = features.filter(feature => {
+                    if (feature.geometry.type === 'Point') {
+                        const coordDifference = [
+                            Math.abs(feature.geometry.coordinates[0] - markerCoords[0]),
+                            Math.abs(feature.geometry.coordinates[1] - markerCoords[1])
+                        ];
+
+                        const areCoordsEqual: boolean = coordDifference[0] < 0.005 && coordDifference[1] < 0.005
+                            ? true
+                            : false;
+
+                        if (areCoordsEqual) {
+                            return feature;
+                        }
+                    }
+                })[0];
+
+                // Update active marker styling.
+                if (markerEventedId.current?.clicked) {
+                    // Remove click effect from previous clicked marker.
+                    map.current!.setFeatureState(
+                        {
+                            source: 'imageSource', 
+                            id: markerEventedId.current.clicked
+                        },
+                        {
+                            click: false
+                        }
+                    );
+    
+                    // Clear spidered marker styling.
+                    if (spiderMarkerClicked.current) {
+                        spiderMarkerClicked.current.classList.remove('active');
+                        spiderfier.current.unspiderfy();
+                    }
+                }
+
+                if (marker.id) {
+                    markerEventedId.current.clicked = marker.id;
+                    // Remove hover effect, add click effect to new marker.
+                    map.current!.setFeatureState(
+                        { 
+                            source: 'imageSource',
+                            id: markerEventedId.current.clicked
+                        },
+                        {
+                            hover: false,
+                            click: true
+                        }
+                    );
+                }
+            }, 3000)    // Give clusters time to settle.
+            
+            // Reset states.
             dispatch(handleMarkerLocator('idle'));
+            dispatch(handleMarkerLocatorEventSource(null));
         }
     }, [markerLocator, sourceStatus]);
 
@@ -348,6 +417,9 @@ const MapCanvas: React.FunctionComponent = () => {
         const markerDocId: string = marker
             ? marker.properties?.doc_id
             : spiderMarkerDocId;
+
+        // Set identifier for marker locator.
+        dispatch(handleMarkerLocatorEventSource('mapClick'));
 
         // Dispatch new doc ID to enlarger, triggering  loading and opening of enlarger.
         if (markerDocId !== enlargeDocId) {
@@ -540,17 +612,14 @@ const MapCanvas: React.FunctionComponent = () => {
         });
 
         // Adjust and zoom map to fit all markers. 
-        map.current.fitBounds(
-            bbox,
-            {
-                padding: getMapPaddingOffset('bound', windowSize) as mapboxgl.PaddingOptions,
-                linear: false,
-                animate: true,
-                duration: 1500,
-                curve: 1.2,
-                maxZoom: 13
-            }
-        );
+        map.current.fitBounds(bbox, {
+            padding: getMapPaddingOffset('bound', windowSize) as mapboxgl.PaddingOptions,
+            linear: false,
+            animate: true,
+            duration: 1500,
+            curve: 1.2,
+            maxZoom: 13
+        });
 
         // Set 'loaded' as check for map.on() methods.
         dispatch(setMarkersStatus('loaded'));

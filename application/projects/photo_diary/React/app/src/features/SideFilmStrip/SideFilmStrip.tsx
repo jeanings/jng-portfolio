@@ -16,6 +16,7 @@ import { routePrefixForYears } from '../TimelineBar/TimelineBar';
 import { ImageDocTypes } from '../TimelineBar/timelineSlice';
 import { handleSlideView, SideFilmStripProps } from './sideFilmStripSlice';
 import { handleToolbarButtons, ToolbarProps } from '../Toolbar/toolbarSlice';
+import { handleMarkerLocatorEventSource } from '../MapCanvas/mapCanvasSlice';
 import ImageFrame from './ImageFrame';
 import ImageEnlarger, { getBorderSVG } from './ImageEnlarger';
 import ImageThumbRoute from './ImageThumbRoute';
@@ -77,6 +78,7 @@ const SideFilmStrip: React.FunctionComponent = () => {
                     ? `${routeExisting}/${routePrefixForThumbs}/${newDocId}`
                     : `${routePrefixForThumbs}/${newDocId}`;
                 // Redirect to image thumb's route, triggering actions.
+                dispatch(handleMarkerLocatorEventSource('thumbClick'));
                 setSlideImageIndex(null);
                 navigate(newRoute);
             }

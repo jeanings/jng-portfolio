@@ -5,7 +5,7 @@ import {
     useMediaQueries } from '../../common/hooks';
 import { Link } from 'react-router-dom';
 import { ImageDocTypes } from '../TimelineBar/timelineSlice';
-import { handleMarkerLocator } from '../MapCanvas/mapCanvasSlice';
+import { handleMarkerLocator, handleMarkerLocatorEventSource } from '../MapCanvas/mapCanvasSlice';
 import { handleToolbarButtons, ToolbarProps } from '../Toolbar/toolbarSlice';
 import { getExistingRoute, routePrefixForThumbs } from './SideFilmStrip';
 import './ImageFrame.css';
@@ -26,7 +26,9 @@ const ImageFrame: React.FunctionComponent<ImageFrameProps> = (props: ImageFrameP
     /* ------------------------------------------------------------------------
         Handles same-image clicks, separate from image thumb route redirects.
     ------------------------------------------------------------------------ */
-    const onImageClick = (event: React.SyntheticEvent) => {     
+    const onImageClick = (event: React.SyntheticEvent) => {
+        dispatch(handleMarkerLocatorEventSource('thumbClick'));
+
         if (toolbarImageEnlarger !== 'on'
             && props.imageDoc._id === enlargeDoc?._id) {
             // Show image enlarger (if closed) if same image clicked.

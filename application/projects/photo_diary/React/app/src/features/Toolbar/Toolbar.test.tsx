@@ -233,7 +233,8 @@ test("bounds button calls mapbox's fitBounds method", async() => {
         'markersStatus': 'idle', 
         'sourceStatus': 'loaded',
         'fitBoundsButton': 'idle',
-        'markerLocator': 'idle'
+        'markerLocator': 'idle',
+        'markerLocatorEventSource': null
     }));
 
     // Verify individual toolbar buttons are rendered.
