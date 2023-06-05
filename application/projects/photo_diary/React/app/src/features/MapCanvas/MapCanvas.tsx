@@ -253,14 +253,16 @@ const MapCanvas: React.FunctionComponent = () => {
                     zoom: currentZoomLevel,
                 });
             }
-            spiderfier.current.unspiderfy();
-
+        
             if (markerLocatorEvent === 'mapClick') {
                 // Reset states.
                 dispatch(handleMarkerLocator('idle'));
                 dispatch(handleMarkerLocatorEventSource(null));
                 return;
             }
+
+            // Unspiderfy for non-map-marker clicks.
+            spiderfier.current.unspiderfy();
 
             setTimeout(() => {
                 if (map.current === null) {
