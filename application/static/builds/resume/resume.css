@@ -191,7 +191,7 @@ h4 {
                             column-gap: 0.5mm;
                             font-style: italic;
                             font-weight: 400;
-                            align-self: center;
+                            align-self: baseline;
                         }
 
                         .Resume__section__item__header__links {
