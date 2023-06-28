@@ -16,7 +16,8 @@ const initialState: MapStatusProps = {
     sourceStatus: 'idle',
     markersStatus: 'idle',
     fitBoundsButton: 'idle',
-    markerLocator: 'idle'
+    markerLocator: 'idle',
+    markerLocatorEventSource: null
 };
 
 const mapCanvasSlice = createSlice({
@@ -64,12 +65,19 @@ const mapCanvasSlice = createSlice({
             const fitBoundsStatus: MapStatusProps['fitBoundsButton'] = action.payload;
             state.fitBoundsButton = fitBoundsStatus;
         },
-         /* ----------------------------------------
+        /* ----------------------------------------
             Handles image enlarger marker locator.
         ----------------------------------------- */
         handleMarkerLocator: (state, action: PayloadAction<MapStatusProps['markerLocator']>) => {
             const locatorStatus: MapStatusProps['markerLocator'] = action.payload;
             state.markerLocator = locatorStatus;
+        },
+        /* ----------------------------------------
+            Handles marker click .
+        ----------------------------------------- */
+        handleMarkerLocatorEventSource: (state, action: PayloadAction<MapStatusProps['markerLocatorEventSource']>) => {
+            const clickSource: MapStatusProps['markerLocatorEventSource'] = action.payload;
+            state.markerLocatorEventSource = clickSource;
         }
     }
 });
@@ -79,12 +87,13 @@ const mapCanvasSlice = createSlice({
     Types.
 ===================================================================== */
 export interface MapStatusProps {
-    [index: string]: boolean | 'idle' | 'loaded' | 'clicked',
+    [index: string]: boolean | 'idle' | 'loaded' | 'clicked' | 'mapClick' | 'thumbClick' | null,
     styleLoaded: boolean,
     sourceStatus: 'idle' | 'loaded',
     markersStatus: 'idle' | 'loaded',
     fitBoundsButton: 'idle' | 'clicked'
-    markerLocator: 'idle' | 'clicked'
+    markerLocator: 'idle' | 'clicked',
+    markerLocatorEventSource: 'mapClick' | 'thumbClick' | null 
 };
 
 
@@ -99,5 +108,6 @@ export const {
     setMarkersStatus, 
     cleanupMarkerSource, 
     handleBoundsButton, 
-    handleMarkerLocator } = actions;
+    handleMarkerLocator,
+    handleMarkerLocatorEventSource } = actions;
 export default reducer;

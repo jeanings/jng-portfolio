@@ -264,7 +264,8 @@ test("adds marker layer and fits map to bounds", async() => {
         'markersStatus': 'idle', 
         'sourceStatus': 'loaded',
         'fitBoundsButton': 'idle',
-        'markerLocator': 'idle'
+        'markerLocator': 'idle',
+        'markerLocatorEventSource': null
     });
 
     // Map layer added and bounds fitted.
@@ -339,7 +340,8 @@ test("replaces previous layer and source on new data fetches", async() => {
         'markersStatus': 'idle', 
         'sourceStatus': 'loaded',
         'fitBoundsButton': 'idle',
-        'markerLocator': 'idle'
+        'markerLocator': 'idle',
+        'markerLocatorEventSource': null
     });
 
     // Map layer added and bounds fitted.

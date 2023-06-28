@@ -9,7 +9,7 @@ import {
     useDebounceCallback } from '../../common/hooks';
 import { useNavigate } from 'react-router-dom';
 import { handleToolbarButtons, ToolbarProps } from '../Toolbar/toolbarSlice';
-import { handleMarkerLocator } from '../MapCanvas/mapCanvasSlice';
+import { handleMarkerLocator, handleMarkerLocatorEventSource } from '../MapCanvas/mapCanvasSlice';
 import { routePrefixForThumbs } from './SideFilmStrip';
 import { 
     handleEnlarger, 
@@ -250,6 +250,7 @@ const ImageEnlarger: React.FunctionComponent <ImageEnlargerProps> = (props: Imag
                 : `${routePrefixForThumbs}/${newDocId}`;
             
             // Redirect to image thumb's route, triggering actions.
+            dispatch(handleMarkerLocatorEventSource('thumbClick'));
             navigate(newRoute);
         }
     }, 200);
