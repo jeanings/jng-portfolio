@@ -2,7 +2,100 @@ describe('interactions with mapbox (markers)', () => {
     beforeEach(() => {
         // Run tests in 1080 screen.
         cy.viewport(1920, 1080)
-    })
+    });
+
+    it('changes clustered (spider) marker colour on select', () => {
+        // Listen to fetch calls to Mapbox.
+        cy.intercept('GET', 'https://api.mapbox.com/**/*')
+        .as('mapboxAPI');
+
+        cy.visit('http://localhost:3000/');
+        
+        // Verify initial map load successful.
+        cy.wait('@mapboxAPI')
+            .then((interception) => {
+                expect(interception.response?.statusCode).to.equal(200);
+            });
+
+        // Allow map to transition.
+        cy.wait(2000);
+
+        const initMarkerPos = {
+            'x': 305,
+            'y': 565,
+        };
+
+        // Click to zoom to marker cluster (canvas layer).
+        cy.get('[aria-label="Map"]')
+            .click(initMarkerPos.x, initMarkerPos.y, { force: true });
+
+        // Allow map to transition.
+        cy.wait(2000);
+
+        const secondMarkerPos = {
+            'x': 950,
+            'y': 500,
+        };
+
+        // Zoom to marker again (canvas layer).
+        cy.get('[aria-label="Map"]')
+            .click(secondMarkerPos.x, secondMarkerPos.y, { force: true });
+
+        // Allow map to transition.
+        cy.wait(2000);
+
+        const thirdMarkerPos = {
+            'x': 970,
+            'y': 550,
+        };
+
+        // Click to open marker cluster (canvas layer).
+        cy.get('[aria-label="Map"]')
+            .click(thirdMarkerPos.x, thirdMarkerPos.y, { force: true });
+
+        cy.get('.spider-leg-pin')
+            .as('expandedClusterMarkers')
+        
+        cy.get('@expandedClusterMarkers')
+            .should('exist');
+
+        cy.get('@expandedClusterMarkers')
+            .should((markers) => expect(markers).to.have.length(4));
+
+        // Get spidered marker to click (HTML layer).
+        cy.get('@expandedClusterMarkers')
+            .eq(0)
+            .as('spiderMarkerToTestA');
+
+        cy.get('@spiderMarkerToTestA')
+            .click();
+
+        // Allow map to transition.
+        cy.wait(2000);
+
+        // Verify 'active' styling.
+        cy.get('@spiderMarkerToTestA')
+            .should('have.class', 'active');    // "active" sets fill to primary accent colour.
+
+        // Test another spidered market (HTML layer).
+        cy.get('@expandedClusterMarkers')
+            .eq(1)
+            .as('spiderMarkerToTestB');
+
+        cy.get('@spiderMarkerToTestB')
+            .click();
+
+        // Allow map to transition.
+        cy.wait(2000);
+
+        // Verify 'active' styling.
+        cy.get('@spiderMarkerToTestB')
+            .should('have.class', 'active');
+
+        // Verify 'active' styling removal for previous marker.
+        cy.get('@spiderMarkerToTestA')
+            .should('not.have.class', 'active');
+    });
 
     it('expands stacked markers on click, \
         scrolls film strip to marker\'s image and opens image enlarger', () => {
@@ -29,26 +122,25 @@ describe('interactions with mapbox (markers)', () => {
             .invoke('text')
             .then((year) => {
                 if(!expect(year).to.equal('2022')) {
-                    // Click to access 2022 data set.
-                    cy.get('[aria-label="selected year"]')
-                        .trigger('mouseover');
-        
-                    cy.wait(500);
-                    
                     // Verify visibility year items.
+                    cy.get('[aria-label="year selector"]')
+                        .trigger('mouseover', { force: true });
+
                     cy.get('[aria-label="year selector option"]')
                         .should((elems) => {
                             expect(elems).to.have.length.above(7);   // >7 years as of this test
                             expect(elems).to.be.visible;
-                        });
-
-                    // Click on a year.
-                    cy.get('[aria-label="year selector option"]')
+                        });      
+                    
+                    // Click to access 2022 data set. 
+                    cy.get('[aria-label="year selector"]')
+                        .children('li')
                         .filter('#year-item-2022')
                         .as('yearItem2022');
 
                     cy.get('@yearItem2022')
-                        .click();
+                        .children('a')      // target element's route.
+                        .click({ force: true });
 
                     // Verify new data fetch.
                     cy.wait('@mapboxAPI')
