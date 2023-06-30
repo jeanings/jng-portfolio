@@ -1,5 +1,5 @@
 describe('interactions with timeline menu bar', () => {
-    it.only('reveals year items on hovering over year,\
+    it('reveals year items on hovering over year,\
         fetches new data on clicking year item', () => {
         // Listen to fetch calls to Mapbox.
         cy.intercept('GET', 'https://api.mapbox.com/**/*')
@@ -14,20 +14,8 @@ describe('interactions with timeline menu bar', () => {
             });
 
         // Allow map to transition.
-        cy.wait(2000);
+        cy.wait(2500);
 
-        cy.get('[aria-label="selected year"]')
-            .trigger('mouseover');
-
-        cy.wait(500);
-        
-        // Verify visibility year items.
-        cy.get('[aria-label="year selector option"]')
-            .should((elems) => {
-                expect(elems).to.have.length.above(7);   // >7 years as of this test
-                expect(elems).to.be.visible;
-            });      
-        
         // Get number of images from counter.
         cy.get('[aria-label="month selector option"]')
             .filter('#month-item-all')
@@ -36,14 +24,26 @@ describe('interactions with timeline menu bar', () => {
         cy.get('@allImagesCountElem')
             .invoke('text')
             .then((text) => text.replace(/\D/g, ''))
-            .as('initAllImagesCount');
+            .as('initAllImagesCount');       
 
-        // Click on a year.
+        // Verify visibility year items.
+        cy.get('[aria-label="year selector"]')
+            .trigger('mouseover', { force: true });
+
         cy.get('[aria-label="year selector option"]')
+            .should((elems) => {
+                expect(elems).to.have.length.above(7);   // >7 years as of this test
+                expect(elems).to.be.visible;
+            });      
+        
+        // Click on a year.    
+        cy.get('[aria-label="year selector"]')
+            .children('li')
             .filter('#year-item-2018')
             .as('yearItem2018');
 
         cy.get('@yearItem2018')
+            .children('a')      // target element's route.
             .click({ force: true });
 
         // Verify new data fetch.
@@ -53,7 +53,7 @@ describe('interactions with timeline menu bar', () => {
             });
 
         // Allow map to transition.
-        cy.wait(2000);
+        cy.wait(2500);
 
         // Counter transition.
         cy.wait(500);
@@ -87,7 +87,7 @@ describe('interactions with timeline menu bar', () => {
             });
 
         // Allow map to transition.
-        cy.wait(2000);
+        cy.wait(2500);
 
         // Click on a month: May.
         cy.get('[aria-label="month selector"]')
