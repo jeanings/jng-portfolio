@@ -37,16 +37,19 @@ describe('interactions with film strip panel', () => {
         cy.get('[aria-label="images strip"]')
             .children('div')
             .eq(0)
-            .as('thumbnailToClick');
-
-        cy.get('@thumbnailToClick')
+            .as('thumbnailToClickDiv');
+        
+        cy.get('@thumbnailToClickDiv')
+            .children('a')
             .children('img')
-            .first()
-            .invoke('attr', 'src')
-            .as('thumbnailClickedSrc');
+            .as('thumbnailToClickImg')
 
+        cy.get('@thumbnailToClickImg')
+            .invoke('attr', 'src')
+            .as('thumbnailClickedImgSrc');
+    
         // Click thumbnail.
-        cy.get('@thumbnailToClick')
+        cy.get('@thumbnailToClickDiv')
             .click();
 
         // Verify image enlarger opened.
@@ -59,13 +62,11 @@ describe('interactions with film strip panel', () => {
             .as('enlargedImageSrc');
 
         // Verify thumbnail stying changed.
-        cy.get('@thumbnailToClick')
-            .children('img')
-            .eq(0)
+        cy.get('@thumbnailToClickImg')
             .should('have.class', "selected");
 
         // Verify thumbnail shows enlarged version.
-        cy.get('@thumbnailClickedSrc')
+        cy.get('@thumbnailClickedImgSrc')
             .then((thumbnailSrc) => {
                 const enlargedImageShouldEqual = thumbnailSrc.replace('thumbs', 'images');
 
