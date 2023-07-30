@@ -38,14 +38,14 @@
         grid-template-columns: repeat(4, 1fr);
     }
 
-        #Toolbar-filter {
+        #Toolbar-filter.mobile.port {
             grid-column: 2 / 3;
         }
 
-        #Toolbar-bounds {
+        #Toolbar-bounds.mobile.port {
             grid-column: 3 / 4;
         }
 
-        #Toolbar-imageEnlarger {
+        #Toolbar-imageEnlarger.mobile.port {
             grid-column: 4 / -1;
         }
