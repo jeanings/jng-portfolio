@@ -725,7 +725,7 @@ function getMapPaddingOffset(
             let bottomBoundOffset = windowSize.width >= 800 
                 && windowSize.width > windowSize.height
                     ? windowSize.height * 0.15      // Non-mobile, landscape
-                    : windowSize.height * 0.35;     // Mobile or portrait
+                    : windowSize.height * 0.75;     // Mobile or portrait
 
             let leftBoundOffset = windowSize.width >= 800 
                 && windowSize.width > windowSize.height
@@ -752,8 +752,8 @@ function getMapPaddingOffset(
                     : 0;
 
             let yAxisOffset = windowSize.width < windowSize.height
-                    ? windowSize.height * -0.25      // Shifts center point to mid-bottom of screen for portrait
-                    : 0;
+                ? windowSize.height * -0.45      // Shifts center point to mid-bottom of screen for portrait
+                : 0;
            
             offset = [ xAxisOffset, yAxisOffset ];
             return offset;
