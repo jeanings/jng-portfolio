@@ -706,6 +706,11 @@ function getMapPaddingOffset(
     mode: 'bound' | 'fly', 
     windowSize: { [index: string]: number }): mapboxgl.PaddingOptions | mapboxgl.PointLike {
 
+    const isShorterMobile: boolean = windowSize.height < 800 ? true : false;
+    const isNotMobile: boolean = windowSize.height >= 800 
+        && windowSize.height < windowSize.width ? true : false;
+
+    let offset: mapboxgl.PointLike = [ 0, 0 ];
     let padding: mapboxgl.PaddingOptions = {
         'top': 0,
         'bottom': 0,
@@ -713,28 +718,28 @@ function getMapPaddingOffset(
         'right': 0
     };
 
-    let offset: mapboxgl.PointLike = [ 0, 0 ];
-    
     switch(mode) {
         case 'bound':
             // Assign different ratios depending on type of screen.
-            let topBoundOffset = windowSize.width >= 800 
-                && windowSize.width > windowSize.height
-                    ? windowSize.height * 0.15      // Non-mobile, landscape
-                    : windowSize.height * 0.13;     // Mobile or portrait
-            let bottomBoundOffset = windowSize.width >= 800 
-                && windowSize.width > windowSize.height
-                    ? windowSize.height * 0.15      // Non-mobile, landscape
-                    : windowSize.height * 0.75;     // Mobile or portrait
+            let topBoundOffset = isNotMobile
+                ? windowSize.height * 0.15          // landscape non-mobile screen
+                : isShorterMobile               
+                    ? windowSize.height * 0.20      // shorter mobile screen
+                    : windowSize.height * 0.175;     // longer mobile screen
 
-            let leftBoundOffset = windowSize.width >= 800 
-                && windowSize.width > windowSize.height
-                    ? windowSize.width * 0.10       // Non-mobile, landscape
-                    : windowSize.width * 0.12;      // Mobile or portrait
-            let rightBoundOffset = windowSize.width >= 800
-                && windowSize.width > windowSize.height
-                    ? windowSize.width * 0.25       // Non-mobile, landscape
-                    : windowSize.width * 0.12;      // Mobile or portrait
+            let bottomBoundOffset = isNotMobile
+                ? windowSize.height * 0.15
+                : isShorterMobile
+                    ? windowSize.height * 0.60
+                    : windowSize.height * 0.60;
+
+            let leftBoundOffset = isNotMobile
+                ? windowSize.width * 0.10
+                : windowSize.width * 0.10;
+
+            let rightBoundOffset = isNotMobile
+                ? windowSize.width * 0.25
+                : windowSize.width * 0.10;
 
             padding = {
                 'top': topBoundOffset,
@@ -742,20 +747,23 @@ function getMapPaddingOffset(
                 'left': leftBoundOffset,
                 'right': rightBoundOffset
             };
+
             return padding;
 
         case 'fly':
             // Assign different ratios depending on type of screen.
-            let xAxisOffset = windowSize.width > 800
-                && windowSize.width > windowSize.height
-                    ? windowSize.width * -0.25      // Shifts center point to left of screen for landscape
-                    : 0;
+            let xAxisOffset = isNotMobile
+                ? windowSize.width * -0.25      // Shifts center point to left of screen for landscape
+                : 0;
 
-            let yAxisOffset = windowSize.width < windowSize.height
-                ? windowSize.height * -0.45      // Shifts center point to mid-bottom of screen for portrait
+            let yAxisOffset = isNotMobile === false
+                ? isShorterMobile               // Shifts center point to mid-bottom of screen for portrait
+                    ? windowSize.height * -0.275
+                    : windowSize.height * -0.290
                 : 0;
            
             offset = [ xAxisOffset, yAxisOffset ];
+            
             return offset;
     }
 }
